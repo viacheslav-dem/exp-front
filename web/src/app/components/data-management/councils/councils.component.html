@@ -1,0 +1,339 @@
+<h5 class="mb-3">Справочник ГЭС</h5>
+<div class="row">
+
+  <!--SELECT COUNCIL PANEL-->
+  <div class="col-md-4">
+    <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
+    <ul [loadingData]="_loading" class="list-group">
+      <li *ngFor="let council of councils" class="list-group-item list-group-item-action selectable"
+          [class.disabled]="council.disabled" [class.active]="council == selectedCouncil"
+          (click)="selectCouncil(council)">
+        <span>{{councilToString(council)}}</span>
+        <span *ngIf="council.id == 0" class="text-mini font-weight-bold">(не сохранён)</span>
+        <span *ngIf="council.disabled" class="text-mini font-weight-bold">(неактивный)</span>
+      </li>
+      <app-pagination
+        [page]="_page" [pagination]="_pagination" [maxSize]="5"
+        (onPageChanged)="onPageChanged($event)" class="border-radius-0">
+      </app-pagination>
+      <li (click)="addCouncil()" class="list-group-item selectable link background-dark-sea-green">
+        Добавить ГЭС
+      </li>
+    </ul>
+  </div>
+
+  <!--SELECTED COUNCIL, BUREAU AND SECTIONS PANEL-->
+  <div [loadingData]="_loading" class="col-md-8 list-group">
+
+    <!--COUNCIL-->
+    <div *ngIf="selectedCouncil">
+
+      <!--COUNCIL HEADER-->
+      <div class="list-group-item selectable background-light-blue"
+           [class.border-bottom-none]="selectedCouncil.isExpanded"
+           (click)="selectedCouncil.isExpanded=!selectedCouncil.isExpanded">
+        <div class="text-mini font-weight-bold">
+          Государственный экспертный совет
+          <span *ngIf="selectedCouncil.id == 0">(не сохранён)</span>
+          <span *ngIf="selectedCouncil.disabled">(неактивный)</span>
+        </div>
+        <div>{{councilToString(selectedCouncil)}}</div>
+      </div>
+
+      <div *ngIf="selectedCouncil.isExpanded" class="list-group-item border-top-none">
+
+        <!--SHOW COUNCIL-->
+        <div *ngIf="!selectedCouncil.isEdit">
+          <a class="float-right btn btn-icon" (click)="editCouncil()">
+            <fa-icon icon="cog" size="lg"></fa-icon>
+          </a>
+          <span>Курирующие сотрудники БелИСА:</span>
+          <ul *ngIf="selectedCouncil.belisaWorkers.length > 0" class="form-sub-group italic">
+            <li *ngFor="let person of selectedCouncil.belisaWorkers">
+              {{person | fullName}}
+            </li>
+          </ul>
+          <span *ngIf="selectedCouncil.belisaWorkers.length == 0" class="form-sub-group italic">
+              не указаны
+            </span>
+          <div>
+            <span>Приоритетные направления научных исследований и (или) научно-технической деятельности:</span>
+            <ul *ngIf="selectedCouncil.directions.length > 0" class="form-sub-group italic">
+              <li *ngFor="let direction of selectedCouncil.directions">
+                {{direction.name}}
+              </li>
+            </ul>
+            <span *ngIf="selectedCouncil.directions.length == 0" class="form-sub-group italic">
+              не указаны
+            </span>
+          </div>
+        </div>
+
+        <!--EDIT COUNCIL-->
+        <div *ngIf="selectedCouncil.isEdit">
+          <div *ngIf="selectedCouncil.id != 0" class="form-sub-group">
+            <app-checkbox [(ngModel)]="editedCouncil.disabled">Неактивный (ГЭС больше не функционирует)</app-checkbox>
+          </div>
+          <div class="form-sub-group">
+            <div>Номер</div>
+            <input numberInput type="text" [(ngModel)]="editedCouncil.code"
+                   placeholder="Номер ГЭСа" class="form-control" title="Номер">
+          </div>
+          <div class="form-group">
+            <div>Наименование</div>
+            <input type="text" [(ngModel)]="editedCouncil.name"
+                   placeholder="Наименование ГЭСа" class="form-control" title="Наименование">
+          </div>
+          <div [class.form-group]="editedCouncil.belisaWorkers.length == 0">
+            <span>Курирующие сотрудники БелИСА:</span>
+            <span *ngIf="editedCouncil.belisaWorkers.length == 0" class="form-sub-group italic">
+                не указаны
+              </span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchBelisaWorkerModal()">
+              <fa-icon icon="plus"></fa-icon>
+            </a>
+          </div>
+          <ul *ngIf="editedCouncil.belisaWorkers.length > 0" class="form-group italic">
+            <li *ngFor="let person of editedCouncil.belisaWorkers; let i = index">
+              {{person | fullName}}
+              <a class="btn btn-icon btn-icon-sm" (click)="editedCouncil.belisaWorkers.splice(i, 1)">
+                <fa-icon icon="minus"></fa-icon>
+              </a>
+            </li>
+          </ul>
+          <div class="form-group">
+            <div>Приоритетные направления научных исследований и (или) научно-технической деятельности:</div>
+            <div class="form-sub-group italic">
+              <ul *ngIf="editedCouncil.directions.length != 0" class="mb-0">
+                <li *ngFor="let direction of editedCouncil.directions; let i = index">
+                  {{direction.name}}
+                  <a class="btn btn-icon btn-icon-sm" (click)="editedCouncil.directions.splice(i, 1)">
+                    <fa-icon icon="minus"></fa-icon>
+                  </a>
+                </li>
+              </ul>
+              <div *ngIf="editedCouncil.directions.length == 0">направления не указаны</div>
+            </div>
+            <div class="row">
+              <div class="col-10 pr-2">
+                <app-select-catalog [catalog]="Catalog.DIRECTION" [(ngModel)]="newDirection"></app-select-catalog>
+              </div>
+              <div class="col-2 pl-2">
+                <button class="btn btn-primary w-100" [disabled]="!newDirection" (click)="addDirection()">Добавить</button>
+              </div>
+            </div>
+          </div>
+          <div class="mt-1">
+            <button class="btn btn-secondary" (click)="cancelEditCouncil()">Отмена</button>
+            <button class="btn btn-primary" (click)="saveEditedCouncil()">Сохранить</button>
+            <button *ngIf="selectedCouncil.id == 0" class="btn btn-danger" (click)="deleteCouncil()">
+              Удалить
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--BUREAU-->
+    <div *ngIf="selectedBureau">
+
+      <!--BUREAU HEADER-->
+      <div class="list-group-item list-group-item-action selectable"
+           [class.border-bottom-none]="selectedBureau.isExpanded"
+           (click)="selectedBureau.isExpanded=!selectedBureau.isExpanded">
+        <span class="text-mini font-weight-bold">бюро</span>
+        <div>Бюро Государственного экспертного совета</div>
+      </div>
+
+      <div *ngIf="selectedBureau.isExpanded" class="list-group-item border-top-none pt-0">
+
+        <!--SHOW BUREAU-->
+        <div *ngIf="!selectedBureau.isEdit">
+          <a class="float-right btn btn-icon" (click)="editBureau()">
+            <fa-icon icon="cog" size="lg"></fa-icon>
+          </a>
+          <div>Председатель:
+            <span class="italic">{{selectedBureau.chairman | fullName}}</span>
+          </div>
+          <div>Заместитель Председателя:
+            <span class="italic">{{selectedBureau.deputyChairman | fullName}}</span>
+          </div>
+          <div class="form-sub-group">Секретарь:
+            <span class="italic">{{selectedBureau.secretary | fullName}}</span>
+          </div>
+          <div>Члены бюро:
+            <span *ngIf="selectedBureau.assessors.length == 0" class="form-sub-group italic">
+                не указаны
+              </span>
+          </div>
+          <ul *ngIf="selectedBureau.assessors.length > 0" class="form-sub-group italic">
+            <li *ngFor="let person of selectedBureau.assessors">{{person | fullName}}</li>
+          </ul>
+        </div>
+
+        <!--EDIT BUREAU-->
+        <div *ngIf="selectedBureau.isEdit">
+          <div>Председатель:
+            <span class="italic">{{editedBureau.chairman | fullName}}</span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchBureauChairmanModal()">
+              <fa-icon icon="pencil-alt"></fa-icon>
+            </a>
+          </div>
+          <div>Заместитель Председателя:
+            <span class="italic">{{editedBureau.deputyChairman | fullName}}</span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchBureauDeputyChairmanModal()">
+              <fa-icon icon="pencil-alt"></fa-icon>
+            </a>
+          </div>
+          <div class="form-sub-group">Секретарь:
+            <span class="italic">{{editedBureau.secretary | fullName}}</span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchBureauSecretaryModal()">
+              <fa-icon icon="pencil-alt"></fa-icon>
+            </a>
+          </div>
+          <div [class.form-group]="editedBureau.assessors.length == 0">Члены бюро:
+            <span *ngIf="editedBureau.assessors.length == 0" class="form-group italic">
+                не указаны
+              </span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchBureauAssessorModal()">
+              <fa-icon icon="plus"></fa-icon>
+            </a>
+          </div>
+          <ul *ngIf="editedBureau.assessors.length > 0" class="form-group italic">
+            <li *ngFor="let assessor of editedBureau.assessors;let i=index">{{assessor | fullName}}
+              <a class="btn btn-icon btn-icon-sm" (click)="editedBureau.assessors.splice(i, 1)">
+                <fa-icon icon="minus"></fa-icon>
+              </a>
+            </li>
+          </ul>
+          <div class="mt-1">
+            <button class="btn btn-secondary" (click)="cancelEditBureau()">Отмена</button>
+            <button class="btn btn-primary" (click)="saveEditedBureau()">Сохранить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--SECTIONS-->
+    <div *ngFor="let section of selectedCouncil?.sections; let sectionInd = index">
+
+      <!--SECTION HEADER-->
+      <div class="list-group-item list-group-item-action selectable"
+           [class.border-bottom-none]="section.isExpanded" [class.disabled]="section.disabled"
+           (click)="section.isExpanded=!section.isExpanded">
+          <span class="text-mini font-weight-bold">
+            {{section.sectionType | sectionType}} секция
+            <span *ngIf="section.id == 0">(не сохранена)</span>
+            <span *ngIf="section.disabled">(неактивная)</span>
+          </span>
+        <div>{{section.name}}</div>
+      </div>
+
+      <div *ngIf="section.isExpanded" class="list-group-item border-top-none pt-0">
+
+        <!--SHOW SECTION-->
+        <div *ngIf="!section.isEdit">
+          <a class="float-right btn btn-icon" (click)="editSection(section)">
+            <fa-icon icon="cog" size="lg"></fa-icon>
+          </a>
+          <div>Руководитель секции:
+            <span class="italic">{{section.head | fullName}}</span>
+          </div>
+          <div>Заместитель руководителя:
+            <span class="italic">{{section.deputyHead | fullName}}</span>
+          </div>
+          <div class="form-sub-group">Секретарь:
+            <span class="italic">{{section.secretary | fullName}}</span>
+          </div>
+          <div>Члены секции:
+            <span *ngIf="section.assessors.length == 0" class="form-sub-group italic">
+                не указаны
+              </span>
+          </div>
+          <ul *ngIf="section.assessors.length > 0" class="form-sub-group italic">
+            <li *ngFor="let person of section.assessors">{{person | fullName}}</li>
+          </ul>
+        </div>
+
+        <!--EDIT SECTION-->
+        <div *ngIf="section.isEdit">
+          <div *ngIf="section.id != 0" class="form-sub-group">
+            <app-checkbox [(ngModel)]="editedSection.disabled">
+              Неактивная (секция больше не функционирует)
+            </app-checkbox>
+          </div>
+          <div class="form-sub-group">
+            <div>Тип</div>
+            <app-dropdown
+              [options]="allSectionTypes" [notSelected]="'Тип секции не выбран'"
+              [(ngModel)]="editedSection.sectionType" [optionToString]="sectionTypeToString">
+            </app-dropdown>
+          </div>
+          <div class="form-sub-group">
+            <div>Наименование</div>
+            <input type="text" [(ngModel)]="editedSection.name"
+                   placeholder="Наименование секции" class="form-control" title="Наименование">
+          </div>
+          <div>Руководитель секции:
+            <span class="italic">{{editedSection.head | fullName}}</span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchSectionHeadModal()">
+              <fa-icon icon="pencil-alt"></fa-icon>
+            </a>
+          </div>
+          <div>Заместитель руководителя:
+            <span class="italic">{{editedSection.deputyHead | fullName}}</span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchSectionDeputyHeadModal()">
+              <fa-icon icon="pencil-alt"></fa-icon>
+            </a>
+          </div>
+          <div class="form-sub-group">Секретарь:
+            <span class="italic">{{editedSection.secretary | fullName}}</span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchSectionSecretaryModal()">
+              <fa-icon icon="pencil-alt"></fa-icon>
+            </a>
+          </div>
+          <div [class.form-group]="editedSection.assessors.length == 0">Члены секции:
+            <span *ngIf="editedSection.assessors.length == 0" class="form-group italic">
+                не указаны
+              </span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchSectionAssessorModal()">
+              <fa-icon icon="plus"></fa-icon>
+            </a>
+          </div>
+          <ul *ngIf="editedSection.assessors.length > 0" class="form-group italic">
+            <li *ngFor="let assessor of editedSection.assessors;let i=index">{{assessor | fullName}}
+              <a class="btn btn-icon btn-icon-sm" (click)="editedSection.assessors.splice(i, 1)">
+                <fa-icon icon="minus"></fa-icon>
+              </a>
+            </li>
+          </ul>
+          <div class="mt-1">
+            <button class="btn btn-secondary" (click)="cancelEditSection()">Отмена</button>
+            <button class="btn btn-primary" (click)="saveEditedSection(sectionInd)">Сохранить</button>
+            <button *ngIf="section.id == 0" class="btn btn-danger" (click)="deleteSection(sectionInd)">
+              Удалить
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--ADD SECTION-->
+    <div *ngIf="canAddSection()" (click)="addSection()">
+      <div class="list-group-item selectable link background-dark-sea-green">
+        Добавить секцию
+      </div>
+    </div>
+
+    <div *ngIf="!selectedCouncil">
+      <div class="italic list-group-item background-light-blue">
+        Государственные экспертные советы отсутствуют
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-search-person
+  [filters]="[searchPersonFilter]"
+  (selected)="selectPerson($event)">
+</app-search-person>

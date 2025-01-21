@@ -1,0 +1,17 @@
+<app-choose-files (onFilesChosen)="onFilesChosen($event)" [typesAccept]="typesAccept" ></app-choose-files>
+
+<app-modal #fileLoaderModal [title]="'Загрузка файла'" >
+  <div class="form-group">
+    <label>Название</label>
+    <input class="form-control" title="Название" [(ngModel)]="fileName">
+  </div>
+  <div class="form-group">
+    <label>Описание</label>
+    <textarea class="form-control" title="Описание" rows="4" [(ngModel)]="fileDescription"></textarea>
+  </div>
+  <progress class="progress progress-striped" *ngIf="progressValue" [value]="progressValue" max="100"></progress>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="fileLoaderModal.hide()">Отмена</button>
+    <button type="button" class="btn btn-primary" (click)="saveFile()">Загрузить</button>
+  </div>
+</app-modal>

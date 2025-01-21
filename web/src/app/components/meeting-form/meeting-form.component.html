@@ -1,0 +1,38 @@
+<app-modal #modal [title]="isEdit?'Редактирование заседания':'Назначение даты заседания'">
+  <div class="row">
+    <div class="col-4">
+      <div class="form-group">
+        <label>Дата</label>
+        <app-date-input class="width-100" [(ngModel)]="period.start" [title]="'Дата'"></app-date-input>
+      </div>
+      <div class="form-group">
+        <label>Время начала</label>
+        <app-time-input [(ngModel)]="period.start"></app-time-input>
+      </div>
+      <div class="form-group">
+        <label>Время окончания</label>
+        <app-time-input [(ngModel)]="period.end"></app-time-input>
+      </div>
+      <div class="form-group">
+        <label>Место проведения</label>
+        <textarea rows="2" class="form-control" placeholder="Место проведения заседания"
+                  [(ngModel)]="place"></textarea>
+      </div>
+    </div>
+    <div class="col-8">
+      <h5>Объекты экспертизы</h5>
+      <div *ngFor="let project of projects">
+        <ng-container>
+          <app-checkbox [(ngModel)]="project.isChecked">{{project | titleAndCode}}</app-checkbox>
+        </ng-container>
+      </div>
+      <div class="italic" *ngIf="projects.length == 0">Объектов экспертизы для рассмотрения нет</div>
+    </div>
+  </div>
+
+  <div class="mt-2">
+    <button type="button" class="btn btn-secondary" (click)="cancel()">Отмена</button>
+    <button *ngIf="!isEdit" type="button" class="btn btn-primary" (click)="save()">Создать</button>
+    <button *ngIf="isEdit" type="button" class="btn btn-primary" (click)="edit()">Сохранить</button>
+  </div>
+</app-modal>

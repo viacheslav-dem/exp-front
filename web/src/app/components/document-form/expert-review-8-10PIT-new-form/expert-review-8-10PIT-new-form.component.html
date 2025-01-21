@@ -1,0 +1,24 @@
+<div class="form-group">
+
+  <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+
+  <app-product-name-block [_form]="_form"></app-product-name-block>
+  <hr/>
+  <app-patents-block [_form]="_form"
+                     [num]="'1'"
+                     (onConditionsChanged)="onConditionsChanged()"></app-patents-block>
+  <hr/>
+  <app-advantage-block [_form]="_form"
+                       [num]="'2'"
+                       (onConditionsChanged)="onConditionsChanged()"></app-advantage-block>
+  <hr/>
+  <app-product-competitiveness-block [_form]="_form"
+                                     [num]="'3'"
+                                     (onConditionsChanged)="onConditionsChanged()"></app-product-competitiveness-block>
+</div>
+
+<hr/>
+<app-conclusion-8-10PIT-block [_form]="_form"></app-conclusion-8-10PIT-block>
+
+<hr/>
+<app-notes-block [_form]="_form" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>

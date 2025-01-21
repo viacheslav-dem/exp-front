@@ -1,0 +1,250 @@
+.btn-right-sm {
+  margin-top: -0.3rem;
+  display: inline-block;
+  float: right;
+}
+
+.btn-right {
+  margin-top: -0.17rem;
+  display: inline-block;
+  float: right;
+}
+
+.pagination {
+  text-align: center;
+  margin: 0;
+  .pagination-first, .pagination-last, .pagination-prev, .pagination-next {
+    width: 100%;
+  }
+}
+
+.btn-icon {
+  color: $custom-file-color;
+  border-radius: 50%;
+  width: 2rem;
+  padding: 0.25rem;
+  border-color: transparent;
+  background-color: transparent;
+  outline: 0 !important;
+}
+
+.btn-icon:hover {
+  color: #000;
+  background-color: #dffadf;
+  border-color: #0b2e13;
+}
+
+.btn-icon-hide .btn-icon {
+  opacity: 0;
+}
+
+.btn-icon-hide:hover .btn-icon {
+  opacity: 1;
+}
+
+.btn-icon i {
+  width: 24px;
+  font-size: 1.5rem;
+}
+
+.btn-icon-sm.btn-icon i {
+  width: 1rem;
+  font-size: 1rem;
+}
+
+.dropdown {
+  font-family: inherit;
+  width: 100%;
+  .scrollable-menu {
+    height: auto;
+    max-height: 300px;
+    overflow-x: hidden;
+    width: 100%;
+  }
+  .dropdown-toggle {
+    width: 100%;
+  }
+  button, .dropdown-item {
+    font-family: inherit;
+    cursor: pointer;
+    white-space: normal;
+    text-align: left;
+  }
+}
+
+.btn-link-sm {
+  font-size: 0.875rem;
+}
+
+.checkable input[type="checkbox"], input[type="radio"] {
+  display: none;
+}
+
+.selectable {
+  cursor: pointer;
+}
+
+.select {
+  width: 1%;
+  min-width: 160px;
+  -webkit-box-flex: 1;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  .c-btn {
+    text-align: left;
+    box-shadow: none !important;
+    min-height: calc(1.8125rem + 2px);
+  }
+  .arrow-up {
+    border-bottom: 15px solid black !important;
+  }
+  .selected-list .c-angle-down, .selected-list .c-angle-up {
+    top: 40%;
+  }
+}
+
+.input-group-prepend .sort-icon {
+  height: inherit !important;
+}
+
+.input-group-sm .select {
+  font-size: 0.875rem;
+  .c-btn {
+    padding: 0.3rem 0.5rem !important;
+  }
+}
+
+.input-group-sm .input-group-append:first-child .btn:first-child {
+  border-top-left-radius: 0.2rem;
+  border-bottom-left-radius: 0.2rem;
+}
+
+.input-group .select:not(:last-child) {
+  .c-btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+.input-group .select:not(:first-child) {
+  .c-btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+.custom-file-label::after {
+  content: "Загрузить";
+  z-index: auto;
+}
+
+.custom-file-inline {
+  margin-left: 0.25rem;
+  position: absolute;
+}
+
+.no-label label {
+  display: none;
+}
+
+.custom-file-sm {
+  height: auto;
+  .custom-file-input, .custom-file-label, .custom-file-label::after {
+    height: auto;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: left;
+  }
+}
+
+.custom-file-input, .custom-file-label {
+  z-index: auto;
+}
+
+input {
+  &.ng-valid[required], .ng-valid.required {
+    border-left: 5px solid #42A948; /* green */
+  }
+
+  &.ng-invalid {
+    border-left: 5px solid #a94442; /* red */
+  }
+}
+
+.datafilter-sort {
+  float: right;
+  cursor: pointer;
+}
+
+.datafilter-sort-rotate {
+  -moz-transform: scaleY(-1);
+  -o-transform: scaleY(-1);
+  -webkit-transform: scaleY(-1);
+  transform: scaleY(-1);
+}
+
+.fa-active {
+  color: $brand-primary;
+}
+
+.datafilter-field {
+  vertical-align: top !important;
+}
+
+.accordion {
+  max-height: 0;
+  overflow: hidden;
+  transition: 0.6s ease;
+  //opacity: 0;
+}
+
+.accordion.show {
+  //opacity: 1;
+  max-height: 500px; /* Whatever you like, as long as its more than the height of the content (on all screen sizes) */
+}
+
+.ng2-pagination .pagination {
+  margin: 0;
+}
+
+.dropdown-item.active, .dropdown-item:active {
+  background-color: $gray-400;
+}
+
+date-input-polyfill {
+  z-index: 2000 !important;
+}
+
+.btn.no-focus {
+  outline: 0;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+
+}
+
+@each $placeholder in '.c-btn > span', '::placeholder', ':-ms-input-placeholder' {
+  #{$placeholder} {
+    color: rgba(0, 0, 0, 0.40) !important;
+    font-style: italic;
+  }
+}
+
+[disabled], [disabled] > * {
+  pointer-events: none;
+}
+
+.pagination-page.page-item.disabled {
+  display: none;
+}
+
+.user-org-dropdown .c-btn {
+  background-color: #e9ecef;
+  opacity: 1;
+  font-size: 16px;
+}
+
+.user-org-dropdown .c-btn > span {
+  font-style: normal;
+  color: #495057 !important;
+}

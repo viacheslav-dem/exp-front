@@ -1,0 +1,57 @@
+<div class="form-group">
+
+  <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+
+  <app-significance-block [_form]="_form"
+                          [num]="'1'"></app-significance-block>
+  <hr/>
+  <app-marketing-research-block [_form]="_form"
+                                [num]="'2'"
+                                (onConditionsChanged)="onConditionsChanged()"></app-marketing-research-block>
+  <hr/>
+  <app-effect-block [_form]="_form"
+                    [num]="'3'"></app-effect-block>
+  <hr/>
+  <app-sufficiency-block [_form]="_form"
+                         [num]="'4'"
+                         (onConditionsChanged)="onConditionsChanged()"></app-sufficiency-block>
+  <hr/>
+  <app-users-block [_form]="_form"
+                   [num]="'5'"></app-users-block>
+  <hr/>
+  <app-characteristics-block [_form]="_form"
+                   [num]="'6'"></app-characteristics-block>
+  <hr/>
+  <app-work-accordance-block [_form]="_form"
+                             [num]="'7'"
+                             (onConditionsChanged)="onConditionsChanged()"></app-work-accordance-block>
+  <hr/>
+  <app-requirements-block [_form]="_form"
+                          [num]="'8'"
+                          (onConditionsChanged)="onConditionsChanged()"></app-requirements-block>
+  <hr/>
+  <app-assessment-block [_form]="_form"
+                        [num]="'9'"></app-assessment-block>
+  <hr/>
+  <app-privacy-block [_form]="_form"
+                     [num]="'10'"
+                     (onConditionsChanged)="onConditionsChanged()"></app-privacy-block>
+</div>
+
+<hr/>
+
+<div class="form-group">
+
+  <label class="form-group-label">Реализация и финансирование объекта государственной экспертизы</label>
+
+  <app-conclusion-8-11-14-block [_form]="_form"
+                                [num]="'1'"
+                                (onConditionsChanged)="onConditionsChanged()"></app-conclusion-8-11-14-block>
+  <hr/>
+  <app-stages-exists-block [_form]="_form"
+                           [num]="'2'"
+                           (onConditionsChanged)="onConditionsChanged()"></app-stages-exists-block>
+</div>
+
+<hr/>
+<app-notes-block [_form]="_form" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>

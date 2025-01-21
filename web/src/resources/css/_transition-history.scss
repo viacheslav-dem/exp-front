@@ -1,0 +1,24 @@
+.transition-history {
+  max-height: 550px;
+  min-height: 300px;
+  overflow-y: scroll;
+  .card {
+    min-width: 100%;
+    float: left;
+  }
+  .project-history {
+    background-color: rgb(222,225,255);
+  }
+  .group-history {
+    background-color: rgb(209,255,219);
+  }
+  .lifecycle-history {
+    background-color: rgb(255,255,227);
+  }
+  .expert-history {
+    background-color: rgb(255,228,251);
+  }
+  .history-type {
+    margin-bottom: -0.1rem;
+  }
+}

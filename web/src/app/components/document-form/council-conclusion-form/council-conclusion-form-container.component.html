@@ -1,0 +1,69 @@
+<div>
+  <ng-container *ngIf="project && group">
+    <div class="form-group">
+      <div class="form-group-label">Объект экспертизы: <i>{{project | titleAndCode}}</i></div>
+      <div class="form-group-label">ГЭС: <i>{{group.council | councilCodeAndName}}</i></div>
+    </div>
+
+    <div class="form-group">
+      <label>Дата заключения:</label>
+      <app-date-input class="width-100 input-group-sm input-group" [(ngModel)]="_form.date"></app-date-input>
+    </div>
+
+    <div class="form-group">
+      <div>Исполняющий обязанности Председателя ГЭС:</div>
+      <div>
+        <span class="italic">{{_form.chairman | fullName}}</span>
+        <a class="btn btn-icon btn-icon-sm" (click)="showSearchChairmanModal()">
+          <fa-icon icon="pencil-alt"></fa-icon>
+        </a>
+      </div>
+    </div>
+
+    <ng-container *ngIf="is_8_9()">
+      <div class="form-group">
+        <label>
+          Дата заключения ведомственной научно-технической экспертизы:
+        </label>
+        <app-date-input class="width-100 input-group-sm input-group"
+                        [(ngModel)]="_form.innerExpertiseDate"></app-date-input>
+      </div>
+      <div class="form-group">
+        <label>Другие прилагаемые документы, установленные актами законодательства:</label>
+        <div *ngIf="documents.length == 0" class="italic mb-1">Отсутствуют</div>
+        <div *ngFor="let document of documents; let i = index" class="input-group btn-group input-group-sm mb-2">
+          <input [(ngModel)]="document.text" type="text" class="form-control"
+                 placeholder="документ {{i + 1}}"
+                 title="Документ">
+          <button type="button" class="btn btn-sm btn-outline-danger" (click)="documents.splice(i, 1)">&times;</button>
+        </div>
+        <div>
+          <button type="button" class="btn btn-primary btn-sm" (click)="addDocument()">
+            Добавить документ
+          </button>
+        </div>
+      </div>
+    </ng-container>
+
+    <app-select-directions-and-goals-block *ngIf="needSelectDirections()"
+                                           [form]="_form.projectProtocol"
+                                           [project]="project"></app-select-directions-and-goals-block>
+
+  </ng-container>
+
+  <ng-template #form></ng-template>
+
+  <hr/>
+
+  <div class="mt-2">
+    <button type="button" class="btn btn-secondary" (click)="close()">Отмена</button>
+    <button type="button" class="btn btn-primary ml-05" (click)="save()">Создать</button>
+    <div class="mt-1 text-sm italic">Черновик формы автоматически сохраняется каждые 30 секунд и при закрытии формы.</div>
+    <div class="mt-1 text-sm italic">Будьте внимательны! Если Вы ранее уже создавали этот документ, то он будет перезаписан.</div>
+  </div>
+</div>
+
+<app-search-person-by-roles
+  [roles]="Role.BUREAU_CHAIRMAN"
+  (selected)="selectPerson($event)">
+</app-search-person-by-roles>

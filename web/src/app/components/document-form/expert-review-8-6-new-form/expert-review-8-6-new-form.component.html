@@ -1,0 +1,25 @@
+<div class="form-group">
+
+  <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+
+  <app-results-block [_form]="_form"
+                     [num]="'1'"></app-results-block>
+  <hr/>
+  <app-effectiveness-block [_form]="_form"
+                           [num]="'2'"></app-effectiveness-block>
+</div>
+
+<hr/>
+
+<div class="form-group">
+
+  <label class="form-group-label">Заключительные решения эксперта по объекту государственной экспертизы</label>
+
+  <app-result-accordance-block [_form]="_form"
+                               (onConditionsChanged)="onConditionsChanged()"></app-result-accordance-block>
+  <hr/>
+  <app-effect-accordance-block [_form]="_form"
+                               (onConditionsChanged)="onConditionsChanged()"></app-effect-accordance-block>
+  <hr/>
+  <app-conclusion-8-6-block [_form]="_form"></app-conclusion-8-6-block>
+</div>

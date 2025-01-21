@@ -1,0 +1,140 @@
+<h5 class="mb-3">Справочник организаций</h5>
+<div class="list-group">
+
+  <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
+
+  <div [loadingData]="_loading">
+
+    <div (click)="addOrg()">
+      <div class="list-group-item selectable link background-dark-sea-green">
+        Добавить организацию
+      </div>
+    </div>
+
+    <div *ngFor="let org of orgs; let orgInd = index">
+
+      <!--ORG HEADER-->
+      <div class="list-group-item list-group-item-action selectable"
+           [class.border-bottom-none]="org.isExpanded" [class.disabled]="org.disabled"
+           (click)="org.isExpanded=!org.isExpanded">
+        <div class="text-mini font-weight-bold">
+          организация
+          <span *ngIf="org.id == 0">(не сохранена)</span>
+          <span *ngIf="org.disabled">(неактивная)</span>
+        </div>
+        <div>{{org.name | orElse : 'Наименование отсутствует'}}</div>
+      </div>
+
+      <div *ngIf="org.isExpanded" class="list-group-item border-top-none pt-0">
+
+        <!--SHOW ORG-->
+        <div *ngIf="!org.isEdit">
+          <a class="float-right btn btn-icon" (click)="editOrg(org)">
+            <fa-icon icon="cog" size="lg"></fa-icon>
+          </a>
+          <div>Глава организации:
+            <span class="italic">{{org.chairman | fullName}}</span>
+          </div>
+          <div>Краткое наименование:
+            <span class="italic">{{org.shortName | orElse: 'не указано'}}</span>
+          </div>
+          <div>УНП:
+            <span class="italic">{{org.unp | orElse: 'не указан'}}</span>
+          </div>
+          <div>Адрес:
+            <span class="italic">{{org.orgAddress | orElse: 'не указан'}}</span>
+          </div>
+          <div>Код организации:
+            <span class="italic">{{org.code | orElse: 'не указан'}}</span>
+          </div>
+          <div *ngIf="org.childOrgs.length==0">Головная организация:
+            <span class="italic">{{org.parentOrg?.name | orElse: 'не указана'}}</span>
+          </div>
+          <div *ngIf="org.childOrgs.length>0">Подчиненные организации:
+            <a class="italic link" (click)="showChildOrgs(org.childOrgs)"> показать</a>
+          </div>
+        </div>
+
+        <!--EDIT ORG-->
+        <div *ngIf="org.isEdit">
+          <div *ngIf="org.id != 0" class="form-sub-group">
+            <app-checkbox [(ngModel)]="editedOrg.disabled">Неактивная (организация больше не существует)
+            </app-checkbox>
+          </div>
+          <div class="form-sub-group">
+            <div>Наименование</div>
+            <input type="text" [(ngModel)]="editedOrg.name"
+                   placeholder="Наименование организации" class="form-control" title="Наименование">
+          </div>
+          <div class="form-sub-group">Глава организации:
+            <span class="italic">{{editedOrg.chairman | fullName}}</span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showPersonModal()">
+              <fa-icon icon="pencil-alt"></fa-icon>
+            </a>
+          </div>
+          <div class="form-sub-group">
+            <div>Краткое наименование</div>
+            <input type="text" [(ngModel)]="editedOrg.shortName"
+                   placeholder="Краткое наименование" class="form-control" title="Краткое наименование">
+          </div>
+          <div class="form-group">
+            <div>УНП</div>
+            <input type="text" [(ngModel)]="editedOrg.unp"
+                   placeholder="УНП организации" class="form-control" title="УНП">
+          </div>
+          <div class="form-group">
+            <div>Адрес</div>
+            <input type="text" [(ngModel)]="editedOrg.orgAddress"
+                   placeholder="Адрес организации" class="form-control" title="Адрес">
+          </div>
+          <div class="form-group">
+            <div>Код организации</div>
+            <input type="text" [(ngModel)]="editedOrg.code"
+                   placeholder="Код организации" class="form-control" title="Код организации">
+          </div>
+
+          <div class="form-group" *ngIf="org.childOrgs.length==0">
+            <div>Головная организация:
+              <span class="italic">{{editedOrg.parentOrg?.name | orElse: 'не указана'}}</span>
+              <a class="btn btn-icon btn-icon-sm" (click)="showOrgModal()">
+                <fa-icon icon="pencil-alt"></fa-icon>
+              </a>
+              <a class="btn btn-icon btn-icon-sm ml-2" (click)="deleteParentOrg()">
+                <fa-icon icon="trash-alt"></fa-icon>
+              </a>
+            </div>
+          </div>
+
+
+          <div class="mt-1">
+            <button class="btn btn-secondary" (click)="cancelEditOrg()">Отмена</button>
+            <button class="btn btn-primary" (click)="saveEditedOrg()">Сохранить</button>
+            <button *ngIf="org.id == 0" class="btn btn-danger" (click)="deleteOrg(orgInd)">
+              Удалить
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!orgs || orgs.length == 0">
+      <div class="italic list-group-item background-light-blue">
+        Организации отсутствуют
+      </div>
+    </div>
+
+    <app-pagination
+        [page]="_page" [pagination]="_pagination"
+        (onPageChanged)="onPageChanged($event)">
+    </app-pagination>
+  </div>
+</div>
+
+<app-modal #showSubOrgModal [title]="'Подчиненные организации'">
+  <app-sub-orgs-list [orgs]="subOrgs">
+  </app-sub-orgs-list>
+</app-modal>
+
+<app-search-person (selected)="selectPerson($event)"></app-search-person>
+
+<app-search-org (selected)="selectOrg($event)"></app-search-org>

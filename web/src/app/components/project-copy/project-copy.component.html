@@ -1,0 +1,19 @@
+<div class="card card-block compact" *ngIf="_project">
+
+  <div class="form-group">
+    <label class="form-group-label">Наименование объекта экспертизы</label>
+    <textarea rows="2" class="form-control" placeholder="Название объекта экспертизы"
+              [(ngModel)]="_project.title"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label class="form-group-label">Материалы объекта экспертизы</label>
+    <app-checkbox-list [options]="docs" [selected]="selectedDocs"></app-checkbox-list>
+  </div>
+
+  <div class="text-xs-center">
+    <button class="btn btn-primary btn-sm mr-1" (click)="onSave()">Сохранить</button>
+    <button class="btn btn-secondary btn-sm" (click)="onCancel()">Отмена</button>
+  </div>
+
+</div>

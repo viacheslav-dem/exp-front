@@ -1,0 +1,101 @@
+<h5 class="mb-3">Справочник почтовых уведомлений</h5>
+<div class="list-group">
+
+  <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
+
+  <div [loadingData]="_loading">
+
+    <!--MAIL_TEMPLATES-->
+    <div *ngFor="let mailTemplate of items">
+
+      <!--MAIL_TEMPLATE HEADER-->
+      <div class="list-group-item border-bottom-none" [class.disabled]="mailTemplate.disabled">
+        <div class="text-mini font-weight-bold" style="height: 1.5rem">
+          сообщение
+          <span *ngIf="mailTemplate.disabled">(неактивное)</span>
+          <a *ngIf="!mailTemplate.isEdit" class="float-right btn btn-icon" (click)="editItem(mailTemplate)">
+            <fa-icon icon="cog"></fa-icon>
+          </a>
+        </div>
+        <div>
+          {{mailTemplate.name}}
+        </div>
+      </div>
+
+      <div class="list-group-item border-top-none pt-0" [class.disabled]="mailTemplate.disabled">
+
+        <!--SHOW MAIL_TEMPLATE-->
+        <div *ngIf="!mailTemplate.isEdit">
+          <div>
+            Приоритет:
+            <span class="italic">{{mailTemplate.priority | mailPriority}}</span>
+          </div>
+          <div class="mb-2">
+            Тема сообщения:
+            <span class="italic">{{mailTemplate.subject}}</span>
+          </div>
+          <div>
+            <div class="mb-2">
+              Текст сообщения:
+              <button class="btn btn-sm btn-primary" (click)="mailTemplate.isExpanded = !mailTemplate.isExpanded">
+                {{mailTemplate.isExpanded ? 'Скрыть' : 'Показать'}}
+              </button>
+            </div>
+            <div *ngIf="mailTemplate.isExpanded" class="italic card" style="background-color: #dffadf">
+              <pre class="m-0">{{mailTemplate.body}}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!--EDIT MAIL_TEMPLATE-->
+        <div *ngIf="mailTemplate.isEdit">
+          <div class="form-sub-group">
+            <app-checkbox [(ngModel)]="editedItem.disabled">
+              Неактивное (данный тип сообщения не будет рассылаться)
+            </app-checkbox>
+          </div>
+          <div class="form-sub-group">
+            <label>Наименование сообщения</label>
+            <input type="text" [(ngModel)]="editedItem.name"
+                   placeholder="Наименование сообщения" class="form-control" title="Наименование сообщения">
+          </div>
+          <div class="form-sub-group">
+            <label>Приоритет</label>
+            <app-dropdown
+              [options]="allMailPriorities" [notSelected]="'Приоритет не выбран'"
+              [resetEnabled]="false" [(ngModel)]="editedItem.priority" [optionToString]="mailPriorityToString">
+            </app-dropdown>
+          </div>
+          <div class="form-sub-group text-sm">
+            Подсказка: <i>{{editedItem.description}}</i>
+          </div>
+          <div class="form-sub-group">
+            <label>Тема сообщения</label>
+            <input type="text" [(ngModel)]="editedItem.subject"
+                   placeholder="Тема сообщения" class="form-control" title="Тема сообщения">
+          </div>
+          <div class="form-sub-group">
+            <label>Текст сообщения</label>
+            <textarea type="text" rows="7" wrap="hard" [(ngModel)]="editedItem.body"
+                      placeholder="Текст сообщения" class="form-control form-control-sm italic" title="Текст сообщения"></textarea>
+          </div>
+          <div class="mt-1">
+            <button class="btn btn-secondary" (click)="cancelEditItem()">Отмена</button>
+            <button class="btn btn-primary" (click)="saveEditedItem()">Сохранить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!items || items.length == 0">
+      <div class="italic list-group-item background-light-blue">
+        Сообщения отсутствуют
+      </div>
+    </div>
+
+    <app-pagination
+      [page]="_page" [pagination]="_pagination"
+      (onPageChanged)="onPageChanged($event)">
+    </app-pagination>
+  </div>
+</div>

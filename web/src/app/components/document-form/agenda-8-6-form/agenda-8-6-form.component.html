@@ -1,0 +1,27 @@
+<label class="form-group-label">{{ind + 1}}. {{project | titleAndCode}}</label>
+
+<div class="form-sub-group">
+  <app-checkbox [(ngModel)]="customerReplies">
+    - ответы на замечания в установленный срок от заказчика экспертизы представлены
+  </app-checkbox>
+  <app-checkbox [(ngModel)]="singleVoteMode" (onChecked)="toggleVote($event)">
+    - единое голосование
+  </app-checkbox>
+</div>
+
+<div class="form-sub-group">
+  <label><b>{{ind + 1}}.1.</b> Соответствие достигнутого результата запланированному:</label>
+  <app-vote-results [(ngModel)]="_form.accordance" [all]="parent._form.participants.length"></app-vote-results>
+</div>
+
+<div class="form-sub-group">
+  <label>
+    <b>{{ind + 1}}.2.</b> Соответствие экономического
+    и (или) социального эффекта установленным условиям коммерциализации:
+  </label>
+  <app-vote-results [(ngModel)]="_form.effectAccordance" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results #singleVote [(ngModel)]="singleVoteResult"
+                    [all]="parent._form.participants.length"
+                    [display]="singleVoteMode"
+  ></app-vote-results>
+</div>

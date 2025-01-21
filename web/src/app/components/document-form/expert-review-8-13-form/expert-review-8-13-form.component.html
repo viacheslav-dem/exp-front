@@ -1,0 +1,83 @@
+<div class="form-group">
+  <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+  <div class="form-sub-group">
+    <label>
+      1. Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
+      научно-технической деятельности в Республики Беларусь:
+    </label>
+    <textarea [(ngModel)]="_form.accordance" rows="3" class="form-control"
+              placeholder="cоответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      2. Оценка текущего состояния соответствующей сферы планирования по проекту государственной программы:
+    </label>
+    <textarea [(ngModel)]="_form.state" rows="3" class="form-control"
+              placeholder="анализ и оценка текущего состояния соответствующей сферы планирования по объекту экспертизы">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      3. Оценка прогноза научно-технического развития соответствующей сферы планирования
+      по проекту государственной программы:
+    </label>
+    <textarea [(ngModel)]="_form.prognosis" rows="3" class="form-control"
+              placeholder="анализ и оценка прогноза научно-технического развития соответствующей сферы планирования по объекту экспертизы">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>4. Создание объектов права промышленной собственности:</label>
+    <div *ngIf="privacyObjects.length == 0" class="mb-2 italic">не предусматривается</div>
+    <div *ngFor="let privacyObject of privacyObjects; let i = index" class="input-group btn-group mb-2">
+      <app-select-catalog
+          [catalog]="Catalog.INDUSTRIAL_PROPERTY"
+          [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+      ></app-select-catalog>
+      <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+      Добавить объект права
+    </button>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="form-group-label">Выводы и предложения эксперта</label>
+  <div class="form-sub-group">
+    <label>
+      1. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы
+      в части научно-технического уровня для достижения запланированных государственной программой показателей:
+    </label>
+    <app-boolean-button [(ngModel)]="_form.finance" [falseLabel]="'недостаточен'"
+                        [trueLabel]="'достаточен'"></app-boolean-button>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      2. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы
+      в части объемов их финансирования для достижения запланированных государственной программой показателей:
+    </label>
+    <app-boolean-button [(ngModel)]="_form.scientificLevel" [falseLabel]="'недостаточен'"
+                        [trueLabel]="'достаточен'"></app-boolean-button>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      3. Замечания по материалам объекта экспертизы, конкретные предложения о необходимости доработки и (или)
+      корректировки материалов по объекту экспертизы:
+    </label>
+    <div *ngIf="notes.length == 0" class="mb-2 italic">не имеются</div>
+    <div *ngFor="let note of notes; let i = index" class="input-group btn-group mb-2">
+        <textarea [(ngModel)]="note.name" rows="2" class="form-control"
+                  placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
+      <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
+      Добавить замечание
+    </button>
+  </div>
+</div>

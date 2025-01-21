@@ -1,0 +1,30 @@
+.list-group-item {
+  margin-bottom: 0 !important;
+  .text-mini, .badge {
+    margin-right: 0.3rem;
+  }
+}
+
+.list-group-sm > a {
+  line-height: 1rem;
+}
+
+.list-group-item-sm {
+  padding: 0.5rem 1rem;
+}
+
+.list-group-item-multi {
+  display: table-row;
+}
+
+.list-group-item-multi td {
+  padding: $list-group-item-padding-y $list-group-item-padding-x;
+}
+
+.list-group-item:last-child {
+  margin-bottom: -1px;
+}
+
+.list-group-item-last:last-child {
+  margin-bottom: 0px;
+}

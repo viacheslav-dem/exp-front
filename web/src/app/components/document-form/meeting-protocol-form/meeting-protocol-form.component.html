@@ -1,0 +1,74 @@
+<div>
+  <div *ngIf="_meeting" class="form-sub-group">
+    <label class="form-group-label italic">{{_meeting.description}}</label>
+  </div>
+
+  <div class="form-sub-group">
+    <label>Дата составления протокола</label>
+      <app-date-input class="width-100 input-group-sm input-group" [(ngModel)]="_form.date"></app-date-input>
+  </div>
+
+  <div class="form-sub-group">
+  <label>Фактическое время окончания заседания</label>
+  <app-time-input [(ngModel)]="_form.endDate"></app-time-input>
+  </div>
+
+  <div class="form-sub-group">
+    <label>Время затраченное <b>руководителем</b> для предварительного рассмотрения материалов по объектам экспертизы, подготовки и проведения заседаний секций или бюро экспертного совета, а также оформления соответствующих материалов:</label>
+    <input class="form-control" type="number" [(ngModel)]="_form.prepareTimeByChairman" numberInput/>
+  </div>
+
+  <div class="form-sub-group">
+    <label>Время затраченное <b>секретарём</b> для предварительного рассмотрения материалов по объектам экспертизы, подготовки и проведения заседаний секций или бюро экспертного совета, а также оформления соответствующих материалов:</label>
+    <input class="form-control" type="number" [(ngModel)]="_form.prepareTimeBySecretary" numberInput/>
+  </div>
+
+  <div class="form-sub-group">
+    <label>Председательствовал:</label>
+    <span class="italic"> {{_form.chairman | fullName}}</span>
+    <a class="btn btn-icon btn-icon-sm" (click)="showSearchChairmanModal()">
+      <fa-icon icon="pencil-alt"></fa-icon>
+    </a>
+  </div>
+
+  <div class="row form-sub-group">
+    <div class="col-md-6">
+      <label class="form-group-label">Участники заседания (члены ГЭС)</label>
+      <app-checkbox *ngFor="let assessor of assessors; let i = index" [(ngModel)]="assessor.isChecked"
+                    (onChecked)="participantsChanged()">
+        <span class="italic">{{i + 1}}. {{assessor | fullName}}</span>
+      </app-checkbox>
+      <label class="text-mini italic">Выбрано: {{_form.participants.length}}</label>
+    </div>
+    <div class="col-md-6">
+      <label class="form-group-label">Приглашённые лица</label>
+      <div *ngIf="invited.length == 0" class="italic mb-1">Отсутствуют</div>
+      <div *ngFor="let person of invited; let i = index" class="input-group btn-group input-group-sm mb-2">
+        <input title="Приглашённое лицо"
+               [(ngModel)]="person.name" type="text" class="form-control" placeholder="И.О.Фамилия">
+        <button (click)="invited.splice(i, 1)" type="button" class="btn btn-sm btn-outline-danger">&times;</button>
+      </div>
+      <button (click)="invited.push({name:''})" type="button" class="btn btn-primary btn-sm">
+        Добавить приглашённое лицо
+      </button>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <ng-template #form></ng-template>
+  </div>
+
+  <hr/>
+
+  <div class="mt-2">
+    <button type="button" class="btn btn-secondary" (click)="close()">Закрыть</button>
+    <button type="button" class="btn btn-primary ml-05" (click)="save()">Создать</button>
+    <div class="mt-1 text-sm italic">Черновик формы автоматически сохраняется каждые 30 секунд и при закрытии формы.</div>
+    <div class="mt-1 text-sm italic">Будьте внимательны! Если Вы ранее уже создавали этот документ, то он будет перезаписан.</div>
+  </div>
+</div>
+
+<app-search-person-by-roles
+  [roles]="searchPersonRoles"
+  (selected)="selectPerson($event)">
+</app-search-person-by-roles>

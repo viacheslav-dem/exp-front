@@ -1,0 +1,120 @@
+<div class="form-group">
+    <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+    <app-novelty-block
+            [_form]="_form"
+            [num]="'1'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-novelty-block>
+    <hr/>
+    <app-scientific-level-block [_form]="_form"
+                                [num]="'1.1'"></app-scientific-level-block>
+    <hr/>
+    <app-novelty-exists-block [_form]="_form"
+                              [num]="'1.2'"
+                              (onConditionsChanged)="onConditionsChanged()"></app-novelty-exists-block>
+    <hr/>
+    <app-technology-type-block [_form]="_form"
+                               [num]="'1.3'"
+                               (onConditionsChanged)="onConditionsChanged()"></app-technology-type-block>
+    <hr/>
+    <app-document-accordance-block
+                               [_form]="_form"
+                               [num]="'1.4'"
+                               (onConditionsChanged)="onConditionsChanged()"></app-document-accordance-block>
+    <hr/>
+
+    <app-economic-significance-8-8-block
+            [_form]="_form"
+            [num]="'2'"
+            [project]="project"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-economic-significance-8-8-block>
+    <hr/>
+    <app-balance-block [_form]="_form"
+                       [num]="'2.1'"
+                       (onConditionsChanged)="onConditionsChanged()"></app-balance-block>
+    <hr/>
+    <app-export-oriented-block [_form]="_form"
+                               [full]="false"
+                               [num]="'2.2'"
+                               (onConditionsChanged)="onConditionsChanged()"></app-export-oriented-block>
+    <hr/>
+    <app-consequences-block [_form]="_form"
+                            [num]="'2.3'"></app-consequences-block>
+    <hr/>
+    <app-resources-sufficiency-block
+            [_form]="_form"
+            [num]="'3'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-resources-sufficiency-block>
+    <hr/>
+    <app-competence-sufficiency-block
+            [_form]="_form"
+            [num]="'4'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-competence-sufficiency-block>
+    <hr/>
+    <app-marketing-research-plain-block [_form]="_form"
+                                        [num]="'5'"
+                                        (onConditionsChanged)="onConditionsChanged()"></app-marketing-research-plain-block>
+    <hr/>
+    <app-marketing-research-results-block [_form]="_form"
+                                          [num]="'5.1'"></app-marketing-research-results-block>
+    <hr/>
+    <app-scientific-level-of-injected-tech-block [_form]="_form"
+                                                 [num]="'5.2'"></app-scientific-level-of-injected-tech-block>
+    <hr/>
+    <app-analog-description-block [_form]="_form"
+                                  [num]="'5.3'"></app-analog-description-block>
+    <hr/>
+    <app-analog-params-description-block [_form]="_form"
+                                         [num]="'5.4'"></app-analog-params-description-block>
+    <hr/>
+    <app-risks-block
+            [_form]="_form"
+            [num]="'6'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-risks-block>
+    <hr/>
+    <app-privacy-block
+            [_form]="_form"
+            [num]="'7'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-privacy-block>
+    <hr/>
+    <app-name-accordance-block
+            [_form]="_form"
+            [num]="'8.1'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-name-accordance-block>
+    <hr/>
+    <app-terms-accordance-block
+            [form]="_form"
+            [num]="'8.2'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-terms-accordance-block>
+    <hr/>
+    <app-finance-accordance-block
+            [_form]="_form"
+            [num]="'8.3'"
+            [project]="project"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-finance-accordance-block>
+    <hr/>
+    <app-finance-conclusion-block
+            [_form]="_form"
+            [num]="'8.4'"
+            [project]="project"
+            [noveltyNum]="'2'"
+            [economicSignificanceNum]="'4'"
+            (onConditionsChanged)="onConditionsChanged()"
+            [disabled]="isFinanceConclusionDisabled()"
+    ></app-finance-conclusion-block>
+    <hr/>
+    <app-target-accordance-block [_form]="_form"
+                                 [num]="'8.5'"
+                                 (onConditionsChanged)="onConditionsChanged()"></app-target-accordance-block>
+    <hr/>
+    <app-notes-block [_form]="_form" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>
+
+</div>

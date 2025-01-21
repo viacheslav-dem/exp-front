@@ -1,0 +1,125 @@
+<div class="card mx-3 pb-3 pt-3">
+    <div class="card-title row">
+        <div class="col">
+            <h5>Справочник экспертов</h5>
+        </div>
+        <div class="col">
+            <button class="btn btn-outline-primary no-focus filter-collapse float-right collapsed" type="button"
+                    data-toggle="collapse"
+                    data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseExample">
+                <span class="show-filter">Показать фильтр</span>
+                <span class="hide-filter">Скрыть фильтр</span>
+            </button>
+        </div>
+
+    </div>
+    <!--FILTER-->
+    <div class="collapse" id="collapseFilter">
+        <app-filter
+                [fieldClass]="'col-lg-3'" [filterClass]="'row'" [fields]="_searchFields"
+                (onFilterChanged)="onFilterChanged()">
+        </app-filter>
+    </div>
+
+    <div class="mt-2" [loadingData]="_loading">
+        <div class="list-group">
+            <div *ngFor="let expert of experts" class="list-group-item list-group-item-action">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="bold">{{expert|fullName}}</div>
+                        <div class="text-sm italic text-muted">{{expert.personInfo | academicInfo}}</div>
+                        <div class="text-sm italic">{{expert.email}}</div>
+                        <div class="text-sm italic">{{expert.phones | phones}}</div>
+                    </div>
+                    <div class="col-lg-3 text-sm px-0">
+                        <div *ngIf="expert.areas.length > 0">
+                            Области компетенции:&nbsp;<span class="italic">{{expert | areas}}</span>
+                        </div>
+                        <div *ngIf="expert.personInfo.specializations">
+                            Специализация:&nbsp;
+                            <div *ngFor="let spec of expert.personInfo.specializations"
+                                 class="italic">{{spec.name}}
+                            </div>
+                        </div>
+                        <div *ngIf="expert.personInfo.specialities">
+                            Специальность:&nbsp;
+                            <div *ngFor="let special of expert.personInfo.specialities"
+                                 class="italic">{{special.name}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 text-sm pr-0">
+                        <div *ngIf="expert.org?.name">
+                            Организация:&nbsp;<span class="italic">{{expert.org?.name}}</span>
+                        </div>
+                        <div *ngIf="expert.post">
+                            Должность:&nbsp;<span class="italic">{{expert.post}}</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 text-sm">
+                        <div class="link" (click)="showProjectsOnExpertExamination(expert)">
+                            Объектов на&nbsp;экспертизе:&nbsp;<span
+                                class="bold">{{expert.realTimeStats.projectsOnExamination}}</span>
+                        </div>
+                        <div class="link" (click)="showProjectsOnExpertConfirmation(expert)">
+                            Ожидают подтверждения:&nbsp;<span
+                                class="bold">{{expert.realTimeStats.reviewsOnConfirmation}}</span>
+                        </div>
+                        <div class="link" (click)="showProjectsExpertReviewsTermsViolation(expert)">
+                            Нарушены сроки:&nbsp;<span
+                                class="bold">{{expert.realTimeStats.reviewsTermsViolation.red}}</span>
+                        </div>
+                        <div class="link" (click)="showProjectsExpertReviewFinished(expert)">
+                            Завершено заключений:&nbsp;
+                            <span class="bold">
+                                {{expert.realTimeStats.acceptedProjects + expert.realTimeStats.rejectedProjects}}
+                            </span>
+                        </div>
+                        <div class="text-mini">
+                            <div class="d-inline-block text-nowrap mr-2">
+                                Отказы эксперта:&nbsp;
+                                <span class="bold">
+                                    {{expert.realTimeStats.rejectedReviewsByExpert}}
+                                </span>
+                            </div>
+                            <div class="d-inline-block text-nowrap">
+                                Отказы ГКНТ:&nbsp;
+                                <span class="bold">
+                                    {{expert.realTimeStats.rejectedReviewsByGknt}}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="link" *ngIf="getCurrentRole()==Role.GKNT_CHAIRMAN"
+                             (click)="showExpertPayInfoDialog(expert)">
+                            <span class="bold">Подробная информация</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-4 text-center">
+                        <div class="text-sm text-muted pt-2">Подготовлено экспертных заключений за год</div>
+                        <app-finished-reviews-sparkline-chart
+                                [stats]="expert.stats"></app-finished-reviews-sparkline-chart>
+                    </div>
+                    <div class="col-xl-4 text-center">
+                        <div class="text-sm text-muted pt-2">Статистика работы эксперта за год</div>
+                        <app-review-results-sparkline-chart [stats]="expert.stats"></app-review-results-sparkline-chart>
+                    </div>
+                    <div class="col-xl-4 text-center">
+                        <div class="text-sm text-muted pt-2">Время подготовки заключения</div>
+                        <app-reviews-violation-sparkline-chart
+                                [stats]="expert.stats"></app-reviews-violation-sparkline-chart>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="experts.length == 0" class="alert alert-info italic mb-0">
+                Эксперты не найдены
+            </div>
+        </div>
+        <app-pagination [page]="_page" [pagination]="_pagination"
+                        (onPageChanged)="onPageChanged($event)"></app-pagination>
+    </div>
+</div>
+<app-modal #expertPayInfo [title]="'Список проектов'" [modalClasses]="'modal-xl'">
+    <app-expert-pay-info [expert]="expertId"></app-expert-pay-info>
+</app-modal>

@@ -1,0 +1,44 @@
+<label class="form-group-label">{{ind + 1}}. {{project | titleAndCode}}</label>
+
+<div class="form-sub-group">
+  <app-checkbox [(ngModel)]="customerReplies">
+    - ответы на замечания в установленный срок от заказчика экспертизы представлены
+  </app-checkbox>
+  <app-checkbox [(ngModel)]="singleVoteMode" (onChecked)="toggleVote($event)">
+    - единое голосование
+  </app-checkbox>
+</div>
+
+<div class="form-sub-group">
+  <label>
+    <b>{{ind + 1}}.1.</b> Финансирование и&nbsp;(или) льготирование реализации
+    и&nbsp;(или) стимулирование реализации объекта государственной экспертизы
+  </label>
+  <label>Целесообразность реализации внедряемых технологий с учетом их оптимальности и инновационности:</label>
+  <app-vote-results [(ngModel)]="_form.realization" [all]="parent._form.participants.length"></app-vote-results>
+</div>
+
+<div class="form-sub-group">
+  <label>
+    <b>{{ind + 1}}.2.</b> Создание объектов права промышленной собственности
+    при реализации объекта государственной экспертизы:
+  </label>
+  <div *ngIf="privacyObjects.length == 0" class="mb-1 italic">Не предусматривается</div>
+  <div *ngFor="let privacyObject of privacyObjects; let i = index" class="input-group btn-group input-group-sm mb-2">
+    <app-select-catalog
+        [catalog]="Catalog.INDUSTRIAL_PROPERTY"
+        [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+    ></app-select-catalog>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+  </div>
+  <div class="mb-2">
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+      Добавить объект права
+    </button>
+  </div>
+  <app-vote-results [(ngModel)]="_form.privacy" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results #singleVote [(ngModel)]="singleVoteResult"
+                    [all]="parent._form.participants.length"
+                    [display]="singleVoteMode"
+  ></app-vote-results>
+</div>

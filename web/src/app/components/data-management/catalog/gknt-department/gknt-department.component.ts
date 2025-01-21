@@ -1,0 +1,86 @@
+import {Component, ViewChild} from '@angular/core';
+import {GlobalToastyService} from "app/services/global-toasty.service";
+import {Catalog, DataService} from "app/services/data.service";
+import {IdNameDto} from "app/dto/IdNameDto";
+import {SearchField} from "app/components/common-components/page-and-filter/model/SearchField";
+import {Direction} from "app/components/common-components/page-and-filter/model/SortOrder";
+import {CatalogTemplate} from "app/components/data-management/catalog/CatalogTemplate";
+import {GkntDepartmentDto} from "@app/dto/GkntDepartmentDto";
+import {SearchPersonComponent} from "@app/components/search/search-person/search-person.component";
+import {Filter} from "@app/components/common-components/page-and-filter/model/Filter";
+import {PersonPlainDto} from "@app/dto/PersonPlainDto";
+import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
+import {PersonDto} from "@app/dto/PersonDto";
+
+@Component({
+  selector: 'app-gknt-department',
+  templateUrl: './gknt-department.component.html'
+})
+export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> {
+
+  gknt: IdNameDto;
+  searchPersonFilter: Filter<PersonPlainDto>;
+  onPersonSelected: Function;
+
+  @ViewChild(SearchPersonComponent) public searchPersonModal: SearchPersonComponent;
+
+  constructor(public _toasty: GlobalToastyService,
+              public _dataService: DataService) {
+    super(_toasty, _dataService);
+    this.type = Catalog.GKNT_DEPARTMENT;
+  }
+
+  ngOnInit() {
+    this._dataService.getGknt().subscribe(res => {
+      this.searchPersonFilter = FilterBuilder.equals('org', res);
+      this.gknt = res;
+    });
+    this._searchFields = [
+      SearchField.contains('name').setPlaceholder('Поиск по описанию...').setSortDirection(Direction.ASC).setSortable(true),
+      SearchField.checkbox('disabled', 'Показывать неактивные'),
+    ];
+  }
+
+  editItem(item: GkntDepartmentDto) {
+    super.editItem(item);
+    this.selectedItem.isExpanded = true;
+  }
+
+  showSearchChairmanModal() {
+    this.onPersonSelected = person => this.editedItem.chairman = person;
+    this.showPersonModal();
+  }
+
+  showSearchDeputyChairmanModal() {
+    this.onPersonSelected = person => this.editedItem.deputyChairman = person;
+    this.showPersonModal();
+  }
+
+  showSearchGkntChairmanModal() {
+    this.onPersonSelected = person => this.editedItem.gkntChairman = person;
+    this.showPersonModal();
+  }
+
+  showSearchGkntWorkerModal() {
+    this.onPersonSelected = person => {
+      if (!this.editedItem.persons.find(existingPerson => existingPerson.id == person.id)) {
+        this.editedItem.persons.push(person);
+      }
+    };
+    this.showPersonModal();
+  }
+
+  showPersonModal() {
+    this.searchPersonModal.show();
+  }
+
+  selectPerson(person: PersonDto) {
+    this.onPersonSelected(person);
+    this.searchPersonModal.hide();
+  }
+
+  create(): GkntDepartmentDto {
+    return new GkntDepartmentDto();
+  }
+}
+

@@ -1,0 +1,46 @@
+<div class="card pt-3">
+  <h5 class="card-title">
+    <span>История проведения экспертиз в ГЭС</span>
+    <span *ifRole="Role.BUREAU_CHAIRMAN"> {{_council | councilCodeAndName}}</span>
+  </h5>
+  <div *ngIf="role != Role.BUREAU_CHAIRMAN" class="mb-05">
+    <app-dropdown
+      [options]="allCouncils" [notSelected]="'ГЭС не выбран'"
+      [(ngModel)]="_council" [emptyOptionsLabel]="'Данные об ГЭСах отсутствуют'"
+      (onSelected)="update()" [resetEnabled]="false"
+      [optionToString]="councilToString"
+    ></app-dropdown>
+  </div>
+  <div class="input-group input-group-sm date input-daterange"
+       data-date-autoclose="true" data-date-language="ru" data-provide="datepicker" data-date-format="MM yyyy">
+    <input #dateFromInput class="form-control" title="Начальная дата" [value]="dateFrom | monthYear">
+    <div class="input-group-append input-group-prepend">
+      <div class="input-group-text">-</div>
+    </div>
+    <input #dateToInput class="form-control" title="Конечная дата" [value]="dateTo | monthYear">
+    <div class="input-group-append">
+      <div class="input-group-text">
+        <fa-icon icon="calendar"></fa-icon>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <app-council-projects-chart [stats]="statsV2"></app-council-projects-chart>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <app-council-results-chart [stats]="statsV2"></app-council-results-chart>
+    </div>
+  </div>
+  <br>
+  <div *ngIf="role == Role.ADMIN" style="display: flex; justify-content: flex-end;">
+    <button class="btn btn-primary btn-sm mt-1" style="width: 250px" (click)="updateCouncilStatsForLastYear()">Обновить статистику за год</button>
+    <button class="btn btn-primary btn-sm mt-1" style="width: 250px; margin-left: 10px" (click)="updateCouncilStatsForAllTime()">Обновить статистику за все время</button>
+  </div>
+</div>
+
+<project-list-from-stats (cancel)="listProjectsFromStats.hide()"></project-list-from-stats>
+
+

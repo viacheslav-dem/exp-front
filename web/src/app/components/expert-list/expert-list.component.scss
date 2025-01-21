@@ -1,0 +1,16 @@
+.filter-collapse{
+  &.collapsed{
+    .hide-filter{
+      display:none;
+    }
+    .show-filter{
+      display:block;
+    }
+  }
+  .hide-filter{
+    display:block;
+  }
+  .show-filter{
+    display:none;
+  }
+}

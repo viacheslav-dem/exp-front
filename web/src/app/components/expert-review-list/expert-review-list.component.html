@@ -1,0 +1,21 @@
+<!--HEADER-->
+<div class="mb-2">
+  <div class="d-inline-block text-muted">Экспертные оценки:</div>
+  <button *ngIf="canChooseExperts" class="btn btn-sm btn-primary btn-right"
+          (click)="searchExpertComponent.show()">
+    Добавить эксперта
+  </button>
+</div>
+
+<!--BODY-->
+<div *ngIf="expertReviews.length == 0">
+  <div class="list-group-item text-muted text-sm italic">
+    Экспертные оценки отсутствуют
+  </div>
+</div>
+<div class="review" *ngFor="let expertReview of expertReviews">
+  <app-expert-review [role]="role" [project]="project" [review]="expertReview"></app-expert-review>
+</div>
+
+<!--SEARCH EXPERT MODAL-->
+<app-search-expert *ngIf="canChooseExperts" (selected)="onSelectedExpert($event)"></app-search-expert>

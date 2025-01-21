@@ -1,0 +1,9 @@
+<div class="ng2-pagination" *ngIf="page">
+  <pagination [disabled]="page.totalPages < 2" [totalItems]="page.totalElements"
+              [(ngModel)]="pagination.page" [maxSize]="maxSize"
+              [itemsPerPage]="pagination.itemsPerPage" class="pagination-sm"
+              (pageChanged)="pageChanged($event)"
+              [boundaryLinks]="true" [rotate]="false"
+              [previousText]="previousText" [nextText]="nextText" [firstText]="firstText" [lastText]="lastText">
+  </pagination>
+</div>

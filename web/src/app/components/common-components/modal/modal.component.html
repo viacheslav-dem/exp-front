@@ -1,0 +1,15 @@
+<div bsModal #ng2Modal="bs-modal" class="modal" role="dialog" aria-hidden="true" [config]="config">
+  <div class="modal-dialog" [ngClass]="modalClasses">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">{{title}}</h4>
+        <button type="button" class="btn btn-outline-danger float-right" aria-label="Закрыть" (click)="internalHide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ng-content></ng-content>
+      </div>
+    </div>
+  </div>
+</div>

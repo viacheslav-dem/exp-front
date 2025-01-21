@@ -1,0 +1,26 @@
+<app-modal #modalComponent [title]="title" (onClose)="close()" [closePermission]="false">
+  <ng-container *ngIf="dlg!= null && data != null">
+    <ng-container [ngSwitch]="dlg.type">
+
+      <ng-container *ngSwitchCase="DialogType.USER">
+        <app-user-form [user]="data" (onSave)="save($event)" (canceled)="cancel()">
+        </app-user-form>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="DialogType.PASSWORD">
+        <app-change-password [userId]="data" (onSave)="save($event)" (canceled)="cancel()"></app-change-password>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="DialogType.CONFIRM">
+        <app-confirm-dialog
+            [message]="data.message" [description]="data.description" [okBtnMessage]="data.okBtnMessage"
+            [cancelBtnMessage]="data.cancelBtnMessage" (onSave)="save($event)" [fields]="data.fields"
+            (canceled)="cancel()">
+        </app-confirm-dialog>
+      </ng-container>
+      <ng-container *ngSwitchCase="DialogType.VIEWER">
+        <app-pdf-viewer [url]="data.url" [doc]="data.doc"></app-pdf-viewer>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</app-modal>

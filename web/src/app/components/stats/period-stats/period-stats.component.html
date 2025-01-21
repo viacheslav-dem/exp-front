@@ -1,0 +1,60 @@
+<div class="card pt-3">
+  <h5 class="card-title">
+    История проведения экспертиз
+  </h5>
+  <div class="input-group input-group-sm date input-daterange"
+       data-date-autoclose="true" data-date-language="ru" data-provide="datepicker" data-date-format="MM yyyy">
+    <input #dateFromInput class="form-control" title="Начальная дата" [value]="dateFrom | monthYear">
+    <div class="input-group-append input-group-prepend">
+      <div class="input-group-text">-</div>
+    </div>
+    <input #dateToInput class="form-control" title="Конечная дата" [value]="dateTo | monthYear">
+    <div class="input-group-append">
+      <div class="input-group-text">
+        <fa-icon icon="calendar"></fa-icon>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-6">
+      <app-project-results-chart [stats]="stats"></app-project-results-chart>
+    </div>
+    <div class="col-lg-6">
+      <app-review-results-chart [stats]="stats"></app-review-results-chart>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-6">
+      <app-finished-projects-chart [stats]="stats"></app-finished-projects-chart>
+    </div>
+    <div class="col-lg-6">
+      <app-finished-reviews-chart [stats]="stats"></app-finished-reviews-chart>
+    </div>
+  </div>
+  <!--
+ <div class="row">
+   <div class="col-lg-6">
+     <app-payment-chart [stats]="stats"></app-payment-chart>
+   </div>
+   <div class="col-lg-6">
+     <app-payment-violation-chart [stats]="stats"></app-payment-violation-chart>
+   </div>
+ </div>
+ -->
+ <div class="row">
+   <div class="col-lg-6">
+     <app-gknt-consideration-violation-chart [stats]="stats"></app-gknt-consideration-violation-chart>
+   </div>
+   <div class="col-lg-6">
+     <app-reviews-violation-chart [stats]="stats"></app-reviews-violation-chart>
+   </div>
+ </div>
+ <div class="row">
+   <div class="col-lg-6">
+     <app-councils-examination-violation-chart [stats]="stats"></app-councils-examination-violation-chart>
+   </div>
+   <div class="col-lg-6">
+     <app-gknt-results-forwarding-violation-chart [stats]="stats"></app-gknt-results-forwarding-violation-chart>
+   </div>
+ </div>
+</div>

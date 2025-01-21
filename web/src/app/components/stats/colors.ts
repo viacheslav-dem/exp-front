@@ -1,0 +1,10 @@
+export let acceptedClr = '#28a745';
+export let rejectedClr = '#dc3545';
+export let returnedClr = '#ff6e00';
+export let returnedWithoutExpertiseClr = '#910183';
+export let redClr = '#dc3545';
+export let red05Clr = 'rgba(220,53,69,0.5)';
+export let yellowClr = '#e9e700';
+export let blueClr = '#005cd6';
+export let blue05Clr = 'rgba(0,92,214,0.5)';
+export let noViolationClr = '#a2c2cc';

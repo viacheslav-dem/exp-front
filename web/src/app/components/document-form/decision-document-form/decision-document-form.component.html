@@ -1,0 +1,30 @@
+<div>
+  <div class="form-group">
+    <label class="form-group-label">Объект экспертизы: <i>{{project | titleAndCode}}</i></label>
+    <label *ngIf="council" class="form-group-label">ГЭС: <i>{{council | councilCodeAndName}}</i></label>
+  </div>
+
+  <div class="form-group">
+    <label>Дата:</label>
+    <app-date-input class="width-100 input-group-sm" [(ngModel)]="_form.date"></app-date-input>
+  </div>
+
+  <div *ngIf="needCauses" class="form-group">
+    <label>Причины возврата:</label>
+    <div *ngIf="causes.length == 0" class="mb-2 italic">Не указаны</div>
+    <div *ngFor="let cause of causes; let i = index" class="input-group input-group-sm btn-group mb-2">
+      <textarea [(ngModel)]="cause.name" rows="2" class="form-control" placeholder="{{i + 1}}. Причина {{i + 1}}."></textarea>
+      <button type="button" class="btn btn-outline-danger" (click)="causes.splice(i, 1)">&times;</button>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm"
+            (click)="causes.push({name: ''})">
+      Добавить причину
+    </button>
+  </div>
+
+  <div class="mt-2">
+    <button type="button" class="btn btn-secondary" (click)="close()">Отмена</button>
+    <button type="button" class="btn btn-primary ml-05" (click)="save()">Создать</button>
+    <div class="mt-1 text-sm italic">Будьте внимательны! Если Вы ранее уже создавали этот документ, то он будет перезаписан.</div>
+  </div>
+</div>

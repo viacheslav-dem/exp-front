@@ -1,0 +1,42 @@
+<hr/>
+
+<label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+
+<app-scientific-level-conclusion-block
+  [_form]="_form"
+  [num]="'1'"
+  (onConditionsChanged)="onConditionsChanged()"
+></app-scientific-level-conclusion-block>
+
+<hr/>
+
+<app-priority-accordance-conclusion-block
+  [_form]="_form"
+  [num]="'2'"
+  (onConditionsChanged)="onConditionsChanged()"
+></app-priority-accordance-conclusion-block>
+
+<hr/>
+
+<app-technology-block
+  [_form]="_form"
+  [num]="'3'"
+  (onConditionsChanged)="onConditionsChanged()"
+></app-technology-block>
+
+<hr/>
+
+<app-consequences-conclusion-block
+  [_form]="_form"
+  [num]="'4'"
+  (onConditionsChanged)="onConditionsChanged()"
+></app-consequences-conclusion-block>
+
+<hr/>
+
+<app-conclusion-council-block
+  [form]="_form"
+  [financeConclusionNum]="financeConclusionNum"
+  [project]="project"
+  [group]="group"
+></app-conclusion-council-block>

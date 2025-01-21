@@ -1,0 +1,80 @@
+<div class="list-group-item">
+
+  <!--SHOW-->
+  <div *ngIf="!isEdit">
+    <a class="btn btn-icon float-right" (click)="edit()">
+      <fa-icon icon="cog" size="lg"></fa-icon>
+    </a>
+    <div class="form-sub-group">
+      Срок рассмотрения объекта экспертизы в ГКНТ:
+      <i><b>{{value.gkntCheckingAndSigningTerms}}</b>&nbsp;(рабочих дней)</i>
+    </div>
+    <div class="form-sub-group">
+      Срок принятия объекта на экспертизу (или отказа) экспертом:
+      <i><b>{{value.expertConfirmationTerms}}</b>&nbsp;(рабочих дней)</i>
+    </div>
+    <div class="form-sub-group">
+      Срок подготовки экспертного заключения:
+      <i><b>{{value.expertReviewTerms}}</b>&nbsp;(календарных дней)</i>
+    </div>
+    <div class="form-sub-group">
+      Срок рассмотрения объекта экспертизы (кроме кодов 8.9 и 8.12ИП) в ГЭС:
+      <i><b>{{value.examinationExcept_8_9_12IP_Terms}}</b>&nbsp;(календарных дней)</i>
+    </div>
+    <div class="form-sub-group">
+      Срок рассмотрения объекта экспертизы c кодом 8.9 или 8.12ИП в ГЭС:
+      <i><b>{{value.examination_8_9_12IP_Terms}}</b>&nbsp;(календарных дней)</i>
+    </div>
+    <div class="form-sub-group">
+      Срок передачи объекта экспертизы Председателем бюро в секции:
+      <i><b>{{value.attachSectionsTerms}}</b>&nbsp;(рабочих дней)</i>
+    </div>
+    <div class="form-sub-group">
+      Срок оплаты по договору с экспертом или членом ГЭС:
+      <i><b>{{value.paymentTerms}}</b>&nbsp;(календарных дней)</i>
+    </div>
+  </div>
+
+  <!--EDIT-->
+  <div *ngIf="isEdit">
+    <div class="form-group">
+      <label>Срок рассмотрения объекта экспертизы в ГКНТ, рабочих дней</label>
+      <input numberInput type="text" [(ngModel)]="editedValue.gkntCheckingAndSigningTerms" placeholder="Количество рабочих дней"
+             class="form-control" title="Срок рассмотрения объекта экспертизы в ГКНТ, рабочих дней">
+    </div>
+    <div class="form-group">
+      <label>Срок принятия объекта на экспертизу (или отказа) экспертом, рабочих дней</label>
+      <input numberInput type="text" [(ngModel)]="editedValue.expertConfirmationTerms" placeholder="Количество рабочих дней"
+             class="form-control" title="Срок принятия объекта на экспертизу (или отказа) экспертом, рабочих дней">
+    </div>
+    <div class="form-group">
+      <label>Срок подготовки экспертного заключения, календарных дней</label>
+      <input numberInput type="text" [(ngModel)]="editedValue.expertReviewTerms" placeholder="Количество календарных дней"
+             class="form-control" title="Срок подготовки экспертного заключения, календарных дней">
+    </div>
+    <div class="form-group">
+      <label>Срок рассмотрения объекта экспертизы (кроме кодов 8.9 и 8.12ИП) в ГЭС, календарных дней</label>
+      <input numberInput type="text" [(ngModel)]="editedValue.examinationExcept_8_9_12IP_Terms" placeholder="Количество календарных дней"
+             class="form-control" title="Срок рассмотрения объекта экспертизы (кроме кодов 8.9 и 8.12ИП) в ГЭС, календарных дней">
+    </div>
+    <div class="form-group">
+      <label>Срок рассмотрения объекта экспертизы c кодом 8.9 или 8.12ИП в ГЭС, календарных дней</label>
+      <input numberInput type="text" [(ngModel)]="editedValue.examination_8_9_12IP_Terms" placeholder="Количество календарных дней"
+             class="form-control" title="Срок рассмотрения объекта экспертизы c кодом 8.9 или 8.12ИП в ГЭС, календарных дней">
+    </div>
+    <div class="form-group">
+      <label>Срок передачи объекта экспертизы Председателем бюро в секции, рабочих дней</label>
+      <input numberInput type="text" [(ngModel)]="editedValue.attachSectionsTerms" placeholder="Количество рабочих дней"
+             class="form-control" title="Срок передачи объекта экспертизы Председателем бюро в секции, рабочих дней">
+    </div>
+    <div class="form-group">
+      <label>Срок оплаты по договору с экспертом или членом ГЭС, календарных дней</label>
+      <input numberInput type="text" [(ngModel)]="editedValue.paymentTerms" placeholder="Количество календарных дней"
+             class="form-control" title="Срок оплаты по договору с экспертом или членом ГЭС, календарных дней">
+    </div>
+    <div class="mt-1">
+      <button class="btn btn-secondary" (click)="isEdit = false">Отмена</button>
+      <button class="btn btn-primary" (click)="savePropertyValue()">Сохранить</button>
+    </div>
+  </div>
+</div>

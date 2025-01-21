@@ -1,0 +1,197 @@
+<div class="list-group" *ngIf="_group">
+  <div>
+    <div class="list-group-item" style="z-index: auto; padding: 0.75rem 1rem"
+         [ngClass]="{'alert-danger': _group.red,'alert-warning': _group.yellow,'alert-primary': _group.blue}">
+      <!--TITLE-->
+      <div class="pb-2">
+        <button class="btn btn-outline-danger btn-sm float-right"
+                *ngIf="canEditGroups() && _group.state != LifecycleGroupState.RETURNED_WITHOUT_EXPERTISE"
+                (click)="deleteLifecycleGroup(_group)">&times;
+        </button>
+        <span (click)="showTransitionHistoryModal()" class="selectable"
+              [ngClass]="['badge', LifecycleGroupStateBadge[_group.state]]">
+          {{_group.state | lifecycleGroupState}}
+        </span>
+        <span class="text-sm">ГЭС {{_group.council | councilCodeAndName}}</span>
+        <button class="btn btn-sm btn-right "
+                [ngClass]="_group.isAnswerReceived && project.isRescheduleBureau? 'btn-outline-success':'btn-outline-danger'"
+                (click)="answerForBureauRemark(_group)" *ngIf=checkGroupRemarks(_group.remarks)>Замечания
+        </button>
+        <span class="text-muted bold text-sm italic">{{_group.termsMessage}}</span>
+      </div>
+
+      <div *ngIf="_group.state == 'RETURNED_WITHOUT_EXPERTISE'" class="italic text-sm mt-05">
+        <div><b>Причина возврата:</b> {{_group.returnReason | orElse: 'не соответствует профилю ГЭС'}}</div>
+        <app-document-list class="mt-05 d-block" *ngIf="_group.decisionDocument" [documents]="_group.decisionDocument"></app-document-list>
+      </div>
+
+      <!--REFERRAL-->
+      <div *ngIf="_group.state != 'RETURNED_WITHOUT_EXPERTISE'">
+        <div class="mt-05 mb-1">
+          <div class="d-inline-block text-muted text-sm">Направление в ГЭС</div>
+          <div class="btn-right-sm" *ngIf="canEditReferral()">
+            <button class="btn btn-sm btn-primary" (click)="referralFormModal.show()">Создать</button>
+          </div>
+        </div>
+        <app-document-list
+            [documents]="_group.referral"
+            [canDelete]="canEditReferral()"
+            (onDelete)="deleteReferral(_group)">
+        </app-document-list>
+      </div>
+
+      <!--PROTOCOL-->
+      <div *ngIf="_group.remarkDocuments.length">
+        <div class="mt-2 mb-1">
+          <div class="text-muted text-sm">О наличии замечаний</div>
+        </div>
+        <app-document-list [documents]="_group.remarkDocuments"></app-document-list>
+      </div>
+
+      <!--PROTOCOL-->
+      <div *ngIf="_group.meetingProtocol.length">
+        <div class="mt-2 mb-1">
+          <div class="text-muted text-sm">Протокол заседания бюро</div>
+        </div>
+        <app-document-list [documents]="_group.meetingProtocol"></app-document-list>
+      </div>
+
+      <!--CONCLUSION-->
+      <div *ngIf="_group.state != 'RETURNED_WITHOUT_EXPERTISE'">
+        <div class="mt-2 mb-1">
+          <div class="d-inline-block text-muted text-sm">Заключение ГЭС</div>
+          <div class="btn-right-sm" *ngIf="canEditConclusion()">
+            <button class="btn btn-sm btn-primary" (click)="showConclusionForm()">Создать</button>
+          </div>
+        </div>
+        <app-document-list
+            [documents]="_group.conclusion"
+            [canDelete]="canEditConclusion()"
+            (onDelete)="deleteConclusion()">
+        </app-document-list>
+      </div>
+
+      <!--LETTER FOR CUSTOMER-->
+      <div *ngIf="canReadLifecycleGroupDecision()">
+        <div class="mt-2 mb-1">
+          <div class="d-inline-block text-muted text-sm">Направление результатов заказчику</div>
+          <div class="btn-right-sm" *ngIf="canEditLifecycleGroupDecision()">
+            <button class="btn btn-sm btn-primary" (click)="groupDecisionFormModal.show()">
+              Создать
+            </button>
+          </div>
+        </div>
+        <app-document-list
+            [documents]="_group.decisionDocument"
+            [canDelete]="canEditLifecycleGroupDecision()"
+            (onDelete)="deleteLifecycleGroupDecision(_group)">
+        </app-document-list>
+      </div>
+    </div>
+  </div>
+
+  <!--SECTIONS-->
+  <div *ngIf="_group.state != 'RETURNED_WITHOUT_EXPERTISE'">
+    <div *ngFor="let lifecycle of _group.lifecycles">
+      <div class="list-group-item" style="padding: 0.75rem 1rem">
+        <button class="btn btn-outline-danger btn-sm btn-right"
+                (click)="deleteLifecycle(lifecycle)" *ngIf="canEditSections()">&times;
+        </button>
+        <button class="btn btn-outline-danger btn-sm btn-right"
+                (click)="changeSection(lifecycle)" *ngIf="canChangeSections(lifecycle)">Переназначить
+        </button>
+        <button class="btn btn-sm btn-right "
+                [ngClass]="lifecycle.isAnswerReceived && project.isRescheduleSection? 'btn-outline-success':'btn-outline-danger'"
+                (click)="answerForSectionRemark(lifecycle)" *ngIf=checkGroupRemarks(lifecycle.remarks)>Замечания
+        </button>
+        <span class="selectable" [ngClass]="['badge', ProjectLifecycleStateBadge[lifecycle.state]]"
+              (click)="showLifecycleTransitionHistoryModal(lifecycle)">
+          {{lifecycle.state | lifecycleState}}
+        </span>
+        <span class="text-sm">
+          {{lifecycle.section | sectionFullName}}
+        </span>
+        <span class="text-sm" *ngIf="lifecycle.state==LifecycleGroupState.RETURNED_WITHOUT_EXPERTISE">
+          ({{lifecycle.rejectionReason}})
+        </span>
+        <div *ngIf="lifecycle.remarkDocuments.length">
+          <app-document-list [documents]="lifecycle.remarkDocuments"></app-document-list>
+        </div>
+        <div *ngIf="lifecycle.meetingProtocol.length" class="mt-2">
+          <app-document-list [documents]="lifecycle.meetingProtocol"></app-document-list>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="canEditSections()">
+      <div class="list-group-item list-group-item-action selectable text-sm-center text-primary text-sm"
+           (click)="showSearchSectionModal()">
+        <fa-icon icon="plus"> </fa-icon>
+        Выбрать секцию
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--SEARCH SECTION MODAL-->
+<app-search-section #searchSection
+                    *ngIf="canEditSections()|| this._group.state == LifecycleGroupState.IN_PROCESSING && this.role == Role.BUREAU_CHAIRMAN"
+                    (selected)="onSelectedSection($event)"></app-search-section>
+
+<!--CHANGE SECTION MODAL-->
+<app-search-section #changeSection
+                    *ngIf="this._group.state == LifecycleGroupState.IN_PROCESSING && this.role == Role.BUREAU_CHAIRMAN"
+                    (selected)="onChangeSection($event)"></app-search-section>
+
+<!--REFERRAL MODAL-->
+<app-modal #referralFormModal *ngIf="canEditReferral()" [title]="'Направление в ГЭС'">
+  <app-referral-form [project]="project" [council]="_group?.council"
+                     (onSave)="generateReferral($event)"
+                     (onClose)="referralFormModal.hide()">
+  </app-referral-form>
+</app-modal>
+
+<!--CONCLUSION MODAL-->
+<app-modal #councilFormModal *ngIf="_group && canEditConclusion()" [title]="'Заключение ГЭС'" (onClose)="closeConclusionForm()">
+  <app-council-conclusion-form [project]="project" [group]="_group"
+                               [draftOwner]="_group"
+                               [draftService]="_lifecycleGroupService"
+                               (onSave)="generateConclusion($event)"
+                               (onClose)="councilFormModal.hide()">
+  </app-council-conclusion-form>
+</app-modal>
+
+<!--LETTER FOR CUSTOMER MODAL-->
+<app-modal #groupDecisionFormModal *ngIf="canEditLifecycleGroupDecision()"
+           [title]="'Направление результатов экспертизы'">
+  <app-decision-document-form [project]="project" [council]="_group?.council" [needCauses]="false"
+                              (onSave)="generateLifecycleGroupDecisionDocument($event)"
+                              (onClose)="groupDecisionFormModal.hide()">
+  </app-decision-document-form>
+</app-modal>
+
+<app-modal #transitionHistoryModal [title]="'Информация о ходе проведения экспертизы'" [modalClasses]="'modal-xl'">
+  <div class="transition-history">
+    <app-group-transition-history [history]="transitionHistory"></app-group-transition-history>
+  </div>
+</app-modal>
+
+<app-modal #lifecycleTransitionHistoryModal [title]="'Информация о ходе проведения экспертизы'"
+           [modalClasses]="'modal-xl'">
+  <div class="transition-history">
+    <app-lifecycle-transition-history [history]="lifecycleTransitionHistory"></app-lifecycle-transition-history>
+  </div>
+</app-modal>
+
+<app-modal #remarkResponseForSection [title]="'Ответы на замечания секции'">
+  <app-remark-response [remarks]="lifecycleRemark.remarks" (onSave)="saveRemarkResponseForSection($event)"
+                       (onReply)="replyForSectionRemark($event)"
+                       [isExpired]="project.isSectionRemarksExpired"
+                       [isEdit]="canAnswerForSectionQuestion(lifecycleRemark)"></app-remark-response>
+</app-modal>
+
+<app-modal #remarkResponseForBureau [title]="'Ответы на замечания бюро'">
+  <app-remark-response [remarks]="groupRemark.remarks" (onSave)="saveRemarkResponseForBureau($event)"
+                       (onReply)="replyForBureauRemark($event)"
+                       [isExpired]="project.isBureauRemarksExpired"
+                       [isEdit]="canAnswerForBureauQuestion(_group)"></app-remark-response>
+</app-modal>

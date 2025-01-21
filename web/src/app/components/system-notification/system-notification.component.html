@@ -1,0 +1,59 @@
+<div class="card mx-3 pb-3 pt-3">
+    <h5 class="mb-3">Настройка системного оповещения</h5>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-sub-group">
+                <label>Выберите оповещение:</label>
+                <app-dropdown
+                        [options]="notificationNames"
+                        [notSelected]="'Оповещение не выбрано'"
+                        [(ngModel)]="selectedNotificationName"
+                        (ngModelChange)="changeNotification(selectedNotificationName)">
+                </app-dropdown>
+            </div>
+
+            <div *ngIf="selectedNotificationName!='Оповещение не выбрано'">
+
+            <div class="form-sub-group">
+                <label>Отображение оповещения: </label>
+                <app-boolean-button [(ngModel)]="notification.enabled" [falseLabel]="'отключено'"
+                                    [trueLabel]="'включено'" class="space-between-button"></app-boolean-button>
+            </div>
+
+            <div class="form-sub-group">
+                <label>Выберите тип оповещения:</label>
+                <app-dropdown
+                        [options]="notificationTypes"
+                        [notSelected]="'Обычное сообщение (белый фон)'"
+                        [(ngModel)]="selectedNotificationType"
+                        (ngModelChange)="changeNotificationType(selectedNotificationType)">
+                </app-dropdown>
+            </div>
+
+            <div class="form-sub-group">
+                <label>Текст оповещения (RAW HTML):</label>
+                <textarea [(ngModel)]="notification.message" rows="3" class="form-control mt-05" placeholder="Введите текст оповещения">
+                </textarea>
+            </div>
+
+            <div class="mt-1">
+                <button class="btn btn-secondary" (click)="deleteNotification()">Очистить текст оповещения</button>
+                <button class="btn btn-primary float-right" (click)="postNotification(notification.message)">Сохранить</button>
+            </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+
+<div *ngIf="selectedNotificationName!='Оповещение не выбрано' && notification.message != ''">
+    <p>Отображаемое сообщение:</p>
+
+    <div class="card-notification-block">
+        <div id="displayed-notification" class="card py-3" [ngClass]= "[notification.type, displayedNotificationStyleClass]">
+            <div [innerHTML]="notificationToSafeHtml(notification.message)"> </div>
+        </div>
+    </div>
+</div>

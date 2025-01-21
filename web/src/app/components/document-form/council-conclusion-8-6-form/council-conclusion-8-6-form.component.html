@@ -1,0 +1,26 @@
+<hr/>
+
+<label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+
+<app-result-accordance-block
+  [_form]="_form"
+  [num]="'1'"
+  (onConditionsChanged)="onConditionsChanged()"
+></app-result-accordance-block>
+
+<hr/>
+
+<app-effect-accordance-block
+  [_form]="_form"
+  [num]="'2'"
+  (onConditionsChanged)="onConditionsChanged()"
+></app-effect-accordance-block>
+
+<hr/>
+
+<app-conclusion-council-block
+  [form]="_form"
+  [financeConclusionNum]="'1 и 2'"
+  [project]="project"
+  [group]="group"
+></app-conclusion-council-block>

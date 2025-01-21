@@ -1,0 +1,40 @@
+<div *ngFor="let person of persons" class="list-group-item form-group">
+
+  <!--SHOW-->
+  <div *ngIf="!procurations[person].isEdit">
+    <a class="btn btn-icon float-right" (click)="edit(person)">
+      <fa-icon icon="cog" size="lg"></fa-icon>
+    </a>
+    <label class="form-group-label">{{person}}</label>
+    <div>Номер доверенности: <i>{{procurations[person].code | orElse: 'не указан'}}</i></div>
+    <div>Дата доверенности: <i>{{procurations[person].date | mdate | orElse: 'не указана'}}</i></div>
+  </div>
+
+  <!--EDIT-->
+  <div *ngIf="procurations[person].isEdit">
+    <label class="form-group-label">{{person}}</label>
+    <div class="form-group">
+      <label>Номер доверенности</label>
+      <input type="text" [(ngModel)]="editedProcuration.code"
+             placeholder="123456789" class="form-control" title="Номер доверенности">
+    </div>
+    <div class="form-group">
+      <label>Дата доверенности</label>
+      <app-date-input [(ngModel)]="editedProcuration.date" [title]="'Дата доверенности'"></app-date-input>
+    </div>
+    <div class="mt-1">
+      <button class="btn btn-secondary" (click)="cancelEdit()">Отмена</button>
+      <button class="btn btn-primary" (click)="saveEditedProcuration()">Сохранить</button>
+      <button class="btn btn-danger" (click)="deleteProcuration()">Удалить</button>
+    </div>
+  </div>
+</div>
+
+<!--ADD PROCURATION-->
+<div (click)="showSearchPersonModal()">
+  <div class="list-group-item selectable link background-dark-sea-green">
+    Добавить доверенность
+  </div>
+</div>
+
+<app-search-person-by-roles [roles]="Role.GKNT_CHAIRMAN" (selected)="selectPerson($event)"></app-search-person-by-roles>

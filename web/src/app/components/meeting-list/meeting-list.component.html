@@ -1,0 +1,48 @@
+<div>
+  <div class="mb-1" *ifRole="[Role.SECTION_CHAIRMAN, Role.BUREAU_CHAIRMAN]">
+    <button class="btn btn-primary btn-sm" (click)="showCreateMeetingModal()">Новое заседание</button>
+  </div>
+  <div class="row">
+    <div class="col-lg-8 pr-0">
+      <div [loadingData]="_loading" class="list-group">
+        <div *ngIf="meetings.length == 0" class="alert alert-info italic mb-0">
+          Заседаний не найдено
+        </div>
+        <div *ngFor="let meeting of meetings" class="list-group-item list-group-item-action"
+             [routerLink]="meeting.routerLink"
+             [class.selectable]="role == Role.SECTION_CHAIRMAN || role == Role.BUREAU_CHAIRMAN">
+          <div>
+            <span [ngClass]="['badge', MeetingStateBadge[meeting.state]]">{{meeting.state | meetingState}}</span>
+            <span>{{meeting.description}}</span>
+          </div>
+          <div *ngIf="meeting.state == 'CANCELED'" class="italic text-sm">
+            <b>Причина отмены:</b> {{meeting.cancelReason | orElse: 'не указана'}}
+          </div>
+          <div class="text-sm">
+            <div>Время проведения заседания: <i>{{meeting.period.start | mtime}}-{{meeting.period.end | mtime}}</i></div>
+            <div>Место проведения заседания: <i>{{meeting.place | orElse: 'не указано'}}</i></div>
+          </div>
+          <div class="text-muted text-sm mt-2">Объекты экспертизы</div>
+          <div class="text-sm link" *ngFor="let a of meeting.agendas"
+               [routerLink]="['/projects',a.project.id, 'agendas', a.id, {hash:a.project.hash, agendaHash: a.hash}]">
+            <app-decision-tag [decision]="a.decision"></app-decision-tag>
+            {{a.project.title}}
+          </div>
+          <div *ngIf="meeting.agendas.length == 0" class="text-sm italic">Объекты экспертизы отсутствуют</div>
+        </div>
+        <app-pagination [page]="_page" [pagination]="_pagination"
+                        (onPageChanged)="onPageChanged($event)"></app-pagination>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card pt-3">
+        <div class="card-title">
+          <h5 style="margin: 0">Фильтр</h5>
+        </div>
+        <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-meeting-form *ifRole="[Role.SECTION_CHAIRMAN, Role.BUREAU_CHAIRMAN]" (onAdd)="update()"></app-meeting-form>

@@ -1,0 +1,27 @@
+<div class="form-group">
+
+  <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+
+  <app-program-requirements-block [_form]="_form"
+                                  [num]="'1'"
+                                  (onConditionsChanged)="onConditionsChanged()"></app-program-requirements-block>
+  <hr/>
+  <app-prognosis-block [_form]="_form"
+                       [num]="'2'"
+                       (onConditionsChanged)="onConditionsChanged()"></app-prognosis-block>
+  <hr/>
+  <app-target-analysis-block [_form]="_form"
+                             [num]="'3'"
+                             (onConditionsChanged)="onConditionsChanged()"></app-target-analysis-block>
+  <hr/>
+  <app-program-sufficiency-block [_form]="_form"
+                                 [num]="'4'"
+                                 (onConditionsChanged)="onConditionsChanged()"></app-program-sufficiency-block>
+</div>
+
+<hr/>
+<app-conclusion-8-13-block [_form]="_form"
+                           [disabled]="isConclusionDisabled()"
+                           (onConditionsChanged)="onConditionsChanged()"></app-conclusion-8-13-block>
+<hr/>
+<app-notes-block [_form]="_form" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>

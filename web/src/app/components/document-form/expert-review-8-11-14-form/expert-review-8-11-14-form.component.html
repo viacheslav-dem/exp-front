@@ -1,0 +1,182 @@
+<div class="form-group">
+  <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+  <div class="form-sub-group">
+    <label>
+      1. Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
+      научно-технической деятельности в Республики Беларусь:
+    </label>
+    <textarea [(ngModel)]="_form.accordance" rows="3" class="form-control"
+              placeholder="cоответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      2. Значение работы для реализации приоритетов социально-экономического развития,
+      разработки новых технологических процессов, наукоемкой, конкурентоспособной продукции,
+      формирования перспективных научных направлений:
+    </label>
+    <textarea [(ngModel)]="_form.significance" rows="3" class="form-control"
+              placeholder="суть значения и важности работы для республики">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      3. Сведения о проведении маркетинговых и патентных исследований и их результаты:
+    </label>
+    <textarea [(ngModel)]="_form.marketing" rows="3" class="form-control"
+              placeholder="результаты проведения маркетинговых и патентных исследований по объекту экспертизы">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      4. Возможный экономический и (или) социальный и (или) экологический эффект от реализации мероприятия:
+    </label>
+    <textarea [(ngModel)]="_form.effect" rows="3" class="form-control"
+              placeholder="возможный эффект по объекту экспертизы">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      5. Достаточность запланированных этапов работ (услуг), создаваемого и приобретаемого программного обеспечения,
+      технических средств и (или) комплексов программно-технических средств
+      для достижения целей программы информатизации (подпрограммы):
+    </label>
+    <app-boolean-button [(ngModel)]="_form.sufficiency" [falseLabel]="'недостаточно'"
+                        [trueLabel]="'достаточно'"></app-boolean-button>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      6. Сведения о предполагаемом владельце, операторе, пользователях программно-технических средств,
+      информационных ресурсов, информационных систем и информационных сетей:
+    </label>
+    <textarea [(ngModel)]="_form.users" rows="3" class="form-control"
+              placeholder="сведения по объекту экспертизы">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      7. Функциональные, технические, технологические и другие характеристики создаваемых
+      и приобретаемых программного обеспечения, технических средств и (или) комплексов программно-технических средств,
+      а также возможности достижения заданных значений указанных характеристик:
+    </label>
+    <textarea [(ngModel)]="_form.characteristics" rows="3" class="form-control"
+              placeholder="все характеристики и возможности по объекту экспертизы">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      8. Соответствие объемов выполняемых работ (оказываемых услуг), включая работы (услуги)
+      по технической поддержке и сопровождению программно-технических средств, информационных ресурсов,
+      информационных систем и информационных сетей, заявленным объемам финансирования:
+    </label>
+    <app-boolean-button [(ngModel)]="_form.workAccordance" [falseLabel]="'не соответствуют'"
+                        [trueLabel]="'соответствуют'"></app-boolean-button>
+  </div>
+
+  <div class="form-sub-group">
+    <label>9. Создание объектов права промышленной собственности:</label>
+    <div *ngIf="privacyObjects.length == 0" class="mb-2 italic">не предусматривается</div>
+    <div *ngFor="let privacyObject of privacyObjects; let i = index" class="input-group btn-group mb-2">
+      <app-select-catalog
+          [catalog]="Catalog.INDUSTRIAL_PROPERTY"
+          [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+      ></app-select-catalog>
+      <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+      Добавить объект права
+    </button>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="form-group-label">Анализ и оценка потенциального исполнителя</label>
+  <div class="form-sub-group">
+    <label>
+      1. Требования к квалификации и опыту лиц, привлекаемых для выполнения работ (оказания услуг),
+      к уровню производственной, научной, конструкторско-технологической базы, необходимой для реализации мероприятия:
+    </label>
+    <textarea [(ngModel)]="_form.executorRequirements" rows="3" class="form-control"
+              placeholder="все требования к потенциальным исполнителям по объекту экспертизы">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      2. Оценка научно-технического уровня, эффективности, достаточности и соответствия предложений поставщиков
+      (подрядчиков, исполнителей), претендующих на участие в реализации мероприятия, целям рассматриваемого мероприятия:
+    </label>
+    <textarea [(ngModel)]="_form.assessment" rows="3" class="form-control"
+              placeholder="оценка по указанным параметрам для объекта экспертизы ">
+    </textarea>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="form-group-label">Выводы и предложения эксперта</label>
+  <div class="form-sub-group">
+    <label>
+      1. Финансирование за счет средств республиканского бюджета и (или) других источников финансирования:
+    </label>
+      <app-boolean-button [(ngModel)]="_form.finance" [falseLabel]="'нецелесообразно'"
+                          [trueLabel]="'целесообразно'"></app-boolean-button>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      2. Целесообразность отнесения мероприятия в установленном порядке к наиболее значимым для
+      Республики Беларусь исследованиям и разработкам, определенным в соответствии с абзацем третьим подпункта&nbsp;1.1
+      пункта&nbsp;1 Указа Президента Республики Беларусь от 7&nbsp;сентября 2009&nbsp;г. №&nbsp;441
+      «О дополнительных мерах по стимулированию научной, научно-технической и инновационной деятельности»:
+    </label>
+    <div *ngIf="!_form.finance" class="font-weight-bold">нецелесообразно согласно пункту 1 данного раздела</div>
+    <div *ngIf="_form.finance">
+      <app-boolean-button [(ngModel)]="_form.promotion" [falseLabel]="'нецелесообразно'"
+                          [trueLabel]="'целесообразно'"></app-boolean-button>
+    </div>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      3. Определение в календарном плане этапов мероприятия, подлежащих государственной регистрации
+      в соответствии с абзацем вторым пункта&nbsp;5 Положения о порядке государственной регистрации
+      научно-исследовательских, опытно-конструкторских и опытно-технологических работ, утвержденного
+      Указом Президента Республики Беларусь от 25&nbsp;мая 2006&nbsp;г. №&nbsp;356 «О государственной регистрации
+      научно-исследовательских, опытно-конструкторских и опытно-технологических работ»:
+    </label>
+    <div *ngIf="!_form.finance" class="font-weight-bold">не имеются согласно пункту 1 данного раздела</div>
+    <div *ngIf="_form.finance">
+      <div *ngIf="stages.length == 0" class="mb-2 italic">не имеются</div>
+      <div *ngFor="let stage of stages; let i = index" class="input-group btn-group mb-2">
+        <input [(ngModel)]="stage.name" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
+        <button (click)="stages.splice(i, 1)" type="button" class="btn btn-outline-danger">&times;</button>
+      </div>
+      <button (click)="stages.push({name: ''})" type="button" class="btn btn-primary btn-sm">
+        Добавить этап
+      </button>
+    </div>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      4. Замечания по материалам объекта экспертизы, конкретные предложения о необходимости доработки и (или)
+      корректировки материалов по объекту экспертизы:
+    </label>
+    <div *ngIf="notes.length == 0" class="mb-2 italic">не имеются</div>
+    <div *ngFor="let note of notes; let i = index" class="input-group btn-group mb-2">
+        <textarea [(ngModel)]="note.name" rows="2" class="form-control"
+                  placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
+      <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
+      Добавить замечание
+    </button>
+  </div>
+</div>

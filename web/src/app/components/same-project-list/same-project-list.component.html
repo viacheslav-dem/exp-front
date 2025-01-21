@@ -1,0 +1,15 @@
+<div class="form-sub-group">
+    <label class="form-group-label">Наименование</label>
+    <button class="btn btn-primary float-right mb-1" (click)="getSameProjects()">Найти</button>
+    <input type="text" id="title" class="form-control"
+           placeholder="название объекта экспертизы" [(ngModel)]="title">
+
+</div>
+
+<div *ngIf="sameProjects.length == 0"
+     class="alert alert-info italic mb-0">
+    Объектов экспертизы не найдено
+</div>
+<div *ngFor="let item of sameProjects">
+    <app-project-li [item]="item" [baseItemLink]="'/projects/'"></app-project-li>
+</div>

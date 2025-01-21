@@ -1,0 +1,41 @@
+import {Component} from '@angular/core';
+import {GlobalToastyService} from "app/services/global-toasty.service";
+import {Catalog, DataService} from "app/services/data.service";
+import {IdNameDto} from "app/dto/IdNameDto";
+import {ProjectCodeDto} from "app/dto/ProjectCodeDto";
+import {SearchField} from "app/components/common-components/page-and-filter/model/SearchField";
+import {Direction} from "app/components/common-components/page-and-filter/model/SortOrder";
+import {CatalogTemplate} from "app/components/data-management/catalog/CatalogTemplate";
+import {TariffRateDto} from "@app/dto/TariffRateDto";
+
+@Component({
+  selector: 'app-project-codes',
+  templateUrl: './project-codes.component.html'
+})
+export class ProjectCodesComponent extends CatalogTemplate<ProjectCodeDto> {
+
+  gkntDepartments: IdNameDto[] = [];
+  rates:TariffRateDto[] = []
+
+  constructor(public _toasty: GlobalToastyService,
+              public _dataService: DataService) {
+    super(_toasty, _dataService);
+    this.type = Catalog.PROJECT_CODE;
+  }
+
+  ngOnInit() {
+    this._dataService.getCatalog(Catalog.GKNT_DEPARTMENT).subscribe(res => this.gkntDepartments = res);
+    this._dataService.getCatalog(Catalog.TARIFF).subscribe(res => this.rates = <TariffRateDto[]>res);
+    this._searchFields = [
+      SearchField.contains('name').setPlaceholder('Поиск по описанию...').setSortable(true),
+      SearchField.startsWith('code').setPlaceholder('Поиск по коду...')
+        .setSortDirection(Direction.ASC).setSortable(true),
+      SearchField.checkbox('disabled', 'Показывать неактивные'),
+    ];
+  }
+
+  create(): ProjectCodeDto {
+    return new ProjectCodeDto();
+  }
+}
+

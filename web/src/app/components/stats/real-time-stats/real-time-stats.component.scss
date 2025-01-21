@@ -1,0 +1,55 @@
+.stats-number {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.stats-number-sm {
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 3rem;
+}
+
+.stats-pane {
+  text-align: center;
+  border: 1px solid #6c757d;
+  height: 6rem;
+  padding: 0;
+  background-color: #d1ecf1;
+  border-radius: 0.25rem;
+}
+
+.stats-label {
+  font-size: 0.875rem;
+  font-style: italic;
+  color: #6c757d !important;
+  line-height: 1;
+}
+
+.legend-text {
+  font-weight: bold;
+  font-size: 12px;
+  margin-right: 1rem;
+  white-space: nowrap;
+  .fa-circle {
+    font-size: 0.875rem;
+    margin-right: 0.25rem;
+  }
+}
+
+.red {
+  color: #de2548 !important;
+}
+
+
+.yellow {
+  color: #f3be04 !important;
+}
+
+
+.blue {
+  color: #005cd6 !important;
+}
+
+.no-violation {
+  color: #a2c2cc !important;
+}

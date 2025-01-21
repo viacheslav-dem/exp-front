@@ -1,0 +1,10 @@
+<div class="mb-2">
+  <span class="text-muted">Комментарии</span>
+</div>
+<div>
+  <div class="form-group">
+    <textarea rows="3" class="form-control form-control-sm" placeholder="Введите сообщение..." type="text" [(ngModel)]="text"></textarea>
+    <button class="btn btn-primary btn-sm mt-1" (click)="createComment()">Отправить</button>
+  </div>
+  <app-comment-list [comments]="comments"></app-comment-list>
+</div>

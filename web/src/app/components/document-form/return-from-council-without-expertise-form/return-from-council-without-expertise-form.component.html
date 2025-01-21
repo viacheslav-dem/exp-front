@@ -1,0 +1,49 @@
+<div>
+  <div class="form-group">
+    <label class="form-group-label">Объект экспертизы: <i>{{project | titleAndCode}}</i></label>
+    <div class="form-group-label">ГЭС: <i>{{council | councilCodeAndName}}</i></div>
+  </div>
+
+  <div class="form-group">
+    <label>Дата</label>
+    <app-date-input class="width-100" [(ngModel)]="_form.date"></app-date-input>
+  </div>
+
+  <div class="form-group">
+    <div>Исполняющий обязанности Председателя ГЭС:</div>
+    <div>
+      <span class="italic">{{_form.chairman | fullName}}</span>
+      <a class="btn btn-icon btn-icon-sm" (click)="showSearchChairmanModal()">
+        <fa-icon icon="pencil-alt"></fa-icon>
+      </a>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>
+      Вы возвращаете объект экспертизы, потому что он не соответствует профилю Вашего ГЭС.
+      При необходимости сделайте дополнительные пояснения по поводу причины возврата:
+    </label>
+    <textarea title="Причины возврата" [(ngModel)]="_form.rejectionReason"
+              rows="2" class="form-control"
+              placeholder="причины возврата"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label>
+      Рекомендуем направить объект экспертизы в следующий ГЭС:
+    </label>
+    <app-select-catalog [catalog]="Catalog.COUNCIL" [(ngModel)]="_form.targetCouncil"></app-select-catalog>
+  </div>
+
+  <div class="mt-2">
+    <button type="button" class="btn btn-secondary" (click)="close()">Отмена</button>
+    <button type="button" class="btn btn-primary ml-05" (click)="save()">Вернуть в ГКНТ</button>
+  </div>
+</div>
+
+<app-search-person-by-roles
+  [roles]="Role.BUREAU_CHAIRMAN"
+  (selected)="selectPerson($event)">
+</app-search-person-by-roles>
+

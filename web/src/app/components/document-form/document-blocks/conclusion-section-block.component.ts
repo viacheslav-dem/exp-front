@@ -1,0 +1,61 @@
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
+import {NewVoteResults} from "@app/components/document-form/meeting-protocol-form/NewVoteResults";
+import {DecisionStateBadge} from "@app/pipes/decision.pipe";
+
+@Component({
+  selector: 'app-section-conclusion-block',
+  template: `
+    <div class="form-sub-group">
+      <label>
+        <span>{{num}}.</span>
+        <span>
+          Заключение секции/бюро по объекту государственной экспертизы 
+          <i>{{project?.title}}</i>:
+        </span>
+        <span class="ml-05" [ngClass]="['badge', DecisionStateBadge[_form.conclusion.getDecision()] || 'badge-info']">
+          {{(_form.conclusion.getDecision() | decision) || 'не указано'}}
+        </span>
+      </label>
+      <app-new-vote-results
+        [(ngModel)]="_form.conclusion"
+        [all]="allParticipants"
+        (onChanged)="onConditionsChanged.emit(true)"
+      ></app-new-vote-results>
+      <div *ngIf="financeConclusionNum" class="hint">
+        <p>
+          <b>Подсказка.</b>
+          Положительное решение принимается, только если в пункте {{financeConclusionNum}} имеется положительная оценка.
+        </p>
+      </div>
+    </div>
+  `
+})
+export class ConclusionSectionBlockComponent {
+
+  DecisionStateBadge = DecisionStateBadge;
+
+  @Input()
+  num: string = "11";
+
+  @Input()
+  financeConclusionNum: string;
+
+  @Input()
+  full: boolean = true;
+
+  @Input()
+  disabled: boolean = false;
+
+  @Input()
+  project: ProjectPlainDto;
+
+  @Input()
+  _form: { conclusion: NewVoteResults };
+
+  @Input()
+  allParticipants: number;
+
+  @Output()
+  onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+}

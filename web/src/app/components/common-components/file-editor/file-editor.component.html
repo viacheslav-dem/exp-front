@@ -1,0 +1,16 @@
+<app-modal #fileEditorModal [title]="'Наименование и описание файла'" >
+  <div *ngIf="doc" class="modal-body">
+    <div class="form-group">
+      <label>Название</label>
+      <input title="Название" class="form-control" [(ngModel)]="doc.name">
+    </div>
+    <div class="form-group">
+      <label>Описание</label>
+      <textarea title="Описание" class="form-control" rows="4" [(ngModel)]="doc.description"></textarea>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="fileEditorModal.hide()">Отмена</button>
+    <button type="button" class="btn btn-primary" (click)="update()">Сохранить</button>
+  </div>
+</app-modal>

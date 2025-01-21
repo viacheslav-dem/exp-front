@@ -1,0 +1,34 @@
+.alert-danger {
+  color: #721c24 !important;
+  background-color: #f8d7da !important;
+}
+
+.alert-danger:hover {
+  background-color: #721c24;
+  opacity: 0.85;
+}
+
+.alert-warning {
+  color: #856404 !important;
+  background-color: #fff3cd !important;
+}
+
+.alert-warning:hover {
+  background-color: #856404;
+  opacity: 0.85;
+}
+
+.alert-primary {
+  color: #004085 !important;
+  background-color: #cce5ff !important;
+}
+
+.alert-primary:hover {
+  background-color: #004085;
+  opacity: 0.85;
+}
+
+.alert-dark {
+  color: #1b1e21 !important;
+  background-color: #d6d8d9 !important;
+}

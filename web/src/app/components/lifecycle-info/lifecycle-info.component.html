@@ -1,0 +1,40 @@
+<div *ngIf="_lifecycle">
+  <!--TITLE-->
+  <div class="">
+    <div (click)="showTransitionHistoryModal()" class="d-inline-block selectable"
+         [ngClass]="['badge', ProjectLifecycleStateBadge[_lifecycle.state]]">
+      {{_lifecycle.state|lifecycleState}}
+    </div>
+    <span class="text-muted text-sm italic"
+          *ngIf="_lifecycle.state==LifecycleGroupState.RETURNED_WITHOUT_EXPERTISE"> ({{_lifecycle.rejectionReason}}
+      )</span>
+  </div>
+  <div>{{_lifecycle.section | sectionFullName}}</div>
+
+  <div *ngIf="_lifecycle.remarkDocuments.length">
+    <div class="mt-2 mb-1">
+      <div class="text-muted text-sm">О наличии замечаний</div>
+    </div>
+    <app-document-list [documents]="_lifecycle.remarkDocuments"></app-document-list>
+  </div>
+
+  <!--SECTION MEETING PROTOCOL-->
+  <div class="mt-2 mb-1 text-muted text-sm">Протокол заседания секции</div>
+  <app-document-list [documents]="_lifecycle.meetingProtocol"></app-document-list>
+  <ng-container *ngIf="_lifecycle.remarks!=null &&_lifecycle.remarks.length>0 ">
+    <div class="list-group-item list-group-item-action selectable"
+
+         [class.border-bottom-none]="isExpanded"
+         (click)="isExpanded=!isExpanded">
+      <div class="text-sm">Ответы на замечания</div>
+    </div>
+    <app-remark-response *ngIf="isExpanded" [remarks]="_lifecycle.remarks" [isEdit]="false"
+    [isExpired]="project.isSectionRemarksExpired"></app-remark-response>
+  </ng-container>
+</div>
+
+<app-modal #transitionHistoryModal [title]="'Информация о ходе проведения экспертизы'" [modalClasses]="'modal-xl'">
+  <div class="transition-history">
+    <app-lifecycle-transition-history [history]="transitionHistory"></app-lifecycle-transition-history>
+  </div>
+</app-modal>

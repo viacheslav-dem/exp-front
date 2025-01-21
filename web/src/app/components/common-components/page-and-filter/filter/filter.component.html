@@ -1,0 +1,76 @@
+<div [ngClass]="filterClass">
+  <div class="text-sm" [ngClass]="fieldClass" *ngFor="let field of _fields">
+
+    <!--TITLE-->
+    <div *ngIf="field.title" class="mb-05">
+      {{field.title}}
+    </div>
+
+    <div class="mb-05 input-group input-group-sm">
+
+      <!--SORT-->
+      <div *ngIf="field.sortable" class="input-group-prepend selectable" (click)="sortBy(field)">
+        <div class="input-group-text sort-icon">
+          <fa-icon [class.fa-active]="field.sortDirection" [icon]="sortIconClass(field)"></fa-icon>
+        </div>
+      </div>
+
+      <!--SEARCH FIELD-->
+      <input *ngIf="field.type == SearchFieldType.TEXT" type="text" title="Текст для поиска" class="form-control"
+             (input)="changeSearchText($event, field)" [value]="field.value"
+             (keyup.enter)="filterChanged()"
+             [placeholder]="field.placeholder | orElse: 'Поиск...'">
+
+      <!--DATE PERIOD-->
+      <ng-container *ngIf="field.type == SearchFieldType.DATE_PERIOD">
+        <app-date-period
+          class="form-control" [(ngModel)]="field.value"
+          (onSelect)="filterChanged()" [placeholder]="field.placeholder | orElse: 'Выбрать период...'"
+        ></app-date-period>
+      </ng-container>
+
+      <!--NUMBER RANGE-->
+      <ng-container *ngIf="field.type == SearchFieldType.NUMBER_RANGE">
+        <input numberInput type="text" title="от" [placeholder]="field.placeholderFrom | orElse: 'от'"
+               [value]="field.value.start" step="1" (input)="changePeriod($event, field, 'start')" class="form-control"/>
+        <div class="input-group-prepend input-group-append">
+          <div class="input-group-text">
+            <span> – </span>
+          </div>
+        </div>
+        <input numberInput type="text" title="до" [placeholder]="field.placeholderTo | orElse: 'до'"
+               [value]="field.value.end" step="1" (input)="changePeriod($event, field, 'end')" class="form-control"/>
+      </ng-container>
+
+      <!--CHECKBOXES-->
+      <div *ngIf="field.type == SearchFieldType.MULTI_CHECK" class="input-group-append">
+        <div *ngFor="let check of field.multiCheck" class="btn btn-primary" [class.active]="check.selected"
+             (click)="changeMultiCheck(field, check)">
+          {{check.getItemAsString()}}
+        </div>
+      </div>
+
+      <!--SINGLE CHECKBOX-->
+      <app-checkbox class="text-sm" *ngIf="field.type == SearchFieldType.CHECKBOX"
+                    [ngModel]="field.checked" (onChecked)="changeCheckbox(field)">
+        {{field.label}}
+      </app-checkbox>
+
+      <!--MULTISELECT-->
+      <angular2-multiselect
+        *ngIf="field.type == SearchFieldType.MULTI_SELECT"
+        [data]="field.allItems" [(ngModel)]="field.selectedItems" [settings]="field.settings"
+        (onSelect)="changeMultiSelect(field)" (onDeSelect)="changeMultiSelect(field)"
+        (onSelectAll)="changeMultiSelect(field)" (onDeSelectAll)="changeMultiSelect(field)">>
+      </angular2-multiselect>
+
+      <div *ngIf="field.resetEnabled && !field.isEmpty()" class="input-group-append selectable">
+        <button class="btn btn-primary" (click)="filterChanged()">Поиск</button>
+      </div>
+      <!--RESET-->
+      <div *ngIf="field.resetEnabled && !field.isEmpty()" class="input-group-append selectable">
+        <button class="btn btn-primary" (click)="reset(field)"><fa-icon icon="times"></fa-icon></button>
+      </div>
+    </div>
+  </div>
+</div>

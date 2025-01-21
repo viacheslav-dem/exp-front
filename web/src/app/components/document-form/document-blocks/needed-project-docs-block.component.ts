@@ -1,0 +1,55 @@
+import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
+import {ProjectDto} from "@app/dto/ProjectDto";
+
+@Component({
+    selector: 'app-needed-project-docs-block',
+    template: `
+    <div class="form-sub-group">
+      <label>
+        {{num}}. Разработка проектной (предпроектной) документации:
+      </label>
+      <div>
+        <app-boolean-button class="d-inline-block"
+                            [(ngModel)]="_form.neededProjectDocs"
+                            [trueLabel]="'требуется'"
+                            [falseLabel]="'не требуется'"
+                            (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      </div>
+        
+            <div>
+                <textarea *ngIf="full" [(ngModel)]="_form.neededProjectDocsText" rows="3" class="form-control mt-05"
+                    placeholder="Пояснительный текст (при необходимости)."></textarea>
+            </div>
+        
+        
+        <div *ngIf="full" class="hint">
+            <p>
+                <b>Подсказка.</b>
+                При отсутствии разработанной проектной (предпроектной) документации на обьект (в случае, когда ее разработка требуется)
+                на момент проведения государственной экспертизы или отсутствие соответствующей информации в материалах по обьекту государственной 
+                экспертизы (в случае, когда экспертом сделан вывод о целесообразном проведении работ в сфере строительной деятельности) оценка по обьекту 
+                государственной экспертизы дается с государственную экспертизу с актуализацией бизнес-плана с учетом новых обьемов и источников 
+                финансирования после разработки проектной (предпроектной) документации на обьект и прохождения ею соответствующих экспертиз).
+            </p>
+        </div>
+    </div>
+  `
+})
+export class NeededProjectDocsBlockComponent {
+
+    @Input()
+    num: string = "3.2";
+
+    @Input()
+    full: boolean = true;
+
+    @Input()
+    project: ProjectPlainDto | ProjectDto;
+
+    @Input()
+    _form: { neededProjectDocs: boolean, neededProjectDocsText: string };
+
+    @Output()
+    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+}

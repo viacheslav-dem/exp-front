@@ -1,0 +1,41 @@
+<hr/>
+
+<app-agenda-header-block [_form]="_form" [ind]="ind" [project]="_project"></app-agenda-header-block>
+
+<div class="collapse" [attr.id]="'meeting-project-' + _project?.id">
+  <hr/>
+
+  <app-customer-replies-block [_form]="_form"></app-customer-replies-block>
+
+  <hr/>
+
+  <app-pvt-product-name-block
+          [num]="'1.1'"
+          [_form]="_form"
+  ></app-pvt-product-name-block>
+  <hr/>
+
+  <app-pvt-cof-tech-block [_form]="_form"
+                      [num]="'1.2'"
+                      (onConditionsChanged)="onConditionsChanged()">
+  </app-pvt-cof-tech-block>
+
+  <hr/>
+
+  <app-high-tech-block
+    [_form]="_form"
+    [num]="'1.3'"
+    (onConditionsChanged)="onConditionsChanged()"
+  ></app-high-tech-block>
+
+  <hr/>
+
+  <app-section-conclusion-block
+    [_form]="_form"
+    [num]="'2'"
+    [financeConclusionNum]="'1'"
+    [project]="project"
+    [allParticipants]="getAllParticipants()"
+    (onConditionsChanged)="onConditionsChanged()"
+  ></app-section-conclusion-block>
+</div>

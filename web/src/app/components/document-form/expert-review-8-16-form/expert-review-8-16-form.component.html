@@ -1,0 +1,45 @@
+<div class="form-group">
+  <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+  <app-economic-activity-block
+          [_form]="_form"
+          [num]="'1'"
+          (onConditionsChanged)="onChange()">
+  </app-economic-activity-block>
+  <hr/>
+  <app-based-on-high-tech-block
+          [_form]="_form"
+          [num]="'2'"
+          (onConditionsChanged)="onChange()">
+  </app-based-on-high-tech-block>
+  <hr/>
+   <app-export-orientated-block
+           [_form]="_form"
+           [num]="'3'"
+           (onConditionsChanged)="onChange()">
+   </app-export-orientated-block>
+  <hr/>
+  <app-import-orientation-block
+          [_form]="_form"
+          [num]="'4'"
+          (onConditionsChanged)="onChange()">
+  </app-import-orientation-block>
+  <hr/>
+  <app-catalog-high-tech-block
+          [_form]="_form"
+          [disabled]="isCatalogHighTechBlockDisabled()"
+          (onConditionsChanged)="onConditionsChanged()">
+  </app-catalog-high-tech-block>
+
+  <li class="dropdown-item selectable">
+    <fa-icon icon="file-word" [fixedWidth]="true"></fa-icon>
+    <a class="not-link" target="_blank" (click)="downloadDocxDocument()">
+      Положение</a>
+  </li>
+<!--  <hr/>-->
+<!--  <app-conclusion-8-16-block [_form]="_form"-->
+<!--                             (onConditionsChanged)="onConditionsChanged()">-->
+<!--  </app-conclusion-8-16-block>-->
+  <hr/>
+  <app-notes-block [_form]="_form" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>
+
+</div>

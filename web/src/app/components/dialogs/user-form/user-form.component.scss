@@ -1,0 +1,26 @@
+.img-holder {
+  //background: #747474;
+  &:hover {
+    .hover-btn {
+      display: block;
+      position: absolute;
+      top: 0px;
+      //color: #cccccc;
+      //background: black;
+      //opacity: 0.6;
+    }
+    img {
+      opacity: .5;
+    }
+  }
+  .hover-btn {
+    display: none;
+  }
+  img {
+    opacity: 1;
+    -webkit-transition: .3s ease-in-out;
+    transition: .3s ease-in-out;
+    height: 200px;
+    width: 200px;
+  }
+}

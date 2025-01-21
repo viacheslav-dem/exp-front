@@ -1,0 +1,234 @@
+<div class="form-group">
+  <label class="mr-1">
+    Конечный результат проекта:
+  </label>
+  <div class="btn-group">
+    <label class="btn btn-sm btn-primary" [class.active]="_form.product" (click)="_form.product = !_form.product"><fa-icon *ngIf="_form.product" icon="check"></fa-icon> товар</label>
+    <label class="btn btn-sm btn-primary" [class.active]="_form.service" (click)="_form.service = !_form.service"><fa-icon *ngIf="_form.service" icon="check"></fa-icon> услуга</label>
+  </div>
+</div>
+
+<div *ngIf="industries" class="form-group">
+  <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+  <div class="form-sub-group">
+    <label>
+      1. Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
+      научно-технической деятельности в Республики Беларусь:
+    </label>
+    <textarea [(ngModel)]="_form.accordance" rows="3" class="form-control"
+              placeholder="cоответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      2. Сведения о проведении маркетинговых и патентных исследований и их результаты:
+    </label>
+    <textarea [(ngModel)]="_form.marketing" rows="3" class="form-control"
+              placeholder="результаты проведения маркетинговых и патентных исследований по объекту экспертизы">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>3. Создание объектов права промышленной собственности:</label>
+    <div *ngIf="privacyObjects.length == 0" class="mb-2 italic">не предусматривается</div>
+    <div *ngFor="let privacyObject of privacyObjects; let i = index" class="input-group btn-group mb-2">
+      <app-select-catalog
+          [catalog]="Catalog.INDUSTRIAL_PROPERTY"
+          [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+      ></app-select-catalog>
+      <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+      Добавить объект права
+    </button>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      4. Секция и подсекция основного вида экономической деятельности, которому соответствует
+      планируемый к реализации инновационный проект:
+    </label>
+    <div class="custom-control custom-checkbox mb-2" (click)="onChooseSection()">
+      <input type="checkbox" class="custom-control-input" title="Выбор" [(ngModel)]="_form.sectionNotPresented">
+      <label class="custom-control-label"> - не представлено в материалах по объекту экспертизы</label>
+    </div>
+    <div *ngIf="!_form.sectionNotPresented" class="dropdown form-sub-group">
+      <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-toggle="dropdown">
+        <span class="bold">{{_form.section.code}}</span> - {{_form.section.name}}
+      </button>
+      <ul class="dropdown-menu scrollable-menu">
+        <li *ngFor="let item of industries" class="dropdown-item"
+            (click)="_form.section = item">
+          <span class="bold">{{item.code}}</span> - {{item.name}}
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="!_form.sectionNotPresented" class="form-sub-group">
+      <label>согласно представленным материалам объекта экспертизы</label>
+      <textarea [(ngModel)]="_form.sectionPlace" rows="2" class="form-control"
+                placeholder="ссылки на документы и страницы материалов, где содержится соответствующая информация">
+      </textarea>
+    </div>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      5. Пороговое значение валовой добавленной стоимости в расчете на одного занятого
+      по основным видам экономической деятельности в Европейском союзе, евро:
+    </label>
+    <input *ngIf="!_form.sectionNotPresented" class="form-control" disabled title="Пороговое значение, евро"
+           [value]="_form.section.addedValueBound | number: 1">
+    <input *ngIf="_form.sectionNotPresented" class="form-control" disabled title="Пороговое значение, евро"
+           value="не представлено в материалах по объекту экспертизы">
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      6. Уровень добавленной стоимости на одного работающего по инновационному проекту, соответствующий году,
+      следующему за годом выхода на проектную мощность, евро:
+    </label>
+    <div class="custom-control custom-checkbox mb-2" (click)="_form.addedValueNotPresented = !_form.addedValueNotPresented">
+      <input type="checkbox" class="custom-control-input" title="Выбор" [(ngModel)]="_form.addedValueNotPresented">
+      <label class="custom-control-label"> - не представлено в материалах по объекту экспертизы</label>
+    </div>
+    <div *ngIf="!_form.addedValueNotPresented" class="form-sub-group">
+      <input class="form-control" numberInput type="text" title="Уровень добавленной стоимости, евро"
+             [(ngModel)]="_form.addedValue">
+    </div>
+    <div *ngIf="!_form.addedValueNotPresented" class="form-sub-group">
+      <label>согласно представленным материалам объекта экспертизы</label>
+      <textarea [(ngModel)]="_form.addedValuePlace" rows="2" class="form-control"
+                placeholder="ссылки на документы и страницы материалов, где содержится соответствующая информация">
+    </textarea>
+    </div>
+  </div>
+
+
+  <div class="form-sub-group">
+    <label>
+      7. Сальдо потока денежных средств от текущей (операционной) деятельности, евро:
+    </label>
+    <div class="custom-control custom-checkbox mb-2" (click)="_form.balanceNotPresented = !_form.balanceNotPresented">
+      <input type="checkbox" class="custom-control-input" title="Выбор" [(ngModel)]="_form.balanceNotPresented">
+      <label class="custom-control-label"> - не представлено в материалах по объекту экспертизы</label>
+    </div>
+    <div *ngIf="!_form.balanceNotPresented" class="form-sub-group">
+      <input class="form-control" numberInput type="text" title="Сальдо потока денежных средств, евро"
+             [(ngModel)]="_form.balance">
+    </div>
+    <div *ngIf="!_form.balanceNotPresented" class="form-sub-group">
+      <label>согласно представленным материалам объекта экспертизы</label>
+      <textarea [(ngModel)]="_form.balancePlace" rows="2" class="form-control"
+                placeholder="ссылки на документы и страницы материалов, где содержится соответствующая информация">
+    </textarea>
+    </div>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      8. Оценка научно-технического уровня внедряемых технологий по сравнению с передовыми технологиями,
+      используемыми в мире, и возможности их применения на соответствующем производстве:
+    </label>
+    <textarea [(ngModel)]="_form.scientificLevel" rows="3" class="form-control"
+              placeholder="оценка научно-технического уровня внедряемых технологий по сравнению с передовыми технологиями для объекта экспертизы ">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      9. Подтверждается ли научно-технический уровень внедряемых технологий наличием:
+      патентов на объекты права промышленной собственности, полученных в Республике Беларусь
+      и за рубежом (решений патентных органов о выдаче патентов); имущественных прав на секреты производства (ноу-хау),
+      относящиеся к продукту и (или) способу; исключительных прав на программное обеспечение;
+      лицензионных договоров на предоставление права использования результатов интеллектуальной деятельности,
+      договоров на передачу секретов производства (ноу-хау), относящихся к продукту и (или) к способу?
+    </label>
+      <app-boolean-button [(ngModel)]="_form.scientificLevelAccordance" [falseLabel]="'не подтверждается'"
+                          [trueLabel]="'подтверждается'"></app-boolean-button>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      10. Наиболее близкий аналог используемой (выпускаемой) на территории Республики Беларусь
+      и (или) в мире технологии и (или) продукции того же назначения:
+    </label>
+    <textarea [(ngModel)]="_form.analogue" rows="3" class="form-control"
+              placeholder="наиболее близкий аналог в республике по объекту экспертизы">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      11. Признаки, которыми технологии и (или) продукция отличаются от аналогов
+      на территории Республики Беларусь и (или) в мире:
+    </label>
+    <textarea [(ngModel)]="_form.differences" rows="3" class="form-control"
+              placeholder="признаки, по которым наиболее близкий аналог в республике отличается от объекта экспертизы">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      12. Обоснованность расходов по сравнению с аналогичными технологиями и (или) продукцией,
+      применяемыми и (или) выпускаемой в Республике Беларусь и (или) мире:
+    </label>
+    <textarea [(ngModel)]="_form.relevance" rows="3" class="form-control"
+              placeholder="анализ и оценка обоснованности расходов во внедряемые технологии по объекту экспертизы">
+    </textarea>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      13. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
+      и необходимости модернизации (реконструкции) взаимосвязанных действующих производственных объектов:
+    </label>
+    <textarea [(ngModel)]="_form.consequences" rows="3" class="form-control"
+              placeholder="оценка возможных последствий внедрения выбранных технологий и необходимости модернизации">
+    </textarea>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="form-group-label">Выводы и предложения эксперта</label>
+  <div class="form-sub-group">
+    <label>
+      1. Организация технологического процесса, обеспечивающего средний уровень добавленной стоимости
+      на одного работающего, аналогичный среднему уровню добавленной стоимости на одного работающего
+      по соответствующему виду экономической деятельности в Европейском союзе либо превышающий этот уровень:
+    </label>
+    <input class="form-control" disabled title="Организация технологического процесса" [value]="organizationLabel">
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      2. Экспортная ориентированность инновационного проекта (превышение экспорта над импортом):
+    </label>
+    <input class="form-control" disabled title="Организация технологического процесса" [value]="exportLabel">
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      3. Создание и внедрение новых технологий и (или) производство новой для Республики Беларусь
+      и (или) мировой экономики продукции:
+    </label>
+    <app-boolean-button [(ngModel)]="_form.innovative" [falseLabel]="'не соответствует'"
+                        [trueLabel]="'соответствует'"></app-boolean-button>
+  </div>
+
+  <div class="form-sub-group">
+    <label>
+      4. Замечания по материалам объекта экспертизы, конкретные предложения о необходимости доработки и (или)
+      корректировки материалов по объекту экспертизы:
+    </label>
+    <div *ngIf="notes.length == 0" class="mb-2 italic">не имеются</div>
+    <div *ngFor="let note of notes; let i = index" class="input-group btn-group mb-2">
+        <textarea [(ngModel)]="note.name" rows="2" class="form-control"
+                  placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
+      <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
+      Добавить замечание
+    </button>
+  </div>
+</div>

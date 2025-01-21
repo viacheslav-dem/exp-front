@@ -1,0 +1,69 @@
+<hr/>
+
+<label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+
+<app-product-name-block [_form]="_form"></app-product-name-block>
+
+<hr/>
+
+<app-high-tech-accordance-block
+  [_form]="_form"
+  [num]="'1'"
+  (onConditionsChanged)="onConditionsChanged()"
+></app-high-tech-accordance-block>
+
+<hr/>
+
+<app-science-block
+        [_form]="_form"
+        [num]="'2'"
+        (onConditionsChanged)="onConditionsChanged()"
+></app-science-block>
+
+<hr/>
+
+<app-export-orientation-block
+  [_form]="_form"
+  [num]="'3'"
+  (onConditionsChanged)="onConditionsChanged()"
+></app-export-orientation-block>
+
+<hr/>
+
+
+<app-added-value-accordance-block
+  [_form]="_form"
+  [num]="'4'"
+  (onConditionsChanged)="onConditionsChanged()"
+></app-added-value-accordance-block>
+
+<hr/>
+
+<app-title-protection-block
+        [_form]="_form"
+        [num]="'5'"
+        (onConditionsChanged)="onConditionsChanged()">
+</app-title-protection-block>
+
+<hr/>
+
+<app-cof-tech-block [_form]="_form"
+[num]="'6'"
+(onConditionsChanged)="onConditionsChanged()">
+</app-cof-tech-block>
+
+<hr/>
+
+<app-high-tech-block [_form]="_form"
+                     [num]="'7'"
+                     (onConditionsChanged)="onConditionsChanged()">
+</app-high-tech-block>
+
+<hr/>
+
+<app-conclusion-council-hightech-block
+  [form]="_form"
+  [financeConclusionNum]="'7'"
+  [project]="project"
+  [group]="group"
+></app-conclusion-council-hightech-block>

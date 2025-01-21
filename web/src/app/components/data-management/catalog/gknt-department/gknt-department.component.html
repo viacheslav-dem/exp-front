@@ -1,0 +1,144 @@
+<h5 class="mb-3">Справочник подразделений ГКНТ</h5>
+<div class="list-group">
+
+  <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
+
+  <div [loadingData]="_loading">
+
+    <!--ADD DEPARTMENT-->
+    <div (click)="addItem()">
+      <div class="list-group-item selectable link background-dark-sea-green">
+        Добавить подразделение
+      </div>
+    </div>
+
+    <!--DEPARTMENTS-->
+    <div *ngFor="let department of items; let departmentInd = index">
+
+      <!--DEPARTMENT HEADER-->
+      <div class="list-group-item list-group-item-action selectable"
+           [class.border-bottom-none]="department.isExpanded" [class.disabled]="department.disabled"
+           (click)="department.isExpanded=!department.isExpanded">
+        <div class="text-mini font-weight-bold">
+          подразделение
+          <span *ngIf="department.id == 0">(не сохранено)</span>
+          <span *ngIf="department.disabled">(неактивное)</span>
+        </div>
+        <div>{{department.name | orElse: 'Наименование отсутствует'}}</div>
+      </div>
+
+      <div *ngIf="department.isExpanded" class="list-group-item border-top-none pt-0">
+
+        <!--SHOW DEPARTMENT-->
+        <div *ngIf="!department.isEdit">
+          <a class="float-right btn btn-icon" (click)="editItem(department)">
+            <fa-icon icon="cog"></fa-icon>
+          </a>
+          <div>Начальник подразделения:
+            <span class="italic">{{department.chairman | fullName}}</span>
+          </div>
+          <div>Заместитель начальника:
+            <span class="italic">{{department.deputyChairman | fullName}}</span>
+          </div>
+          <div>Курирующий зам. Председателя:
+            <span class="italic">{{department.gkntChairman | fullName}}</span>
+          </div>
+          <div>Краткое наименование:
+            <span class="italic">{{department.shortName | orElse: 'не указано'}}</span>
+          </div>
+          <div>Код подразделения:
+            <span class="italic">{{department.code | orElse: 'не указан'}}</span>
+          </div>
+          <div>Сотрудники подразделения:
+            <span *ngIf="department.persons.length == 0" class="form-sub-group italic">
+                не указаны
+              </span>
+          </div>
+          <ul *ngIf="department.persons.length > 0" class="form-sub-group italic">
+            <li *ngFor="let person of department.persons">{{person | fullName}}</li>
+          </ul>
+        </div>
+
+        <!--EDIT DEPARTMENT-->
+        <div *ngIf="department.isEdit">
+          <div *ngIf="department.id != 0" class="form-sub-group">
+            <app-checkbox [(ngModel)]="editedItem.disabled">
+              Неактивное (подразделение больше не существует)
+            </app-checkbox>
+          </div>
+          <div class="form-sub-group">
+            <div>Наименование</div>
+            <input type="text" [(ngModel)]="editedItem.name"
+                   placeholder="Наименование подразделения" class="form-control" title="Наименование">
+          </div>
+          <div class="form-sub-group">
+            Начальник подразделения:
+            <span class="italic">{{editedItem.chairman | fullName}}</span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchChairmanModal()">
+              <fa-icon icon="pencil-alt"></fa-icon>
+            </a>
+          </div>
+          <div class="form-sub-group">
+            Заместитель начальника:
+            <span class="italic">{{editedItem.deputyChairman | fullName}}</span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchDeputyChairmanModal()">
+              <fa-icon icon="pencil-alt"></fa-icon>
+            </a>
+          </div>
+          <div class="form-sub-group">
+            Курирующий зам. Председателя:
+            <span class="italic">{{editedItem.gkntChairman | fullName}}</span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchGkntChairmanModal()">
+              <fa-icon icon="pencil-alt"></fa-icon>
+            </a>
+          </div>
+          <div class="form-sub-group">
+            <div>Краткое наименование</div>
+            <input type="text" [(ngModel)]="editedItem.shortName"
+                   placeholder="Краткое наименование" class="form-control" title="Краткое наименование">
+          </div>
+          <div class="form-group">
+            <div>Код подразделения</div>
+            <input type="text" [(ngModel)]="editedItem.code"
+                   placeholder="Код подразделения" class="form-control" title="Код подразделения">
+          </div>
+          <div [class.form-group]="editedItem.persons.length == 0">Сотрудники подразделения:
+            <span *ngIf="editedItem.persons.length == 0" class="form-group italic">
+                не указаны
+              </span>
+            <a class="btn btn-icon btn-icon-sm" (click)="showSearchGkntWorkerModal()">
+              <fa-icon icon="plus"></fa-icon>
+            </a>
+          </div>
+          <ul *ngIf="editedItem.persons.length > 0" class="form-group italic">
+            <li *ngFor="let worker of editedItem.persons;let i=index">{{worker | fullName}}
+              <a class="btn btn-icon btn-icon-sm" (click)="editedItem.persons.splice(i, 1)">
+                <fa-icon icon="minus"></fa-icon>
+              </a>
+            </li>
+          </ul>
+          <div class="mt-1">
+            <button class="btn btn-secondary" (click)="cancelEditItem()">Отмена</button>
+            <button class="btn btn-primary" (click)="saveEditedItem()">Сохранить</button>
+            <button *ngIf="department.id == 0" class="btn btn-danger" (click)="deleteItem(departmentInd)">
+              Удалить
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!items || items.length == 0">
+      <div class="italic list-group-item background-light-blue">
+        Подразделения ГКНТ отсутствуют
+      </div>
+    </div>
+
+    <app-pagination
+      [page]="_page" [pagination]="_pagination"
+      (onPageChanged)="onPageChanged($event)">
+    </app-pagination>
+  </div>
+</div>
+
+<app-search-person *ngIf="gknt" [filters]="[searchPersonFilter]" (selected)="selectPerson($event)"></app-search-person>
