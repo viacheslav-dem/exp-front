@@ -200,7 +200,7 @@ export class UserFormComponent {
   }
 
   getPhoto(person: IdDto) {
-    if (person.id != 0)
+    if (person.id != 0){
       this._personService.getPhoto(person).subscribe(
         (res) => {
           if (res.name != null) {
@@ -210,6 +210,7 @@ export class UserFormComponent {
           }
         },
         () => this.photo = 'assets/abstract_profile.jpg');
+    }
     else
       this.photo = 'assets/abstract_profile.jpg';
   }

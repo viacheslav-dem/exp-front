@@ -75,7 +75,7 @@ export class LoginoffComponent implements OnInit, OnDestroy {
   }
 
   changePassword() {
-    this.dialogService.showChangePasswordDialog(this.user.id).subscribe();
+    this.dialogService.showChangePasswordDialog(this.user.user.id).subscribe();
   }
 
   getUserManual() {

@@ -6,7 +6,7 @@
         <app-silent-file-uploader
             [controlClass]="'btn py-0'"
             [typesAccept]="'image/jpeg,image/png,image/jpg'"
-            [url]="SERVER_URL+'/persons/'+_user.id+'/photo'"
+            [url]="SERVER_URL+'/persons/'+_user.user.id+'/photo'"
             (saved)="getPhoto(_user)">
         </app-silent-file-uploader>
       </div>
