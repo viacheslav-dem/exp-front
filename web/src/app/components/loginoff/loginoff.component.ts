@@ -6,6 +6,8 @@ import {DialogService} from "@app/components/dialogs/dialog.service";
 import {PersonService} from "@app/services/person.service";
 import {PersonDto} from "@app/dto/PersonDto";
 import {Subscription} from "rxjs";
+import {StorageService} from "@app/services/storage.service";
+import {RoleInfoDto} from "@app/dto/RoleInfoDto";
 
 @Component({
   selector: 'app-loginoff',
@@ -27,6 +29,8 @@ import {Subscription} from "rxjs";
 })
 export class LoginoffComponent implements OnInit, OnDestroy {
   public roles: string[] = [];
+  public role: string;
+  public currRole;
   public user: PersonDto;
   onCurrentPersonChangedSubscription: Subscription;
 
@@ -34,10 +38,12 @@ export class LoginoffComponent implements OnInit, OnDestroy {
               private _authService: AuthService,
               private _personService: PersonService,
               private toasty: GlobalToastyService,
-              private dialogService: DialogService) {
+              private dialogService: DialogService,
+              private _storageService: StorageService) {
   }
 
   ngOnInit() {
+    this.role = this._storageService.getCurrRole();
     this._personService.getCurrentPerson().subscribe(res => this.update(res));
     this.onCurrentPersonChangedSubscription = this._personService.onCurrentPersonChanged.subscribe(
       person => this.update(person));
