@@ -132,7 +132,9 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
       `Пересоздать договор в соответствии с изменившимися данными в системе?`,
       'Дата договора при этом останется неизменной'
     ).subscribe(() => {
-      this._accountingService.refreshContract(accounting, new PeriodDto()).subscribe(res => {
+      this._accountingService.refreshContract(accounting
+      //    , new PeriodDto()
+      ).subscribe(res => {
         accounting.contract = res.contract;
         this._toasty.success("Документ успешно обновлён.");
       });

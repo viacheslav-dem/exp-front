@@ -116,15 +116,21 @@ export class ExpertReviewComponent implements OnInit {
     }
 
     refreshContract() {
-        this._dialogService.showConfirmDialogWithFields(
-            [new ConfirmDialogField<Date>('startDate', 'Дата начала работ', 'date'),
-                new ConfirmDialogField<Date>('endDate', 'Дата завершения работ', 'date')],
+        // this._dialogService.showConfirmDialogWithFields(
+        //     [new ConfirmDialogField<Date>('startDate', 'Дата начала работ', 'date'),
+        //         new ConfirmDialogField<Date>('endDate', 'Дата завершения работ', 'date')],
+        //     'Пересоздание документа',
+        //     `Пересоздать договор в соответствии с изменившимися данными в системе?`,
+        //     'Дата договора при этом останется неизменной'
+        this._dialogService.showConfirmDialog(
             'Пересоздание документа',
-            `Пересоздать договор в соответствии с изменившимися данными в системе?`,
-            'Дата договора при этом останется неизменной'
+                 `Пересоздать договор в соответствии с изменившимися данными в системе?`,
+                 'Дата договора при этом останется неизменной'
         ).subscribe((dlgResult: DialogResult<any>) => {
-            let period = new PeriodDto(dlgResult.value.startDate, dlgResult.value.endDate)
-            this._accountingService.refreshContract(this.expertReview.accounting, period).subscribe(res => {
+         //   let period = new PeriodDto(dlgResult.value.startDate, dlgResult.value.endDate)
+            this._accountingService.refreshContract(this.expertReview.accounting
+            //    , period
+            ).subscribe(res => {
                 this.expertReview.accounting = <AccountingPlainDto>res;
                 this._toasty.success("Документ успешно обновлён.");
             });

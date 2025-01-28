@@ -47,8 +47,12 @@ export class AccountingService extends HasStateService {
     return this._http.postBlock(`${this.url}/refresh-act/${idDto.id}`, null);
   }
 
-  refreshContract(idDto: IdDto, period: PeriodDto): Observable<AccountingDto> {
-    return this._http.postBlock(`${this.url}/refresh-contract/${idDto.id}`, period);
+  refreshContract(idDto: IdDto
+  //                , period: PeriodDto
+  ): Observable<AccountingDto> {
+    return this._http.postBlock(`${this.url}/refresh-contract/${idDto.id}`
+    //    , period
+    ,null);
   }
 
     // downloadAgreements(dateFrom: number, dateTo: number) {
