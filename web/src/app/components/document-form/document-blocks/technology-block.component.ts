@@ -11,7 +11,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
                           [falseLabel]="'не подтверждается'"
                           (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       <textarea *ngIf="full" [(ngModel)]="_form.technologyText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст."></textarea>
       <div *ngIf="full" class="hint">
         <p>
           <b>Подсказка.</b>

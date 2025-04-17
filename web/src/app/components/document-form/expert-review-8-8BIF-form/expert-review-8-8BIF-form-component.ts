@@ -7,7 +7,7 @@ import {
     ExpertReview_8_8BIF_FormContent
 } from "@app/components/document-form/form-model/ExpertReview_8_8BIF_FormContent";
 import {PeriodDto} from "@app/dto/PeriodDto";
-import {anyMatch} from "@app/support/utils";
+import {anyMatch, isEmptyOrNull} from "@app/support/utils";
 
 
 @Component({
@@ -23,7 +23,47 @@ export class ExpertReview_8_8BIF_FormComponent extends ExpertReviewForm<ExpertRe
     }
 
     Catalog = Catalog;
-    validate() {}
+    validate() {
+        if (isEmptyOrNull(this._form.noveltyText)
+            || isEmptyOrNull(this._form.scientificLevel)
+            || isEmptyOrNull(this._form.noveltyExistsText)
+            || isEmptyOrNull(this._form.technologyTypeText)
+            || isEmptyOrNull(this._form.economicSignificanceText)
+            || isEmptyOrNull(this._form.balanceText)
+            || isEmptyOrNull(this._form.consequences)
+            || isEmptyOrNull(this._form.resourcesSufficiencyText)
+            || isEmptyOrNull(this._form.competenceSufficiencyText)
+            || isEmptyOrNull(this._form.marketingResearchText)
+            || isEmptyOrNull(this._form.analogText)
+            || isEmptyOrNull(this._form.analogParamsText)
+            || isEmptyOrNull(this._form.risksText)
+            || isEmptyOrNull(this._form.privacyObjectsDescriptionText)
+            || isEmptyOrNull(this._form.nameAccordanceText)
+            || isEmptyOrNull(this._form.termsAccordanceText)
+            || isEmptyOrNull(this._form.financeConclusionText)
+        ) {
+            throw 'Пожалуйста, заполните все поля заключения.';
+        }
+        if (this._form.noveltyText.length < 30
+            || this._form.scientificLevel.length < 30
+            || this._form.noveltyExistsText.length < 30
+            || this._form.technologyTypeText.length < 30
+            || this._form.economicSignificanceText.length < 30
+            || this._form.balanceText.length < 30
+            || this._form.consequences.length < 30
+            || this._form.resourcesSufficiencyText.length < 30
+            || this._form.competenceSufficiencyText.length < 30
+            || this._form.marketingResearchText.length < 30
+            || this._form.analogText.length < 30
+            || this._form.analogParamsText.length < 30
+            || this._form.risksText.length < 30
+            || this._form.privacyObjectsDescriptionText.length < 30
+            || this._form.nameAccordanceText.length < 30
+            || this._form.termsAccordanceText.length < 30
+            || this._form.financeConclusionText.length < 30) {
+            throw 'Длина сообщения меньше 30 символов';
+        }
+    }
     onConditionsChanged() {
         if (this.isFinanceConclusionDisabled()) {
             this._form.financeConclusion = false;

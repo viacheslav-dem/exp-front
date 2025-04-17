@@ -2,11 +2,11 @@
   <div class="form-group row">
     <div class="img-holder media col-4" style="text-align: center">
       <img class="media-object" [src]='photo' alt="Фото пользователя">
-      <div class="hover-btn" *ngIf="_user.id != 0" style="width: 200px">
+      <div class="hover-btn" *ngIf="_user.id != 0 && _user.id" style="width: 200px">
         <app-silent-file-uploader
             [controlClass]="'btn py-0'"
             [typesAccept]="'image/jpeg,image/png,image/jpg'"
-            [url]="SERVER_URL+'/persons/'+_user.user.id+'/photo'"
+            [url]="SERVER_URL+'/persons/'+ _user.id +'/photo'"
             (saved)="getPhoto(_user)">
         </app-silent-file-uploader>
       </div>

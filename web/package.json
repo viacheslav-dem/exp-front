@@ -39,6 +39,7 @@
     "popper.js": "1.14.4",
     "rxjs": "^6.3.3",
     "rxjs-compat": "^6.3.3",
+    "sass": "^1.86.0",
     "ts-helpers": "1.1.2",
     "zone.js": "^0.8.26"
   },

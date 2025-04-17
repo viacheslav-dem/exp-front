@@ -25,7 +25,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         ></textarea>
       </ng-container>
       <textarea *ngIf="full" [(ngModel)]="_form.sufficiencyText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст."></textarea>
     </div>
   `
 })

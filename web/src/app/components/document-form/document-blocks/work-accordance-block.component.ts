@@ -14,7 +14,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
                           [falseLabel]="'не соответствует'" 
                           (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       <textarea *ngIf="full" [(ngModel)]="_form.workAccordanceText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст."></textarea>
     </div>
   `
 })

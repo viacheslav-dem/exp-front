@@ -12,7 +12,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
                     (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       <textarea *ngIf="full || _form.privacyObjectsDescription == 'предусматривается'" 
                 [(ngModel)]="_form.privacyObjectsDescriptionText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст"></textarea>
       <div *ngIf="full" class="hint">
         <p>
           <b>Подсказка.</b>

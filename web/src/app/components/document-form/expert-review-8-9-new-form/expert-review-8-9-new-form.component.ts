@@ -14,8 +14,18 @@ export class ExpertReview_8_9_NewFormComponent extends ExpertReviewForm<ExpertRe
     if (isEmptyOrNull(this._form.scientificLevel)
       || isEmptyOrNull(this._form.priorityAccordance)
       || isEmptyOrNull(this._form.consequences)
+        || isEmptyOrNull(this._form.technologyText)
+        || isEmptyOrNull(this._form.conclusionText)
     ) {
       throw 'Пожалуйста, заполните все поля заключения.';
+    }
+    if  (this._form.scientificLevel.length < 30
+        || this._form.priorityAccordance.length < 30
+        || this._form.technologyText.length < 30
+        || this._form.consequences.length < 30
+        || this._form.conclusionText.length < 30
+    ) {
+      throw 'Длина сообщения меньше 30 символов';
     }
   }
 

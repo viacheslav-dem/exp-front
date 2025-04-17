@@ -13,8 +13,17 @@ export class ExpertReview_8_6_NewFormComponent extends ExpertReviewForm<ExpertRe
     super.validate();
     if (isEmptyOrNull(this._form.results)
       || isEmptyOrNull(this._form.effectiveness)
+        || isEmptyOrNull(this._form.accordanceText)
+        || isEmptyOrNull(this._form.effectAccordanceText)
     ) {
       throw 'Пожалуйста, заполните все поля заключения.';
+    }
+    if (this._form.results.length < 30
+        || this._form.effectiveness.length < 30
+        || this._form.accordanceText.length < 30
+        || this._form.effectAccordanceText.length < 30
+    ) {
+      throw 'Длина сообщения меньше 30 символов';
     }
   }
 

@@ -20,7 +20,7 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
         </div>
       </ng-container>
       <textarea *ngIf="full" [(ngModel)]="_form.termsAccordanceText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст"></textarea>
     </div>
   `
 })

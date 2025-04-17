@@ -18,7 +18,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         [falseLabel]="'нецелесообразно'"
         (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       <textarea *ngIf="full" [(ngModel)]="_form.financeConclusionText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст"></textarea>
       <div *ngIf="(full || disabled) && noveltyNum && economicSignificanceNum" class="hint">
         <p class="mb-0">
           <b>Подсказка.</b>

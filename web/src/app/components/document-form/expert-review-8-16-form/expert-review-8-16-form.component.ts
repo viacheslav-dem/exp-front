@@ -4,6 +4,7 @@ import {Catalog} from "@app/services/data.service";
 import {ExpertReview_8_16_FormContent} from "@app/components/document-form/form-model/ExpertReview_8_16_FormContent";
 import {DocumentService} from "@app/services/document.service";
 import {HttpClientSecure} from "@app/services/http.client";
+import {isEmptyOrNull} from "@app/support/utils";
 
 
 @Component({
@@ -21,7 +22,22 @@ export class ExpertReview_8_16_FormComponent extends ExpertReviewForm<ExpertRevi
 
   Catalog = Catalog;
 
-  validate() {}
+  validate() {
+    if (isEmptyOrNull(this._form.economicActivityText)
+        || isEmptyOrNull(this._form.basedOnHighTechText)
+        || isEmptyOrNull(this._form.exportOrientationText)
+        || isEmptyOrNull(this._form.importOrientationText)
+    ) {
+      throw 'Пожалуйста, заполните все поля заключения.';
+    }
+    if (this._form.economicActivityText.length < 30
+        || this._form.basedOnHighTechText.length < 30
+        || this._form.exportOrientationText.length < 30
+        || this._form.importOrientationText.length < 30
+    ) {
+      throw 'Длина сообщения меньше 30 символов';
+    }
+  }
   downloadDocxDocument() {
         return this._documentService.downloadFile(`${this.url}?${this._http.getTokenParamsString()}`).subscribe();
     }

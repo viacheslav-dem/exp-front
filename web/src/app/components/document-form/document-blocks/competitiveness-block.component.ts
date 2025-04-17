@@ -10,7 +10,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <app-dropdown [options]="competitivenessOptions" [(ngModel)]="_form.competitiveness"
                     (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       <textarea *ngIf="full" [(ngModel)]="_form.competitivenessText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст"></textarea>
       <div *ngIf="full" class="hint">
         <p>
           <b>Подсказка.</b>

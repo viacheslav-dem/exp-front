@@ -32,7 +32,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
                             (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       </div>
       <textarea *ngIf="full" [(ngModel)]="_form.technologyTypeText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст"></textarea>
     </div>
   `
 })

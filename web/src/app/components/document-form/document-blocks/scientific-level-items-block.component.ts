@@ -12,7 +12,7 @@ import {Text} from "@app/components/document-form/form-model/Text";
         <app-checkbox [(ngModel)]="opt.isChecked" (onChecked)="onChecked()"> {{opt.text}}</app-checkbox>
       </div>
       <textarea *ngIf="full" [(ngModel)]="_form.scientificLevelItemsText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст."></textarea>
     </div>
   `
 })

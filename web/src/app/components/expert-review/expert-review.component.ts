@@ -85,6 +85,7 @@ export class ExpertReviewComponent implements OnInit {
 
     showReviewFormModal() {
         console.log(this.project.code);
+        // console.log(this.expertReview.id);
         this.formRenderer = this._formResolver.getFormRenderer(this.project.code.expertReviewType);
         if (!this.formRenderer) {
             this._toasty.warn("Не найдено подходящей формы экспертного заключения. Будет сегенерирован документ по умолчанию.");

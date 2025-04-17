@@ -12,7 +12,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
                             (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       <textarea *ngIf="full || _form.importOrientation" 
                 [(ngModel)]="_form.importOrientationText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст."></textarea>
     </div>
   `
 })

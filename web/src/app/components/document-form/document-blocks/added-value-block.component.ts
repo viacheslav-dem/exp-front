@@ -13,7 +13,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
              placeholder="сумма в евро"
              (ngModelChange)="onConditionsChanged.emit(true)">
       <textarea *ngIf="full" [(ngModel)]="_form.addedValueText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст"></textarea>
       <div *ngIf="full" class="hint">
         <p>
           <b>Подсказка.</b>

@@ -14,7 +14,7 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
       <app-dropdown [options]="significanceOptions" [(ngModel)]="_form.economicSignificance"
                     (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       <textarea *ngIf="full" [(ngModel)]="_form.economicSignificanceText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст"></textarea>
       <div *ngIf="full" class="hint">
         <p>
           <b>Подсказка.</b>
@@ -119,6 +119,9 @@ export class EconomicSignificanceBlockComponent {
 
   @Input()
   _form: { economicSignificance: string, economicSignificanceText: string };
+
+  @Input()
+  isTextRequired: boolean = false;
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

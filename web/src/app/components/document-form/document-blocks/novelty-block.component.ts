@@ -42,6 +42,9 @@ export class NoveltyBlockComponent {
   @Input()
   _form: { novelty: string, noveltyText: string };
 
+  @Input()
+  isTextRequired: boolean = false;
+
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 }

@@ -19,8 +19,25 @@ export class ExpertReview_8_11_14_NewFormComponent extends ExpertReviewForm<Expe
       || isEmptyOrNull(this._form.assessment)
       || isEmptyOrNull(this._form.stagesExist)
       || isEmptyOrNull(this._form.privacyObjectsDescription)
+        || isEmptyOrNull(this._form.marketingResearchText)
+        || isEmptyOrNull(this._form.sufficiencyText)
+        || isEmptyOrNull(this._form.workAccordanceText)
+        || isEmptyOrNull(this._form.requirementsText)
+        || isEmptyOrNull(this._form.privacyObjectsDescriptionText)
+        || isEmptyOrNull(this._form.conclusionText)
+        || isEmptyOrNull(this._form.stagesExistText)
     ) {
       throw 'Пожалуйста, заполните все поля заключения.';
+    }
+
+    if (this._form.marketingResearchText.length < 30
+        || this._form.sufficiencyText.length < 30
+        || this._form.workAccordanceText.length < 30
+        || this._form.requirementsText.length < 30
+        || this._form.privacyObjectsDescriptionText.length < 30
+        || this._form.conclusionText.length < 30
+        || this._form.stagesExistText.length < 30) {
+      throw 'Длина сообщения меньше 30 символов';
     }
   }
 

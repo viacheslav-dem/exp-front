@@ -13,7 +13,7 @@ import {EconomicActivityBlockComponent} from "@app/components/document-form/docu
                             (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       <textarea *ngIf="full || _form.basedOnHighTech" 
                 [(ngModel)]="_form.basedOnHighTechText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст."></textarea>
     </div>
   `
 })

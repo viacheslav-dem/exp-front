@@ -39,6 +39,7 @@ export class MeetingService implements DraftService<MeetingProtocolNewFormConten
   }
 
   finishMeeting(meeting: IdDto): Observable<MeetingDto> {
+
     return this._http.postBlock(`${this.url}/finish/${meeting.id}/${this._authService.getCurrRole()}`, null);
   }
 

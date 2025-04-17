@@ -21,7 +21,7 @@ import {Catalog} from "@app/services/data.service";
         </p>
       </div>
       <textarea [(ngModel)]="_form.sectionText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст"></textarea>
       <div class="hint">
         <p>
           <b>Подсказка.</b>

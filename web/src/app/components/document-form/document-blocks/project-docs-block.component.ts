@@ -19,7 +19,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         
             <div>
                 <textarea *ngIf="full" [(ngModel)]="_form.projectDocsText" rows="3" class="form-control mt-05"
-                          placeholder="Пояснительный текст (при необходимости)."></textarea>
+                          placeholder="Обязательный текст."></textarea>
             </div>
 
         <div *ngIf="full" class="hint">
