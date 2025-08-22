@@ -114,6 +114,7 @@ export enum Catalog {
   COUNCIL = 'council',
   AREA_OF_COMPETENCE = 'area-of-competence',
   CURRENCY = 'currency',
+  STUDY = 'study',
   DIRECTION = 'direction',
   SOCIAL_ECONOMIC_GOAL = 'social-economic-goal',
   PROJECT_CODE = 'project-code',

@@ -10,13 +10,14 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         {{num}}. Целесообразность реализации объекта государственной экспертизы и его финансирования за счет средств
         республиканского бюджета и (или) других источников финансирования:
       </label>
-      <app-boolean-button
-        [(ngModel)]="_form.financeConclusion"
-        [disabled]="disabled"
-        [showDisabledSelection]="true"
-        [trueLabel]="'целесообразно'"
-        [falseLabel]="'нецелесообразно'"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button [disabled]=disabled type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.financeConclusion === true}" (click)="stateButton(true)">
+          Целесобразно
+        </button>
+        <button [disabled]=disabled type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.financeConclusion === false}" (click)="stateButton(false)">
+          Нецелесобразно
+        </button>
+      </div>
       <textarea *ngIf="full" [(ngModel)]="_form.financeConclusionText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст"></textarea>
       <div *ngIf="(full || disabled) && noveltyNum && economicSignificanceNum" class="hint">
@@ -45,8 +46,13 @@ import {ProjectDto} from "@app/dto/ProjectDto";
 })
 export class FinanceConclusionBlockComponent {
 
+  ngOnInit(){
+    this._form.financeConclusion = false;
+  }
+
+
   @Input()
-  num: string = "9.4";
+  num: string = "10.6";
 
   @Input()
   noveltyNum: string;
@@ -68,4 +74,13 @@ export class FinanceConclusionBlockComponent {
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  stateButton(flag: boolean) {
+    if(flag){
+      this._form.financeConclusion = true;
+    } else {
+      this._form.financeConclusion = false;
+    }
+  }
+
 }

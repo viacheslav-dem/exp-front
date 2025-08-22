@@ -41,6 +41,7 @@ import {TimeInputComponent} from "@app/components/common-components/time-input/t
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {NumberInputDirective} from "@app/components/common-components/number-input/number-input.directive";
 import {BankAccountInputDirective} from "@app/components/common-components/bank-account/bank-account-input.directive";
+import {BooleanButtonV2Component} from "@app/components/common-components/boolean-button/boolean-button-v2.component";
 
 @NgModule({
   imports: [
@@ -101,7 +102,8 @@ import {BankAccountInputDirective} from "@app/components/common-components/bank-
     DateInputComponent,
     TimeInputComponent,
     NumberInputDirective,
-    BankAccountInputDirective
+    BankAccountInputDirective,
+    BooleanButtonV2Component
   ],
   declarations: [
     DocumentListComponent,
@@ -127,6 +129,7 @@ import {BankAccountInputDirective} from "@app/components/common-components/bank-
     ProgressComponent,
     SliderComponent,
     BooleanButtonComponent,
+    BooleanButtonV2Component,
     ChooseFilesComponent,
     SilentFileUploaderComponent,
     MonthYearComponent,

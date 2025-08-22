@@ -7,12 +7,17 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <label>
         {{num}}. Соответствие объекта государственной экспертизы своему наименованию:
       </label>
-      <app-boolean-button [(ngModel)]="_form.nameAccordance" [trueLabel]="'соответствует'"
-                          [falseLabel]="'не соответствует'"
-                          (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <ng-container *ngIf="!_form.nameAccordance">
-        <label>Рекомендуемое наименование:</label>
-        <textarea [(ngModel)]="_form.nameSuggestion" rows="2" class="form-control"
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.nameAccordance === true}" (click)="stateButton(true)">
+          Соответсвует
+        </button>
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.nameAccordance === false}" (click)="stateButton(false)">
+          Не соотвествует
+        </button>
+      </div>
+      <ng-container *ngIf="!_form.nameAccordance" >
+        <label class="ml-2">Рекомендуемое наименование:</label>
+        <textarea [(ngModel)]="_form.nameSuggestion" rows="2" class="form-control mt-2"
                   title="Рекомендуемое наименование"
                   placeholder="Предлагаемое наименование"></textarea>
       </ng-container>
@@ -23,8 +28,12 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class NameAccordanceBlockComponent {
 
+  ngOnInit() {
+    this._form.nameAccordance = false;
+  }
+
   @Input()
-  num: string = "9.1";
+  num: string = "10.1";
 
   @Input()
   full: boolean = true;
@@ -34,4 +43,13 @@ export class NameAccordanceBlockComponent {
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+
+  stateButton(flag: boolean) {
+    if(flag){
+      this._form.nameAccordance = true;
+    } else{
+      this._form.nameAccordance = false;
+    }
+  }
 }

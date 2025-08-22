@@ -24,6 +24,10 @@
   </div>
 
   <div class="form-group">
+    <label class="form-group-label">Наименование программы (подпрограммы)</label>
+  </div>
+
+  <div class="form-group">
     <label class="form-group-label">Заказчик экспертизы (данные из Вашего профиля)</label>
     <div class="form-sub-group">
       <label>Наименование организации</label>
@@ -50,6 +54,20 @@
         <app-date-period class="form-control" [(ngModel)]="_project.period"></app-date-period>
       </div>
     </div>
+
+      <div class="form-group">
+        <label class="form-group-label">Вид научного исследования по объекту государственной экспертизы</label>
+        <div class="form-sub-group">
+          <label class="form-sub-group-label">
+            <span>Исследование: </span>
+            <app-select-catalog
+                    class="d-inline-block"
+                    [catalog]="Catalog.STUDY"
+                    [resetEnabled]="false"
+                    [(ngModel)]="_project.study"
+            ></app-select-catalog>
+          </label>
+        </div>
 
     <div class="form-group">
       <label class="form-group-label">Финансирование</label>

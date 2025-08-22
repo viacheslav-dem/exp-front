@@ -31,19 +31,35 @@ import {
 import {
   ExpertReview_8_8BIF_FormComponent
 } from "@app/components/document-form/expert-review-8-8BIF-form/expert-review-8-8BIF-form-component";
+import {
+  ExpertReview_8_1_2_15_2025FormComponent
+} from "@app/components/document-form/expert-review-8-1-2-15-2025-form/expert-review_8_1_2_15_2025-form.component";
+import {
+  ExpertReview_8_3_4_12NIOKTR_2025FormComponent
+} from "@app/components/document-form/expert-review-8-3-4-12NIOKTR-2025-form/expert-review_8_3_4_12-n-i-o-k-t-r_2025-form.component";
+import {
+  ExpertReview_8_5_7_8_12IP_2025FormComponent
+} from "@app/components/document-form/expert-review-8-5-7-8-12IP-2025-form/expert-review_8_5_7_8_12-i-p_2025-form.component";
+import {
+  ExpertReview_8_14_2025FormComponent
+} from "@app/components/document-form/expert-review-8-14-2025-form/expert-review_8_14_2025-form.component";
 
 export class ExpertReviewFormResolver {
 
   private formRenderers: any = {
     [TemplateType.EXPERT_REVIEW_8_1]: ExpertReview_8_1_FormComponent,
     [TemplateType.EXPERT_REVIEW_8_1_2_15_NEW]: ExpertReview_8_1_2_15_NewFormComponent,  //сделан и надо
+    [TemplateType.EXPERT_REVIEW_8_1_2_15_2025]: ExpertReview_8_1_2_15_2025FormComponent,  //сделан и надо
     [TemplateType.EXPERT_REVIEW_8_3_4_12NIOKTR_NEW]: ExpertReview_8_3_4_12NIOKTR_NewFormComponent, //сделан и надо
+    [TemplateType.EXPERT_REVIEW_8_3_4_12NIOKTR_2025]: ExpertReview_8_3_4_12NIOKTR_2025FormComponent, //сделан и надо
     [TemplateType.EXPERT_REVIEW_8_5_7_8_12IP_NEW]: ExpertReview_8_5_7_8_12IP_NewFormComponent,  //сделан и надо
+    [TemplateType.EXPERT_REVIEW_8_5_7_8_12IP_2025]: ExpertReview_8_5_7_8_12IP_2025FormComponent,  //сделан и надо
     [TemplateType.EXPERT_REVIEW_8_6_NEW]: ExpertReview_8_6_NewFormComponent, //сделан и надо
     [TemplateType.EXPERT_REVIEW_8_9_NEW]: ExpertReview_8_9_NewFormComponent, //сделан и надо
     [TemplateType.EXPERT_REVIEW_8_10PVT_NEW]: ExpertReview_8_10PVT_NewFormComponent, //нечего валидировать а надо
     [TemplateType.EXPERT_REVIEW_8_10PIT_NEW]: ExpertReview_8_10PIT_NewFormComponent, //сделан и надо
     [TemplateType.EXPERT_REVIEW_8_11_14_NEW]: ExpertReview_8_11_14_NewFormComponent, //сделан и надо
+    [TemplateType.EXPERT_REVIEW_8_14_2025]: ExpertReview_8_14_2025FormComponent, //сделан и надо
     [TemplateType.EXPERT_REVIEW_8_13_NEW]: ExpertReview_8_13_NewFormComponent, //сделан и надо
     [TemplateType.EXPERT_REVIEW_8_2]: ExpertReview_8_2_FormComponent, //нечего валидировать
     [TemplateType.EXPERT_REVIEW_8_3_4_5_7_8]: ExpertReview_8_3_4_5_7_8_FormComponent, //нечего валидировать

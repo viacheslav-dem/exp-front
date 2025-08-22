@@ -1,0 +1,36 @@
+import {Component, Input} from "@angular/core";
+
+@Component({
+    selector: 'app-users-block-2025',
+    template: `
+    <div class="form-sub-group">
+      <label>
+        {{num}}. Сведения о предполагаемом владельце, операторе, пользователях программно-технических средств, 
+        информационных ресурсов, информационных систем и информационных сетей.
+      </label>
+      <textarea [(ngModel)]="_form.users" rows="3" class="form-control"
+                placeholder="Обязательный текст."></textarea>
+      <div *ngIf="full" class="hint">
+        <p>
+          <b>Подсказка.</b>
+            Эксперт должен указать необходимые сведения по объекту экспертизы по представленным материалам объекта государственной экспертизы.
+        </p>
+        <p>
+            Если в материалах по объекту государственной экспертизы отсутствует данная информация, эксперт должен указать: 
+            «Не представлено в материалах по объекту государственной экспертизы».
+        </p>
+      </div>
+    </div>
+  `
+})
+export class UsersBlock2025Component {
+
+    @Input()
+    num: string = "5";
+
+    @Input()
+    full: boolean = true;
+
+    @Input()
+    _form: { users: string };
+}

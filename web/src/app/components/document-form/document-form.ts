@@ -4,7 +4,6 @@ import {DraftService} from "@app/components/document-form/draft.service";
 import {IdDto} from "@app/dto/IdDto";
 import {Observable} from "rxjs";
 import {deepClone} from "@app/support/utils";
-
 @Injectable()
 export class DocumentForm<Form extends FormContent> implements OnInit, OnDestroy {
 

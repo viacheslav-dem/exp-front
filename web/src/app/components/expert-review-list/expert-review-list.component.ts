@@ -44,6 +44,7 @@ export class ExpertReviewListComponent implements OnInit {
   }
 
   onSelectedExpert(expert) {
+    console.log("review-list")
     this.searchExpertComponent.hide();
     this._dialogService.showConfirmDialog(
       'Выбор эксперта',

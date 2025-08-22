@@ -8,11 +8,13 @@ import {CatalogDto} from "@app/dto/CatalogDto";
 import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
 import {HasState} from "@app/dto/HasState";
 import {FundingDto} from "@app/dto/FundingDto";
+import {DirectionDto} from "@app/dto/DirectionDto";
 
 export class ProjectDto extends HasState {
   title: string;
   period: PeriodDto;
   currency: IdNameDto;
+  study: IdNameDto;
   financing: FundingDto[] = [];
   createdDate: number;
   registerDate: number;

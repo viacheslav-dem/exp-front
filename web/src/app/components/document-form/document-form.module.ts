@@ -228,9 +228,119 @@ import {
 import {
   Agenda_8_8_Bif_Eac_FormComponent
 } from "@app/components/document-form/agenda-8-8-bif-eac-form/agenda-8-8-bif-eac-form.component";
-
-
-
+import { ExpertReview_8_1_2_15_2025FormComponent } from './expert-review-8-1-2-15-2025-form/expert-review_8_1_2_15_2025-form.component';
+import {NoveltyBlock2025Component} from "@app/components/document-form/document-blocks/novelty-block-2025.component";
+import {
+  EconomicSignificanceBlock2025Component
+} from "@app/components/document-form/document-blocks/economic-significance-block-2025.component";
+import {
+  CommerceBlock2025Component
+} from "@app/components/document-form/document-blocks/commerce-block-2025.components";
+import {
+  ResourcesSufficiencyBlock2025Component
+} from "@app/components/document-form/document-blocks/resources-sufficiency-block-2025.component";
+import {
+  CompetenceSufficiencyBlock2025Component
+} from "@app/components/document-form/document-blocks/competence-sufficiency-block-2025.component";
+import {
+  MarketingResearchBlock2025Component
+} from "@app/components/document-form/document-blocks/marketing-research-block-2025.component";
+import {RisksBlock2025Component} from "@app/components/document-form/document-blocks/risks-block-2025.component";
+import {PrivacyBlock2025Component} from "@app/components/document-form/document-blocks/privacy-block-2025.component";
+import {
+  StagesExistsBlock2025Component
+} from "@app/components/document-form/document-blocks/stages-exists-block-2025.components";
+import {
+  SocialOrSecurityBlock2025Component
+} from "@app/components/document-form/document-blocks/social-or-security-block-2025.component";
+import {
+  FinanceAccordanceBlock2025Component
+} from "@app/components/document-form/document-blocks/finance-accordance-block-2025.component";
+import {
+  SoftwareToolBlock2025Component
+} from "@app/components/document-form/document-blocks/software-tool-block-2025.component";
+import { ExpertReview_8_3_4_12NIOKTR_2025FormComponent } from './expert-review-8-3-4-12NIOKTR-2025-form/expert-review_8_3_4_12-n-i-o-k-t-r_2025-form.component';
+import {
+  ScientificResearchBlock2025Component
+} from "@app/components/document-form/document-blocks/scientific-research-block-2025.component";
+import {TaskListsBlock2025Component} from "@app/components/document-form/document-blocks/task-lists-block-2025.component";
+import {
+  TechnologicalOrderBlock2025Component
+} from "@app/components/document-form/document-blocks/technological-order-block-2025.component";
+import {TargetBlock2025Component} from "@app/components/document-form/document-blocks/target-block-2025.component";
+import {
+  CompetitivenessBlock2025Component
+} from "@app/components/document-form/document-blocks/competitiveness-block-2025.component";
+import {AnalogBlock2025Component} from "@app/components/document-form/document-blocks/analog-block-2025.component";
+import {
+  AnalogParamsBlock2025Component
+} from "@app/components/document-form/document-blocks/analog-params-block-2025.component";
+import {NeedsBlock2025Component} from "@app/components/document-form/document-blocks/needs-block-2025.component";
+import {
+  NameAccordanceBlock2025Component
+} from "@app/components/document-form/document-blocks/name-accordance-block-2025.component";
+import {
+  TermsAccordanceBlock2025Component
+} from "@app/components/document-form/document-blocks/terms-accordance-block-2025.component";
+import {
+  FinanceConclusionBlock2025Component
+} from "@app/components/document-form/document-blocks/finance-conclusion-block-2025.component";
+import {
+  TargetAccordanceBlock2025Component
+} from "@app/components/document-form/document-blocks/target-accordance-block-2025.component";
+import { ExpertReview_8_5_7_8_12IP_2025FormComponent } from './expert-review-8-5-7-8-12IP-2025-form/expert-review_8_5_7_8_12-i-p_2025-form.component';
+import {
+  ScientificLevelBlock2025Component
+} from "@app/components/document-form/document-blocks/scientific-level-block-2025.component";
+import {
+  NoveltyExistsBlock2025Component
+} from "@app/components/document-form/document-blocks/novelty-exists-block-2025.component";
+import {
+  TechnologyTypeBlock2025Component
+} from "@app/components/document-form/document-blocks/technology-type-block-2025.component";
+import {SectionBlock2025Component} from "@app/components/document-form/document-blocks/section-block-2025.component";
+import {
+  AddedValueBlock2025Component
+} from "@app/components/document-form/document-blocks/added-value-block-2025.component";
+import {
+  AddedValueInBoundBlock2025Component
+} from "@app/components/document-form/document-blocks/added-value-in-bound-block-2025.component";
+import {BalanceBlock2025Component} from "@app/components/document-form/document-blocks/balance-block-2025.component";
+import {ExportBlock2025Component} from "@app/components/document-form/document-blocks/export-block-2025.componennt";
+import {
+  ConsequencesBlock2025Component
+} from "@app/components/document-form/document-blocks/consequences-block-2025.component";
+import {
+  ConstructionWorkBlock2025Component
+} from "@app/components/document-form/document-blocks/construction-work-block-2025.component";
+import {
+  ProjectDocsBlock2025Component
+} from "@app/components/document-form/document-blocks/project-docs-block-2025.component";
+import {
+  NeededProjectDocsBlock2025Component
+} from "@app/components/document-form/document-blocks/needed-project-docs-block-2025.component";
+import {
+  MarketingResearchResultsBlock2025Component
+} from "@app/components/document-form/document-blocks/marketing-research-results-block-2025.component";
+import { ExpertReview_8_14_2025FormComponent } from './expert-review-8-14-2025-form/expert-review_8_14_2025-form.component';
+import {SignificanceBlock2025Component} from "@app/components/document-form/document-blocks/significance-block-2025";
+import {EffectBlock2025Component} from "@app/components/document-form/document-blocks/effect-block-2025.component";
+import {
+  SufficiencyBlock2025Component
+} from "@app/components/document-form/document-blocks/sufficiency-block-2025.component";
+import {UsersBlock2025Component} from "@app/components/document-form/document-blocks/users-block-2025.component";
+import {
+  CharacteristicsBlock2025Component
+} from "@app/components/document-form/document-blocks/characteristics-block-2025.component";
+import {
+  WorkAccordanceBlock2025Component
+} from "@app/components/document-form/document-blocks/work-accordance-block-2025.component";
+import {
+  RequirementsBlock2025Component
+} from "@app/components/document-form/document-blocks/requirements-block-2025.component";
+import {
+  Conclusion_8_14_BlockComponent
+} from "@app/components/document-form/document-blocks/conclusion-8-14-block-2025.component";
 
 @NgModule({
   imports: [
@@ -240,13 +350,17 @@ import {
   entryComponents: [
     ExpertReview_8_1_FormComponent,
     ExpertReview_8_1_2_15_NewFormComponent,
+    ExpertReview_8_1_2_15_2025FormComponent,
     ExpertReview_8_3_4_12NIOKTR_NewFormComponent,
+    ExpertReview_8_3_4_12NIOKTR_2025FormComponent,
     ExpertReview_8_5_7_8_12IP_NewFormComponent,
+    ExpertReview_8_5_7_8_12IP_2025FormComponent,
     ExpertReview_8_10PVT_NewFormComponent,
     ExpertReview_8_6_NewFormComponent,
     ExpertReview_8_9_NewFormComponent,
     ExpertReview_8_10PIT_NewFormComponent,
     ExpertReview_8_11_14_NewFormComponent,
+    ExpertReview_8_14_2025FormComponent,
     ExpertReview_8_13_NewFormComponent,
     ExpertReview_8_2_FormComponent,
     ExpertReview_8_3_4_5_7_8_FormComponent,
@@ -326,21 +440,43 @@ import {
     MeetingProtocolFormComponent,
     VoteResultsComponent,
     CouncilConclusionFormContainerComponent,
+    FinanceConclusionBlock2025Component,
+    TargetAccordanceBlock2025Component,
     NoveltyBlockComponent,
+    CompetitivenessBlock2025Component,
+    AnalogBlock2025Component,
+    TermsAccordanceBlock2025Component,
+    AnalogParamsBlock2025Component,
+    NeedsBlock2025Component,
+    NameAccordanceBlock2025Component,
+    NoveltyBlock2025Component,
     EconomicSignificanceBlockComponent,
     EconomicSignificance88BIFBlockComponent,
     ResourcesSufficiencyBlockComponent,
+    TaskListsBlock2025Component,
+    TechnologicalOrderBlock2025Component,
+    TargetBlock2025Component,
+    ResourcesSufficiencyBlock2025Component,
+    ScientificResearchBlock2025Component,
     CompetenceSufficiencyBlockComponent,
+    CompetenceSufficiencyBlock2025Component,
     MarketingResearchBlockComponent,
+    MarketingResearchBlock2025Component,
     RisksBlockComponent,
+    RisksBlock2025Component,
     PrivacyBlockComponent,
+    PrivacyBlock2025Component,
     StagesExistsBlockComponent,
+    StagesExistsBlock2025Component,
+    SocialOrSecurityBlock2025Component,
     EconomicActivityBlockComponent,
     BasedOnHighTechBlockComponent,
     ImportOrientationBlockComponent,
     NameAccordanceBlockComponent,
     TermsAccordanceBlockComponent,
     FinanceAccordanceBlockComponent,
+    FinanceAccordanceBlock2025Component,
+    SoftwareToolBlock2025Component,
     FinanceConclusionBlockComponent,
     ConclusionBlockComponent,
     NotesBlockComponent,
@@ -353,19 +489,29 @@ import {
     TargetAccordanceBlockComponent,
     ExpertReview_8_5_7_8_12IP_NewFormComponent,
     ScientificLevelBlockComponent,
+    ScientificLevelBlock2025Component,
     NoveltyExistsBlockComponent,
+    NoveltyExistsBlock2025Component,
     TechnologyTypeBlockComponent,
+    TechnologyTypeBlock2025Component,
     DocumentAccordanceBlock,
     SectionBlockComponent,
+    SectionBlock2025Component,
     AddedValueBlockComponent,
+    AddedValueBlock2025Component,
     AddedValueInBoundBlockComponent,
+    AddedValueInBoundBlock2025Component,
     BalanceBlockComponent,
+    BalanceBlock2025Component,
     ExportBlockComponent,
+    ExportBlock2025Component,
     ExportBalanceBlockComponent,
     ConsequencesBlockComponent,
+    ConsequencesBlock2025Component,
     MarketingResearchPlainBlockComponent,
     MarketingResearchPlainBifBlockComponent,
     MarketingResearchResultsBlockComponent,
+    MarketingResearchResultsBlock2025Component,
     ScientificLevelItemsBlockComponent,
     ScientificLevelOfInjectedTechBlockComponent,
     AnalogDescriptionBlockComponent,
@@ -376,6 +522,8 @@ import {
     EffectivenessBlockComponent,
     ResultAccordanceBlockComponent,
     EffectAccordanceBlockComponent,
+    EconomicSignificanceBlock2025Component,
+    CommerceBlock2025Component,
     Conclusion_8_6_BlockComponent,
     EconomicSignificance_8_8_BlockComponent,
     ExportOrientedBlockComponent,
@@ -465,16 +613,31 @@ import {
     CouncilConclusion_8_6_FormComponent,
     ReturnFromCouncilWithoutExpertiseFormComponent,
     ConstructionWorkBlockComponent,
+    ConstructionWorkBlock2025Component,
     CorrespondenceOfProductNameComponent,
     NewAndHighTechComponent,
     PercentageOfExportToImportBlockComponent,
     ProjectDocsBlockComponent,
+    ProjectDocsBlock2025Component,
     NeededProjectDocsBlockComponent,
+    NeededProjectDocsBlock2025Component,
     TitleProtectionBlockComponent,
     ExportOrientationBlockComponent,
     CofTechBlockComponent,
     CatalogHighTechBlockComponent,
     ConclusionCouncilHightechBlockComponent,
+    ExpertReview_8_1_2_15_2025FormComponent,
+    ExpertReview_8_3_4_12NIOKTR_2025FormComponent,
+    ExpertReview_8_5_7_8_12IP_2025FormComponent,
+    ExpertReview_8_14_2025FormComponent,
+    SignificanceBlock2025Component,
+    EffectBlock2025Component,
+    SufficiencyBlock2025Component,
+    UsersBlock2025Component,
+    CharacteristicsBlock2025Component,
+    WorkAccordanceBlock2025Component,
+    RequirementsBlock2025Component,
+    Conclusion_8_14_BlockComponent
   ],
   providers: [
     ExpertReviewFormResolver,

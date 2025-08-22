@@ -7,6 +7,7 @@ import {PersonService} from "@app/services/person.service";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {FundingDto} from "@app/dto/FundingDto";
 import {FundingTypePipe, getAllFundingType} from "@app/pipes/funding-type.pipe";
+import {DirectionDto} from "@app/dto/DirectionDto";
 
 
 @Component({
@@ -16,7 +17,7 @@ import {FundingTypePipe, getAllFundingType} from "@app/pipes/funding-type.pipe";
 export class ProjectFormComponent implements OnInit {
 
   Catalog = Catalog;
-  newDirection: CatalogDto;
+  newDirection: DirectionDto;
   newSocialEconomicGoal: CatalogDto;
   funding: FundingDto = new FundingDto();
   allFundingType: string[] = getAllFundingType();

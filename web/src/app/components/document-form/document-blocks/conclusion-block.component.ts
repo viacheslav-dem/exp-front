@@ -9,13 +9,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         Заключение эксперта по объекту государственной экспертизы 
       </label>
         <br\>
-      <app-boolean-button
-        [(ngModel)]="_form.conclusion"
-        [disabled]="disabled"
-        [showDisabledSelection]="true"
-        [trueLabel]="'положительное'"
-        [falseLabel]="'отрицательное'"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button [disabled]=disabled type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.conclusion === true}" (click)="stateButton(true)">
+          Положительное
+        </button>
+        <button [disabled]=disabled type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.conclusion === false}" (click)="stateButton(false)">
+          Отрицательное
+        </button>
+      </div>
       <textarea [(ngModel)]="_form.conclusionText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст"></textarea>
       <div *ngIf="financeConclusionNum" class="hint">
@@ -40,4 +41,13 @@ export class ConclusionBlockComponent {
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  stateButton(flag: boolean) {
+    if(flag){
+      this._form.conclusion = true;
+    } else {
+      this._form.conclusion = false;
+    }
+  }
+
 }

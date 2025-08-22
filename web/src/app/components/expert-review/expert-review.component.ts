@@ -2,7 +2,9 @@ import {Component, EventEmitter, Input, OnInit, Output, Type, ViewChild} from "@
 import {ExpertReviewState, ExpertReviewStateBadge} from "@app/pipes/review-state.pipe";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
-import {ExpertReviewFormResolver} from "@app/components/document-form/expert-review-form-container/expert-review-form-resolver.service";
+import {
+    ExpertReviewFormResolver
+} from "@app/components/document-form/expert-review-form-container/expert-review-form-resolver.service";
 import {ExpertReviewDto} from "@app/dto/ExpertReviewDto";
 import {ExpertReviewService} from "@app/services/expert-review.service";
 import {ExpertTransitionHistoryDto} from "@app/dto/ExpertTransitionHistoryDto";
@@ -18,12 +20,15 @@ import {anyMatch} from "@app/support/utils";
 import {SERVER_URL} from "@app/config";
 import {ProjectState} from "@app/pipes/project-state.pipe";
 import {DocType} from "@app/components/common-components/file-uploader/doc-type";
-import {ExpertReviewFormContainerComponent} from "@app/components/document-form/expert-review-form-container/expert-review-form-container.component";
+import {
+    ExpertReviewFormContainerComponent
+} from "@app/components/document-form/expert-review-form-container/expert-review-form-container.component";
 import {DataService} from "@app/services/data.service";
 import "rxjs-compat/add/operator/takeWhile";
 import {PeriodDto} from "@app/dto/PeriodDto";
 import * as moment from "moment";
 import {AccountingPlainDto} from "@app/dto/AccountingPlainDto";
+import {TemplateType} from "@app/components/document-form/form-model/TemplateType";
 
 @Component({
     selector: 'app-expert-review',
@@ -85,12 +90,13 @@ export class ExpertReviewComponent implements OnInit {
 
     showReviewFormModal() {
         console.log(this.project.code);
-        // console.log(this.expertReview.id);
         this.formRenderer = this._formResolver.getFormRenderer(this.project.code.expertReviewType);
+        console.log(this.formRenderer);
         if (!this.formRenderer) {
             this._toasty.warn("Не найдено подходящей формы экспертного заключения. Будет сегенерирован документ по умолчанию.");
             this.generateReviewDocument({});
         } else {
+            console.log("Загрузка шаблона.")
             this.reviewFormModal.show();
             this.expertReviewForm.startAutoSave();
         }
@@ -152,6 +158,7 @@ export class ExpertReviewComponent implements OnInit {
     }
 
     generateReviewDocument(reviewForm) {
+        // console.log(reviewForm);
         this._reviewService.generateReviewDocument(this.expertReview, reviewForm).subscribe(res => {
             this.closeForm();
             this.review = res;

@@ -26,9 +26,16 @@
     </div>
 
     <div class="form-group">
-      <label>Количество затраченных часов</label>
+      <label>Количество часов, затраченных на подготовку экспертного заключения</label>
       <input title="Количество затраченных часов"
              [(ngModel)]="_form.hours" min="1" numberInput type="text" class="form-control" placeholder="Часы">
+      <div class="hint">
+        <p>
+          <b>Подсказка.</b>
+          Эксперт указывает количество часов исходя из времени, фактически затраченного на рассмотрение объекта государственной экспертизы,
+          с учетом сложности и объема представленных документов и материалов, но не более 10 часов.
+        </p>
+      </div>
     </div>
 
     <app-select-directions-and-goals-block *ngIf="needSelectDirections()"

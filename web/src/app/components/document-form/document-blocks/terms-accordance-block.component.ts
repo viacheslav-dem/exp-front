@@ -9,13 +9,18 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
       <label>
         {{num}}. Соответствие сроков выполнения объекта государственной экспертизы необходимым:
       </label>
-      <app-boolean-button [(ngModel)]="_form.termsAccordance" [trueLabel]="'соответствует'"
-                          [falseLabel]="'не соответствует'"
-                          (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.termsAccordance === true}" (click)="stateButton(true)">
+          Соответсвует
+        </button>
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.termsAccordance === false}" (click)="stateButton(false)">
+          Не соотвествует
+        </button>
+      </div>
       <ng-container *ngIf="!_form.termsAccordance">
-        <label>Рекомендуемые сроки реализации:</label>
+        <label class="ml-2">Рекомендуемые сроки реализации:</label>
         <div class="input-group">
-          <app-date-period class="form-control" [(ngModel)]="_terms"
+          <app-date-period class="form-control mt-2" [(ngModel)]="_terms"
                            (ngModelChange)="onTermsChanged()"></app-date-period>
         </div>
       </ng-container>
@@ -30,7 +35,7 @@ export class TermsAccordanceBlockComponent {
   _form: { termsAccordance: boolean, termsSuggestion: PeriodDto, termsAccordanceText: string };
 
   @Input()
-  num: string = "9.2";
+  num: string = "10.2";
 
   @Input()
   full: boolean = true;
@@ -47,4 +52,13 @@ export class TermsAccordanceBlockComponent {
   onTermsChanged() {
     this._form.termsSuggestion = new PeriodDto(this._terms.start, this._terms.end);
   }
+
+  stateButton(flag: boolean){
+    if(flag){
+      this._form.termsAccordance = true;
+    } else {
+      this._form.termsAccordance = false;
+    }
+  }
+
 }
