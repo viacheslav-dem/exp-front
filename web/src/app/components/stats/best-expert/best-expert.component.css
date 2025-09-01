@@ -1,0 +1,84 @@
+
+form {
+    margin-bottom: 20px;
+}
+
+form label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+form input {
+    margin-bottom: 10px;
+}
+
+.experts-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.experts-table th, .experts-table td {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.experts-table td {
+    vertical-align: top;
+}
+
+.experts-table .text-sm {
+    margin-top: 5px;
+}
+
+.experts-table .italic {
+    font-style: italic;
+}
+
+.experts-table .text-muted {
+    color: gray;
+}
+
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+}
+
+label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="date"] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 180px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #45a049;
+}

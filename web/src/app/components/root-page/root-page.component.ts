@@ -55,6 +55,7 @@ export class RootPageComponent implements OnInit {
       {link: '/stats', title: 'Общая статистика'},
       {link: '/council-stats', title: 'Статистика по ГЭС'},
       {link: '/result-fun', title: 'Результаты функционирования'},
+      {link: '/best-expert', title: 'Эксперт года'},
     ];
     let notificationMenu = [
       {link: '/notification', title: 'Уведомление на почту'},
