@@ -29,6 +29,7 @@ import {SubOrgListComponent} from "@app/components/sub-org-list/sub-org-list.com
 import {NotificationComponent} from "@app/components/notification/notification.component";
 import {SystemNotificationComponent} from "@app/components/system-notification/system-notification.component";
 import {ResultFunComponent} from "@app/components/stats/result-fun/result-fun.component";
+import {BestExpertComponent} from "@app/components/stats/best-expert/best-expert.component";
 
 const appRoutes: Routes = [
   {
@@ -59,6 +60,7 @@ const appRoutes: Routes = [
       {path: 'experts', component: ExpertListComponent},
       {path: 'index', component: RealTimeStatsComponent},
       {path: 'result-fun', component: ResultFunComponent},
+      {path: 'best-expert', component: BestExpertComponent},
       {path: 'stats', component: PeriodStatsComponent},
       {path: 'council-stats', component: CouncilStatsComponent},
       {path: 'accounting', component: AccountingComponent},
