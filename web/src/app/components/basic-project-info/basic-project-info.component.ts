@@ -18,7 +18,8 @@ import {DocType} from "@app/components/common-components/file-uploader/doc-type"
 import {DocumentService} from "@app/services/document.service";
 import {LifecycleGroupDto} from "@app/dto/LifecycleGroupDto";
 import {LifecycleGroupState} from "@app/pipes/lifecycle-group-state.pipe";
-import {ProjectLifecycleState} from "@app/pipes/lifecycle-state.pipe";
+import {DirectionDto} from "@app/dto/DirectionDto";
+import {Catalog, DataService} from "@app/services/data.service";
 
 @Component({
   selector: 'app-basic-project-info',
@@ -50,7 +51,8 @@ export class BasicProjectInfoComponent implements OnInit {
               private _transitionHistoryService: TransitionHistoryService,
               private _toasty: GlobalToastyService,
               private authService: AuthService,
-              private _documentService: DocumentService) {
+              private _documentService: DocumentService,
+              private _dataService: DataService) {
   }
 
   ngOnInit() {
@@ -173,5 +175,38 @@ export class BasicProjectInfoComponent implements OnInit {
       }
     }
     return documents;
+  }
+
+  displayDirection() {
+    console.log(this.project);
+    let subDirections = this.project.subDirections;
+    // let directions = this.project.directions;
+    let catalogDirections: DirectionDto[];
+    this._dataService.getCatalog(Catalog.DIRECTION).subscribe(res => {
+      catalogDirections = res as DirectionDto[];
+    });
+    let newDirections: DirectionDto[] = [];
+    for (let i = 0; i < catalogDirections.length; i++) {
+      for (let j = 0; j < catalogDirections[i].subDirectionDtos.length; j++) {
+        for (let k = 0; k < subDirections.length; k++) {
+          if(catalogDirections[i].subDirectionDtos[j].directionName === subDirections[k].directionName){
+            let newDir = catalogDirections[i];
+            let flag = false;
+            for (let l = 0; l < newDirections.length; l++) {
+              if(newDirections[l].name === newDir.name){
+                newDirections[l].subDirectionDtos.push(subDirections[k]);
+                flag = true;
+                break;
+              }
+            }
+            if(!flag) {
+              newDir.subDirectionDtos.push(subDirections[k]);
+              newDirections.push(newDir);
+            }
+          }
+        }
+      }
+    }
+    return newDirections;
   }
 }

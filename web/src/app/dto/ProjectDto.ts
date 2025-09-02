@@ -9,6 +9,7 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
 import {HasState} from "@app/dto/HasState";
 import {FundingDto} from "@app/dto/FundingDto";
 import {DirectionDto} from "@app/dto/DirectionDto";
+import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 
 export class ProjectDto extends HasState {
   title: string;
@@ -21,9 +22,11 @@ export class ProjectDto extends HasState {
   executor: string;
   code: ProjectCodePlainDto;
   directions: CatalogDto[] = [];
+
+  subDirections: SubDirectionDto[] = [];
   socialEconomicGoals: CatalogDto[] = [];
   documents: DocumentDto[] = [];
-  program: IdNameDto;
+  program: string;
   customer: PersonCustomerDto;
   subCustomer: PersonCustomerDto;
   returnReason: String;

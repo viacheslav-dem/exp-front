@@ -23,8 +23,20 @@
     </div>
   </div>
 
-  <div class="form-group">
-    <label class="form-group-label">Наименование программы (подпрограммы)</label>
+  <div class="form-group" *ngIf="_project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || _project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'">
+    <label class="form-group-label" *ngIf="!_project.code?.code == '8.4'">Наименование программы (подпрограммы)</label>
+    <label class="form-group-label" *ngIf="_project.code?.code == '8.4'">Наименование двусторонней научно-технической программы с </label>
+    <textarea rows="2" class="form-control" placeholder="Наименование программы (подпрограммы)"
+              [(ngModel)]="_project.program"></textarea>
+    <textarea *ngIf="_project.code?.code == '8.4'" rows="2" class="form-control" placeholder="Название страны"
+              [(ngModel)]="_project.program"></textarea>
+    <div class="hint">
+      <p class="font-italic">
+        <b>Подсказка.</b>
+          Заполняется при наличии программы (подпрограммы). При отсутствии программы (подпрограммы) указывается «Выполнение в рамках программы (подпрограммы)
+          не предусмотрено».
+      </p>
+    </div>
   </div>
 
   <div class="form-group">
@@ -42,9 +54,15 @@
   </div>
 
   <div class="form-group">
-    <label class="form-group-label">Организация-исполнитель проекта</label>
+    <label class="form-group-label">Потенциальный(-е) исполнитель(-и) объекта государственной экспертизы</label>
     <textarea rows="2" class="form-control" placeholder="Организация-исполнитель проекта"
               [(ngModel)]="_project.executor" title="Наименование организации"></textarea>
+    <div class="hint">
+      <p class="font-italic">
+        <b>Подсказка.</b>
+        Если известен(-ы) (наименование исполнителя(-ей), соисполнителя(-ей).
+      </p>
+    </div>
   </div>
   <div *ngIf="!_project.code?.code.startsWith('8.10')">
     <div *ngIf="!_project.code?.code.startsWith('8.16')">
@@ -54,49 +72,49 @@
         <app-date-period class="form-control" [(ngModel)]="_project.period"></app-date-period>
       </div>
     </div>
-
       <div class="form-group">
-        <label class="form-group-label">Вид научного исследования по объекту государственной экспертизы</label>
-        <div class="form-sub-group">
-          <label class="form-sub-group-label">
-            <span>Исследование: </span>
-            <app-select-catalog
-                    class="d-inline-block"
-                    [catalog]="Catalog.STUDY"
-                    [resetEnabled]="false"
-                    [(ngModel)]="_project.study"
-            ></app-select-catalog>
-          </label>
+        <div class="form-sub-group" *ngIf=" _project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025'">
+          <label class="form-group-label">Вид научного исследования по объекту государственной экспертизы</label>
+          <div class="form-sub-group">
+            <label class="form-sub-group-label">
+              <span>Исследование: </span>
+              <app-select-catalog
+                      class="d-inline-block"
+                      [catalog]="Catalog.STUDY"
+                      [resetEnabled]="false"
+                      [(ngModel)]="_project.study"
+              ></app-select-catalog>
+            </label>
+          </div>
         </div>
+        <div class="form-group">
+          <label class="form-group-label">Финансирование</label>
+          <div class="form-sub-group">
+            <label class="form-sub-group-label">
+              <span>Валюта: </span>
+              <app-select-catalog
+                class="d-inline-block"
+                [catalog]="Catalog.CURRENCY"
+                [resetEnabled]="false"
+                [(ngModel)]="_project.currency"
+              ></app-select-catalog>
+            </label>
+          </div>
 
-    <div class="form-group">
-      <label class="form-group-label">Финансирование</label>
-      <div class="form-sub-group">
-        <label class="form-sub-group-label">
-          <span>Валюта: </span>
-          <app-select-catalog
-            class="d-inline-block"
-            [catalog]="Catalog.CURRENCY"
-            [resetEnabled]="false"
-            [(ngModel)]="_project.currency"
-          ></app-select-catalog>
-        </label>
-      </div>
-
-      <div class="form-sub-group italic">
-        <ul *ngIf="_project.financing.length != 0">
-          <li *ngFor="let financing of _project.financing; let i = index">
-            <span>{{financing.type | fundingType}} финансирование, </span>
-            <span>{{financing.comment ? financing.comment + ' - ' : ''}}</span>
-            <span>{{financing.source.name}}: </span>
-            <span>{{financing.value}} {{_project.currency?.name || 'руб.'}}</span>
-            <a class="btn btn-icon btn-icon-sm" (click)="_project.financing.splice(i, 1)">
-              <fa-icon icon="minus"></fa-icon>
-            </a>
-          </li>
-        </ul>
-        <div *ngIf="_project.financing.length == 0" class="italic">финансирование не указано</div>
-      </div>
+        <div class="form-sub-group italic">
+          <ul *ngIf="_project.financing.length != 0">
+            <li *ngFor="let financing of _project.financing; let i = index">
+              <span>{{financing.type | fundingType}} финансирование, </span>
+              <span>{{financing.comment ? financing.comment + ' - ' : ''}}</span>
+              <span>{{financing.source.name}}: </span>
+              <span>{{financing.value}} {{_project.currency?.name || 'руб.'}}</span>
+              <a class="btn btn-icon btn-icon-sm" (click)="_project.financing.splice(i, 1)">
+                <fa-icon icon="minus"></fa-icon>
+              </a>
+            </li>
+          </ul>
+          <div *ngIf="_project.financing.length == 0" class="italic">финансирование не указано</div>
+        </div>
       <div class="row">
         <div class="col-sm-2 pr-0">
           <app-dropdown class="dropdown btn-group" [options]="(allFundingType)"
@@ -126,8 +144,9 @@
         деятельности</label>
       <div class="form-sub-group italic">
         <ul *ngIf="_project.directions.length != 0">
-          <li *ngFor="let direction of _project.directions; let i = index">
-            {{direction.name}}
+          <li *ngFor="let direction of displayDirection(_project.directions); let i = index">
+            {{direction.name}} <br>
+            - {{direction.subDirectionDtos[i].directionName}}
             <a class="btn btn-icon btn-icon-sm" (click)="_project.directions.splice(i, 1)">
               <fa-icon icon="minus"></fa-icon>
             </a>
@@ -140,10 +159,28 @@
           <app-select-catalog [catalog]="Catalog.DIRECTION" [(ngModel)]="newDirection"></app-select-catalog>
         </div>
         <div class="col-2 pl-2">
-          <button class="btn btn-primary w-100" [disabled]="!newDirection" (click)="addDirection()">Добавить</button>
+          <button class="btn btn-primary w-100" [disabled]="!subDirection" (click)="addDirection()">Добавить</button>
         </div>
       </div>
+      <div class="row  m-1" *ngIf="newDirection">
+        <app-dropdown [(ngModel)]="subDirection" [notSelected]="'Ничего не выбрано'" [options]="getSubDirectionName()"
+                      [resetEnabled]="true" [optionToString]="optionToString"></app-dropdown>
+        <!--          <div class="dropdown" >-->
+<!--              <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown">-->
+<!--                {{subDirection.directionName}}-->
+<!--              </button>-->
+<!--            <ul class="dropdown-menu scrollable-menu" role="menu">-->
+<!--              <li *ngFor="let sub of newDirection.subDirectionDtos; let i = index" class="dropdown-item" (click)="select(sub)">-->
+<!--                {{sub.directionName}}-->
+<!--              </li>-->
+<!--              <li *ngIf="!subDirection">-->
+<!--                Ничего не выбрано-->
+<!--              </li>-->
+<!--            </ul>-->
+<!--          </div>-->
+      </div>
     </div>
+
 
     <div *ngIf="canAddSocialEconomicGoals()" class="form-group">
       <label class="form-group-label">Цель (приоритет) социально-экономического развития</label>

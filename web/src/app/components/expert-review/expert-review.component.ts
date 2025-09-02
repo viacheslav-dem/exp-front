@@ -89,14 +89,11 @@ export class ExpertReviewComponent implements OnInit {
     }
 
     showReviewFormModal() {
-        console.log(this.project.code);
         this.formRenderer = this._formResolver.getFormRenderer(this.project.code.expertReviewType);
-        console.log(this.formRenderer);
         if (!this.formRenderer) {
             this._toasty.warn("Не найдено подходящей формы экспертного заключения. Будет сегенерирован документ по умолчанию.");
             this.generateReviewDocument({});
         } else {
-            console.log("Загрузка шаблона.")
             this.reviewFormModal.show();
             this.expertReviewForm.startAutoSave();
         }
@@ -158,7 +155,7 @@ export class ExpertReviewComponent implements OnInit {
     }
 
     generateReviewDocument(reviewForm) {
-        // console.log(reviewForm);
+        console.log(reviewForm);
         this._reviewService.generateReviewDocument(this.expertReview, reviewForm).subscribe(res => {
             this.closeForm();
             this.review = res;

@@ -11,6 +11,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       </label>
       <app-dropdown [options]="marketingResearchOptions" [(ngModel)]="_form.marketingResearch"
                     (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+        <textarea *ngIf="full" [(ngModel)]="_form.marketingResearchText" rows="3" class="form-control mt-05"
+                  placeholder="Обязательный текст"></textarea>
       <div *ngIf="full" class="hint">
         <p>
           <b>Подсказка.</b>

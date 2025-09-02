@@ -4,6 +4,7 @@ import {Input} from "@angular/core";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {Catalog, DataService} from "@app/services/data.service";
 import * as _ from "lodash";
+import {DirectionDto} from "@app/dto/DirectionDto";
 
 export abstract class CatalogTemplate<T extends CatalogDto> extends FilterAndPages<T> {
 
@@ -28,9 +29,11 @@ export abstract class CatalogTemplate<T extends CatalogDto> extends FilterAndPag
   }
 
   editItem(item: T) {
+    console.log(item);
     if (this.selectedItem) {
       this.selectedItem.isEdit = false;
     }
+
     this.selectedItem = item;
     this.editedItem = (item.id == 0 ?
       this.selectedItem : _.cloneDeep(this.selectedItem));
@@ -57,8 +60,6 @@ export abstract class CatalogTemplate<T extends CatalogDto> extends FilterAndPag
     this.items.unshift(newItem);
     this.editItem(newItem);
   }
-
-
 
   abstract create():T;
 }

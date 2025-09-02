@@ -8,6 +8,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
 import {FundingDto} from "@app/dto/FundingDto";
 import {FundingTypePipe, getAllFundingType} from "@app/pipes/funding-type.pipe";
 import {DirectionDto} from "@app/dto/DirectionDto";
+import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 
 
 @Component({
@@ -18,10 +19,13 @@ export class ProjectFormComponent implements OnInit {
 
   Catalog = Catalog;
   newDirection: DirectionDto;
+  subDirection: SubDirectionDto;
   newSocialEconomicGoal: CatalogDto;
   funding: FundingDto = new FundingDto();
   allFundingType: string[] = getAllFundingType();
   fundingToString: Function;
+
+  @Input() optionToString: Function;
 
   _project: ProjectDto;
   @Output() save = new EventEmitter();
@@ -29,6 +33,7 @@ export class ProjectFormComponent implements OnInit {
 
   codes: any = [];
   customer: any;
+
 
   constructor(private viewContainerRef: ViewContainerRef,
               private _dataService: DataService,
@@ -67,6 +72,11 @@ export class ProjectFormComponent implements OnInit {
   }
 
   validate() {
+    if(this._project.code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025'){
+      if (isEmptyOrNull(this._project.program)){
+        throw 'Наименование программы (подпрограммы) не может быть пустым.';
+      }
+    }
     if (isEmptyOrNull(this._project.title)) {
       throw 'Наименование объекта экспертизы не может быть пустым.';
     }
@@ -100,10 +110,14 @@ export class ProjectFormComponent implements OnInit {
   }
 
   addDirection() {
+    console.log(this.subDirection.id);
     if (this.newDirection) {
       this._project.directions.push(this.newDirection);
+      this._project.subDirections.push(this.subDirection);
       this.newDirection = null;
+      this.subDirection = null
     }
+    console.log(this._project);
   }
 
   addSocialEconomicGoal() {
@@ -134,4 +148,16 @@ export class ProjectFormComponent implements OnInit {
     this.funding = new FundingDto();
   }
 
+  // select(option: SubDirectionDto) {
+  //   console.log(option);
+  //   this.subDirection = option;
+  // }
+
+  getSubDirectionName() {
+    return  this.newDirection.subDirectionDtos;
+  }
+
+  displayDirection(directions: CatalogDto[]) {
+    return directions as DirectionDto[];
+  }
 }

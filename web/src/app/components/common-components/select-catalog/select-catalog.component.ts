@@ -34,6 +34,9 @@ export class SelectCatalogComponent extends ControlComponent<CatalogDto> {
   }
 
   ngOnInit(): void {
-    this.dataService.getCatalog<CatalogDto>(this.catalog).subscribe(res => this.options = res);
+    this.dataService.getCatalog<CatalogDto>(this.catalog).subscribe(res => {
+      this.options = res
+      console.log(res);
+    });
   }
 }

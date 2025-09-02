@@ -1,6 +1,7 @@
 import {Component, EventEmitter, forwardRef, Input, Output} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
+import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 
 export const DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -66,7 +67,7 @@ export class DropdownComponent<T> extends ControlComponent<T> {
     if (this.optionToString) {
       return this.optionToString(option);
     }
-    return option.name ? option.name : option.toString();
+    return option.name ? option.name : (option.directionName ? option.directionName : option.toString());
   }
 }
 

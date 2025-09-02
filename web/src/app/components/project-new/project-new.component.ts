@@ -18,6 +18,7 @@ export class ProjectNewComponent implements OnInit {
   }
 
   onCreate(project) {
+    console.log(project);
     this._projectService.createProject(project).subscribe(res => {
       this._toasty.success('Объект экспертизы сохранен.');
       this.router.navigate(['/projects', res.id]);

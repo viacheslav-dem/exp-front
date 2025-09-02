@@ -4,6 +4,9 @@ import {Text} from "@app/components/document-form/form-model/Text";
 
 export class ExpertReviewFormContent extends FormContent {
   hours: number;
+
+  program: string;
+  study: string;
   selectedDirections: IdNameDto[] = [];
   selectedSocialEconomicGoals: IdNameDto[] = [];
   directionsAndGoalsText: string;

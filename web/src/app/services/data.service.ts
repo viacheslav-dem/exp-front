@@ -15,6 +15,7 @@ import {CouncilPlainDto} from "@app/dto/CouncilPlainDto";
 import {CatalogDto} from "@app/dto/CatalogDto";
 import {AuthPolicy, PropertyDto} from "@app/dto/PropertyDto";
 import {PropertyPlainDto} from "@app/dto/PropertyPlainDto";
+import {DirectionDto} from "@app/dto/DirectionDto";
 
 @Injectable()
 export class DataService {
@@ -58,6 +59,10 @@ export class DataService {
 
   saveCatalog<T extends CatalogDto>(type: string | Catalog, value: T): Observable<T> {
     return this._http.putBlock<T>(`${this.url}/${type}`, value);
+  }
+
+  saveDirection(directionDto: DirectionDto): Observable<DirectionDto>{
+    return this._http.putBlock<DirectionDto>(`${this.url}/save/direction`, directionDto);
   }
 
   getHighTechCriteria(): Observable<HighTechCriteria> {

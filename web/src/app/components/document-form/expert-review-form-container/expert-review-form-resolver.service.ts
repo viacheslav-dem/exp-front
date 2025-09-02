@@ -43,6 +43,9 @@ import {
 import {
   ExpertReview_8_14_2025FormComponent
 } from "@app/components/document-form/expert-review-8-14-2025-form/expert-review_8_14_2025-form.component";
+import {
+  ExpertReview_8_13_2025FormComponent
+} from "@app/components/document-form/expert-review-8-13-2025-form/expert-review_8_13_2025-form.component";
 
 export class ExpertReviewFormResolver {
 
@@ -61,6 +64,7 @@ export class ExpertReviewFormResolver {
     [TemplateType.EXPERT_REVIEW_8_11_14_NEW]: ExpertReview_8_11_14_NewFormComponent, //сделан и надо
     [TemplateType.EXPERT_REVIEW_8_14_2025]: ExpertReview_8_14_2025FormComponent, //сделан и надо
     [TemplateType.EXPERT_REVIEW_8_13_NEW]: ExpertReview_8_13_NewFormComponent, //сделан и надо
+    [TemplateType.EXPERT_REVIEW_8_13_2025]: ExpertReview_8_13_2025FormComponent, //сделан и надо
     [TemplateType.EXPERT_REVIEW_8_2]: ExpertReview_8_2_FormComponent, //нечего валидировать
     [TemplateType.EXPERT_REVIEW_8_3_4_5_7_8]: ExpertReview_8_3_4_5_7_8_FormComponent, //нечего валидировать
     [TemplateType.EXPERT_REVIEW_8_6]: ExpertReview_8_6_FormComponent, //нечего валидировать

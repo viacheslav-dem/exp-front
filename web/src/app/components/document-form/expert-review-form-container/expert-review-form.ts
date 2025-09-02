@@ -37,6 +37,9 @@ export class ExpertReviewForm<Form extends ExpertReviewFormContent> extends Docu
   setForm(form: Form) {
     super.setForm(form);
 
+    this._form.program = this.project.program;
+    this._form.study = this.project.study.name;
+
     this._form.wrappedNotes = this._form.wrappedNotes || [];
 
     /* for old forms */
@@ -53,5 +56,6 @@ export class ExpertReviewForm<Form extends ExpertReviewFormContent> extends Docu
     this.notes = this._form.notes.map(name => {
       return {name: name};
     });
+
   }
 }

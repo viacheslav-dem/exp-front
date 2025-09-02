@@ -341,6 +341,30 @@ import {
 import {
   Conclusion_8_14_BlockComponent
 } from "@app/components/document-form/document-blocks/conclusion-8-14-block-2025.component";
+import {
+  ExpertReview_8_13_2025FormComponent
+} from './expert-review-8-13-2025-form/expert-review_8_13_2025-form.component';
+import {
+  ExpertReview_8_13_2025FormContent
+} from "@app/components/document-form/form-model/ExpertReview_8_13_2025FormContent";
+import {
+  SocioEconomivDev2025Component
+} from "@app/components/document-form/document-blocks/socio-economic-dev-2025.component";
+import {
+  ProgramRequirementsBlock2025Component
+} from "@app/components/document-form/document-blocks/program-requirements-block-2025.component";
+import {
+  PrognosisBlock2025Component
+} from "@app/components/document-form/document-blocks/prognosis-block-2025.component";
+import {
+  TargetAnalysisBlock2025Component
+} from "@app/components/document-form/document-blocks/target-analysis-block-2025.component";
+import {
+  ProgramSufficiencyBlock2025Component
+} from "@app/components/document-form/document-blocks/program-sufficiency-block-2025.component";
+import {
+  Conclusion_8_13_Block2025Component
+} from "@app/components/document-form/document-blocks/conclusion-8-13-block-2025.component";
 
 @NgModule({
   imports: [
@@ -371,6 +395,7 @@ import {
     ExpertReview_8_11_14_FormComponent,
     ExpertReview_8_12IP_FormComponent,
     ExpertReview_8_12NIOKTR_FormComponent,
+    ExpertReview_8_13_2025FormComponent,
     ExpertReview_8_13_FormComponent,
     ExpertReview_8_15_FormComponent,
     ExpertReview_8_16_FormComponent,
@@ -637,7 +662,14 @@ import {
     CharacteristicsBlock2025Component,
     WorkAccordanceBlock2025Component,
     RequirementsBlock2025Component,
-    Conclusion_8_14_BlockComponent
+    Conclusion_8_14_BlockComponent,
+    ExpertReview_8_13_2025FormComponent,
+    SocioEconomivDev2025Component,
+    ProgramRequirementsBlock2025Component,
+    PrognosisBlock2025Component,
+    TargetAnalysisBlock2025Component,
+    ProgramSufficiencyBlock2025Component,
+    Conclusion_8_13_Block2025Component
   ],
   providers: [
     ExpertReviewFormResolver,
