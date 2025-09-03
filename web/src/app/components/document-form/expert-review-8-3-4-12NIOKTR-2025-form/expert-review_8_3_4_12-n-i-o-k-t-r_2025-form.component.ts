@@ -148,7 +148,7 @@ export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewF
     if (isEmptyOrNull(this._form.economicSignificanceText)) {
       throw "В пункте 'Экономическая и (или) социальная значимость объекта государственной экспертизы.' нет комментария к заключению."
     }
-    if (isEmptyOrNull(this._form.targetText)) {
+    if (isEmptyOrNull(this._form.targetText) && this.showTarget8_3()) {
       throw "В пункте 'Оценка целевых показателей проекта.' нет комментария к заключению."
     }
     if (isEmptyOrNull(this._form.taskListsText)) {
@@ -209,7 +209,7 @@ export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewF
     if (isEmptyOrNull(this._form.economicSignificance)) {
       throw "В пункте 'Экономическая и (или) социальная значимость объекта государственной экспертизы.' не выстановленно заключение."
     }
-    if (isEmptyOrNull(this._form.target)) {
+    if (isEmptyOrNull(this._form.target) && this.showTarget8_3()) {
       throw "В пункте 'Оценка целевых показателей проекта.' не выстановленно заключение."
     }
     if (isEmptyOrNull(this._form.taskLists)) {
