@@ -15,6 +15,9 @@ import {
 import {
   CouncilConclusion_8_8BIF_FormComponent
 } from "@app/components/document-form/council-conclusion-8-BIF-form/council-conclusion-8-8BIF-form.component";
+import {
+    CouncilConclusion_8_14_2025_FormComponent
+} from "@app/components/document-form/council-conclusion-8-14-form-2025/council-conclusion-8-14-form-2025.component";
 
 @Injectable()
 export class CouncilConclusionFormResolver {
@@ -32,7 +35,7 @@ export class CouncilConclusionFormResolver {
       return CouncilConclusion_8_10PVT_FormComponent;
     } else if (ProjectCodePlainDto.isCode(code, '10ПИТ')) {
       return CouncilConclusion_8_10PIT_FormComponent;
-    } else if (ProjectCodePlainDto.isCodeIn(code, 11, 14)) {
+    } else if (ProjectCodePlainDto.isCodeIn(code, 11)) {
       return CouncilConclusion_8_11_14_FormComponent;
     } else if (ProjectCodePlainDto.isCode(code, 13)) {
       return CouncilConclusion_8_13_FormComponent;
@@ -44,6 +47,8 @@ export class CouncilConclusionFormResolver {
       return CouncilConclusion_8_8BIF_FormComponent
     } else if (ProjectCodePlainDto.isCode(code,'8ЕАС')) {
       return CouncilConclusion_8_8BIF_FormComponent
+    } else if (ProjectCodePlainDto.isCode(code,14)) {
+        return CouncilConclusion_8_14_2025_FormComponent
     } else {
       return CouncilConclusion_8_3_4_5_7_8_12_15_FormComponent;
     }

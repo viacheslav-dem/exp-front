@@ -183,4 +183,7 @@ export class AgendaNewFormContent extends FormContent {
 
   neededProjectDocs: boolean;
   neededProjectDocsText: string;
+
+  deadlinesCompliance: string;
+  deadlinesComplianceText: string;
 }
