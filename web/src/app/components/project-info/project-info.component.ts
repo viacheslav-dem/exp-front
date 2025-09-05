@@ -33,6 +33,8 @@ import {ProjectCopyDto} from "@app/dto/ProjectCopyDto";
 import {SameProjectListComponent} from "@app/components/same-project-list/same-project-list.component";
 import {ProjectLifecycleDto} from "@app/dto/ProjectLifecycleDto";
 import {ReturnFromCouncilWithoutExpertiseFormContent} from "@app/components/document-form/form-model/ReturnFromCouncilWithoutExpertiseFormContent";
+import {DocumentDto} from "@app/dto/DocumentDto";
+import {DocumentService} from "@app/services/document.service";
 
 @Component({
   selector: 'app-project-info',
@@ -41,6 +43,8 @@ import {ReturnFromCouncilWithoutExpertiseFormContent} from "@app/components/docu
 export class ProjectInfoComponent implements OnInit {
 
   Role = Role; // enum for template
+
+  agreement: boolean = false;
 
   currentUser: any;
   role: string;
@@ -76,6 +80,7 @@ export class ProjectInfoComponent implements OnInit {
   @ViewChild('returnFromCouncilWithoutExpertiseModal') returnFromCouncilWithoutExpertiseModal: ModalComponent;
   @ViewChild('copyProjectModal') copyProjectModal: ModalComponent;
   @ViewChild('expertRejectProject') expertRejectProject: ModalComponent;
+  @ViewChild('expertAgreement') expertAgreement: ModalComponent;
   @ViewChild('listProjects') listProjects: ModalComponent;
   @ViewChild(SameProjectListComponent) sameProjectList: SameProjectListComponent;
 
@@ -94,7 +99,8 @@ export class ProjectInfoComponent implements OnInit {
               private _meetingService: MeetingService,
               private _reviewService: ExpertReviewService,
               private _dialogService: DialogService,
-              private _personPipe: PersonFullNamePipe) {
+              private _personPipe: PersonFullNamePipe,
+              private _documentService: DocumentService) {
   }
 
   ngOnInit() {
@@ -787,13 +793,23 @@ export class ProjectInfoComponent implements OnInit {
     }
     if (this.expertReview && this.role == Role.EXPERT) {
       if (this.expertReview.state == 'ON_EXPERT_CONFIRMATION') {
-        this.buttons.push(new ActionButtonMetadata(
-          'Принять',
-          () => this.acceptProject(), 'btn-primary'));
+        if (this.agreement){
+          this.buttons.push(new ActionButtonMetadata(
+              'Принять',
+              () => this.acceptProject(), 'btn-primary'));
 
-        this.buttons.push(new ActionButtonMetadata(
-          'Отклонить',
-          () => this.expertRejectProject.show(), 'btn-secondary'));
+          this.buttons.push(new ActionButtonMetadata(
+              'Отклонить',
+              () => this.expertRejectProject.show(), 'btn-secondary'));
+        } else {
+          this.buttons.push(new ActionButtonMetadata(
+              'Ознакомится',
+              () => this.geAcquainted(), 'btn-primary'));
+
+          this.buttons.push(new ActionButtonMetadata(
+              'Соглашение',
+              () => this.viewDocument(this.project.documents[0]), 'btn-primary'));
+        }
       }
       if (this.expertReview.state == 'ON_EXAMINATION' && this.expertReview.documents.length > 0) {
         this.buttons.push(new ActionButtonMetadata(
@@ -915,6 +931,23 @@ export class ProjectInfoComponent implements OnInit {
         && this.lifecycleGroup.state != LifecycleGroupState.ACCEPTED);
   }
 
+  viewDocument(doc: DocumentDto) {
+    this._documentService.checkPdfView(doc).subscribe(res => {
+      if (!res) {
+        this._toasty.warn("Формат файла не поддерживается для предпросмотра. " +
+            "Вместо этого, пожалуйста, скачайте его и откройте у себя на компьютере предустановленной программой");
+      } else {
+        this._dialogService.showPDFViewer("document", doc).subscribe();
+        // this.selectedDocument = doc;
+        // this.fileViewerModal.show();
+      }
+    });
+  }
+
+  private geAcquainted() {
+    this.agreement = true;
+    this.initActionButtons();
+  }
 }
 
 export class ActionButtonMetadata {

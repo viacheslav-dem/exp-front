@@ -42,6 +42,10 @@ import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {NumberInputDirective} from "@app/components/common-components/number-input/number-input.directive";
 import {BankAccountInputDirective} from "@app/components/common-components/bank-account/bank-account-input.directive";
 import {BooleanButtonV2Component} from "@app/components/common-components/boolean-button/boolean-button-v2.component";
+import {DatePeriodNIOKTRComponent} from "@app/components/common-components/date-period/date-period-NIOKTR.component";
+import {
+  DatePeriodInnovationComponent
+} from "@app/components/common-components/date-period/date-period-innovation.component";
 
 @NgModule({
   imports: [
@@ -82,6 +86,8 @@ import {BooleanButtonV2Component} from "@app/components/common-components/boolea
     BankAccountComponent,
     DropdownComponent,
     DatePeriodComponent,
+    DatePeriodNIOKTRComponent,
+    DatePeriodInnovationComponent,
     NumberRangeComponent,
     FilterComponent,
     DocumentUploaderComponent,
@@ -116,6 +122,8 @@ import {BooleanButtonV2Component} from "@app/components/common-components/boolea
     BankAccountComponent,
     DropdownComponent,
     DatePeriodComponent,
+    DatePeriodNIOKTRComponent,
+    DatePeriodInnovationComponent,
     NumberRangeComponent,
     FilterComponent,
     DocumentUploaderComponent,
