@@ -365,6 +365,26 @@ import {
 import {
   Conclusion_8_13_Block2025Component
 } from "@app/components/document-form/document-blocks/conclusion-8-13-block-2025.component";
+import {
+  SelectDirectionsAndGoalsBlock2025Component
+} from "@app/components/document-form/document-blocks/select-directions-and-goals-block-2025.component";
+import {
+  CompetitivenessBlockAgenda2025Component
+} from "@app/components/document-form/document-blocks/competitiveness-block-agenda-2025.component";
+import {StagesBlock2025Component} from "@app/components/document-form/document-blocks/stages-block-2025.component";
+import {RbNeedsBlock2025Component} from "@app/components/document-form/document-blocks/rb-needs-block-2025.component";
+import {
+  Agenda_8_1_2_3_4_5_7_8_12NIOKTR_14_2025_FormComponent,
+} from "@app/components/document-form/agenda-8-1-2-3-4-5-7-8-12NIOKTR-14-2025-form/agenda-8-1-2-3-4-5-7-8-12NIOKTR-14-2025-form";
+import {
+  AssessmentConclusionBlock2025Component
+} from "@app/components/document-form/document-blocks/assessment-conclusion-block-2025.component";
+import {
+  Agenda_8_12IP_2025FormComponent
+} from "@app/components/document-form/agenda-8-12IP-2025-form/agenda-8-12IP-2025-form.component";
+import {
+  Agenda_8_15_2025FormComponent
+} from "@app/components/document-form/agenda-8-15-2025-form/agenda-8-15-2025-form.component";
 
 @NgModule({
   imports: [
@@ -412,6 +432,7 @@ import {
     VoteResultsComponent,
     Agenda_8_1_2_NewFormComponent,
     Agenda_8_3_4_5_7_8_11_12NIOKTR_NewFormComponent,
+    Agenda_8_1_2_3_4_5_7_8_12NIOKTR_14_2025_FormComponent,
     Agenda_8_8_Bif_Eac_FormComponent,
     Agenda_8_14_NewFormComponent,
     Agenda_8_6_NewFormComponent,
@@ -419,8 +440,10 @@ import {
     Agenda_8_9_NewFormComponent,
     Agenda_8_10PIT_NewFormComponent,
     Agenda_8_12IP_NewFormComponent,
+    Agenda_8_12IP_2025FormComponent,
     Agenda_8_13_NewFormComponent,
     Agenda_8_15_NewFormComponent,
+    Agenda_8_15_2025FormComponent,
     Agenda_8_16_NewFormComponent,
     CouncilConclusion_8_1_2_FormComponent,
     CouncilConclusion_8_3_4_5_7_8_12_15_FormComponent,
@@ -456,6 +479,7 @@ import {
     Agenda_8_15_FormComponent,
     Agenda_8_9_FormComponent,
     Agenda_8_12IP_FormComponent,
+    Agenda_8_12IP_2025FormComponent,
     Agenda_8_10PIT_FormComponent,
     Agenda_8_10PVT_FormComponent,
     Agenda_8_13_FormComponent,
@@ -469,6 +493,7 @@ import {
     TargetAccordanceBlock2025Component,
     NoveltyBlockComponent,
     CompetitivenessBlock2025Component,
+    CompetitivenessBlockAgenda2025Component,
     AnalogBlock2025Component,
     TermsAccordanceBlock2025Component,
     AnalogParamsBlock2025Component,
@@ -584,19 +609,24 @@ import {
     Conclusion_8_13_BlockComponent,
     Conclusion_8_16_BlockComponent,
     SelectDirectionsAndGoalsBlockComponent,
+    SelectDirectionsAndGoalsBlock2025Component,
     Agenda_8_1_2_NewFormComponent,
     RbNeedsBlockComponent,
+    RbNeedsBlock2025Component,
     StagesBlockComponent,
+    StagesBlock2025Component,
     PercentageOfImportToExportBlockComponent,
     NewVoteResultsComponent,
     ConclusionSectionBlockComponent,
     Agenda_8_3_4_5_7_8_11_12NIOKTR_NewFormComponent,
+    Agenda_8_1_2_3_4_5_7_8_12NIOKTR_14_2025_FormComponent,
     Agenda_8_8_Bif_Eac_FormComponent,
     AgendaHeaderBlockComponent,
     CustomerRepliesBlockComponent,
     Agenda_8_14_NewFormComponent,
     Agenda_8_6_NewFormComponent,
     AssessmentConclusionBlockComponent,
+    AssessmentConclusionBlock2025Component,
     Agenda_8_9_NewFormComponent,
     ScientificLevelConclusionBlockComponent,
     PriorityAccordanceConclusionBlockComponent,
@@ -610,6 +640,7 @@ import {
     ProgramLevelBlockComponent,
     ProgramSufficiencyFinanceBlockComponent,
     Agenda_8_15_NewFormComponent,
+    Agenda_8_15_2025FormComponent,
     Agenda_8_16_NewFormComponent,
     CouncilConclusion_8_1_2_FormComponent,
     ConclusionCouncilBlockComponent,
