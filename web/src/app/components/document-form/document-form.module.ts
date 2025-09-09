@@ -366,6 +366,12 @@ import {
   Conclusion_8_13_Block2025Component
 } from "@app/components/document-form/document-blocks/conclusion-8-13-block-2025.component";
 import {
+    DeadlinesComplianceBlockComponent
+} from "@app/components/document-form/document-blocks/deadlines-compilance-block/deadlines-compilance-block.component";
+import {
+    CouncilConclusion_8_14_2025_FormComponent
+} from "@app/components/document-form/council-conclusion-8-14-form-2025/council-conclusion-8-14-form-2025.component";
+import {
   SelectDirectionsAndGoalsBlock2025Component
 } from "@app/components/document-form/document-blocks/select-directions-and-goals-block-2025.component";
 import {
@@ -454,6 +460,7 @@ import {
     CouncilConclusion_8_13_FormComponent,
     CouncilConclusion_8_6_FormComponent,
     CouncilConclusion_8_16_FormComponent,
+    CouncilConclusion_8_14_2025_FormComponent,
     CouncilConclusion_8_8BIF_FormComponent
   ],
   declarations: [
@@ -700,7 +707,9 @@ import {
     PrognosisBlock2025Component,
     TargetAnalysisBlock2025Component,
     ProgramSufficiencyBlock2025Component,
-    Conclusion_8_13_Block2025Component
+    Conclusion_8_13_Block2025Component,
+    CouncilConclusion_8_14_2025_FormComponent,
+    DeadlinesComplianceBlockComponent
   ],
   providers: [
     ExpertReviewFormResolver,

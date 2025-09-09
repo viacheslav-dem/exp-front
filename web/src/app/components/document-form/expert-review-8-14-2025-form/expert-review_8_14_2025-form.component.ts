@@ -21,7 +21,7 @@ export class ExpertReview_8_14_2025FormComponent extends ExpertReviewForm<Expert
         || isEmptyOrNull(this._form.effect)
         || isEmptyOrNull(this._form.users)
         || isEmptyOrNull(this._form.characteristics)
-        || isEmptyOrNull(this._form.assessment)
+        // || isEmptyOrNull(this._form.assessment)
         || isEmptyOrNull(this._form.stagesExist)
         || isEmptyOrNull(this._form.privacyObjectsDescription)
         || isEmptyOrNull(this._form.marketingResearchText)
