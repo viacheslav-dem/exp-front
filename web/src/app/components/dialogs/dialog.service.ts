@@ -6,6 +6,7 @@ import {DialogContainer, DialogType} from "@app/components/dialogs/dialog-contai
 import {ConfirmDialog} from "@app/components/dialogs/confirm-dialog/ConfirmDialog";
 import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/ConfirmDialogField";
 import {DocumentDto} from "@app/dto/DocumentDto";
+import {MethRecDialog} from "@app/components/dialogs/meth-rec/MethRecDialog";
 
 @Injectable()
 export class DialogService {
@@ -59,6 +60,19 @@ export class DialogService {
     this.dialogSubject$.next(new DialogContainer<FileInfo>(DialogType.VIEWER, info, dialogCloseSubject$));
     return dialogCloseSubject$.asObservable();
   }
+
+  showMethRecPDF(title: string = 'Подтверждение действия',
+                 message: string = 'Вы действительно хотите выполнить данную операцию?',
+                 description: string = 'Пожалуйста, перепроверьте данные, поскольку обратить действие будет невозможно.',
+                 okBtnMessage: string = 'Подтвердить',
+                 cancelBtnMessage: string = 'Отмена',
+                 fields?: ConfirmDialogField<any>[]): Observable<DialogResult<ConfirmDialog>> {
+    let methRec = new MethRecDialog(title, message, description, okBtnMessage, cancelBtnMessage, fields);
+    let dialogCloseSubject$ = new Subject<DialogResult<ConfirmDialog>>();
+    this.dialogSubject$.next(new DialogContainer<ConfirmDialog>(DialogType.METH_REC, methRec, dialogCloseSubject$));
+    return dialogCloseSubject$.asObservable();
+  }
+
 }
 
 

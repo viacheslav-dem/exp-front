@@ -272,10 +272,10 @@ export class ProjectInfoComponent implements OnInit {
   }
 
   acceptProject() {
-    this._dialogService.showConfirmDialog(
+    this._dialogService.showMethRecPDF(
       'Принятие объекта экспертизы',
       `Вы согласны провести экспертизу объекта "${this.project.title}"?`,
-      'Вы будете обязаны завершить экспертизу в течение установленного нормативными актами срока.'
+      'Вы соглашаетесь с методическими рекомендациями и будете обязаны завершить экспертизу в течение установленного нормативными актами срока.'
     ).subscribe(() => {
       this._reviewService.acceptProject(this.expertReview).subscribe(res => {
         this.expertReview = res;
@@ -793,23 +793,12 @@ export class ProjectInfoComponent implements OnInit {
     }
     if (this.expertReview && this.role == Role.EXPERT) {
       if (this.expertReview.state == 'ON_EXPERT_CONFIRMATION') {
-        if (this.agreement){
           this.buttons.push(new ActionButtonMetadata(
               'Принять',
               () => this.acceptProject(), 'btn-primary'));
-
           this.buttons.push(new ActionButtonMetadata(
               'Отклонить',
               () => this.expertRejectProject.show(), 'btn-secondary'));
-        } else {
-          this.buttons.push(new ActionButtonMetadata(
-              'Ознакомится',
-              () => this.geAcquainted(), 'btn-primary'));
-
-          this.buttons.push(new ActionButtonMetadata(
-              'Соглашение',
-              () => this.viewDocument(this.project.documents[0]), 'btn-primary'));
-        }
       }
       if (this.expertReview.state == 'ON_EXAMINATION' && this.expertReview.documents.length > 0) {
         this.buttons.push(new ActionButtonMetadata(

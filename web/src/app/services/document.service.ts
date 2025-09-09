@@ -83,6 +83,10 @@ export class DocumentService {
     return this._http.post(`${SERVER_URL}/document/template/`, request)
   }
 
+  getMethRec() {
+    return this._http.get(`${SERVER_URL}/get/meth_rec/`);
+  }
+
   deleteDocument(doc: DocumentDto, url: string, onDelete: Function = noop, options?: any) {
     this._dialogService.showConfirmDialog('Удаление документа',
       'Вы действительно хотите удалить документ "' + doc.name + '"?'

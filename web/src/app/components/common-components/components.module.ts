@@ -46,6 +46,7 @@ import {DatePeriodNIOKTRComponent} from "@app/components/common-components/date-
 import {
   DatePeriodInnovationComponent
 } from "@app/components/common-components/date-period/date-period-innovation.component";
+import {MethRecPdfComponent} from "@app/components/dialogs/meth-rec/meth-rec-pdf.component";
 
 @NgModule({
   imports: [
@@ -109,7 +110,8 @@ import {
     TimeInputComponent,
     NumberInputDirective,
     BankAccountInputDirective,
-    BooleanButtonV2Component
+    BooleanButtonV2Component,
+    MethRecPdfComponent
   ],
   declarations: [
     DocumentListComponent,
@@ -145,7 +147,8 @@ import {
     DateInputComponent,
     TimeInputComponent,
     NumberInputDirective,
-    BankAccountInputDirective
+    BankAccountInputDirective,
+    MethRecPdfComponent
   ]
 })
 export class CommonComponentsModule {

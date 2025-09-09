@@ -49,6 +49,7 @@ export class RootPageComponent implements OnInit {
       {link: '/data-management/specialization', title: 'Специализации'},
       {link: '/data-management/industrial-property', title: 'Объекты промышленной собственности'},
       {link: '/data-management/tariff', title: 'Тарифы'},
+      {link: '/data-management/meth-rec', title: 'Методические рекомендации'},
     ];
     let statsMenu = [
       {link: '/index', title: 'Сводная информация'},

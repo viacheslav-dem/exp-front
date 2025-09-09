@@ -1,4 +1,5 @@
 import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/ConfirmDialogField";
+import {DocumentDto} from "@app/dto/DocumentDto";
 
 export class ConfirmDialog {
 
@@ -18,3 +19,4 @@ export class ConfirmDialog {
     this.fields = fields;
   }
 }
+
