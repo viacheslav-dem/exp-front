@@ -160,7 +160,7 @@ import {BsDatepickerModule} from "ngx-bootstrap";
         MeetingRemarkComponent,
         RemarkResponseComponent,
         NotificationComponent,
-        SystemNotificationComponent,
+        SystemNotificationComponent
     ],
     bootstrap: [
         AppComponent

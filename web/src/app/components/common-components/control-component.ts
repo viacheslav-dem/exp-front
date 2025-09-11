@@ -22,6 +22,7 @@ export class ControlComponent<T> implements OnInit, ControlValueAccessor {
   };
 
   set value(v: T) {
+    console.log(v);
     if (v !== this._value) {
       this.log(v, 'call setter');
       this._value = v;

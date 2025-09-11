@@ -10,7 +10,7 @@ import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/Confirm
         <label>{{field.label}}</label>
         <input class="form-control" [type]="field.type" [(ngModel)]="field.value" required [name]="field.name"/>
       </div>
-      <div class="text-sm italic">{{description}}</div>
+      <div class="text-sm">{{description}}</div>
       <div class="mt-3">
         <button class="btn btn-primary mr-1" (click)="confirm()">{{okBtnMessage}}</button>
         <button class="btn btn-dark" (click)="cancel()">{{cancelBtnMessage}}</button>

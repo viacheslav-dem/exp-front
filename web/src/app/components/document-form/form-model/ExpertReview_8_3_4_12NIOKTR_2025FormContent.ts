@@ -3,6 +3,18 @@ import {ExpertReviewFormContent} from "@app/components/document-form/form-model/
 
 export class ExpertReview_8_3_4_12NIOKTR_2025FormContent extends ExpertReviewFormContent {
 
+  priorityAreas: boolean;
+
+  priorityAreasSuggestion: string;
+
+  priorityAreasText: string;
+
+  availabilityDoc: boolean;
+
+  availabilityDocSuggestion: string;
+
+  availabilityDocText: string;
+
   novelty: string;
   noveltyText: string;
 

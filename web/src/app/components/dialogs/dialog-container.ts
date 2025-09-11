@@ -19,5 +19,6 @@ export enum DialogType {
   USER = 'USER',
   PASSWORD = 'PASSWORD',
   CONFIRM = 'CONFIRM',
-  VIEWER = 'VIEWER'
+  VIEWER = 'VIEWER',
+  METH_REC = 'METH_REC'
 }

@@ -23,6 +23,7 @@ import {SubOrgsComponent} from "@app/components/data-management/orgs/sub-orgs.co
 import {SocialEconomicGoalsComponent} from "@app/components/data-management/catalog/social-economic-goals/social-economic-goals.component";
 import {TariffComponent} from "@app/components/data-management/catalog/tariff/tariff.component";
 import {CurrencyComponent} from "@app/components/data-management/catalog/currency/currency.component";
+import {MethRecComponent} from "@app/components/data-management/catalog/meth-rec/meth-rec.component";
 
 export const DataManagementRoutes: Route = {
   path: 'data-management',
@@ -46,6 +47,7 @@ export const DataManagementRoutes: Route = {
     {path: 'specialization', component: SpecializationComponent},
     {path: 'industrial-property', component: IndustrialPropertyComponent},
     {path: 'tariff', component: TariffComponent},
+    {path: 'meth-rec', component: MethRecComponent}
   ]
 };
 
@@ -75,6 +77,7 @@ export const DataManagementRoutes: Route = {
     SocialEconomicGoalsComponent,
     TariffComponent,
     CurrencyComponent,
+    MethRecComponent
   ],
   providers: [],
   exports: [
@@ -95,6 +98,7 @@ export const DataManagementRoutes: Route = {
     SocialEconomicGoalsComponent,
     TariffComponent,
     CurrencyComponent,
+    MethRecComponent
   ]
 })
 export class DataManagementModule {

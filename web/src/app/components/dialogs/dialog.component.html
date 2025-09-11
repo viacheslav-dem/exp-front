@@ -21,6 +21,11 @@
       <ng-container *ngSwitchCase="DialogType.VIEWER">
         <app-pdf-viewer [url]="data.url" [doc]="data.doc"></app-pdf-viewer>
       </ng-container>
+      <ng-container *ngSwitchCase="DialogType.METH_REC">
+        <app-meth-rec-pdf [message]="data.message" [description]="data.description" [okBtnMessage]="data.okBtnMessage"
+                          [cancelBtnMessage]="data.cancelBtnMessage" (onSave)="save($event)" [fields]="data.fields"
+                          (canceled)="cancel()"></app-meth-rec-pdf>
+      </ng-container>
     </ng-container>
   </ng-container>
 </app-modal>

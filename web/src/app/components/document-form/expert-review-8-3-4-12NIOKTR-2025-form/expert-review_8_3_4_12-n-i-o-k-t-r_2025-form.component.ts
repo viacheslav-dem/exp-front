@@ -15,9 +15,6 @@ import {PeriodDto} from "@app/dto/PeriodDto";
 })
 export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewForm<ExpertReview_8_3_4_12NIOKTR_2025FormContent> {
 
-  ngOnInit() {
-  }
-
   validate() {
     super.validate();
     this.validationConclusionAnalysisAndEvaluation();
@@ -66,7 +63,7 @@ export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewF
       "направленным на обеспечение национальной безопасности.' нет комментария к заключению."
     }
     if (isEmptyOrNull(this._form.financeAccordanceText)) {
-      throw "Соответствие заявленного финансирования планируемому объему выполняемых работ.' нет комментария к заключению."
+      throw "В пункте 'Соответствие заявленного финансирования планируемому объему выполняемых работ.' нет комментария к заключению."
     }
     if (isEmptyOrNull(this._form.targetAccordanceText)) {
       throw "В пункте 'Соответствие объекта государственной экспертизы заявленным целям.' нет комментария к заключению."
@@ -78,6 +75,9 @@ export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewF
   }
 
   private validationLengthCommentsOnConclusionAnalysisAndEvaluation() {
+    if (this._form.priorityAreasText.length < 30) {
+      throw "В пункте 'Соответствие приоритетным направлениям научной, научно-технической и инновационной деятельности в Республике Беларусь.' комментарий должен быть не менее 30 символов."
+    }
     if (this._form.noveltyText.length < 30) {
       throw "В пункте 'Новизна (инновационность) объекта государственной экспертизы.' комментарий должен быть не менее 30 символов."
     }
@@ -87,17 +87,17 @@ export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewF
     if (this._form.economicSignificanceText.length < 30) {
       throw "В пункте 'Экономическая и (или) социальная значимость объекта государственной экспертизы.' комментарий должен быть не менее 30 символов."
     }
-    if (this._form.targetText.length < 30) {
+    if (this.showTarget8_3() && this._form.targetText.length < 30) {
       throw "В пункте 'Оценка целевых показателей проекта.' комментарий должен быть не менее 30 символов."
     }
-    if (this._form.taskListsText.length < 30) {
+    if (this.showTarget8_4() && this._form.taskListsText.length < 30) {
       throw "В пункте 'Оценка перечня задач проекта, планируемый способ их реализации и обеспечение достижения поставленных целей проекта." +
       "комментарий должен быть не менее 30 символов."
     }
     if (this._form.technologicalOrderText.length < 30) {
       throw "В пункте 'Уровень технологического уклада научно-технической продукции.'комментарий должен быть не менее 30 символов."
     }
-    if (this._form.commerceText.length < 30) {
+    if ((this.showTarget8_3() || this.showTarget8_4()) && this._form.commerceText.length < 30) {
       throw "В пункте 'Способ коммерциализации результата (-ов) научно-технической деятельности.'комментарий должен быть не менее 30 символов."
     }
     if (this._form.resourcesSufficiencyText.length < 30) {
@@ -139,6 +139,9 @@ export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewF
   }
 
   private validationCommentsOnConclusionAnalysisAndEvaluation() {
+    if (isEmptyOrNull(this._form.priorityAreasText)) {
+      throw "В пункте 'Соответствие приоритетным направлениям научной, научно-технической и инновационной деятельности в Республике Беларусь.' нет комментария к заключению."
+    }
     if (isEmptyOrNull(this._form.noveltyText)) {
       throw "В пункте 'Новизна (инновационность) объекта государственной экспертизы.' нет комментария к заключению."
     }
@@ -148,17 +151,17 @@ export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewF
     if (isEmptyOrNull(this._form.economicSignificanceText)) {
       throw "В пункте 'Экономическая и (или) социальная значимость объекта государственной экспертизы.' нет комментария к заключению."
     }
-    if (isEmptyOrNull(this._form.targetText)) {
+    if (isEmptyOrNull(this._form.targetText) && this.showTarget8_3()) {
       throw "В пункте 'Оценка целевых показателей проекта.' нет комментария к заключению."
     }
-    if (isEmptyOrNull(this._form.taskListsText)) {
+    if (isEmptyOrNull(this._form.taskListsText)  && this.showTarget8_4()) {
       throw "В пункте 'Оценка перечня задач проекта, планируемый способ их реализации и обеспечение достижения поставленных целей проекта." +
       "' нет комментария к заключению."
     }
     if (isEmptyOrNull(this._form.technologicalOrderText)) {
       throw "В пункте 'Уровень технологического уклада научно-технической продукции.' нет комментария к заключению."
     }
-    if (isEmptyOrNull(this._form.commerceText)) {
+    if (isEmptyOrNull(this._form.commerceText) && (this.showTarget8_3() || this.showTarget8_4())) {
       throw "В пункте 'Способ коммерциализации результата (-ов) научно-технической деятельности.' нет комментария к заключению."
     }
     if (isEmptyOrNull(this._form.resourcesSufficiencyText)) {
@@ -200,6 +203,9 @@ export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewF
   }
 
   private validationConclusionAnalysisAndEvaluation() {
+    // if (isEmptyOrNull(this._form.priorityAreas)) {
+    //   throw "В пункте 'Соответствие приоритетным направлениям научной, научно-технической и инновационной деятельности в Республике Беларусь.' не выстановленно заключение."
+    // }
     if (isEmptyOrNull(this._form.novelty)) {
       throw "В пункте 'Новизна (инновационность) объекта государственной экспертизы.' не выстановленно заключение."
     }
@@ -209,17 +215,17 @@ export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewF
     if (isEmptyOrNull(this._form.economicSignificance)) {
       throw "В пункте 'Экономическая и (или) социальная значимость объекта государственной экспертизы.' не выстановленно заключение."
     }
-    if (isEmptyOrNull(this._form.target)) {
+    if (isEmptyOrNull(this._form.target) && this.showTarget8_3()) {
       throw "В пункте 'Оценка целевых показателей проекта.' не выстановленно заключение."
     }
-    if (isEmptyOrNull(this._form.taskLists)) {
+    if (isEmptyOrNull(this._form.taskLists) && this.showTarget8_4()) {
       throw "В пункте 'Оценка перечня задач проекта, планируемый способ их реализации и обеспечение достижения поставленных целей проекта.' " +
       "не выстановленно заключение."
     }
     if (isEmptyOrNull(this._form.technologicalOrder)) {
       throw "В пункте 'Уровень технологического уклада научно-технической продукции.' не выстановленно заключение."
     }
-    if (isEmptyOrNull(this._form.commerce)) {
+    if (isEmptyOrNull(this._form.commerce) && (this.showTarget8_3() || this.showTarget8_4())) {
       throw "В пункте 'Способ коммерциализации результата (-ов) научно-технической деятельности.' не выстановленно заключение."
     }
     if (isEmptyOrNull(this._form.resourcesSufficiency)) {

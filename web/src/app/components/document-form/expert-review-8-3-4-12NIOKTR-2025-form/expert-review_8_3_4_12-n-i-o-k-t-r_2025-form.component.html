@@ -2,6 +2,15 @@
 
     <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
+    <app-priority_areas-block-2025 [_form]="_form"
+                                   [num]="'0'"
+                                   (onConditionsChanged)="onConditionsChanged()"></app-priority_areas-block-2025>
+
+    <app-availability-of-documents-block-2025 [_form]="_form"
+                                              [num]="'0'"
+                                              (onConditionsChanged)="onConditionsChanged()"></app-availability-of-documents-block-2025>
+
+
     <app-novelty-block-2025 [_form]="_form"
                             [project]="project"
                             [num]="'1'"

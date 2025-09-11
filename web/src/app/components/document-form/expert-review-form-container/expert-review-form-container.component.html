@@ -8,7 +8,9 @@
         <label>Приоритетное направление научных исследований Республики Беларусь
           и (или) приоритетное направление научно-технической деятельности</label>
         <ul>
-          <li *ngFor="let direction of _project.directions" class="italic">{{direction.name}}</li>
+          <li *ngFor="let direction of _project.subDirections" class="italic">
+            {{direction.directionName}} ({{direction.direction.name}})
+          </li>
         </ul>
       </div>
 

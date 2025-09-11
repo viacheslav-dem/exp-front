@@ -17,7 +17,7 @@ export const PERIOD_FILTER_CONTROL_VALUE_ACCESSOR: any = {
 @Component({
   selector: 'app-date-period',
   template: `
-    <ng-container *ngIf="value!=null">
+    <ng-container>
       <input style="padding: 0; margin: 0; border:0; width: 100%"
              bsDaterangepicker
              [(ngModel)]="bsRangeValue"
@@ -47,6 +47,7 @@ export class DatePeriodComponent extends ControlComponent<DateRange> {
 
   prepareValue(): void {
     if (this._value) {
+      console.log("prepareValue");
       this.bsRangeValue = [this.getDate(this._value.start), this.getDate(this._value.end)];
     }
   }
@@ -68,6 +69,5 @@ export class DatePeriodComponent extends ControlComponent<DateRange> {
 
   getDate(time: number): Date {
     return time == null ? null : new Date(time);
-
   }
 }

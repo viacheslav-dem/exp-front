@@ -42,6 +42,7 @@ import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {NumberInputDirective} from "@app/components/common-components/number-input/number-input.directive";
 import {BankAccountInputDirective} from "@app/components/common-components/bank-account/bank-account-input.directive";
 import {BooleanButtonV2Component} from "@app/components/common-components/boolean-button/boolean-button-v2.component";
+import {MethRecPdfComponent} from "@app/components/dialogs/meth-rec/meth-rec-pdf.component";
 
 @NgModule({
   imports: [
@@ -103,7 +104,8 @@ import {BooleanButtonV2Component} from "@app/components/common-components/boolea
     TimeInputComponent,
     NumberInputDirective,
     BankAccountInputDirective,
-    BooleanButtonV2Component
+    BooleanButtonV2Component,
+    MethRecPdfComponent
   ],
   declarations: [
     DocumentListComponent,
@@ -137,7 +139,8 @@ import {BooleanButtonV2Component} from "@app/components/common-components/boolea
     DateInputComponent,
     TimeInputComponent,
     NumberInputDirective,
-    BankAccountInputDirective
+    BankAccountInputDirective,
+    MethRecPdfComponent
   ]
 })
 export class CommonComponentsModule {

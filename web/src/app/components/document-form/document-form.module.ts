@@ -366,6 +366,12 @@ import {
   Conclusion_8_13_Block2025Component
 } from "@app/components/document-form/document-blocks/conclusion-8-13-block-2025.component";
 import {
+  PriorityAreasBlock2025Components
+} from "@app/components/document-form/document-blocks/priority-areas-block-2025.components";
+import {
+  AvailabilityOfDocumentsBlock2025Component
+} from "@app/components/document-form/document-blocks/availability-of-documents-block-2025.component";
+import {
     DeadlinesComplianceBlockComponent
 } from "@app/components/document-form/document-blocks/deadlines-compilance-block/deadlines-compilance-block.component";
 import {
@@ -464,6 +470,7 @@ import {
     CouncilConclusion_8_8BIF_FormComponent
   ],
   declarations: [
+    PriorityAreasBlock2025Components,
     ExpertReviewFormContainerComponent,
     DocumentFormContainerComponent,
     ExpertReview_8_1_FormComponent,
@@ -708,6 +715,7 @@ import {
     TargetAnalysisBlock2025Component,
     ProgramSufficiencyBlock2025Component,
     Conclusion_8_13_Block2025Component,
+    AvailabilityOfDocumentsBlock2025Component,
     CouncilConclusion_8_14_2025_FormComponent,
     DeadlinesComplianceBlockComponent
   ],
