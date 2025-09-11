@@ -183,4 +183,37 @@ export class AgendaNewFormContent extends FormContent {
 
   neededProjectDocs: boolean;
   neededProjectDocsText: string;
+
+  deadlinesCompliance: string;
+  deadlinesComplianceText: string;
+
+  constructionWorks: boolean;
+  constructionWorksText: string;
+
+  scientificResearch: string;
+  scientificResearchText: string;
+
+  commerce: string;
+  commerceText: string;
+
+  analog: string;
+  analogText: string;
+
+  analogParams: string;
+  analogParamsText: string;
+
+  socialOrSecurity: boolean;
+  socialOrSecurityText: string;
+
+  softwareTool: number;
+  softwareToolSuggestion: string;
+  softwareToolText: string;
+
+  technologicalOrder: string;
+  technologicalOrderText: string;
+
+  rbNeeds: string;
+  rbNeedsText: string;
+
+  multilateralDirectionsText: string;
 }

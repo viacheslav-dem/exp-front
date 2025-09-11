@@ -5,8 +5,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Льготирование реализации объекта государственной экспертизы.
-        Целесообразность государственной регистрации объекта государственной экспертизы в соответствии
+        {{num}}. Целесообразность государственной регистрации объекта государственной экспертизы в соответствии
         с законодательством Республики Беларусь:
       </label>
       <app-dropdown [options]="stagesOptions" [(ngModel)]="_form.stagesExist"

@@ -1,0 +1,167 @@
+<hr/>
+
+<app-agenda-header-block [_form]="_form" [ind]="ind" [project]="_project"></app-agenda-header-block>
+
+<div class="collapse" [attr.id]="'meeting-project-' + _project?.id">
+    <hr/>
+
+    <app-customer-replies-block [_form]="_form"></app-customer-replies-block>
+
+    <hr/>
+
+    <app-select-directions-and-goals-block-2025
+            [form]="_form"
+            [num]="'1'"
+            [project]="_project"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-select-directions-and-goals-block-2025>
+
+    <hr/>
+
+    <app-novelty-block-2025
+            [project]="_project"
+            [_form]="_form"
+            [num]="'2'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-novelty-block-2025>
+
+    <hr/>
+
+    <app-economic-significance-block-2025
+            [_form]="_form"
+            [num]="'3'"
+            [project]="_project"
+            [isExpertReview]=false
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-economic-significance-block-2025>
+
+    <hr/>
+
+    <app-commerce-block-2025
+            [_form]="_form"
+            [project]="_project"
+            [num]="'4'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-commerce-block-2025>
+
+    <hr/>
+
+    <app-resources-sufficiency-block-2025
+            [_form]="_form"
+            [num]="'5'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-resources-sufficiency-block-2025>
+
+    <hr/>
+
+    <app-competence-sufficiency-block-2025
+            [_form]="_form"
+            [num]="'6'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-competence-sufficiency-block-2025>
+
+    <hr/>
+
+    <app-marketing-research-block-2025
+            [_form]="_form"
+            [num]="'7'"
+            [project]="_project"
+            (onConditionsChanged)="onConditionsChanged()"
+            [isExpertReview]="false"
+    ></app-marketing-research-block-2025>
+
+    <hr/>
+
+    <app-risks-block-2025
+            [_project]="_project"
+            [_form]="_form"
+            [num]="'8'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-risks-block-2025>
+
+    <hr/>
+
+    <app-privacy-block-2025
+            [_project]="_project"
+            [_form]="_form"
+            [num]="'9'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-privacy-block-2025>
+
+    <hr/>
+
+    <label class="mb-0">
+        10. Льготирование реализации объекта государственной экспертизы
+    </label>
+
+    <hr/>
+
+    <app-stages-exists-block-2025
+            [_form]="_form"
+            [num]="'10.1'"
+            [askStages]="false"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-stages-exists-block-2025>
+
+    <hr/>
+
+    <app-stages-block-2025
+            [_form]="_form"
+            [num]="'10.2'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-stages-block-2025>
+
+    <hr/>
+
+    <label class="mb-0">
+        11. Реализация и финансирование объекта государственной экспертизы
+    </label>
+
+    <hr/>
+
+    <app-name-accordance-block-2025
+            [_form]="_form"
+            [num]="'11.1'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-name-accordance-block-2025>
+
+    <hr/>
+
+    <app-terms-accordance-block-2025
+            [form]="_form"
+            [num]="'11.2'"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-terms-accordance-block-2025>
+
+    <hr/>
+
+    <app-finance-accordance-block-2025
+            [_form]="_form"
+            [num]="'11.3'"
+            [project]="_project"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-finance-accordance-block-2025>
+
+    <hr/>
+
+    <app-finance-conclusion-block-2025
+            [_form]="_form"
+            [num]="'11.4'"
+            [noveltyNum]="'2'"
+            [project]="project"
+            [economicSignificanceNum]="'3'"
+            (onConditionsChanged)="onConditionsChanged()"
+            [disabled]="isFinanceConclusionDisabled()"
+    ></app-finance-conclusion-block-2025>
+
+    <hr/>
+
+    <app-section-conclusion-block
+            [_form]="_form"
+            [num]="'12'"
+            [financeConclusionNum]="financeConclusionNum"
+            [project]="project"
+            [allParticipants]="getAllParticipants()"
+            (onConditionsChanged)="onConditionsChanged()"
+    ></app-section-conclusion-block>
+</div>

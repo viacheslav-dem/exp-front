@@ -5,6 +5,7 @@ import {MeetingProtocolFormComponent} from "@app/components/document-form/meetin
 import {AgendaNewFormContent} from "@app/components/document-form/meeting-protocol-form/AgendaNewFormContent";
 import {PeriodDto} from "@app/dto/PeriodDto";
 import {NewVoteResults} from "@app/components/document-form/meeting-protocol-form/NewVoteResults";
+import {isEmptyOrNull} from "@app/support/utils";
 
 @Injectable()
 export abstract class AgendaNewForm extends DocumentForm<AgendaNewFormContent> {
@@ -73,6 +74,25 @@ export abstract class AgendaNewForm extends DocumentForm<AgendaNewFormContent> {
     if (this.conclusion.isRescheduled() && !this.canRescheduled) {
       throw 'Недопустимо отправление проекта на доработку, так как замечания не сформированы или ответы на них уже получены. ' +
       'Проект: ' + this._project.title;
+    }
+  }
+
+  // Валидация для полей, где в случае false выбора на кнопке, необходимо ввести также предположение
+  // suggestion без конкретного типа данных т.к. может быть строкой, датой или числом
+  validateSuggestion(buttonValue: boolean, suggestion, fieldText: string) {
+    if (!buttonValue) {
+      if (suggestion === undefined) {
+        throw 'Пожалуйста, заполните все поля протокола. Проект: ' + this.project.title;
+      }
+      if (typeof suggestion === 'string' && isEmptyOrNull(suggestion)) {
+        throw 'Пожалуйста, заполните все поля протокола. Проект: ' + this.project.title;
+      }
+      if (typeof suggestion === 'number' && isNaN(suggestion)) {
+        throw 'Пожалуйста, заполните все поля протокола. Проект: ' + this.project.title;
+      }
+    }
+    if (isEmptyOrNull(fieldText)) {
+      throw 'Пожалуйста, заполните все поля протокола. Проект: ' + this.project.title;
     }
   }
 

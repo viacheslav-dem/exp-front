@@ -4,19 +4,20 @@ import {IdNameDto} from "@app/dto/IdNameDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 
 @Component({
-  selector: 'app-select-directions-and-goals-block',
+  selector: 'app-select-directions-and-goals-block-2025',
   template: `
     <ng-container *ngIf="_project">
       <div *ngIf="_allDirections.length > 0" class="form-group">
         <label>
-          <span *ngIf="num">{{num}}.</span>
+          <span *ngIf="num">{{ num }}.</span>
           Выберите приоритетные направления научной,
           научно-технической и инновационной деятельности в Республике Беларусь,
           которым объект экспертизы <b>соответствует</b>:
         </label>
         <div *ngFor="let direction of _allDirections">
           <app-checkbox [(ngModel)]="direction.isChecked"
-                        (ngModelChange)="onDirectionChanged()">{{direction.name}}</app-checkbox>
+                        (ngModelChange)="onDirectionChanged()">{{ direction.name }}
+          </app-checkbox>
         </div>
       </div>
 
@@ -26,21 +27,28 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
           которым объект экспертизы <b>соответствует</b>:
         </label>
         <div *ngFor="let item of _allGoals">
-          <app-checkbox [(ngModel)]="item.isChecked" (ngModelChange)="onGoalChanged()">{{item.name}}</app-checkbox>
+          <app-checkbox [(ngModel)]="item.isChecked" (ngModelChange)="onGoalChanged()">{{ item.name }}
+          </app-checkbox>
         </div>
         <textarea [(ngModel)]="_form.directionsAndGoalsText" rows="3" class="form-control mt-05"
                   placeholder="Пояснительный текст (при необходимости)."></textarea>
       </div>
-        <div *ngIf="full" class="hint">
-            <p>
-                <b>Подсказка.</b>
-                Оценивается соответствие / несоответствие объекта государственной экспертизы приоритету(-ам) и цели(-ям) государственной политики в сфере социально-экономического развития (для проектов государственных программ (за исключением государственной программы в сфере цифрового развития), в рамках которых предусматривается реализация мероприятий в сферах научной, научно-технической и инновационной деятельности) / приоритетному(-ым) направлению(-ям) научной, научно-технической и инновационной деятельности в Республике Беларусь, в том числе сквозному(-ым) приоритетному(-ым) направлению(-ям)* (для проектов государственных научно-технических программ), указанному(-ым) в материалах объекта государственной экспертизы и в пункте 5, а также их соответствие / несоответствие действующим нормативным правовым актам.
-            </p>
-        </div>
+      <textarea *ngIf="showTarget8_4()" [(ngModel)]="_form.multilateralDirectionsText" rows="3" class="form-control mt-05"
+                placeholder="Пояснительный текст."></textarea>
+      <div *ngIf="showTarget8_4()" class="hint">
+        <p>
+          <b>Подсказка.</b>
+          Для объектов государственной экспертизы, указанных в подпункте 8.4 пункта 8 Положения, дополнительно
+          указывается соответствие приоритетным направлениям двустороннего (многостороннего) научно-технического
+          сотрудничества с государством-партнером (государствами-партнерами):
+          соответствует (перечисляются соответствующие приоритетные направления, заявленные в рамках проводимого
+          конкурса совместных проектов, к которым относится объект государственной экспертизы) / не соответствует.
+        </p>
+      </div>
     </ng-container>
   `
 })
-export class SelectDirectionsAndGoalsBlockComponent {
+export class SelectDirectionsAndGoalsBlock2025Component {
 
   _project: ProjectPlainDto | ProjectDto;
   _allDirections: IdNameDto[] = [];
@@ -76,6 +84,10 @@ export class SelectDirectionsAndGoalsBlockComponent {
     this.update();
   }
 
+  showTarget8_4() {
+    return this._project.code.code.startsWith('8.4');
+  }
+
   canHasSocialEconomicGoals() {
     return this._project.code.code == '8.13';
   }
@@ -109,4 +121,5 @@ export class SelectDirectionsAndGoalsBlockComponent {
     this._form.selectedSocialEconomicGoals = this._allGoals.filter(d => d.isChecked).map(d => new IdNameDto(d.id, d.name));
     this.onConditionsChanged.emit(true);
   }
+
 }
