@@ -124,23 +124,11 @@
 
 <hr/>
 
-<app-finance-conclusion-block
-        [_form]="_form"
-        [num]="'9.5'"
-        [noveltyNum]="'1'"
-        [project]="project"
-        [economicSignificanceNum]="'2'"
-        (onConditionsChanged)="onConditionsChanged()"
-        [disabled]="isFinanceConclusionDisabled()"
-></app-finance-conclusion-block>
-
-<hr/>
-
 <app-commerce-block-2025
         *ngIf="showTarget8_1() || showTarget8_2() || showTarget8_3() || showTarget8_4() || showTarget8_15()"
         [_form]="_form"
         [project]="project"
-        [num]="'9.6'"
+        [num]="'9.5'"
         (onConditionsChanged)="onConditionsChanged()"
 ></app-commerce-block-2025>
 
@@ -148,7 +136,7 @@
 
 <app-competitiveness-block-agenda-2025
         [_form]="_form"
-        [num]="'9.7'"
+        [num]="'9.6'"
         (onConditionsChanged)="onConditionsChanged()"
 ></app-competitiveness-block-agenda-2025>
 
@@ -156,7 +144,7 @@
 
 <app-analog-params-block-2025
         [_form]="_form"
-        [num]="'9.8'"
+        [num]="'9.7'"
         (onConditionsChanged)="onConditionsChanged()"
 ></app-analog-params-block-2025>
 
@@ -164,34 +152,25 @@
 
 <app-needs-block-2025
         [_form]="_form"
-        [num]="'9.9'"
-        (onConditionsChanged)="onConditionsChanged()"></app-needs-block-2025>
+        [num]="'9.8'"
+        (onConditionsChanged)="onConditionsChanged()">
+</app-needs-block-2025>
 <hr/>
 
-<hr/>
 
 <app-technological-order-block-2025
         *ngIf="showTarget8_3() || showTarget8_4() || showTarget8_8()"
         [_form]="_form"
-        [num]="'9.10'"
+        [num]="'9.9'"
         (onConditionsChanged)="onConditionsChanged()">
 </app-technological-order-block-2025>
 
 
 <hr/>
 
-<app-software-tool-block-2025
-        *ngIf="showTarget8_1() || showTarget8_3()"
-        [_form]="_form"
-        [num]="'9.11'"
-        (onConditionsChanged)="onConditionsChanged()"
-></app-software-tool-block-2025>
-
-<hr/>
-
 <app-social-or-security-block-2025
         [_form]="_form"
-        [num]="'9.12'"
+        [num]="'9.10'"
         (onConditionsChanged)="onConditionsChanged()"
 ></app-social-or-security-block-2025>
 

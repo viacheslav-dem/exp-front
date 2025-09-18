@@ -34,7 +34,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
                   placeholder="Пояснительный текст (при необходимости)."></textarea>
       </div>
       <textarea *ngIf="showTarget8_4()" [(ngModel)]="_form.multilateralDirectionsText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст."></textarea>
+                placeholder="Обязательный текст."></textarea>
       <div *ngIf="showTarget8_4()" class="hint">
         <p>
           <b>Подсказка.</b>

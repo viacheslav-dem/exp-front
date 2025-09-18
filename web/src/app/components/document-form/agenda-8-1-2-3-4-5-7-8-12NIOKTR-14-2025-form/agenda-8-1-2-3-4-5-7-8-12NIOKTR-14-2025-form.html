@@ -216,23 +216,15 @@
             [_form]="_form"
             [num]="'19.4'"
             [project]="_project"
+            [isTextRequired]="true"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-finance-accordance-block-2025>
 
     <hr/>
 
-    <app-software-tool-block-2025
-            *ngIf="showTarget8_1() || showTarget8_3()"
-            [_form]="_form"
-            [num]="'19.5'"
-            (onConditionsChanged)="onConditionsChanged()"
-    ></app-software-tool-block-2025>
-
-    <hr/>
-
     <app-finance-conclusion-block-2025
             [_form]="_form"
-            [num]="'19.6'"
+            [num]="'19.5'"
             [noveltyNum]="'1'"
             [project]="project"
             [economicSignificanceNum]="'4'"
