@@ -16,6 +16,7 @@ export class CouncilConclusion_8_3_4_5_7_8_12_15_FormComponent extends CouncilCo
   validate() {
     super.validate();
     this.validateFinanceConclusion();
+    this.validationCommentsOnConclusion();
   }
 
     showTarget8_1() {
