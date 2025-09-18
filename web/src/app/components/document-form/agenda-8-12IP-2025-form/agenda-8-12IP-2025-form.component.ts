@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
 import {isEmptyOrNull} from "@app/support/utils";
 import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form/agenda-new-form.service";
-import {PeriodDto} from "@app/dto/PeriodDto";
 
 @Component({
     selector: 'app-agenda-8-12IP-2025-form',
@@ -15,7 +14,6 @@ export class Agenda_8_12IP_2025FormComponent extends AgendaNewForm {
     }
 
     validate() {
-        super.validate();
         if (isEmptyOrNull(this._form.economicSignificance)) {
             throw "В пункте 1: 'Экономическая и (или) социальная значимость объекта государственной экспертизы.' не выстановленно заключение.";
         }
@@ -89,5 +87,6 @@ export class Agenda_8_12IP_2025FormComponent extends AgendaNewForm {
             throw "В пункте 7.3: 'Соответствие заявленного финансирования планируемому объему выполняемых работ.' рекомендуемый объем финансирования финансирования не может быть меньше нуля."
         }
         this.validateFinanceConclusion();
+        super.validate();
     }
 }
