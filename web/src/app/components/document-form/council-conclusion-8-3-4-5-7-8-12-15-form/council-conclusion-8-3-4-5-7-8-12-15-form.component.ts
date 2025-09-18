@@ -23,13 +23,13 @@ export class CouncilConclusion_8_3_4_5_7_8_12_15_FormComponent extends CouncilCo
     showTarget8_1() {
         let is8_1 = false;
         // Использовал регулярные выражения, т.к. проверка возвращала true для 8.1 и 8.11, 8.12 и т.д.
-        const str = /8.1(.*)/;
-        const isDigit = /\d/
-        let code = this.project.code.code
+        const regExp = /8.1(.*)/;
+        const isDigit = /\d/;
+        let code = this.project.code.code;
         if (code.startsWith('8.1')) {
-            let testReg1 = code.match(str);
-            if (testReg1 && testReg1[1]) {
-                is8_1 = !isDigit.test(testReg1[1]);
+            let regExpMatchArray = code.match(regExp);
+            if (regExpMatchArray && regExpMatchArray[1]) {
+                is8_1 = !isDigit.test(regExpMatchArray[1]);
             } else {
                 is8_1 = true;
             }

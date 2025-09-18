@@ -77,25 +77,6 @@ export abstract class AgendaNewForm extends DocumentForm<AgendaNewFormContent> {
     }
   }
 
-  // Валидация для полей, где в случае false выбора на кнопке, необходимо ввести также предположение
-  // suggestion без конкретного типа данных т.к. может быть строкой, датой или числом
-  validateSuggestion(buttonValue: boolean, suggestion, fieldText: string) {
-    if (!buttonValue) {
-      if (suggestion === undefined) {
-        throw 'Пожалуйста, заполните все поля протокола. Проект: ' + this.project.title;
-      }
-      if (typeof suggestion === 'string' && isEmptyOrNull(suggestion)) {
-        throw 'Пожалуйста, заполните все поля протокола. Проект: ' + this.project.title;
-      }
-      if (typeof suggestion === 'number' && isNaN(suggestion)) {
-        throw 'Пожалуйста, заполните все поля протокола. Проект: ' + this.project.title;
-      }
-    }
-    if (isEmptyOrNull(fieldText)) {
-      throw 'Пожалуйста, заполните все поля протокола. Проект: ' + this.project.title;
-    }
-  }
-
   onConditionsChanged() {
   }
 }
