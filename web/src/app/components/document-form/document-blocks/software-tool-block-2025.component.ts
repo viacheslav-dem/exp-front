@@ -27,7 +27,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
                       placeholder="Рекомендуемый программный инструмент"></textarea>
         </ng-container>
       <textarea *ngIf="full" [(ngModel)]="_form.softwareToolText" rows="3" class="form-control mt-05"
-                [attr.placeholder]="isTextRequired ? 'Обязательный текст.' : 'Пояснительный текст (при необходимости).'"></textarea>
+                placeholder="Обязательный текст"></textarea>
     </div>
     <div *ngIf="full" class="hint">
         <p>

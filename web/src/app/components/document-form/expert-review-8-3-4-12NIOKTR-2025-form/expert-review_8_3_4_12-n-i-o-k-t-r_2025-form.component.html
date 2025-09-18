@@ -3,35 +3,36 @@
     <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
     <app-priority_areas-block-2025 [_form]="_form"
-                                   [num]="'0'"
+                                   [num]="'1'"
                                    (onConditionsChanged)="onConditionsChanged()"></app-priority_areas-block-2025>
 
+    <ng-container *ngIf="showTarget8_4()">
     <app-availability-of-documents-block-2025 [_form]="_form"
-                                              [num]="'0'"
+                                              [num]="'2'"
                                               (onConditionsChanged)="onConditionsChanged()"></app-availability-of-documents-block-2025>
-
+    </ng-container>
 
     <app-novelty-block-2025 [_form]="_form"
                             [project]="project"
-                            [num]="'1'"
+                            [num]="'3'"
                             (onConditionsChanged)="onConditionsChanged()"></app-novelty-block-2025>
 
     <hr/>
     <app-scientific-research-block-2025 [_form]="_form"
                                         [project]="project"
-                                        [num]="'2'"
+                                        [num]="'4'"
                                         (onConditionsChanged)="onConditionsChanged()"></app-scientific-research-block-2025>
 
     <hr/>
     <app-economic-significance-block-2025 [_form]="_form"
-                                     [num]="'3'"
+                                     [num]="'5'"
                                      [project]="project"
                                      (onConditionsChanged)="onConditionsChanged()"></app-economic-significance-block-2025>
     <hr/>
     <div>
         <ng-container *ngIf="showTarget8_3()">
             <app-target-block-2025 [_form]="_form"
-                                   [num]="'3.1'"
+                                   [num]="'5.1'"
                                    (onConditionsChanged)="onConditionsChanged()"></app-target-block-2025>
             <hr/>
         </ng-container>
@@ -40,14 +41,14 @@
         <ng-container *ngIf="showTarget8_4()">
             <app-task-lists-block-2025
                             [_form]="_form"
-                            [num]="'3.2'"
+                            [num]="'5.2'"
                             (onConditionsChanged)="onConditionsChanged()"></app-task-lists-block-2025>
             <hr/>
         </ng-container>
 
         <app-technological-order-block-2025
                     [_form]="_form"
-                    [num]="'3.3'"
+                    [num]="'5.3'"
                     (onConditionsChanged)="onConditionsChanged()">
         </app-technological-order-block-2025>
         <hr/>
@@ -56,7 +57,7 @@
             <app-commerce-block-2025
                     [_form]="_form"
                     [project]="project"
-                    [num]="'3.4'"
+                    [num]="'5.4'"
                     (onConditionsChanged)="onConditionsChanged()"></app-commerce-block-2025>
             <hr/>
         </ng-container>
@@ -64,88 +65,88 @@
 
     <app-resources-sufficiency-block-2025
                                       [_form]="_form"
-                                      [num]="'4'"
+                                      [num]="'6'"
                                       (onConditionsChanged)="onConditionsChanged()"></app-resources-sufficiency-block-2025>
     <hr/>
     <app-competence-sufficiency-block-2025
                                         [_form]="_form"
-                                        [num]="'5'"
+                                        [num]="'7'"
                                         (onConditionsChanged)="onConditionsChanged()"></app-competence-sufficiency-block-2025>
     <hr/>
     <app-marketing-research-block-2025
                                     [_form]="_form"
                                     [project]="project"
-                                    [num]="'6'"
+                                    [num]="'8'"
                                     (onConditionsChanged)="onConditionsChanged()"></app-marketing-research-block-2025>
     <hr/>
     <div>
         <app-competitiveness-block-2025 [_form]="_form"
-                                   [num]="'6.1'"
+                                   [num]="'8.1'"
                                    (onConditionsChanged)="onConditionsChanged()"></app-competitiveness-block-2025>
         <hr/>
         <app-analog-block-2025 [_form]="_form"
-                               [num]="'6.2'"
+                               [num]="'8.2'"
                                (onConditionsChanged)="onConditionsChanged()"></app-analog-block-2025>
         <hr/>
         <app-analog-params-block-2025 [_form]="_form"
-                                      [num]="'6.3'"
+                                      [num]="'8.3'"
                                       (onConditionsChanged)="onConditionsChanged()"></app-analog-params-block-2025>
         <hr/>
         <app-needs-block-2025
                 [_form]="_form"
-                [num]="'6.4'"
+                [num]="'8.4'"
                 (onConditionsChanged)="onConditionsChanged()"></app-needs-block-2025>
     </div>
     <hr/>
     <app-risks-block-2025 [_form]="_form"
                           [_project]="project"
-                     [num]="'7'"
+                     [num]="'9'"
                      (onConditionsChanged)="onConditionsChanged()"></app-risks-block-2025>
     <hr/>
     <app-privacy-block-2025 [_form]="_form"
-                       [num]="'8'"
+                       [num]="'10'"
                             [_project]="project"
                        (onConditionsChanged)="onConditionsChanged()"></app-privacy-block-2025>
     <hr/>
     <app-stages-exists-block-2025
             [_form]="_form"
-            [num]="'9'"
+            [num]="'11'"
             (onConditionsChanged)="onConditionsChanged()"></app-stages-exists-block-2025>
 
     <hr/>
     <label class="mb-0">
-        10. Реализация и финансирование объекта государственной экспертизы
+        12. Реализация и финансирование объекта государственной экспертизы
     </label>
 
     <hr/>
     <app-name-accordance-block-2025
             [_form]="_form"
-            [num]="'10.1'"
+            [num]="'12.1'"
             (onConditionsChanged)="onConditionsChanged()"></app-name-accordance-block-2025>
 
     <hr/>
     <app-terms-accordance-block-2025
             [form]="_form"
-            [num]="'10.2'"
+            [num]="'12.2'"
             (onConditionsChanged)="onConditionsChanged()"></app-terms-accordance-block-2025>
     <hr/>
 
     <app-social-or-security-block-2025
             [_form]="_form"
-            [num]="'10.3'"
+            [num]="'12.3'"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-social-or-security-block-2025>
 
     <hr/>
     <app-finance-accordance-block-2025
             [_form]="_form"
-            [num]="'10.4'"
+            [num]="'12.4'"
             [project]="project"
             [isTextRequired]="true"
             (onConditionsChanged)="onConditionsChanged()"></app-finance-accordance-block-2025>
     <app-finance-conclusion-block-2025
             [_form]="_form"
-            [num]="'10.5'"
+            [num]="'12.5'"
             [noveltyNum]="'1'"
             [economicSignificanceNum]="'2'"
             [project]="project"
@@ -154,7 +155,7 @@
     ></app-finance-conclusion-block-2025>
     <hr/>
     <app-target-accordance-block-2025 [_form]="_form"
-                                 [num]="'10.6'"
+                                 [num]="'12.6'"
                                  (onConditionsChanged)="onConditionsChanged()"></app-target-accordance-block-2025>
 </div>
 

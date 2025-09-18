@@ -26,7 +26,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
         </div>
       </ng-container>
       <textarea *ngIf="full" [(ngModel)]="_form.financeAccordanceText" rows="3" class="form-control mt-05"
-                [attr.placeholder]="isTextRequired ? 'Обязательный текст.' : 'Пояснительный текст (при необходимости).'"></textarea>
+                placeholder="Обязательный текст"></textarea>
     </div>
   `
 })

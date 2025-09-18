@@ -28,6 +28,7 @@ export class ProjectFormComponent implements OnInit {
   @Input() optionToString: Function;
 
   _project: ProjectDto;
+
   @Output() save = new EventEmitter();
   @Output() cancel = new EventEmitter();
 
