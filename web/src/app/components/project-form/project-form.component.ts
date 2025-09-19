@@ -12,153 +12,233 @@ import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 
 
 @Component({
-  selector: 'app-project-form',
-  templateUrl: 'project-form.component.html'
+    selector: 'app-project-form',
+    templateUrl: 'project-form.component.html'
 })
 export class ProjectFormComponent implements OnInit {
 
-  Catalog = Catalog;
-  newDirection: DirectionDto;
-  subDirection: SubDirectionDto;
-  newSocialEconomicGoal: CatalogDto;
-  funding: FundingDto = new FundingDto();
-  allFundingType: string[] = getAllFundingType();
-  fundingToString: Function;
+    Catalog = Catalog;
+    newDirection: DirectionDto;
+    subDirection: SubDirectionDto;
+    newSocialEconomicGoal: CatalogDto;
+    funding: FundingDto = new FundingDto();
+    allFundingType: string[] = getAllFundingType();
+    fundingToString: Function;
 
-  @Input() optionToString: Function;
+    @Input() optionToString: Function;
 
-  _project: ProjectDto;
+    _project: ProjectDto;
 
-  @Output() save = new EventEmitter();
-  @Output() cancel = new EventEmitter();
+    @Output() save = new EventEmitter();
+    @Output() cancel = new EventEmitter();
 
-  codes: any = [];
-  customer: any;
+    codes: any = [];
+    customer: any;
 
 
-  constructor(private viewContainerRef: ViewContainerRef,
-              private _dataService: DataService,
-              private _personService: PersonService,
-              private _fundingPipe: FundingTypePipe) {
-    this.fundingToString = finance => _fundingPipe.transform(finance);
-  }
-
-  ngOnInit() {
-    this.getProjectCodes();
-    this._personService.getCurrentPerson().subscribe(res => {
-      this.customer = res;
-    });
-  }
-
-  @Input() set project(project: ProjectDto) {
-    if (!project) project = new ProjectDto();
-    if (!project.period) project.period = new PeriodDto();
-    this._project = project;
-  }
-
-  getProjectCodes() {
-    this._dataService.getCatalog(Catalog.PROJECT_CODE).subscribe(res => this.codes = res)
-  }
-
-  selectCode(code) {
-    this._project.code = code;
-  }
-
-  onSave() {
-    this.validate();
-    if (!this.canAddSocialEconomicGoals()) {
-      this._project.socialEconomicGoals = [];
+    constructor(private viewContainerRef: ViewContainerRef,
+                private _dataService: DataService,
+                private _personService: PersonService,
+                private _fundingPipe: FundingTypePipe) {
+        this.fundingToString = finance => _fundingPipe.transform(finance);
     }
-    this.save.emit(this._project);
-  }
 
-  validate() {
-    if(this._project.code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025'){
-      if (isEmptyOrNull(this._project.program)){
-        throw 'Наименование программы (подпрограммы) не может быть пустым.';
-      }
+    ngOnInit() {
+        this.getProjectCodes();
+        this._personService.getCurrentPerson().subscribe(res => {
+            this.customer = res;
+        });
     }
-    if (isEmptyOrNull(this._project.title)) {
-      throw 'Наименование объекта экспертизы не может быть пустым.';
+
+    @Input() set project(project: ProjectDto) {
+        if (!project) project = new ProjectDto();
+        if (!project.period) project.period = new PeriodDto();
+        this._project = project;
     }
-    if (!this._project.code) {
-      throw 'Пожалуйста, выберите код объекта экспертизы.';
+
+    getProjectCodes() {
+        this._dataService.getCatalog(Catalog.PROJECT_CODE).subscribe(res => this.codes = res)
     }
-    if (isEmptyOrNull(this._project.executor)) {
-      throw 'Пожалуйста, укажите исполнителей и соисполнителей объекта экспертизы.';
+
+    selectCode(code) {
+        this._project.code = code;
     }
-    if (!this._project.code.code.startsWith('8.10')) {
-      if (!this._project.period.start || !this._project.period.end) {
-        throw 'Пожалуйста, укажите сроки реализации объекта экспертизы.';
-      }
-      if (this._project.period.start > this._project.period.end) {
-        throw 'Дата начала не может быть больше даты окончания.';
-      }
-      if (!this._project.code.code.startsWith('8.16')) {
-        if (this._project.directions.length == 0 && !this.canAddSocialEconomicGoals()) {
-          throw 'Пожалуйста, укажите приоритетное направление научных исследований и (или) научно-технической деятельности.';
+
+    onSave() {
+        this.validate();
+        if (!this.canAddSocialEconomicGoals()) {
+            this._project.socialEconomicGoals = [];
         }
-        if (this._project.directions.length == 0 && this._project.socialEconomicGoals.length == 0 && this.canAddSocialEconomicGoals()) {
-          throw 'Пожалуйста, укажите приоритетное направление научных исследований и (или) научно-технической деятельности ' +
-          'или цель (приоритет) социально-экономического развития';
+        this.save.emit(this._project);
+    }
+
+    validate() {
+        if (this._project.code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025') {
+            if (isEmptyOrNull(this._project.program)) {
+                throw 'Наименование программы (подпрограммы) не может быть пустым.';
+            }
         }
-      }
+        if (isEmptyOrNull(this._project.title)) {
+            throw 'Наименование объекта экспертизы не может быть пустым.';
+        }
+        if (!this._project.code) {
+            throw 'Пожалуйста, выберите код объекта экспертизы.';
+        }
+        if (isEmptyOrNull(this._project.executor)) {
+            throw 'Пожалуйста, укажите исполнителей и соисполнителей объекта экспертизы.';
+        }
+        if (!this._project.code.code.startsWith('8.10')) {
+            if (!this._project.period.start || !this._project.period.end) {
+                throw 'Пожалуйста, укажите сроки реализации объекта экспертизы.';
+            }
+            if (this._project.period.start > this._project.period.end) {
+                throw 'Дата начала не может быть больше даты окончания.';
+            }
+            if (!this._project.code.code.startsWith('8.16')) {
+                if (this._project.directions.length == 0 && !this.canAddSocialEconomicGoals()) {
+                    throw 'Пожалуйста, укажите приоритетное направление научных исследований и (или) научно-технической деятельности.';
+                }
+                if (this._project.directions.length == 0 && this._project.socialEconomicGoals.length == 0 && this.canAddSocialEconomicGoals()) {
+                    throw 'Пожалуйста, укажите приоритетное направление научных исследований и (или) научно-технической деятельности ' +
+                    'или цель (приоритет) социально-экономического развития';
+                }
+            }
+        }
     }
-  }
 
-  onCancel() {
-    this.cancel.emit();
-  }
-
-  addDirection() {
-    console.log(this.subDirection.id);
-    if (this.newDirection) {
-      this._project.directions.push(this.newDirection);
-      this._project.subDirections.push(this.subDirection);
-      this.newDirection = null;
-      this.subDirection = null
+    onCancel() {
+        this.cancel.emit();
     }
-    console.log(this._project);
-  }
 
-  addSocialEconomicGoal() {
-    if (this.newSocialEconomicGoal) {
-      this._project.socialEconomicGoals.push(this.newSocialEconomicGoal);
-      this.newSocialEconomicGoal = null;
+    addDirection() {
+        console.log(this.subDirection.id);
+        if (this.newDirection) {
+            this._project.directions.push(this.newDirection);
+            this._project.subDirections.push(this.subDirection);
+            this.newDirection = null;
+            this.subDirection = null
+        }
+        console.log(this._project);
     }
-  }
 
-  canAddSocialEconomicGoals() {
-    return this._project.code && this._project.code.code == '8.13';
-  }
-
-  addFunding() {
-    if (this.funding.type == null) {
-      throw 'Пожалуйста, укажите тип финансирования объекта экспертизы.';
+    addSocialEconomicGoal() {
+        if (this.newSocialEconomicGoal) {
+            this._project.socialEconomicGoals.push(this.newSocialEconomicGoal);
+            this.newSocialEconomicGoal = null;
+        }
     }
-    if (this.funding.source == null) {
-      throw 'Пожалуйста, укажите источник финансирования объекта экспертизы.';
-    }
-    if (this.funding.value == null) {
-      throw  'Пожалуйста, укажите сумму финансирования объекта экспертизы';
-    }
-    if (this.funding.value <= 0) {
-      throw 'Пожалуйста, укажите неотрицательную сумму финансирования объекта экспертизы.';
-    }
-    this._project.financing.push(this.funding);
-    this.funding = new FundingDto();
-  }
 
-  // select(option: SubDirectionDto) {
-  //   console.log(option);
-  //   this.subDirection = option;
-  // }
+    canAddSocialEconomicGoals() {
+        return this._project.code && this._project.code.code == '8.13';
+    }
 
-  getSubDirectionName() {
-    return  this.newDirection.subDirectionDtos;
-  }
+    addFunding() {
+        if (this.funding.type == null) {
+            throw 'Пожалуйста, укажите тип финансирования объекта экспертизы.';
+        }
+        if (this.funding.source == null) {
+            throw 'Пожалуйста, укажите источник финансирования объекта экспертизы.';
+        }
+        if (this.funding.value == null) {
+            throw 'Пожалуйста, укажите сумму финансирования объекта экспертизы';
+        }
+        if (this.funding.value <= 0) {
+            throw 'Пожалуйста, укажите неотрицательную сумму финансирования объекта экспертизы.';
+        }
+        this._project.financing.push(this.funding);
+        this.funding = new FundingDto();
+    }
 
-  displayDirection(directions: CatalogDto[]) {
-    return directions as DirectionDto[];
-  }
+    // select(option: SubDirectionDto) {
+    //   console.log(option);
+    //   this.subDirection = option;
+    // }
+
+    getSubDirectionName() {
+        return this.newDirection.subDirectionDtos;
+    }
+
+    displayDirection(directions: CatalogDto[]) {
+        return directions as DirectionDto[];
+    }
+
+
+
+
+
+
+
+
+    expectedResultList: any = ['Первый результат', 'Второй результат', 'Другое'];
+    selectedResult: string;
+    expectedResult: string;
+    expectedResultDescription: string;
+    expectedResultReferenceInformation: string = 'Cправочная информация';
+    selectExpectedResult(result) {
+        this.selectedResult = result;
+    }
+
+    typeOfWorkList: any = ['Первый вид ', 'Второй вид', 'Третий вид', 'Другое'];
+    selectedTypeOfWork: string;
+    typeOfWork: string;
+    selectTypeOfWork(typeOfWork) {
+        this.selectedTypeOfWork = typeOfWork;
+    }
+
+    resultSpecificList: any = ['Первый характер', 'Второй характер', 'Третий характер'];
+    selectedResultSpecific: string;
+    selectResultSpecific(resultSpecific) {
+        this.selectedResultSpecific = resultSpecific;
+    }
+
+    isCommerceSubject: boolean;
+
+    commerceList: any[] = commerceList;
+    commerce: string;
+    commerceText: string;
+    selectCommerceResult(commerce) {
+        this.commerce = commerce;
+    }
+
+    someList: any[] = ['Первый вариант', 'Второй вариант', 'Третий вариант'];
+    someSelectedElement: string;
+    implementationObjectDescription: string;
+    implementationObjectWay: string;
+    selectSomeResult(selectedElement) {
+        this.someSelectedElement = selectedElement;
+    }
+
+
+    technologyType: string;
+    technologyTypeList: any[] = ['Первый уклад', 'Второй уклад', 'Третий уклад'];
+    selectTechnologyType(technologyType) {
+        this.technologyType = technologyType;
+    }
+
+
 }
+
+export const commerceList: string[] = [
+    'реализация товаров (работ, услуг), создаваемых (выполняемых, оказываемых) с применением результатов научно-технической деятельности ',
+    'использование результатов научно-технической деятельности для собственных нужд',
+    'предоставление на возмездной основе другим лицам права на использование результатов научно-технической деятельности',
+    'полная передача на возмездной основе другим лицам имущественных прав на результаты научно-технической деятельности',
+    'безвозмездная передача другим лицам имущественных прав на результаты научно-технической деятельности',
+    'безвозмездное предоставление права на использование результатов научно-технической деятельности с условием последующей ' +
+    'их коммерциализации приобретателем этих прав посредством реализации товаров (работ, услуг), создаваемых (выполняемых, оказываемых) ' +
+    'с применением результатов научно-технической деятельности, или использования результатов научно-технической деятельности ' +
+    'для собственных нужд, или предоставления на возмездной основе другим лицам права на использование результатов научно-технической деятельности',
+    'возмездная передача сведений (части сведений), составляющих секреты производства (ноу-хау) ',
+    'безвозмездная передача сведений (части сведений), составляющих секреты производства (ноу-хау), ' +
+    'с условием последующей их коммерциализации приобретателем посредством реализации товаров (работ, услуг), ' +
+    'создаваемых (выполняемых, оказываемых) с применением результатов научно-технической деятельности, ' +
+    'или использования результатов научно-технической деятельности для собственных нужд, или возмездной передачи сведений (части сведений), ' +
+    'составляющих секреты производства (ноу-хау)',
+    'возмездная передача документированной научно-технической информации',
+    'безвозмездная передача документированной научно-технической информации с условием последующей ее коммерциализации приобретателем посредством ' +
+    'реализации товаров (работ, услуг), создаваемых (выполняемых, оказываемых) с применением результатов научно-технической деятельности, ' +
+    'или использования результатов научно-технической деятельности для собственных нужд, или возмездной передачи документированной ' +
+    'научно-технической информации',
+    'иные способы, предусмотренные актами законодательства',
+    'не подлежит обязательной коммерциализации**.'
+];

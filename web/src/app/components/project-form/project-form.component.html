@@ -1,283 +1,569 @@
 <div class="card card-block compact" *ngIf="_project">
-  <div class="form-group">
-    <label class="form-group-label">Наименование объекта экспертизы</label>
-    <textarea rows="2" class="form-control" placeholder="Название объекта экспертизы"
-              [(ngModel)]="_project.title" title="Название объекта экспертизы"></textarea>
-  </div>
-
-  <div class="form-group">
-    <label class="form-group-label">Код объекта экспертизы</label>
-    <div class="dropdown">
-      <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
-              data-toggle="dropdown">{{_project.code ? _project.code.code : "Выберите код"}}
-      </button>
-      <ul class="dropdown-menu scrollable-menu">
-        <li *ngFor="let code of codes" class="dropdown-item" (click)="selectCode(code)">
-          <span class="font-weight-bold">{{code.code}}</span>{{!code.name || code.name == '' ? '' : ' - ' +
-            code.name}}
-        </li>
-        <li *ngIf="codes.length == 0" disabled class="dropdown-item disabled">
-          Нет данных
-        </li>
-      </ul>
+    <div class="form-group">
+        <label class="form-group-label">Наименование объекта экспертизы</label>
+        <textarea rows="2" class="form-control" placeholder="Название объекта экспертизы"
+                  [(ngModel)]="_project.title" title="Название объекта экспертизы"></textarea>
     </div>
-  </div>
 
-  <div class="form-group" *ngIf="_project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || _project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'">
-    <label class="form-group-label" *ngIf="_project.code?.code != '8.4'">Наименование программы (подпрограммы)</label>
-    <label class="form-group-label" *ngIf="_project.code?.code == '8.4'">Наименование двусторонней научно-технической программы с </label>
-    <textarea *ngIf="_project.code?.code != '8.4'" rows="2" class="form-control" placeholder="Наименование программы (подпрограммы)"
-              [(ngModel)]="_project.program"></textarea>
-    <textarea *ngIf="_project.code?.code == '8.4'" rows="2" class="form-control" placeholder="Название страны"
-              [(ngModel)]="_project.program"></textarea>
-    <div class="hint">
-      <p class="font-italic">
-        <b>Подсказка.</b>
-          Заполняется при наличии программы (подпрограммы). Для объектов государственной экспертизы, указанных в подпункте 8.4 пункта 8 Положения
-        указывается название страны. При отсутствии программы (подпрограммы) указывается «Выполнение в рамках программы (подпрограммы) не предусмотрено».
-      </p>
-
+    <div class="form-group">
+        <label class="form-group-label">Код объекта экспертизы</label>
+        <div class="dropdown">
+            <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
+                    data-toggle="dropdown">{{ _project.code ? _project.code.code : "Выберите код" }}
+            </button>
+            <ul class="dropdown-menu scrollable-menu">
+                <li *ngFor="let code of codes" class="dropdown-item" (click)="selectCode(code)">
+                    <span class="font-weight-bold">{{ code.code }}</span>{{
+                        !code.name || code.name == '' ? '' : ' - ' +
+                            code.name
+                    }}
+                </li>
+                <li *ngIf="codes.length == 0" disabled class="dropdown-item disabled">
+                    Нет данных
+                </li>
+            </ul>
+        </div>
     </div>
-  </div>
 
-  <div class="form-group">
-    <label class="form-group-label">Заказчик экспертизы (данные из Вашего профиля)</label>
-    <div class="form-sub-group">
-      <label>Наименование организации</label>
-      <input class="form-control" type="text" placeholder="Не указано"
-             disabled [ngModel]="customer?.org?.name" title="Наименование организации"/>
-    </div>
-    <div class="">
-      <label>Должностное лицо</label>
-      <input class="form-control" type="text" placeholder="Должностное лицо" disabled title="Должностное лицо"
-             [ngModel]="customer | fullName"/>
-    </div>
-  </div>
+    <div class="form-group"
+         *ngIf="_project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || _project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'">
+        <label class="form-group-label" *ngIf="_project.code?.code != '8.4'">Наименование программы
+            (подпрограммы)</label>
+        <label class="form-group-label" *ngIf="_project.code?.code == '8.4'">Наименование двусторонней
+            научно-технической программы с </label>
+        <textarea *ngIf="_project.code?.code != '8.4'" rows="2" class="form-control"
+                  placeholder="Наименование программы (подпрограммы)"
+                  [(ngModel)]="_project.program"></textarea>
+        <textarea *ngIf="_project.code?.code == '8.4'" rows="2" class="form-control" placeholder="Название страны"
+                  [(ngModel)]="_project.program"></textarea>
+        <div class="hint">
+            <p class="font-italic">
+                <b>Подсказка.</b>
+                Заполняется при наличии программы (подпрограммы). Для объектов государственной экспертизы, указанных в
+                подпункте 8.4 пункта 8 Положения
+                указывается название страны. При отсутствии программы (подпрограммы) указывается «Выполнение в рамках
+                программы (подпрограммы) не предусмотрено».
+            </p>
 
-  <div class="form-group">
-    <label class="form-group-label">Потенциальный(-е) исполнитель(-и) объекта государственной экспертизы</label>
-    <textarea rows="2" class="form-control" placeholder="Организация-исполнитель проекта"
-              [(ngModel)]="_project.executor" title="Наименование организации"></textarea>
-    <div class="hint">
-      <p class="font-italic">
-        <b>Подсказка.</b>
-        Если известен(-ы) (наименование исполнителя(-ей), соисполнителя(-ей).
-      </p>
+        </div>
     </div>
-  </div>
-  <div *ngIf="!_project.code?.code.startsWith('8.10')">
-    <div *ngIf="!_project.code?.code.startsWith('8.16')">
-      <div class="form-group">
-        <label class="form-group-label">Сроки выполнения проекта</label>
-        <div class="input-group">
-          <app-date-period class="form-control" [(ngModel)]="_project.period"></app-date-period>
-        </div>
-      </div>
-      <div *ngIf="_project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'" class="form-group">
-        <div class="form-group">
-          <label class="form-group-label">Cрок выполнения НИОК(Т)Р</label>
-          <div class="input-group">
-            <input class="form-control" type="text" placeholder="Квартал и год" title="Должностное лицо"
-                   [(ngModel)]="_project.nioktrPeriod"/>
-          </div>
-          <p class="font-italic">
-            <b>Подсказка.</b>
-            Указывается квартал и год.
-          </p>
-        </div>
-        <div class="form-group">
-          <label class="form-group-label">Сроки выполнения работ по освоению (внедрению) инноваций</label>
-          <div class="input-group">
-            <input class="form-control" type="text" placeholder="Квартал и год" title="Должностное лицо"
-                   [(ngModel)]="_project.innovationPeriod"/>
-          </div>
-          <p class="font-italic">
-            <b>Подсказка.</b>
-            Указывается квартал и год.
-          </p>
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="form-sub-group" *ngIf=" _project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025'">
-          <label class="form-group-label">Вид научного исследования по объекту государственной экспертизы</label>
-          <div class="form-sub-group">
-            <label class="form-sub-group-label">
-              <span>Исследование: </span>
-              <app-select-catalog
-                      class="d-inline-block"
-                      [catalog]="Catalog.STUDY"
-                      [resetEnabled]="false"
-                      [(ngModel)]="_project.study"
-              ></app-select-catalog>
-            </label>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-group-label">Финансирование</label>
-          <div class="form-sub-group">
-            <label class="form-sub-group-label">
-              <span>Валюта: </span>
-              <app-select-catalog
-                class="d-inline-block"
-                [catalog]="Catalog.CURRENCY"
-                [resetEnabled]="false"
-                [(ngModel)]="_project.currency"
-              ></app-select-catalog>
-            </label>
-          </div>
 
-        <div class="form-sub-group italic">
-          <ul *ngIf="_project.financing.length != 0">
-            <li *ngFor="let financing of _project.financing; let i = index">
-              <span>{{financing.type | fundingType}} финансирование, </span>
-              <span>{{financing.comment ? financing.comment + ' - ' : ''}}</span>
-              <span>{{financing.source.name}}: </span>
-              <span>{{financing.value}} {{_project.currency?.name || 'руб.'}}</span>
-              <a class="btn btn-icon btn-icon-sm" (click)="_project.financing.splice(i, 1)">
-                <fa-icon icon="minus"></fa-icon>
-              </a>
-            </li>
-          </ul>
-          <div *ngIf="_project.financing.length == 0" class="italic">финансирование не указано</div>
+    <div class="form-group">
+        <label class="form-group-label">Заказчик экспертизы (данные из Вашего профиля)</label>
+        <div class="form-sub-group">
+            <label>Наименование организации</label>
+            <input class="form-control" type="text" placeholder="Не указано"
+                   disabled [ngModel]="customer?.org?.name" title="Наименование организации"/>
         </div>
-      <div class="row">
-        <div class="col-sm-2 pr-0">
-          <app-dropdown class="dropdown btn-group" [options]="(allFundingType)"
-                        [optionToString]="fundingToString" [notSelected]="'Тип не выбран'"
-                        [(ngModel)]="funding.type"></app-dropdown>
+        <div class="">
+            <label>Должностное лицо</label>
+            <input class="form-control" type="text" placeholder="Должностное лицо" disabled title="Должностное лицо"
+                   [ngModel]="customer | fullName"/>
         </div>
-        <div class="col-sm-3 pr-0">
+    </div>
+
+    <div class="form-group">
+        <label class="form-group-label">Потенциальный(-е) исполнитель(-и) объекта государственной экспертизы</label>
+        <textarea rows="2" class="form-control" placeholder="Организация-исполнитель проекта"
+                  [(ngModel)]="_project.executor" title="Наименование организации"></textarea>
+        <div class="hint">
+            <p class="font-italic">
+                <b>Подсказка.</b>
+                Если известен(-ы) (наименование исполнителя(-ей), соисполнителя(-ей).
+            </p>
+        </div>
+    </div>
+    <div *ngIf="!_project.code?.code.startsWith('8.10')">
+        <div *ngIf="!_project.code?.code.startsWith('8.16')">
+            <div class="form-group">
+                <label class="form-group-label">Сроки выполнения проекта</label>
+                <div class="input-group">
+                    <app-date-period class="form-control" [(ngModel)]="_project.period"></app-date-period>
+                </div>
+            </div>
+            <div *ngIf="_project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'" class="form-group">
+                <div class="form-group">
+                    <label class="form-group-label">Cрок выполнения НИОК(Т)Р</label>
+                    <div class="input-group">
+                        <input class="form-control" type="text" placeholder="Квартал и год" title="Должностное лицо"
+                               [(ngModel)]="_project.nioktrPeriod"/>
+                    </div>
+                    <p class="font-italic">
+                        <b>Подсказка.</b>
+                        Указывается квартал и год.
+                    </p>
+                </div>
+                <div class="form-group">
+                    <label class="form-group-label">Сроки выполнения работ по освоению (внедрению) инноваций</label>
+                    <div class="input-group">
+                        <input class="form-control" type="text" placeholder="Квартал и год" title="Должностное лицо"
+                               [(ngModel)]="_project.innovationPeriod"/>
+                    </div>
+                    <p class="font-italic">
+                        <b>Подсказка.</b>
+                        Указывается квартал и год.
+                    </p>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-sub-group" *ngIf=" _project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025'">
+                    <label class="form-group-label">Вид научного исследования по объекту государственной
+                        экспертизы</label>
+                    <div class="form-sub-group">
+                        <label class="form-sub-group-label">
+                            <span>Исследование: </span>
+                            <app-select-catalog
+                                    class="d-inline-block"
+                                    [catalog]="Catalog.STUDY"
+                                    [resetEnabled]="false"
+                                    [(ngModel)]="_project.study"
+                            ></app-select-catalog>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-group-label">Финансирование</label>
+                    <div class="form-sub-group">
+                        <label class="form-sub-group-label">
+                            <span>Валюта: </span>
+                            <app-select-catalog
+                                    class="d-inline-block"
+                                    [catalog]="Catalog.CURRENCY"
+                                    [resetEnabled]="false"
+                                    [(ngModel)]="_project.currency"
+                            ></app-select-catalog>
+                        </label>
+                    </div>
+
+                    <div class="form-sub-group italic">
+                        <ul *ngIf="_project.financing.length != 0">
+                            <li *ngFor="let financing of _project.financing; let i = index">
+                                <span>{{ financing.type | fundingType }} финансирование, </span>
+                                <span>{{ financing.comment ? financing.comment + ' - ' : '' }}</span>
+                                <span>{{ financing.source.name }}: </span>
+                                <span>{{ financing.value }} {{ _project.currency?.name || 'руб.' }}</span>
+                                <a class="btn btn-icon btn-icon-sm" (click)="_project.financing.splice(i, 1)">
+                                    <fa-icon icon="minus"></fa-icon>
+                                </a>
+                            </li>
+                        </ul>
+                        <div *ngIf="_project.financing.length == 0" class="italic">финансирование не указано</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2 pr-0">
+                            <app-dropdown class="dropdown btn-group" [options]="(allFundingType)"
+                                          [optionToString]="fundingToString" [notSelected]="'Тип не выбран'"
+                                          [(ngModel)]="funding.type"></app-dropdown>
+                        </div>
+                        <div class="col-sm-3 pr-0">
           <textarea rows="1" class="form-control" placeholder="Комментарий"
                     [(ngModel)]="funding.comment" title="Комментарий"></textarea>
+                        </div>
+                        <div class="col-sm-3 pr-0">
+                            <app-select-catalog [catalog]="Catalog.FUNDING" [(ngModel)]="funding.source"
+                                                [notSelected]="'Источник не выбран'"></app-select-catalog>
+                        </div>
+                        <div class="col-sm-2 pr-0">
+                            <input class="form-control" min="0" numberInput type="text" placeholder="Сумма"
+                                   [(ngModel)]="funding.value" title="Сумма"/>
+                        </div>
+                        <div class="col-sm-2">
+                            <button class="btn btn-primary w-100" (click)="addFunding()">Добавить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-group-label">Приоритетное направление научных исследований и (или)
+                        научно-технической
+                        деятельности</label>
+                    <div class="form-sub-group italic">
+                        <ul *ngIf="_project.directions.length != 0">
+                            <li *ngFor="let direction of displayDirection(_project.directions); let i = index">
+                                {{ direction.name }} <br>
+                                - {{ direction.subDirectionDtos[i].directionName }}
+                                <a class="btn btn-icon btn-icon-sm" (click)="_project.directions.splice(i, 1)">
+                                    <fa-icon icon="minus"></fa-icon>
+                                </a>
+                            </li>
+                        </ul>
+                        <div *ngIf="_project.directions.length == 0">направления не указаны</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-10 pr-2">
+                            <app-select-catalog [catalog]="Catalog.DIRECTION"
+                                                [(ngModel)]="newDirection"></app-select-catalog>
+                        </div>
+                        <div class="col-2 pl-2">
+                            <button class="btn btn-primary w-100" [disabled]="!subDirection" (click)="addDirection()">
+                                Добавить
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row  m-1" *ngIf="newDirection">
+                        <app-dropdown [(ngModel)]="subDirection" [notSelected]="'Ничего не выбрано'"
+                                      [options]="getSubDirectionName()"
+                                      [resetEnabled]="true" [optionToString]="optionToString"></app-dropdown>
+                        <!--          <div class="dropdown" >-->
+                        <!--              <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown">-->
+                        <!--                {{subDirection.directionName}}-->
+                        <!--              </button>-->
+                        <!--            <ul class="dropdown-menu scrollable-menu" role="menu">-->
+                        <!--              <li *ngFor="let sub of newDirection.subDirectionDtos; let i = index" class="dropdown-item" (click)="select(sub)">-->
+                        <!--                {{sub.directionName}}-->
+                        <!--              </li>-->
+                        <!--              <li *ngIf="!subDirection">-->
+                        <!--                Ничего не выбрано-->
+                        <!--              </li>-->
+                        <!--            </ul>-->
+                        <!--          </div>-->
+                    </div>
+                </div>
+
+
+                <div *ngIf="canAddSocialEconomicGoals()" class="form-group">
+                    <label class="form-group-label">Цель (приоритет) социально-экономического развития</label>
+                    <div class="form-sub-group italic">
+                        <ul *ngIf="_project.socialEconomicGoals.length != 0">
+                            <li *ngFor="let socialEconomicGoal of _project.socialEconomicGoals; let i = index">
+                                {{ socialEconomicGoal.name }}
+                                <a class="btn btn-icon btn-icon-sm" (click)="_project.socialEconomicGoals.splice(i, 1)">
+                                    <fa-icon icon="minus"></fa-icon>
+                                </a>
+                            </li>
+                        </ul>
+                        <div *ngIf="_project.socialEconomicGoals.length == 0">цели (приоритеты) не указаны</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-10 pr-2">
+                            <app-select-catalog [catalog]="Catalog.SOCIAL_ECONOMIC_GOAL"
+                                                [(ngModel)]="newSocialEconomicGoal"></app-select-catalog>
+                        </div>
+                        <div class="col-2 pl-2">
+                            <button class="btn btn-primary w-100" [disabled]="!newSocialEconomicGoal"
+                                    (click)="addSocialEconomicGoal()">
+                                Добавить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-sm-3 pr-0">
-          <app-select-catalog [catalog]="Catalog.FUNDING" [(ngModel)]="funding.source"
-                              [notSelected]="'Источник не выбран'"></app-select-catalog>
+        <div *ngIf="_project.code?.code.startsWith('8.16')">
+            <div class="form-group">
+                <label class="form-group-label">Сроки реализации</label>
+                <div class="input-group">
+                    <app-date-period class="form-control" [(ngModel)]="_project.period"></app-date-period>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-group-label">Наименование товара(ов)</label>
+                <div class="form-sub-group">
+                    <label>Наименование товара(ов) с указанием кода в соответствии
+                        с перечнем кодов продукции по видам экономической деятельности согласно приложению к Положению о
+                        порядке формирования перечня высокотехнологичных товаров, утвержденному постановлением Совета
+                        Министров Республики Беларусь от 1 июля 2022 г. № 435 (далее – Положение), шестизначного кода
+                        товара в соответствии с единой Товарной номенклатурой внешнеэкономической деятельности
+                        Евразийского экономического союза (далее – ТН ВЭД ЕАЭС), к которому относится товар:</label>
+                    <textarea rows="2" class="form-control" placeholder="Наименование товара"
+                              [(ngModel)]="_project.productName" title="Наименование товара"></textarea>
+                </div>
+                <label class="form-group-label">Организация(ии)</label>
+                <div class="form-sub-group">
+                    <label>Организация(ии) Республики Беларусь, осуществляющая(ие) производство товара(ов) (при
+                        наличии): </label>
+                    <textarea rows="2" class="form-control" placeholder="Наименование организации"
+                              [(ngModel)]="_project.orgProduction" title="Наименование организации"></textarea>
+                </div>
+                <label class="form-group-label">Новые технологии</label>
+                <div class="form-sub-group">
+                    <label>Новые и высокие технологии и (или) высокотехнологичные производства, используемые при
+                        производстве товаров :</label>
+                    <textarea rows="2" class="form-control" placeholder="Наименование технологии"
+                              [(ngModel)]="_project.highTechProduction" title="Наименование технологии"></textarea>
+                </div>
+                <label class="form-group-label">Обьём производства</label>
+                <div class="form-sub-group">
+                    <label>Общий объем производства товара на территории Республики Беларусь, а также общий объем
+                        экспорта соответствующего товара
+                        по шестизначному коду ТН ВЭД ЕАЭС в белорусских рублях:</label>
+                    <textarea rows="2" class="form-control" placeholder="Сумма в бел.руб"
+                              [(ngModel)]="_project.productionOnRB" title="Сумма в бел.руб"></textarea>
+                </div>
+                <label class="form-group-label">Общий объем </label>
+                <div class="form-sub-group">
+                    <label>Общий объем экспорта и импорта соответствующего товара по шестизначному коду ТН ВЭД ЕАЭС в
+                        белорусских рублях:</label>
+                    <textarea rows="2" class="form-control" placeholder="Сумма в бел.руб"
+                              [(ngModel)]="_project.exportAndImport" title="Сумма в бел.руб"></textarea>
+                </div>
+            </div>
         </div>
-        <div class="col-sm-2 pr-0">
-          <input class="form-control" min="0" numberInput type="text" placeholder="Сумма"
-                 [(ngModel)]="funding.value" title="Сумма"/>
-        </div>
-        <div class="col-sm-2">
-          <button class="btn btn-primary w-100" (click)="addFunding()">Добавить</button>
-        </div>
-      </div>
     </div>
+</div>
+
+<div class="card card-block mt-2">
+    <!--
+
+     Как только будет понятно, какие данные брать, будут ли они записыватсья в бд и т.д. переделать под этот шаблон
+
+     -->
+    <!--    <label class="form-group-label">Финансирование</label>-->
+    <!--    <div class="form-sub-group">-->
+    <!--        <label class="form-sub-group-label">-->
+    <!--            <span>Валюта: </span>-->
+    <!--            <app-select-catalog-->
+    <!--                    class="d-inline-block"-->
+    <!--                    [catalog]="Catalog.CURRENCY"-->
+    <!--                    [resetEnabled]="false"-->
+    <!--                    [(ngModel)]="_project.currency"-->
+    <!--            ></app-select-catalog>-->
+    <!--        </label>-->
+    <!--    </div>-->
+
 
     <div class="form-group">
-      <label class="form-group-label">Приоритетное направление научных исследований и (или) научно-технической
-        деятельности</label>
-      <div class="form-sub-group italic">
-        <ul *ngIf="_project.directions.length != 0">
-          <li *ngFor="let direction of displayDirection(_project.directions); let i = index">
-            {{direction.name}} <br>
-            - {{direction.subDirectionDtos[i].directionName}}
-            <a class="btn btn-icon btn-icon-sm" (click)="_project.directions.splice(i, 1)">
-              <fa-icon icon="minus"></fa-icon>
-            </a>
-          </li>
-        </ul>
-        <div *ngIf="_project.directions.length == 0">направления не указаны</div>
-      </div>
-      <div class="row">
-        <div class="col-10 pr-2">
-          <app-select-catalog [catalog]="Catalog.DIRECTION" [(ngModel)]="newDirection"></app-select-catalog>
-        </div>
-        <div class="col-2 pl-2">
-          <button class="btn btn-primary w-100" [disabled]="!subDirection" (click)="addDirection()">Добавить</button>
-        </div>
-      </div>
-      <div class="row  m-1" *ngIf="newDirection">
-        <app-dropdown [(ngModel)]="subDirection" [notSelected]="'Ничего не выбрано'" [options]="getSubDirectionName()"
-                      [resetEnabled]="true" [optionToString]="optionToString"></app-dropdown>
-        <!--          <div class="dropdown" >-->
-<!--              <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown">-->
-<!--                {{subDirection.directionName}}-->
-<!--              </button>-->
-<!--            <ul class="dropdown-menu scrollable-menu" role="menu">-->
-<!--              <li *ngFor="let sub of newDirection.subDirectionDtos; let i = index" class="dropdown-item" (click)="select(sub)">-->
-<!--                {{sub.directionName}}-->
-<!--              </li>-->
-<!--              <li *ngIf="!subDirection">-->
-<!--                Ничего не выбрано-->
-<!--              </li>-->
-<!--            </ul>-->
-<!--          </div>-->
-      </div>
-    </div>
 
 
-    <div *ngIf="canAddSocialEconomicGoals()" class="form-group">
-      <label class="form-group-label">Цель (приоритет) социально-экономического развития</label>
-      <div class="form-sub-group italic">
-        <ul *ngIf="_project.socialEconomicGoals.length != 0">
-          <li *ngFor="let socialEconomicGoal of _project.socialEconomicGoals; let i = index">
-            {{socialEconomicGoal.name}}
-            <a class="btn btn-icon btn-icon-sm" (click)="_project.socialEconomicGoals.splice(i, 1)">
-              <fa-icon icon="minus"></fa-icon>
-            </a>
-          </li>
-        </ul>
-        <div *ngIf="_project.socialEconomicGoals.length == 0">цели (приоритеты) не указаны</div>
-      </div>
-      <div class="row">
-        <div class="col-10 pr-2">
-          <app-select-catalog [catalog]="Catalog.SOCIAL_ECONOMIC_GOAL"
-                              [(ngModel)]="newSocialEconomicGoal"></app-select-catalog>
+
+
+        <!--   Ожидаемый результат экспертизы   -->
+        <div class="form-sub-group">
+            <label class="form-group-label">Ожидаемый результат экспертизы</label>
+            <div class="form-sub-group">
+
+
+                <!--
+                    Потом убрать эту часть и заменить на app-select-catalog при необходимости
+                -->
+                <div class="dropdown">
+                    <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
+                            data-toggle="dropdown">{{ selectedResult ? selectedResult : "Выберите вид ожидаемого результата" }}
+                    </button>
+                    <ul class="dropdown-menu scrollable-menu">
+                        <li *ngFor="let result of expectedResultList" class="dropdown-item"
+                            (click)="selectExpectedResult(result)">
+                            <span>{{ result }}</span>
+                        </li>
+                        <li *ngIf="expectedResultList.length == 0" disabled class="dropdown-item disabled">
+                            Нет данных
+                        </li>
+                    </ul>
+                </div>
+                <!--            -->
+                <!--            -->
+                <!--            -->
+
+            </div>
+            <div class="form-sub-group" *ngIf="selectedResult == 'Другое'">
+                <p class="font-italic">
+                    <b>Подсказка.</b>
+                    Введите свой вид ожидаемого результата в дополнительном текстовом поле.
+                </p>
+                <textarea class="form-control" rows="2" placeholder="Введите вид ожидаемого результата"
+                          [(ngModel)]="expectedResult"></textarea>
+            </div>
+
+            <div class="form-sub-group">
+            <textarea class="form-control" rows="2" placeholder="Описание ожидаемого результата"
+                      [(ngModel)]="expectedResultDescription"></textarea>
+                <p *ngIf="selectedResult != 'Другое'" class="font-italic">
+                    <b>Подсказка.</b>
+                    {{ expectedResultReferenceInformation }}
+                </p>
+            </div>
+
         </div>
-        <div class="col-2 pl-2">
-          <button class="btn btn-primary w-100" [disabled]="!newSocialEconomicGoal" (click)="addSocialEconomicGoal()">
-            Добавить
-          </button>
+
+
+
+
+        <!--     Вид работ   -->
+        <div class="form-sub-group">
+            <!--
+           Потом убрать эту часть и заменить на app-select-catalog при необходимости
+            -->
+            <label class="form-group-label">Вид работ</label>
+            <div class="dropdown">
+                <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
+                        data-toggle="dropdown">{{ selectedTypeOfWork ? selectedTypeOfWork : 'Выберите вид работ' }}
+                </button>
+                <ul class="dropdown-menu scrollable-menu">
+                    <li *ngFor="let typeOfWork of typeOfWorkList" class="dropdown-item"
+                        (click)="selectTypeOfWork(typeOfWork)">
+                        <span>{{ typeOfWork }}</span>
+                    </li>
+                    <li *ngIf="typeOfWorkList.length == 0" disabled class="dropdown-item disabled">
+                        Нет данных
+                    </li>
+                </ul>
+            </div>
+            <div class="form-sub-group mt-2" *ngIf="selectedTypeOfWork == 'Другое'">
+                <textarea class="form-control" rows="2" placeholder="Введите вид работ"
+                          [(ngModel)]="typeOfWork"></textarea>
+            </div>
+            <!--            -->
+            <!--            -->
+            <!--            -->
         </div>
-      </div>
+
+
+
+
+        <!--     Характер результата   -->
+        <div class="form-sub-group">
+            <label class="form-group-label">Характер результата</label>
+            <!--
+           Потом убрать эту часть и заменить на app-select-catalog при необходимости
+            -->
+            <div class="dropdown">
+                <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
+                        data-toggle="dropdown">{{ selectedResultSpecific ? selectedResultSpecific : "Выберите характер результата" }}
+                </button>
+                <ul class="dropdown-menu scrollable-menu">
+                    <li *ngFor="let typeOfWork of resultSpecificList" class="dropdown-item"
+                        (click)="selectResultSpecific(typeOfWork)">
+                        <span>{{ typeOfWork }}</span>
+                    </li>
+                    <li *ngIf="resultSpecificList.length == 0" disabled class="dropdown-item disabled">
+                        Нет данных
+                    </li>
+                </ul>
+            </div>
+            <!--            -->
+            <!--            -->
+            <!--            -->
+        </div>
+
+
+
+
+        <!--     Результат подлежит коммерциализации   -->
+        <div class="form-sub-group">
+            <label class="form-group-label">Результат подлежит коммерциализации по Указу Президента Республики
+                Беларусь № 59 от 4 февраля 2013 г. «О коммерциализации результатов научной и научно-технической
+                деятельности, созданных за счёт государственных средств»?</label>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-outline-success" [ngClass]="{'active': isCommerceSubject}"
+                        (click)="isCommerceSubject = true">
+                    Подлежит
+                </button>
+                <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': !isCommerceSubject}"
+                        (click)="isCommerceSubject = false">
+                    Не подлежит
+                </button>
+            </div>
+        </div>
+
+
+
+
+        <!--   Коммерциализация результата   -->
+        <div class="form-sub-group" *ngIf="isCommerceSubject">
+            <label class="form-group-label">Коммерциализация результата</label>
+            <div class="form-sub-group">
+                <textarea class="form-control mb-2" rows="2" placeholder="Описание объекта коммерциализации"
+                          [(ngModel)]="commerceText"></textarea>
+
+
+                <!--
+                    Потом убрать эту часть и заменить на app-select-catalog при необходимости
+                -->
+                <div class="dropdown">
+                    <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
+                            data-toggle="dropdown">{{ commerce ? commerce : "Выберите способ коммерциализации" }}
+                    </button>
+                    <ul class="dropdown-menu scrollable-menu">
+                        <li *ngFor="let commerce of commerceList" class="dropdown-item"
+                            (click)="selectCommerceResult(commerce)">
+                            <span>{{ commerce }}</span>
+                        </li>
+                        <li *ngIf="commerceList.length == 0" disabled class="dropdown-item disabled">
+                            Нет данных
+                        </li>
+                    </ul>
+                </div>
+                <!--            -->
+                <!--            -->
+                <!--            -->
+            </div>
+        </div>
+
+
+
+        <!--   Внедрение результата   -->
+        <div class="form-sub-group" *ngIf="!isCommerceSubject">
+            <label class="form-group-label">Внедрение результата</label>
+            <div class="form-sub-group">
+
+                <!--
+                    Потом убрать эту часть и заменить на app-select-catalog при необходимости
+                -->
+                <div class="dropdown">
+                    <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
+                            data-toggle="dropdown">{{ someSelectedElement ? someSelectedElement : "Выберите характер результата - прикладной" }}
+                    </button>
+                    <ul class="dropdown-menu scrollable-menu">
+                        <li *ngFor="let selectedElement of someList" class="dropdown-item"
+                            (click)="selectSomeResult(selectedElement)">
+                            <span>{{ selectedElement }}</span>
+                        </li>
+                        <li *ngIf="someList.length == 0" disabled class="dropdown-item disabled">
+                            Нет данных
+                        </li>
+                    </ul>
+                </div>
+                <!--            -->
+                <!--            -->
+                <!--            -->
+
+                <textarea class="form-control mb-2 mt-2" rows="2" placeholder="Описание объекта внедрения"
+                          [(ngModel)]="implementationObjectDescription"></textarea>
+                <textarea class="form-control mb-2" rows="2" placeholder="Указание способа внедрения"
+                          [(ngModel)]="implementationObjectWay"></textarea>
+            </div>
+        </div>
+
+
+        <!--    Технологический уклад   -->
+        <div class="form-sub-group">
+            <label class="form-group-label">Технологический уклад</label>
+            <div class="form-sub-group">
+
+                <!--
+                    Потом убрать эту часть и заменить на app-select-catalog при необходимости
+                -->
+                <div class="dropdown">
+                    <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
+                            data-toggle="dropdown">{{ technologyType ? technologyType : "Выберите технологический уклад" }}
+                    </button>
+                    <ul class="dropdown-menu scrollable-menu">
+                        <li *ngFor="let technologyType of technologyTypeList" class="dropdown-item"
+                            (click)="selectTechnologyType(technologyType)">
+                            <span>{{ technologyType }}</span>
+                        </li>
+                        <li *ngIf="technologyTypeList.length == 0" disabled class="dropdown-item disabled">
+                            Нет данных
+                        </li>
+                    </ul>
+                </div>
+                <!--            -->
+                <!--            -->
+                <!--            -->
+            </div>
+        </div>
+
+
+
+
+
+
+
+
     </div>
+
+    <div class="text-xs-center mt-2">
+        <button class="btn btn-primary btn-sm mr-1" (click)="onSave()">Сохранить</button>
+        <button class="btn btn-secondary btn-sm" (click)="onCancel()">Отмена</button>
     </div>
-  </div>
-  <div *ngIf="_project.code?.code.startsWith('8.16')">
-    <div class="form-group">
-      <label class="form-group-label">Сроки реализации</label>
-      <div class="input-group">
-        <app-date-period class="form-control" [(ngModel)]="_project.period"></app-date-period>
-      </div>
-    </div>
-    <div class="form-group">
-        <label class="form-group-label">Наименование товара(ов)</label>
-      <div class="form-sub-group">
-      <label>Наименование товара(ов) с указанием кода в соответствии
-        с перечнем кодов продукции по видам экономической деятельности согласно приложению к Положению о порядке формирования перечня высокотехнологичных товаров, утвержденному постановлением Совета Министров Республики Беларусь от 1 июля 2022 г. № 435 (далее – Положение), шестизначного кода товара в соответствии с единой Товарной номенклатурой внешнеэкономической деятельности Евразийского экономического союза (далее – ТН ВЭД ЕАЭС), к которому относится товар:</label>
-        <textarea rows="2" class="form-control" placeholder="Наименование товара"
-                  [(ngModel)]="_project.productName" title="Наименование товара"></textarea>
-      </div>
-        <label class="form-group-label">Организация(ии)</label>
-      <div class="form-sub-group">
-        <label>Организация(ии) Республики Беларусь, осуществляющая(ие) производство товара(ов) (при наличии): </label>
-        <textarea rows="2" class="form-control" placeholder="Наименование организации"
-                  [(ngModel)]="_project.orgProduction" title="Наименование организации"></textarea>
-      </div>
-      <label class="form-group-label">Новые технологии</label>
-      <div class="form-sub-group">
-        <label>Новые и высокие технологии и (или) высокотехнологичные производства, используемые при производстве товаров :</label>
-        <textarea rows="2" class="form-control" placeholder="Наименование технологии"
-                  [(ngModel)]="_project.highTechProduction" title="Наименование технологии"></textarea>
-      </div>
-    <label class="form-group-label">Обьём производства</label>
-    <div class="form-sub-group">
-      <label>Общий объем производства товара на территории Республики Беларусь, а также общий объем экспорта соответствующего товара
-        по шестизначному коду ТН ВЭД ЕАЭС в белорусских рублях:</label>
-      <textarea rows="2" class="form-control" placeholder="Сумма в бел.руб"
-                [(ngModel)]="_project.productionOnRB" title="Сумма в бел.руб"></textarea>
-    </div>
-      <label class="form-group-label">Общий объем </label>
-      <div class="form-sub-group">
-        <label>Общий объем экспорта и импорта соответствующего товара по шестизначному коду ТН ВЭД ЕАЭС в белорусских рублях:</label>
-        <textarea rows="2" class="form-control" placeholder="Сумма в бел.руб"
-                  [(ngModel)]="_project.exportAndImport" title="Сумма в бел.руб"></textarea>
-      </div>
-    </div>
-  </div>
-  <div class="text-xs-center">
-    <button class="btn btn-primary btn-sm mr-1" (click)="onSave()">Сохранить</button>
-    <button class="btn btn-secondary btn-sm" (click)="onCancel()">Отмена</button>
-  </div>
 </div>
