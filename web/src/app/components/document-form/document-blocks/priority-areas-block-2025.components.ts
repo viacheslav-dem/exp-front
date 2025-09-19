@@ -15,12 +15,16 @@ import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
                 Не соотвествует
             </button>
         </div>
-      <ng-container *ngIf="_form.priorityAreas" >
-        <label class="ml-2">Перечисляются соответствующие приоритетные направления, в том числе сквозные, к которым относится объект государственной экспертизы:</label>
-        <textarea [(ngModel)]="_form.priorityAreasSuggestion" rows="2" class="form-control mt-2"
-                  title="Рекомендуемое наименование"
-                  placeholder="Приоритетные направления, в том числе сквозные."></textarea>
-      </ng-container>
+<!--      <ng-container *ngIf="_form.priorityAreas" >-->
+<!--      -->
+<!--        <textarea [(ngModel)]="_form.priorityAreasSuggestion" rows="2" class="form-control mt-2"-->
+<!--                  title="Рекомендуемое наименование"-->
+<!--                  placeholder="Приоритетные направления, в том числе сквозные."></textarea>-->
+<!--      </ng-container>-->
+        <div *ngIf="full" class="hint">
+            <b>Подсказка.</b>
+            Перечисляются соответствующие приоритетные направления, в том числе сквозные, к которым относится объект государственной экспертизы:
+        </div>
       <textarea *ngIf="full" [(ngModel)]="_form.priorityAreasText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст"></textarea>
         <div *ngIf="full" class="hint">
@@ -43,7 +47,7 @@ export class PriorityAreasBlock2025Components implements OnInit{
     full: boolean = true;
 
     @Input()
-    _form: { priorityAreas: boolean, priorityAreasSuggestion: string, priorityAreasText: string };
+    _form: { priorityAreas: boolean, priorityAreasText: string };
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

@@ -4,8 +4,6 @@ export class ExpertReview_8_14_2025FormContent extends ExpertReviewFormContent {
 
     priorityAreas: boolean;
 
-    priorityAreasSuggestion: string;
-
     priorityAreasText: string;
 
     significance: string;
