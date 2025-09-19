@@ -19,7 +19,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       </button>
 
       <textarea *ngIf="full || _form.stages" [(ngModel)]="_form.stagesText" rows="3" class="form-control mt-05"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+                placeholder="Обязательный текст."></textarea>
       <div *ngIf="full" class="hint">
         <p>
           <b>Подсказка.</b>

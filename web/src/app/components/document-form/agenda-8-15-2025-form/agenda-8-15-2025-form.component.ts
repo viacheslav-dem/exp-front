@@ -14,7 +14,6 @@ export class Agenda_8_15_2025FormComponent extends AgendaNewForm {
     }
 
     validate() {
-        super.validate();
         if (isEmptyOrNull(this._form.novelty)) {
             throw "В пункте 2: 'Новизна (инновационность) объекта государственной экспертизы.' не выстановленно заключение.";
         }
@@ -117,6 +116,7 @@ export class Agenda_8_15_2025FormComponent extends AgendaNewForm {
             throw "В пункте 11.3: 'Соответствие заявленного финансирования планируемому объему выполняемых работ.' рекомендуемый объем финансирования финансирования не может быть меньше нуля.";
         }
         this.validateFinanceConclusion();
+        super.validate();
     }
 
     isFinanceConclusionDisabled() {
