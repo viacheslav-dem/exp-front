@@ -2,8 +2,12 @@ import {ExpertReviewFormContent} from "@app/components/document-form/form-model/
 
 export class ExpertReview_8_13_2025FormContent extends ExpertReviewFormContent {
 
-    socioEconomic: boolean;
-    socioEconomicText: string;
+    priorityAreas: boolean;
+
+    priorityAreasText: string;
+
+    // socioEconomic: boolean;
+    // socioEconomicText: string;
 
     programRequirements: boolean;
     programRequirementsText: string;

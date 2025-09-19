@@ -2,24 +2,28 @@
 
     <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
-    <app-socio-economic-dev-2025 [_form]="_form"
-                                 [num]="'1'"
-                                 (onConditionsChanged)="onConditionsChanged()"></app-socio-economic-dev-2025>
+    <app-priority_areas-block-2025 [_form]="_form"
+                                   [num]="'1'"
+                                   (onConditionsChanged)="onConditionsChanged()"></app-priority_areas-block-2025>
+
+<!--    <app-socio-economic-dev-2025 [_form]="_form"-->
+<!--                                 [num]="'2'"-->
+<!--                                 (onConditionsChanged)="onConditionsChanged()"></app-socio-economic-dev-2025>-->
 
     <app-program-requirements-block-2025 [_form]="_form"
                                          [num]="'2'"
                                          (onConditionsChanged)="onConditionsChanged()"></app-program-requirements-block-2025>
     <hr/>
     <app-prognosis-block-2025 [_form]="_form"
-                              [num]="'2'"
+                              [num]="'3'"
                               (onConditionsChanged)="onConditionsChanged()"></app-prognosis-block-2025>
     <hr/>
     <app-target-analysis-block-2025 [_form]="_form"
-                                    [num]="'3'"
+                                    [num]="'4'"
                                     (onConditionsChanged)="onConditionsChanged()"></app-target-analysis-block-2025>
     <hr/>
     <app-program-sufficiency-block-2025 [_form]="_form"
-                                        [num]="'4'"
+                                        [num]="'5'"
                                         (onConditionsChanged)="onConditionsChanged()"></app-program-sufficiency-block-2025>
 </div>
 
