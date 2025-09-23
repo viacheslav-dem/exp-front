@@ -22,7 +22,6 @@ export class ExpertReview_8_5_7_8_12IP_2025FormComponent extends ExpertReviewFor
     this.validationLengthCommentsOnConclusionAnalysisAndEvaluation()
     this.validationCommentsOnConclusionRelusAndResult();
     this.validationLengthCommentsOnConclusionRelusAndResult();
-
     if (this._form.financeSuggestion < 0) {
       throw 'Предложенная сумма финансирования не может быть меньше нуля.'
     }
@@ -65,6 +64,9 @@ export class ExpertReview_8_5_7_8_12IP_2025FormComponent extends ExpertReviewFor
   }
 
   private validationLengthCommentsOnConclusionAnalysisAndEvaluation() {
+    if (this._form.priorityAreasText.length < 30) {
+      throw "В пункте 'Соответствие приоритетным направлениям научной, научно-технической и инновационной деятельности в Республике Беларусь.' комментарий должен быть не менее 30 символов."
+    }
     if (this._form.noveltyText.length < 30) {
       throw "В пункте 'Новизна (инновационность) объекта государственной экспертизы.' нет комментария к заключению."
     }
@@ -93,6 +95,9 @@ export class ExpertReview_8_5_7_8_12IP_2025FormComponent extends ExpertReviewFor
   }
 
   private validationCommentsOnConclusionAnalysisAndEvaluation() {
+    if (isEmptyOrNull(this._form.priorityAreasText)) {
+      throw "В пункте 'Соответствие приоритетным направлениям научной, научно-технической и инновационной деятельности в Республике Беларусь.' нет комментария к заключению."
+    }
     if (isEmptyOrNull(this._form.noveltyText)) {
       throw "В пункте 'Новизна (инновационность) объекта государственной экспертизы.' нет комментария к заключению."
     }

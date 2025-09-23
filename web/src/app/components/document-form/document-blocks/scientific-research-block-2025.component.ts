@@ -61,7 +61,5 @@ export class ScientificResearchBlock2025Component {
 
 export const scientificResearchOptions: string[] = [
     'фундаментальное',
-    'прикладное',
-    'ОКР',
-    'ОТК'
+    'прикладное'
 ];

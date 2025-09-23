@@ -97,21 +97,6 @@
           </p>
         </div>
       </div>
-      <div class="form-group">
-        <div class="form-sub-group" *ngIf=" _project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025'">
-          <label class="form-group-label">Вид научного исследования по объекту государственной экспертизы</label>
-          <div class="form-sub-group">
-            <label class="form-sub-group-label">
-              <span>Исследование: </span>
-              <app-select-catalog
-                      class="d-inline-block"
-                      [catalog]="Catalog.STUDY"
-                      [resetEnabled]="false"
-                      [(ngModel)]="_project.study"
-              ></app-select-catalog>
-            </label>
-          </div>
-        </div>
         <div class="form-group">
           <label class="form-group-label">Финансирование</label>
           <div class="form-sub-group">

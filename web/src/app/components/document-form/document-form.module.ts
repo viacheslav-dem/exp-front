@@ -397,6 +397,9 @@ import {
 import {
   Agenda_8_15_2025FormComponent
 } from "@app/components/document-form/agenda-8-15-2025-form/agenda-8-15-2025-form.component";
+import {
+  FundamentalOrAppliedResearchComponent
+} from "@app/components/document-form/document-blocks/ fundamental-or-applied-research.component";
 
 @NgModule({
   imports: [
@@ -717,7 +720,8 @@ import {
     Conclusion_8_13_Block2025Component,
     AvailabilityOfDocumentsBlock2025Component,
     CouncilConclusion_8_14_2025_FormComponent,
-    DeadlinesComplianceBlockComponent
+    DeadlinesComplianceBlockComponent,
+    FundamentalOrAppliedResearchComponent
   ],
   providers: [
     ExpertReviewFormResolver,

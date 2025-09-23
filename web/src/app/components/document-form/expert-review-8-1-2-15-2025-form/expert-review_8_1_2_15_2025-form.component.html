@@ -2,10 +2,15 @@
 
     <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
+    <app-scientific-research-block-2025 [_form]="_form"
+                                        [project]="project"
+                                        [num]="'1'"
+                                        (onConditionsChanged)="onConditionsChanged()"></app-scientific-research-block-2025>
+
     <app-novelty-block-2025
             [_form]="_form"
             [project]="project"
-            [num]="'1'"
+            [num]="'2'"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-novelty-block-2025>
 
@@ -13,7 +18,7 @@
 
     <app-economic-significance-block-2025
             [_form]="_form"
-            [num]="'2'"
+            [num]="'3'"
             [project]="project"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-economic-significance-block-2025>
@@ -23,7 +28,7 @@
     <app-commerce-block-2025
             [_form]="_form"
             [project]="project"
-            [num]="'3'"
+            [num]="'4'"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-commerce-block-2025>
 
@@ -31,7 +36,7 @@
 
     <app-resources-sufficiency-block-2025
             [_form]="_form"
-            [num]="'4'"
+            [num]="'5'"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-resources-sufficiency-block-2025>
 
@@ -39,7 +44,7 @@
 
     <app-competence-sufficiency-block-2025
             [_form]="_form"
-            [num]="'5'"
+            [num]="'6'"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-competence-sufficiency-block-2025>
 
@@ -48,7 +53,7 @@
     <app-marketing-research-block-2025
             [_form]="_form"
             [project]="project"
-            [num]="'6'"
+            [num]="'7'"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-marketing-research-block-2025>
 
@@ -57,7 +62,7 @@
     <app-risks-block-2025
             [_form]="_form"
             [_project]="project"
-            [num]="'7'"
+            [num]="'8'"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-risks-block-2025>
 
@@ -65,7 +70,7 @@
 
     <app-privacy-block-2025
             [_form]="_form"
-            [num]="'8'"
+            [num]="'9'"
             [_project]="project"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-privacy-block-2025>
@@ -74,7 +79,7 @@
 
     <app-stages-exists-block-2025
             [_form]="_form"
-            [num]="'9'"
+            [num]="'10'"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-stages-exists-block-2025>
 
