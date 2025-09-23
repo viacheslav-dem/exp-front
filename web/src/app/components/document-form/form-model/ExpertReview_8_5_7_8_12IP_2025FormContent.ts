@@ -7,8 +7,6 @@ export class ExpertReview_8_5_7_8_12IP_2025FormContent extends ExpertReviewFormC
 
     priorityAreas: boolean;
 
-    priorityAreasSuggestion: string;
-
     priorityAreasText: string;
 
     novelty: string;

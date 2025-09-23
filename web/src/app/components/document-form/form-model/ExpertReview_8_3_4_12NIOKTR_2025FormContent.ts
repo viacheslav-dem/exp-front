@@ -5,8 +5,6 @@ export class ExpertReview_8_3_4_12NIOKTR_2025FormContent extends ExpertReviewFor
 
   priorityAreas: boolean;
 
-  priorityAreasSuggestion: string;
-
   priorityAreasText: string;
 
   availabilityDoc: boolean;

@@ -36,13 +36,11 @@ export class AgendaFormResolver {
 
   // noinspection JSMethodCanBeStatic
   getFormRenderer(code: string): Type<AgendaNewForm> {
-    // if (ProjectCodePlainDto.isCodeIn(code, 1, 2)) {
-    //   return Agenda_8_1_2_NewFormComponent;
-    // } else if (ProjectCodePlainDto.isCodeIn(code, 3, 4, 5, 7, 11, '12НИОК(Т)Р', '12НИР', '12ОК(Т)Р')) {
-      // return Agenda_8_3_4_5_7_8_11_12NIOKTR_NewFormComponent;}
-    // } else if (ProjectCodePlainDto.isCode(code, 14)) {
-    //   return Agenda_8_14_NewFormComponent;
-    if (ProjectCodePlainDto.isCodeIn(code, 1, 2, 3, 4, 5, 7, 8, '12НИОК(Т)Р', '12НИР', '12ОК(Т)Р' , 14)) {
+
+
+    if (ProjectCodePlainDto.isCode(code, '12ИП')) {
+      return Agenda_8_12IP_2025FormComponent;
+    } else if (ProjectCodePlainDto.isCodeIn(code, 1, 2, 3, 4, 5, 7, 8, 12, 14)) {
       return Agenda_8_1_2_3_4_5_7_8_12NIOKTR_14_2025_FormComponent;
     } else if (ProjectCodePlainDto.isCode(code, 6)) {
       return Agenda_8_6_NewFormComponent;
@@ -52,21 +50,14 @@ export class AgendaFormResolver {
       return Agenda_8_10PVT_NewFormComponent;
     } else if (ProjectCodePlainDto.isCode(code, '10ПИТ')) {
       return Agenda_8_10PIT_NewFormComponent;
-    // } else if (ProjectCodePlainDto.isCode(code, '12ИП')) {
-    //   return Agenda_8_12IP_NewFormComponent;
-    } else if (ProjectCodePlainDto.isCode(code, '12ИП')) {
-      return Agenda_8_12IP_2025FormComponent;
     } else if (ProjectCodePlainDto.isCode(code, 13)) {
       return Agenda_8_13_NewFormComponent;
     } else if (ProjectCodePlainDto.isCode(code, 16)) {
       return Agenda_8_16_NewFormComponent;
-    } else if (ProjectCodePlainDto.isCodeIn(code, 8,'8БИФ', '8ЕАС')) {
+    } else if (ProjectCodePlainDto.isCodeIn(code, 8, '8БИФ', '8ЕАС')) {
       return Agenda_8_8_Bif_Eac_FormComponent;
     } else {
       return Agenda_8_15_2025FormComponent;
     }
-    // } else {
-    //   return Agenda_8_15_NewFormComponent;
-    // }
   }
 }
