@@ -3,6 +3,9 @@ import {PeriodDto} from "@app/dto/PeriodDto";
 
 export class ExpertReview_8_1_2_15_2025FormContent extends ExpertReviewFormContent {
 
+    priorityAreas: boolean;
+    priorityAreasText: string;
+
     scientificResearch: string
     scientificResearchText: string
 
