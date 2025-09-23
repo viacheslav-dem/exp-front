@@ -14,6 +14,8 @@ export class BestExpertComponent implements OnInit {
     startDate: string;
     endDate: string;
     expertsList: Array<PersonDto> = [];
+    loading: boolean = false;
+
 
     constructor(private http: HttpClient,
     public _degreeTypePipe: DegreeTypePipe) { }
@@ -29,16 +31,14 @@ export class BestExpertComponent implements OnInit {
         }
 
         console.log('Отправка с датами:', this.startDate, this.endDate);
-
         const url = '/examination-api/stats/best-expert';
-        this.http.post<any[]>(url, {}, {
-            params: {
-                startDate: this.startDate,
-                endDate: this.endDate
-            }
-        }).subscribe(
+
+        this.loading = true; // Начать загрузку
+
+        this.http.post<any[]>(url, {}, { params: { startDate: this.startDate, endDate: this.endDate } }).subscribe(
             response => {
                 console.log('Получен ответ:', response);
+                this.loading = false; // Завершить загрузку
                 if (Array.isArray(response)) {
                     this.expertsList = response;
                 } else {
@@ -46,18 +46,10 @@ export class BestExpertComponent implements OnInit {
                 }
             },
             error => {
+                this.loading = false; // Завершить загрузку при ошибке
                 console.error('Ошибка при получении данных', error);
             }
         );
     }
 
-
-
-
-
-    test() {
-        console.log(this.expertsList);
-    }
-
-    protected readonly releaseEvents = releaseEvents;
 }

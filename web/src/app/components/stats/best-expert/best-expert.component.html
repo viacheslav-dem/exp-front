@@ -8,10 +8,13 @@
             <label for="endDate">Дата конца:</label>
             <input type="date" id="endDate" [(ngModel)]="endDate" name="endDate" required>
         </div>
-        <button type="submit">Подтвердить</button>
+        <div class="button-container">
+            <button type="submit">Подтвердить</button>
+        </div>
     </form>
 </div>
 
+<div *ngIf="loading" class="spinner"></div>
 
 <div *ngIf="expertsList.length > 0">
     <table class="experts-table">
