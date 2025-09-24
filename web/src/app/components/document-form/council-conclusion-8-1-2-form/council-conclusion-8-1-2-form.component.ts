@@ -14,7 +14,7 @@ export class CouncilConclusion_8_1_2_FormComponent extends CouncilConclusionForm
     }
 
     validate() {
-        this.validationCommentsOnConclusion();
+        this.validationCommentsConclusion();
         super.validate();
         this.validateFinanceConclusion();
         this.validateFinanceSuggestion();
@@ -31,7 +31,7 @@ export class CouncilConclusion_8_1_2_FormComponent extends CouncilConclusionForm
         }
     }
 
-    private validationCommentsOnConclusion() {
+    private validationCommentsConclusion() {
         if (isEmptyOrNull(this._form.novelty)) {
             throw "В пункте 'Новизна (инновационность) объекта государственной экспертизы.' не выстановленно заключение.";
         }
