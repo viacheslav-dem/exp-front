@@ -372,7 +372,6 @@
                     {{ expectedResultReferenceInformation }}
                 </p>
             </div>
-
         </div>
 
 
@@ -444,11 +443,11 @@
                 Беларусь № 59 от 4 февраля 2013 г. «О коммерциализации результатов научной и научно-технической
                 деятельности, созданных за счёт государственных средств»?</label>
             <div class="btn-group" role="group" aria-label="Basic example">
-                <button type="button" class="btn btn-outline-success" [ngClass]="{'active': isCommerceSubject}"
+                <button type="button" class="btn btn-outline-success" [ngClass]="{'active': isCommerceSubject === true}"
                         (click)="isCommerceSubject = true">
                     Подлежит
                 </button>
-                <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': !isCommerceSubject}"
+                <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': isCommerceSubject === false}"
                         (click)="isCommerceSubject = false">
                     Не подлежит
                 </button>
