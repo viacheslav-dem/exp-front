@@ -156,7 +156,7 @@
         <ul *ngIf="_project.directions.length != 0">
           <li *ngFor="let direction of displayDirection(_project.directions); let i = index">
             {{direction.name}} <br>
-            - {{direction.subDirectionDtos[i].directionName}}
+            - {{direction.subDirectionDtos[i+1].directionName}}
             <a class="btn btn-icon btn-icon-sm" (click)="_project.directions.splice(i, 1)">
               <fa-icon icon="minus"></fa-icon>
             </a>

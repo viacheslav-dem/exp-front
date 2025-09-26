@@ -111,14 +111,14 @@ export class ProjectFormComponent implements OnInit {
   }
 
   addDirection() {
-    console.log(this.subDirection.id);
+    console.log(this.newDirection);
     if (this.newDirection) {
       this._project.directions.push(this.newDirection);
       this._project.subDirections.push(this.subDirection);
       this.newDirection = null;
       this.subDirection = null
     }
-    console.log(this._project);
+    console.log(this._project.subDirections);
   }
 
   addSocialEconomicGoal() {
@@ -159,6 +159,7 @@ export class ProjectFormComponent implements OnInit {
   }
 
   displayDirection(directions: CatalogDto[]) {
+    console.log(directions);
     return directions as DirectionDto[];
   }
 }
