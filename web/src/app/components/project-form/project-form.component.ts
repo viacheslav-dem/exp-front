@@ -48,6 +48,7 @@ export class ProjectFormComponent implements OnInit {
         this._personService.getCurrentPerson().subscribe(res => {
             this.customer = res;
         });
+        this.outputTypeOfWorkList = this.typeOfWorkList;
     }
 
     @Input() set project(project: ProjectDto) {
@@ -62,6 +63,25 @@ export class ProjectFormComponent implements OnInit {
 
     selectCode(code) {
         this._project.code = code;
+        console.log('code')
+        console.log(code)
+        if (
+            this._project.code.code == '8.5' ||
+            this._project.code.code == '8.7' ||
+            this._project.code.code == '8.8ВПБИФ' ||
+            this._project.code.code == '8.8ИПБИФ' ||
+            this._project.code.code == '8.9' ||
+            this._project.code.code == '8.10' ||
+            this._project.code.code == '8.12ИП' ||
+            this._project.code.code == '8.13' ||
+            this._project.code.code == '8.16'
+        ) {
+            this.disableExpectedResultButton = true;
+            this.selectedResult = {name: 'Другое', specific: ''}
+        } else {
+            this.selectedResult = {name: undefined, specific: undefined}
+            this.disableExpectedResultButton = false;
+        }
     }
 
     onSave() {
@@ -162,56 +182,96 @@ export class ProjectFormComponent implements OnInit {
         return directions as DirectionDto[];
     }
 
+    clearAppliedFields() {
 
+    }
 
-
-
-
-
-
-    expectedResultList: any[] = expectedResultList;
-    selectedResult: string;
-    expectedResult: string;
-    expectedResultDescription: string;
-    expectedResultReferenceInformation: string = 'Cправочная информация';
-    selectExpectedResult(result) {
-        this.selectedResult = result.name;
-        this.resultSpecificList = this.resultSpecificList.filter(item => item !== ResultSpecificEnum.MISSING)
-
-        if (result.specific === ResultSpecificEnum.APPLIED){
-            this.selectTypeOfWork('');
-            this.disableTypeOfWorkButton = false;
-            this.selectedResultSpecific = ResultSpecificEnum.APPLIED;
-            this.disableResultSpecificButton = true;
-        } else if (result.specific == ResultSpecificEnum.FUNDAMENTAL) {
-            this.selectTypeOfWork(TypeOfWorkEnum.NIR);
-            this.disableTypeOfWorkButton = true;
-            this.selectedResultSpecific = ResultSpecificEnum.FUNDAMENTAL;
-            this.disableResultSpecificButton = true;
-        } else {
-            this.selectTypeOfWork('');
-            this.resultSpecificList.push(ResultSpecificEnum.MISSING);
-            this.disableTypeOfWorkButton = false;
-            this.disableResultSpecificButton = false;
-            this.selectedResultSpecific = '';
-        }
-
-
+    clearFunctionalFields() {
 
     }
 
     disableTypeOfWorkButton: boolean = false;
     disableResultSpecificButton: boolean = false;
+    disableExpectedResultButton: boolean = false;
 
-    typeOfWorkList: any = [TypeOfWorkEnum.NIR ,TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR, TypeOfWorkEnum.OTHER];
-    selectedTypeOfWork: string;
-    typeOfWork: string;
-    selectTypeOfWork(typeOfWork) {
-        this.selectedTypeOfWork = typeOfWork;
+    expectedResultList: any[] = expectedResultList;
+    selectedResult: {name, specific};
+    expectedResult: string;
+    expectedResultDescription: string;
+    expectedResultReferenceInformation: string = 'Cправочная информация';
+    selectExpectedResult(result) {
+        this.selectedResult = result;
+        this.resultSpecificList = resultSpecificList;
+
+        if (this.selectedResult.specific === ResultSpecificEnum.APPLIED){
+            this.selectedTypeOfWork = '';
+            this.resultSpecificList = [ResultSpecificEnum.APPLIED];
+            this.outputTypeOfWorkList = this.typeOfWorkList.filter(item => item.specific.includes(ResultSpecificEnum.APPLIED) && !item.specific.includes(ResultSpecificEnum.MISSING))
+            this.disableTypeOfWorkButton = false;
+            this.selectedResultSpecific = ResultSpecificEnum.APPLIED;
+            this.disableResultSpecificButton = true;
+        } else if (this.selectedResult.specific == ResultSpecificEnum.FUNDAMENTAL) {
+            this.selectedTypeOfWork = TypeOfWorkEnum.NIR;
+            this.resultSpecificList = [ResultSpecificEnum.FUNDAMENTAL];
+            this.disableTypeOfWorkButton = true;
+            this.selectedResultSpecific = ResultSpecificEnum.FUNDAMENTAL;
+            this.disableResultSpecificButton = true;
+        } else {
+            this.disableTypeOfWorkButton = false;
+            this.disableResultSpecificButton = false;
+            this.outputTypeOfWorkList = this.typeOfWorkList;
+            this.selectedTypeOfWork = '';
+            this.selectedResultSpecific = '';
+        }
+
     }
 
 
-    resultSpecificList: any = [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED];
+    typeOfWorkList: any = [
+        {name: TypeOfWorkEnum.NIR, specific: [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED]},
+        {name: TypeOfWorkEnum.OKR, specific: [ResultSpecificEnum.APPLIED]},
+        {name: TypeOfWorkEnum.OTR, specific: [ResultSpecificEnum.APPLIED]},
+        {name: 'Бизнес-план', specific: [ResultSpecificEnum.MISSING]},
+        {name: 'Комплект заявочных документов', specific: [ResultSpecificEnum.MISSING]},
+        {name: 'Предложения о включении товаров в перечень высокотехнологичных', specific: [ResultSpecificEnum.MISSING]},
+        {name: 'Техническое задание', specific: [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED, ResultSpecificEnum.MISSING]},
+        {name: TypeOfWorkEnum.OTHER, specific: [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED, ResultSpecificEnum.MISSING]},
+    ];
+    outputTypeOfWorkList: any[];
+
+    selectedTypeOfWork: string;
+    typeOfWork: string;
+    selectTypeOfWork(typeOfWork) {
+
+        console.log('typeOfWork')
+        console.log(typeOfWork)
+        console.log('this.selectedResult')
+        console.log(this.selectedResult)
+
+
+        this.selectedTypeOfWork = typeOfWork.name;
+        this.resultSpecificList = typeOfWork.specific;
+
+         if (this.selectedResult &&  !isEmptyOrNull(this.selectedResult.specific)) {
+             this.selectedResultSpecific = this.selectedResult.specific;
+             this.disableResultSpecificButton = true;
+         } else {
+             if (this.resultSpecificList.length === 1) {
+                 this.disableResultSpecificButton = true;
+                 this.selectedResultSpecific = this.resultSpecificList[0];
+             }
+             else {
+                 this.disableResultSpecificButton = false;
+                 this.selectedResultSpecific = '';
+             }
+         }
+
+
+
+    }
+
+
+    resultSpecificList: any[] = resultSpecificList;
     selectedResultSpecific: string;
     selectResultSpecific(resultSpecific) {
         this.selectedResultSpecific = resultSpecific;
@@ -297,29 +357,31 @@ export enum TypeOfWorkEnum {
 export enum ResultSpecificEnum {
     FUNDAMENTAL = 'Фундаментальный',
     APPLIED = 'Прикладной',
-    MISSING = 'Отсутствует'
+    MISSING = 'Не предусмотрен'
 }
+
+export const resultSpecificList: any = [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED, ResultSpecificEnum.MISSING];
 
 export const expectedResultList: any[] = [
     {name: 'сделано открытие (открыт закон, закономерность)', specific: ResultSpecificEnum.FUNDAMENTAL},
     {name: 'разработана научная теория', specific: ResultSpecificEnum.FUNDAMENTAL},
     {name: 'выдвинута и обоснована научная гипотеза', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name:  'сформирована новая область (направление) исследований', specific: ResultSpecificEnum.FUNDAMENTAL},
+    {name: 'сформирована новая область (направление) исследований', specific: ResultSpecificEnum.FUNDAMENTAL},
     {name: 'обнаружено новое явление', specific: ResultSpecificEnum.FUNDAMENTAL},
     {name: 'обнаружено новое свойство известного явления', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name:  'разработаны методы достижения научных решений, направленных на развитие фундаментальных исследований', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name:  'обобщены решения частных научных задач', specific: ResultSpecificEnum.FUNDAMENTAL},
+    {name: 'разработаны методы достижения научных решений, направленных на развитие фундаментальных исследований', specific: ResultSpecificEnum.FUNDAMENTAL},
+    {name: 'обобщены решения частных научных задач', specific: ResultSpecificEnum.FUNDAMENTAL},
     {name: 'систематизированы ранее известные подходы к использованию теорий и открытий в практике', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name:  'разработана теория', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name:   'разработаны новые методы измерений', specific: ResultSpecificEnum.FUNDAMENTAL},
+    {name: 'разработана теория', specific: ResultSpecificEnum.FUNDAMENTAL},
+    {name: 'разработаны новые методы измерений', specific: ResultSpecificEnum.FUNDAMENTAL},
     {name: 'выдвинута и обоснована гипотеза', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name:  'разработана концепция', specific: ResultSpecificEnum.FUNDAMENTAL},
+    {name: 'разработана концепция', specific: ResultSpecificEnum.FUNDAMENTAL},
     {name: 'разработан аналитический доклад с предложениями', specific: ResultSpecificEnum.FUNDAMENTAL},
 
     {name: 'разработан экспериментальный макет изделия', specific: ResultSpecificEnum.APPLIED},
-    {name:  'разработан опытный образец изделия', specific: ResultSpecificEnum.APPLIED},
-    {name:  'создан промышленный образец', specific: ResultSpecificEnum.APPLIED},
-    {name:  'разработан экспериментальный образец технологии получения нового материала', specific: ResultSpecificEnum.APPLIED},
+    {name: 'разработан опытный образец изделия', specific: ResultSpecificEnum.APPLIED},
+    {name: 'создан промышленный образец', specific: ResultSpecificEnum.APPLIED},
+    {name: 'разработан экспериментальный образец технологии получения нового материала', specific: ResultSpecificEnum.APPLIED},
     {name: 'разработан опытный образец новой технологии получения материалов', specific: ResultSpecificEnum.APPLIED},
     {name: 'разработан проект технологического процесса', specific: ResultSpecificEnum.APPLIED},
     {name: 'разработан стандарт, технические условия', specific: ResultSpecificEnum.APPLIED},

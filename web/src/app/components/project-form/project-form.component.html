@@ -337,8 +337,8 @@
                     Потом убрать эту часть и заменить на app-select-catalog при необходимости
                 -->
                 <div class="dropdown">
-                    <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
-                            data-toggle="dropdown">{{ selectedResult ? selectedResult : "Выберите вид ожидаемого результата" }}
+                    <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle" [disabled]="disableExpectedResultButton"
+                            data-toggle="dropdown">{{ selectedResult != undefined && selectedResult.name ? selectedResult.name : "Выберите вид ожидаемого результата" }}
                     </button>
                     <ul class="dropdown-menu scrollable-menu">
                         <li *ngFor="let result of expectedResultList" class="dropdown-item"
@@ -355,7 +355,7 @@
                 <!--            -->
 
             </div>
-            <div class="form-sub-group" *ngIf="selectedResult == 'Другое'">
+            <div class="form-sub-group" *ngIf="selectedResult && selectedResult.name == 'Другое'">
                 <p class="font-italic">
                     <b>Подсказка.</b>
                     Введите свой вид ожидаемого результата в дополнительном текстовом поле.
@@ -365,7 +365,7 @@
             </div>
 
             <div class="form-sub-group">
-                <p *ngIf="selectedResult != 'Другое'" class="font-italic">
+                <p *ngIf="selectedResult && selectedResult.name != 'Другое'" class="font-italic">
                     <b>Подсказка.</b>
                     {{ expectedResultReferenceInformation }}
                 </p>
@@ -388,11 +388,11 @@
                         data-toggle="dropdown">{{ selectedTypeOfWork ? selectedTypeOfWork : 'Выберите вид работ' }}
                 </button>
                 <ul class="dropdown-menu scrollable-menu">
-                    <li *ngFor="let typeOfWork of typeOfWorkList" class="dropdown-item"
+                    <li *ngFor="let typeOfWork of outputTypeOfWorkList" class="dropdown-item"
                         (click)="selectTypeOfWork(typeOfWork)">
-                        <span>{{ typeOfWork }}</span>
+                        <span>{{ typeOfWork.name }}</span>
                     </li>
-                    <li *ngIf="typeOfWorkList.length == 0" disabled class="dropdown-item disabled">
+                    <li *ngIf="outputTypeOfWorkList.length == 0" disabled class="dropdown-item disabled">
                         Нет данных
                     </li>
                 </ul>
