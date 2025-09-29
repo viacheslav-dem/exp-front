@@ -153,15 +153,28 @@
       <label class="form-group-label">Приоритетное направление научных исследований и (или) научно-технической
         деятельности</label>
       <div class="form-sub-group italic">
-        <ul *ngIf="_project.directions.length != 0">
-          <li *ngFor="let direction of displayDirection(_project.directions); let i = index">
-            {{direction.name}} <br>
-            - {{direction.subDirectionDtos[i+1].directionName}}
-            <a class="btn btn-icon btn-icon-sm" (click)="_project.directions.splice(i, 1)">
-              <fa-icon icon="minus"></fa-icon>
-            </a>
-          </li>
-        </ul>
+        <div *ngIf="directions.length != 0">
+          <div *ngFor="let dir of displayDirection(); let i = index">
+            {{dir.name}} <br>
+              <ul>
+                <li *ngFor="let subDir of dir.subDirectionDtos; let j = index">
+                  {{subDir.directionName}}
+                  <a class="btn btn-icon btn-icon-sm" (click)="display(dir, j, i)">
+                    <fa-icon icon="minus"></fa-icon>
+                  </a>
+                </li>
+            </ul>
+          </div>
+        </div>
+<!--        <ul *ngIf="direction.length != 0">-->
+<!--          <li *ngFor="let dir of direction; let i = index">-->
+<!--            {{dir.name}} <br>-->
+<!--            - {{dir.subDirectionDtos[0].directionName}}-->
+<!--            <a class="btn btn-icon btn-icon-sm" (click)="_project.directions.splice(i, 1)">-->
+<!--              <fa-icon icon="minus"></fa-icon>-->
+<!--            </a>-->
+<!--          </li>-->
+<!--        </ul>-->
         <div *ngIf="_project.directions.length == 0">направления не указаны</div>
       </div>
       <div class="row">

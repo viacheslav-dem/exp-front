@@ -17,6 +17,7 @@ import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 })
 export class ProjectFormComponent implements OnInit {
 
+  directions: DirectionDto[] = [];
   Catalog = Catalog;
   newDirection: DirectionDto;
   subDirection: SubDirectionDto;
@@ -65,6 +66,12 @@ export class ProjectFormComponent implements OnInit {
   }
 
   onSave() {
+    this._project.directions = this.directions;
+    for (let i = 0; i < this.directions.length; i++) {
+      for (let j = 0; j < this.directions[i].subDirectionDtos.length; j++) {
+        this._project.subDirections.push(this.directions[i].subDirectionDtos[j]);
+      }
+    }
     this.validate();
     if (!this.canAddSocialEconomicGoals()) {
       this._project.socialEconomicGoals = [];
@@ -111,14 +118,42 @@ export class ProjectFormComponent implements OnInit {
   }
 
   addDirection() {
-    console.log(this.newDirection);
-    if (this.newDirection) {
-      this._project.directions.push(this.newDirection);
-      this._project.subDirections.push(this.subDirection);
+      let flagDirection: boolean = false;
+      let flagSubDirection: boolean = false;
+      for (let i = 0; i < this.directions.length; i++) {
+        let idDir = this.directions[i].id;
+        let idNewDir = this.newDirection.id;
+        if(idDir == idNewDir){
+          flagDirection = true;
+          let lenSubDir = this.directions[i].subDirectionDtos.length;
+          let subDir = this.directions[i].subDirectionDtos;
+          for (let j = 0; j < lenSubDir; j++) {
+            let idSubDir = subDir[j].id;
+            let idNewSubDir = this.subDirection.id;
+            if(idSubDir === idNewSubDir){
+              flagSubDirection = true;
+              break;
+            }
+          }
+          if(!flagSubDirection){
+            let finishSubDir: SubDirectionDto = {...this.subDirection};
+            this.directions[i].subDirectionDtos.push(finishSubDir);
+          }
+          flagSubDirection = false;
+        }
+      }
+      if(!flagDirection){
+        let finishDir: DirectionDto = {...this.newDirection};
+        finishDir.subDirectionDtos = [];
+        finishDir.subDirectionDtos.push(this.subDirection);
+        this.directions.push(finishDir);
+     }
+      // this._project.directions.push(this.newDirection);
+      // this._project.subDirections.push(this.subDirection);
       this.newDirection = null;
-      this.subDirection = null
-    }
-    console.log(this._project.subDirections);
+      this.subDirection = null;
+      flagDirection = false;
+    // }
   }
 
   addSocialEconomicGoal() {
@@ -158,8 +193,16 @@ export class ProjectFormComponent implements OnInit {
     return  this.newDirection.subDirectionDtos;
   }
 
-  displayDirection(directions: CatalogDto[]) {
-    console.log(directions);
-    return directions as DirectionDto[];
+  displayDirection(){
+    return this.directions;
+  }
+
+
+  display(dir: DirectionDto, indexSubDir: number, indexDir) {
+    dir.subDirectionDtos.splice(indexSubDir, 1);
+    if(dir.subDirectionDtos.length == 0){
+      this.directions.splice(indexDir, 1);
+    }
+    return dir.subDirectionDtos;
   }
 }
