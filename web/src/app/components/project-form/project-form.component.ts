@@ -77,9 +77,9 @@ export class ProjectFormComponent implements OnInit {
             this._project.code.code == '8.16'
         ) {
             this.disableExpectedResultButton = true;
-            this.selectedResult = {name: 'Другое', specific: ''}
+            this.selectExpectedResult({name: 'Другое', specific: ''});
         } else {
-            this.selectedResult = {name: undefined, specific: undefined}
+            this.selectExpectedResult({name: undefined, specific: undefined});
             this.disableExpectedResultButton = false;
         }
     }
