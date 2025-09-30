@@ -303,74 +303,40 @@
 </div>
 
 <div class="card card-block mt-2">
-    <!--
-
-     Как только будет понятно, какие данные брать, будут ли они записыватсья в бд и т.д. переделать под этот шаблон
-
-     -->
-    <!--    <label class="form-group-label">Финансирование</label>-->
-    <!--    <div class="form-sub-group">-->
-    <!--        <label class="form-sub-group-label">-->
-    <!--            <span>Валюта: </span>-->
-    <!--            <app-select-catalog-->
-    <!--                    class="d-inline-block"-->
-    <!--                    [catalog]="Catalog.CURRENCY"-->
-    <!--                    [resetEnabled]="false"-->
-    <!--                    [(ngModel)]="_project.currency"-->
-    <!--            ></app-select-catalog>-->
-    <!--        </label>-->
-    <!--    </div>-->
-
 
     <div class="form-group">
-
-
-
-
         <!--   Ожидаемый результат экспертизы   -->
         <div class="form-sub-group">
             <label class="form-group-label">Ожидаемый результат экспертизы</label>
             <div class="form-sub-group">
-
-
-                <!--
-                    Потом убрать эту часть и заменить на app-select-catalog при необходимости
-                -->
                 <div class="dropdown">
-                    <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle" [disabled]="disableExpectedResultButton"
-                            data-toggle="dropdown">{{ selectedResult != undefined && selectedResult.name ? selectedResult.name : "Выберите вид ожидаемого результата" }}
+                    <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
+                            [disabled]="disableExpectedResultButton"
+                            data-toggle="dropdown">{{ _project.expectedResult ? _project.expectedResult.expectedResultType : "Выберите вид ожидаемого результата" }}
                     </button>
                     <ul class="dropdown-menu scrollable-menu">
                         <li *ngFor="let result of expectedResultList" class="dropdown-item"
                             (click)="selectExpectedResult(result)">
-                            <span>{{ result.name }}</span>
+                            <span>{{ result.expectedResultType }}</span>
                         </li>
                         <li *ngIf="expectedResultList.length == 0" disabled class="dropdown-item disabled">
                             Нет данных
                         </li>
                     </ul>
                 </div>
-                <!--            -->
-                <!--            -->
-                <!--            -->
-
             </div>
-            <div class="form-sub-group" *ngIf="selectedResult && selectedResult.name == 'Другое'">
-                <p class="font-italic">
-                    <b>Подсказка.</b>
-                    Введите свой вид ожидаемого результата в дополнительном текстовом поле.
-                </p>
+            <p class="font-italic" *ngIf="_project.expectedResult">
+                <b>Подсказка.</b>
+                {{ _project.expectedResult.description }}
+            </p>
+            <div class="form-sub-group" *ngIf="_project.expectedResult && _project.expectedResult.expectedResultType == 'другое'">
                 <textarea class="form-control" rows="2" placeholder="Введите вид ожидаемого результата"
-                          [(ngModel)]="expectedResult"></textarea>
+                          [(ngModel)]="_project.otherExpectedResult"></textarea>
             </div>
 
             <div class="form-sub-group">
-                <p *ngIf="selectedResult && selectedResult.name != 'Другое'" class="font-italic">
-                    <b>Подсказка.</b>
-                    {{ expectedResultReferenceInformation }}
-                </p>
             <textarea class="form-control" rows="2" placeholder="Описание ожидаемого результата"
-                      [(ngModel)]="expectedResultDescription"></textarea>
+                      [(ngModel)]="_project.expectedResultDescription"></textarea>
             </div>
         </div>
 
@@ -379,13 +345,10 @@
 
         <!--     Вид работ   -->
         <div class="form-sub-group">
-            <!--
-           Потом убрать эту часть и заменить на app-select-catalog при необходимости
-            -->
             <label class="form-group-label">Вид работ</label>
             <div class="dropdown">
                 <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle" [disabled]="disableTypeOfWorkButton"
-                        data-toggle="dropdown">{{ selectedTypeOfWork ? selectedTypeOfWork : 'Выберите вид работ' }}
+                        data-toggle="dropdown">{{ _project.workType ? _project.workType : _project.otherWorkType ? _project.otherWorkType : 'Выберите вид работ' }}
                 </button>
                 <ul class="dropdown-menu scrollable-menu">
                     <li *ngFor="let typeOfWork of outputTypeOfWorkList" class="dropdown-item"
@@ -397,9 +360,9 @@
                     </li>
                 </ul>
             </div>
-            <div class="form-sub-group mt-2" *ngIf="selectedTypeOfWork === 'Другое'">
+            <div class="form-sub-group mt-2" *ngIf="_project.workType === 'Другое'">
                 <textarea class="form-control" rows="2" placeholder="Введите вид работ"
-                          [(ngModel)]="typeOfWork"></textarea>
+                          [(ngModel)]="_project.otherWorkType"></textarea>
             </div>
             <!--            -->
             <!--            -->
@@ -417,7 +380,7 @@
             -->
             <div class="dropdown">
                 <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle" [disabled]="disableResultSpecificButton"
-                        data-toggle="dropdown">{{ selectedResultSpecific ? selectedResultSpecific : "Выберите характер результата" }}
+                        data-toggle="dropdown">{{_project.expectedResult && _project.expectedResult.resultCharacter ? _project.expectedResult.resultCharacter : "Выберите характер результата" }}
                 </button>
                 <ul class="dropdown-menu scrollable-menu">
                     <li *ngFor="let typeOfWork of resultSpecificList" class="dropdown-item"
@@ -435,7 +398,7 @@
         </div>
 
 
-        <div class="form-sub-group" *ngIf="selectedResultSpecific === 'Прикладной'">
+        <div class="form-sub-group" *ngIf="selectedResultSpecific === 'прикладной'">
             <!--     Результат подлежит коммерциализации   -->
             <div class="form-sub-group">
                 <label class="form-group-label">Результат подлежит коммерциализации по Указу Президента Республики
@@ -443,17 +406,15 @@
                     деятельности, созданных за счёт государственных средств»?</label>
                 <div class="btn-group" role="group" aria-label="Basic example">
                     <button type="button" class="btn btn-outline-success" [ngClass]="{'active': isCommerceSubject === true}"
-                            (click)="isCommerceSubject = true">
+                            (click)="isCommerce(true)">
                         Подлежит
                     </button>
                     <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': isCommerceSubject === false}"
-                            (click)="isCommerceSubject = false">
+                            (click)="isCommerce(false)">
                         Не подлежит
                     </button>
                 </div>
             </div>
-
-
 
 
             <!--   Коммерциализация результата   -->
@@ -469,7 +430,7 @@
                     -->
                     <div class="dropdown">
                         <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
-                                data-toggle="dropdown">{{ commerce ? commerce : "Выберите способ коммерциализации" }}
+                                data-toggle="dropdown">{{ this._project.commercializationMethod ? this._project.commercializationMethod : "Выберите способ коммерциализации" }}
                         </button>
                         <ul class="dropdown-menu scrollable-menu">
                             <li *ngFor="let commerce of commerceList" class="dropdown-item"
@@ -493,13 +454,9 @@
             <div class="form-sub-group" *ngIf="isCommerceSubject === false">
                 <label class="form-group-label">Внедрение результата</label>
                 <div class="form-sub-group">
-
-                    <!--
-                        Потом убрать эту часть и заменить на app-select-catalog при необходимости
-                    -->
                     <div class="dropdown">
                         <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
-                                data-toggle="dropdown">{{  choiceOfResultCharacterAppliedSelectedElement ?  choiceOfResultCharacterAppliedSelectedElement : "Выберите характер результата - прикладной" }}
+                                data-toggle="dropdown">{{  _project.implementationResult ?  _project.implementationResult : "Выберите характер результата - прикладной" }}
                         </button>
                         <ul class="dropdown-menu scrollable-menu">
                             <li *ngFor="let selectedElement of choiceOfResultCharacterAppliedList" class="dropdown-item"
@@ -516,48 +473,41 @@
                     <!--            -->
 
                     <textarea class="form-control mb-2 mt-2" rows="2" placeholder="Описание объекта внедрения"
-                              [(ngModel)]="implementationObjectDescription"></textarea>
+                              [(ngModel)]="_project.implementationDescription"></textarea>
                     <textarea class="form-control mb-2" rows="2" placeholder="Указание способа внедрения"
-                              [(ngModel)]="implementationObjectWay"></textarea>
+                              [(ngModel)]="_project.implementationSpecifying"></textarea>
                 </div>
             </div>
-
-
-            <!--    Технологический уклад   -->
-            <div class="form-sub-group" *ngIf="isCommerceSubject !== undefined">
-                <label class="form-group-label">Технологический уклад</label>
-                <div class="form-sub-group">
-
-                    <!--
-                        Потом убрать эту часть и заменить на app-select-catalog при необходимости
-                    -->
-                    <div class="dropdown">
-                        <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
-                                data-toggle="dropdown">{{ selectedTechnologyType ? selectedTechnologyType : technologyType ? technologyType : "Выберите технологический уклад" }}
-                        </button>
-                        <ul class="dropdown-menu scrollable-menu">
-                            <li *ngFor="let technologyType of technologyTypeList" class="dropdown-item"
-                                (click)="selectTechnologyType(technologyType)">
-                                <span>{{ technologyType }}</span>
-                            </li>
-                            <li *ngIf="technologyTypeList.length == 0" disabled class="dropdown-item disabled">
-                                Нет данных
-                            </li>
-                        </ul>
-                    </div>
-                    <textarea *ngIf="isAnotherTechnologyType" class="form-control mb-2 mt-2" rows="2" placeholder="Введите технологический уклад"
-                              [(ngModel)]="technologyType"></textarea>
-                    <!--            -->
-                    <!--            -->
-                    <!--            -->
-                </div>
-            </div>
-
-
-
         </div>
+        <!--    Технологический уклад   -->
+        <div class="form-sub-group" *ngIf="showTechnologyType">
+            <label class="form-group-label">Технологический уклад</label>
+            <div class="form-sub-group">
 
-
+                <!--
+                    Потом убрать эту часть и заменить на app-select-catalog при необходимости
+                -->
+                <div class="dropdown">
+                    <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
+                            data-toggle="dropdown">{{ _project.technologicalOrder ? _project.technologicalOrder : "Выберите технологический уклад" }}
+                    </button>
+                    <ul class="dropdown-menu scrollable-menu">
+                        <li *ngFor="let technologyType of technologyTypeList" class="dropdown-item"
+                            (click)="selectTechnologyType(technologyType)">
+                            <span>{{ technologyType }}</span>
+                        </li>
+                        <li *ngIf="technologyTypeList.length == 0" disabled class="dropdown-item disabled">
+                            Нет данных
+                        </li>
+                    </ul>
+                </div>
+                <textarea *ngIf="isAnotherTechnologyType" class="form-control mb-2 mt-2" rows="2" placeholder="Введите технологический уклад"
+                          [(ngModel)]="technologyType"></textarea>
+                <!--            -->
+                <!--            -->
+                <!--            -->
+            </div>
+        </div>
 
 
 

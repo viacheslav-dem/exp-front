@@ -9,6 +9,7 @@ import {FundingDto} from "@app/dto/FundingDto";
 import {FundingTypePipe, getAllFundingType} from "@app/pipes/funding-type.pipe";
 import {DirectionDto} from "@app/dto/DirectionDto";
 import {SubDirectionDto} from "@app/dto/SubDirectionDto";
+import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
 
 
 @Component({
@@ -48,7 +49,9 @@ export class ProjectFormComponent implements OnInit {
         this._personService.getCurrentPerson().subscribe(res => {
             this.customer = res;
         });
-        this.outputTypeOfWorkList = this.typeOfWorkList;
+        this._dataService.getExpectedResult().subscribe((res => {
+            this.expectedResultList = res;
+        }))
     }
 
     @Input() set project(project: ProjectDto) {
@@ -63,8 +66,6 @@ export class ProjectFormComponent implements OnInit {
 
     selectCode(code) {
         this._project.code = code;
-        console.log('code')
-        console.log(code)
         if (
             this._project.code.code == '8.5' ||
             this._project.code.code == '8.7' ||
@@ -77,10 +78,20 @@ export class ProjectFormComponent implements OnInit {
             this._project.code.code == '8.16'
         ) {
             this.disableExpectedResultButton = true;
-            this.selectExpectedResult({name: 'Другое', specific: ''});
+            this.selectExpectedResult({
+                expectedResultType: 'другое',
+                resultCharacter: '',
+                workType: [
+                    TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR,
+                    TypeOfWorkEnum.BUSINESS_PLAN, TypeOfWorkEnum.INNOVATIVE_PROJECT,
+                    TypeOfWorkEnum.DOCUMENTS_SET, TypeOfWorkEnum.INCLUDE_PROPOSAL,
+                    TypeOfWorkEnum.SPECIFICATION, TypeOfWorkEnum.OTHER],
+                description: 'Введите свой вид ожидаемого результата в дополнительном текстовом поле.'
+            });
         } else {
-            this.selectExpectedResult({name: undefined, specific: undefined});
+            let expRes: ExpectedResultDto;
             this.disableExpectedResultButton = false;
+            this.selectExpectedResult(expRes);
         }
     }
 
@@ -194,66 +205,113 @@ export class ProjectFormComponent implements OnInit {
     disableResultSpecificButton: boolean = false;
     disableExpectedResultButton: boolean = false;
 
-    expectedResultList: any[] = expectedResultList;
-    selectedResult: {name, specific};
-    expectedResult: string;
-    expectedResultDescription: string;
-    expectedResultReferenceInformation: string = 'Cправочная информация';
+
+
+
+
+
+    expectedResultList: any[] = [];
+
+
     selectExpectedResult(result) {
-        this.selectedResult = result;
+        this._project.expectedResult = result;
+
+        console.log('---------------')
+        console.log(this._project)
+        console.log('---------------')
+
+
+
+        // if (this._project.expectedResult.resultCharacter !== ResultSpecificEnum.MISSING && !isEmptyOrNull(this._project.expectedResult.resultCharacter)){
+        //     // Выбран ожидаемый результат с характером Прикладной или фундаментальный
+        //
+        //     this._project.expectedResult.resultCharacter
+        //     console.log('11111111111111111111111111111')
+        // } else {
+        //     // Выбран пункт Другое
+        //     console.log('22222222222222222222222222222')
+        // }
+
+
+
+
         this.resultSpecificList = resultSpecificList;
-
-        if (this.selectedResult.specific === ResultSpecificEnum.APPLIED){
-            this.selectedTypeOfWork = '';
-            this.resultSpecificList = [ResultSpecificEnum.APPLIED];
-            this.outputTypeOfWorkList = this.typeOfWorkList.filter(item => item.specific.includes(ResultSpecificEnum.APPLIED) && !item.specific.includes(ResultSpecificEnum.MISSING))
-            this.disableTypeOfWorkButton = false;
-            this.selectedResultSpecific = ResultSpecificEnum.APPLIED;
-            this.disableResultSpecificButton = true;
-        } else if (this.selectedResult.specific == ResultSpecificEnum.FUNDAMENTAL) {
-            this.selectedTypeOfWork = TypeOfWorkEnum.NIR;
-            this.resultSpecificList = [ResultSpecificEnum.FUNDAMENTAL];
-            this.disableTypeOfWorkButton = true;
-            this.selectedResultSpecific = ResultSpecificEnum.FUNDAMENTAL;
-            this.disableResultSpecificButton = true;
-        } else {
-            this.disableTypeOfWorkButton = false;
-            this.disableResultSpecificButton = false;
-            this.outputTypeOfWorkList = this.typeOfWorkList;
-            this.selectedTypeOfWork = '';
-            this.selectedResultSpecific = '';
-        }
-
+            if (this._project.expectedResult && this._project.expectedResult.resultCharacter === ResultSpecificEnum.APPLIED) {
+                this.selectedTypeOfWork = '';
+                this.resultSpecificList = [ResultSpecificEnum.APPLIED];
+                this.outputTypeOfWorkList = typeOfWorkList.filter(item => item.specific.includes(ResultSpecificEnum.APPLIED) && !item.specific.includes(ResultSpecificEnum.MISSING))
+                this.outputTypeOfWorkList = this._project.expectedResult.workTypes
+                this.disableTypeOfWorkButton = false;
+                this.selectedResultSpecific = ResultSpecificEnum.APPLIED;
+                this.disableResultSpecificButton = true;
+            } else if (this._project.expectedResult &&  this._project.expectedResult.resultCharacter === ResultSpecificEnum.FUNDAMENTAL) {
+                this.selectedTypeOfWork = TypeOfWorkEnum.NIR;
+                this.resultSpecificList = [ResultSpecificEnum.FUNDAMENTAL];
+                this.disableTypeOfWorkButton = true;
+                this.selectedResultSpecific = ResultSpecificEnum.FUNDAMENTAL;
+                this.disableResultSpecificButton = true;
+            } else {
+                this.disableTypeOfWorkButton = false;
+                this.disableResultSpecificButton = false;
+                this.outputTypeOfWorkList = typeOfWorkList;
+                this.selectedTypeOfWork = '';
+                this.selectedResultSpecific = '';
+            }
     }
 
 
-    typeOfWorkList: any = [
-        {name: TypeOfWorkEnum.NIR, specific: [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED]},
-        {name: TypeOfWorkEnum.OKR, specific: [ResultSpecificEnum.APPLIED]},
-        {name: TypeOfWorkEnum.OTR, specific: [ResultSpecificEnum.APPLIED]},
-        {name: 'Бизнес-план', specific: [ResultSpecificEnum.MISSING]},
-        {name: 'Комплект заявочных документов', specific: [ResultSpecificEnum.MISSING]},
-        {name: 'Предложения о включении товаров в перечень высокотехнологичных', specific: [ResultSpecificEnum.MISSING]},
-        {name: 'Техническое задание', specific: [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED, ResultSpecificEnum.MISSING]},
-        {name: TypeOfWorkEnum.OTHER, specific: [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED, ResultSpecificEnum.MISSING]},
-    ];
-    outputTypeOfWorkList: any[];
+
+    outputTypeOfWorkList: any[] = typeOfWorkList;
 
     selectedTypeOfWork: string;
     typeOfWork: string;
     selectTypeOfWork(typeOfWork) {
 
+        this._project.workType = typeOfWork.name;
+        if (typeOfWork.name !== TypeOfWorkEnum.OTHER) {
+            this._project.otherWorkType = '';
+        }
+
+        this.showTechnologyType = typeOfWork.name.includes( TypeOfWorkEnum.BUSINESS_PLAN ) ||
+            typeOfWork.name.includes( TypeOfWorkEnum.INNOVATIVE_PROJECT ) ||
+            typeOfWork.name.includes( TypeOfWorkEnum.DOCUMENTS_SET ) ||
+            typeOfWork.name.includes( TypeOfWorkEnum.INCLUDE_PROPOSAL ) ||
+            typeOfWork.name.includes( TypeOfWorkEnum.OTHER );
+
+
+        if (this.showTechnologyType) {
+            this.selectResultSpecific(ResultSpecificEnum.MISSING)
+            this.disableResultSpecificButton = true;
+        }
+        else {
+            this.selectResultSpecific('')
+            this.disableResultSpecificButton = false;
+        }
+
+
+        console.log('------------------------------')
+        console.log('this.showTechnologyType')
+        console.log(this.showTechnologyType)
+        console.log('------------------------------')
+        console.log('------------------------------')
+        console.log('this._project.expectedResult.resultCharacter')
+        // console.log(this._project.expectedResult.resultCharacter)
+        console.log('------------------------------')
+
         console.log('typeOfWork')
         console.log(typeOfWork)
-        console.log('this.selectedResult')
-        console.log(this.selectedResult)
-
 
         this.selectedTypeOfWork = typeOfWork.name;
         this.resultSpecificList = typeOfWork.specific;
 
-         if (this.selectedResult &&  !isEmptyOrNull(this.selectedResult.specific)) {
-             this.selectedResultSpecific = this.selectedResult.specific;
+
+
+         //
+         //    ПЕРЕДЕЛАТЬ, ведь typeOfWork будет не в формате {name, specific}
+         //
+
+         if (this._project.expectedResult && !isEmptyOrNull(this._project.expectedResult.resultCharacter)) {
+             this.selectedResultSpecific = this._project.expectedResult.resultCharacter;
              this.disableResultSpecificButton = true;
          } else {
              if (this.resultSpecificList.length === 1) {
@@ -275,15 +333,26 @@ export class ProjectFormComponent implements OnInit {
     selectedResultSpecific: string;
     selectResultSpecific(resultSpecific) {
         this.selectedResultSpecific = resultSpecific;
+        this._project.expectedResult.resultCharacter = resultSpecific;
     }
 
     isCommerceSubject: boolean;
+    isCommerce(flag: boolean) {
+        this.isCommerceSubject = flag;
+        this.showTechnologyType = true;
+        if (this.isCommerceSubject) {
+            this._project.resultCommercialization = 'Подлежит'
+        } else {
+            this._project.resultCommercialization = 'Не подлежит'
+        }
+    }
 
     commerceList: any[] = commerceList;
     commerce: string;
     commerceText: string;
     selectCommerceResult(commerce) {
         this.commerce = commerce;
+        this._project.commercializationMethod = commerce;
     }
 
     choiceOfResultCharacterAppliedList: any[] = choiceOfResultCharacterApplied;
@@ -291,15 +360,18 @@ export class ProjectFormComponent implements OnInit {
     implementationObjectDescription: string;
     implementationObjectWay: string;
     selectChoiceOfResultCharacterAppliedResult(selectedElement) {
-        this. choiceOfResultCharacterAppliedSelectedElement = selectedElement;
+        this.choiceOfResultCharacterAppliedSelectedElement = selectedElement;
+        this._project.implementationResult = selectedElement;
     }
 
+    showTechnologyType: boolean = false;
     technologyType: string;
     selectedTechnologyType: string;
     technologyTypeList: any[] = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'Другое'];
     isAnotherTechnologyType: boolean = false;
     selectTechnologyType(technologyType) {
         this.selectedTechnologyType = technologyType;
+        this._project.technologicalOrder = technologyType;
         if (this.selectedTechnologyType === 'Другое') {
             this.technologyType = '';
             this.isAnotherTechnologyType = true;
@@ -311,6 +383,7 @@ export class ProjectFormComponent implements OnInit {
 
 
 }
+
 
 export const commerceList: string[] = [
     'реализация товаров (работ, услуг), создаваемых (выполняемых, оказываемых) с применением результатов научно-технической деятельности ',
@@ -350,47 +423,213 @@ export enum TypeOfWorkEnum {
     NIR = 'НИР',
     OKR = 'ОКР',
     OTR = 'ОТР',
+    BUSINESS_PLAN = 'Бизнес план',
+    INNOVATIVE_PROJECT = 'Инновационный проект',
+    DOCUMENTS_SET = 'Комплект заявочных документов',
+    INCLUDE_PROPOSAL = 'Предложение о включении товаров в перечень высокотехнологичных',
+    SPECIFICATION = 'Техническое задание',
     OTHER = 'Другое'
 }
 
 export enum ResultSpecificEnum {
-    FUNDAMENTAL = 'Фундаментальный',
-    APPLIED = 'Прикладной',
-    MISSING = 'Не предусмотрен'
+    FUNDAMENTAL = 'фундаментальный',
+    APPLIED = 'прикладной',
+    MISSING = 'не предусмотрен'
 }
+
+export const typeOfWorkList: any = [
+    {name: TypeOfWorkEnum.NIR, specific: [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED]},
+    {name: TypeOfWorkEnum.OKR, specific: [ResultSpecificEnum.APPLIED]},
+    {name: TypeOfWorkEnum.OTR, specific: [ResultSpecificEnum.APPLIED]},
+    {name: TypeOfWorkEnum.BUSINESS_PLAN, specific: [ResultSpecificEnum.MISSING]},
+    {name: TypeOfWorkEnum.INNOVATIVE_PROJECT, specific: [ResultSpecificEnum.MISSING]},
+    {name: TypeOfWorkEnum.DOCUMENTS_SET, specific: [ResultSpecificEnum.MISSING]},
+    {name: TypeOfWorkEnum.INCLUDE_PROPOSAL, specific: [ResultSpecificEnum.MISSING]},
+    {name: TypeOfWorkEnum.SPECIFICATION, specific: [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED, ResultSpecificEnum.MISSING]},
+    {name: TypeOfWorkEnum.OTHER, specific: [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED, ResultSpecificEnum.MISSING]},
+];
 
 export const resultSpecificList: any = [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED, ResultSpecificEnum.MISSING];
 
 export const expectedResultList: any[] = [
-    {name: 'сделано открытие (открыт закон, закономерность)', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'разработана научная теория', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'выдвинута и обоснована научная гипотеза', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'сформирована новая область (направление) исследований', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'обнаружено новое явление', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'обнаружено новое свойство известного явления', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'разработаны методы достижения научных решений, направленных на развитие фундаментальных исследований', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'обобщены решения частных научных задач', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'систематизированы ранее известные подходы к использованию теорий и открытий в практике', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'разработана теория', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'разработаны новые методы измерений', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'выдвинута и обоснована гипотеза', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'разработана концепция', specific: ResultSpecificEnum.FUNDAMENTAL},
-    {name: 'разработан аналитический доклад с предложениями', specific: ResultSpecificEnum.FUNDAMENTAL},
+    {
+        expectedResultType: 'сделано открытие (открыт закон, закономерность)',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработана научная теория',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'выдвинута и обоснована научная гипотеза',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'сформирована новая область (направление) исследований',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'обнаружено новое явление',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'обнаружено новое свойство известного явления',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработаны методы достижения научных решений, направленных на развитие фундаментальных исследований',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'обобщены решения частных научных задач',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
 
-    {name: 'разработан экспериментальный макет изделия', specific: ResultSpecificEnum.APPLIED},
-    {name: 'разработан опытный образец изделия', specific: ResultSpecificEnum.APPLIED},
-    {name: 'создан промышленный образец', specific: ResultSpecificEnum.APPLIED},
-    {name: 'разработан экспериментальный образец технологии получения нового материала', specific: ResultSpecificEnum.APPLIED},
-    {name: 'разработан опытный образец новой технологии получения материалов', specific: ResultSpecificEnum.APPLIED},
-    {name: 'разработан проект технологического процесса', specific: ResultSpecificEnum.APPLIED},
-    {name: 'разработан стандарт, технические условия', specific: ResultSpecificEnum.APPLIED},
-    {name: 'разработана методика (измерения, контроля и т. д.)', specific: ResultSpecificEnum.APPLIED},
-    {name: 'разработаны методические рекомендации (использования оборудования приборов и т. д.)', specific: ResultSpecificEnum.APPLIED},
-    {name: 'разработан проект нормативного акта', specific: ResultSpecificEnum.APPLIED},
-    {name: 'разработана программа, план, концепция', specific: ResultSpecificEnum.APPLIED},
-    {name: 'разработаны методические рекомендации (документ, пособие, положение и т. д.)', specific: ResultSpecificEnum.APPLIED},
-    {name: 'разработаны новые нормативы', specific: ResultSpecificEnum.APPLIED},
-    {name: 'разработаны рекомендации', specific: ResultSpecificEnum.APPLIED},
+    {
+        expectedResultType: 'систематизированы ранее известные подходы к использованию теорий и открытий в практике',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработана теория',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработаны новые методы измерений',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'выдвинута и обоснована гипотеза',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработана концепция',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработан аналитический доклад с предложениями',
+        resultCharacter: ResultSpecificEnum.FUNDAMENTAL,
+        workType: [TypeOfWorkEnum.NIR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработан экспериментальный макет изделия',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
 
-    {name: 'Другое', specific: ''}
+    {
+        expectedResultType: 'разработан опытный образец изделия',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'создан промышленный образец',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработан экспериментальный образец технологии получения нового материала',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработан опытный образец новой технологии получения материалов',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработан проект технологического процесса',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработан стандарт, технические условия',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработана методика (измерения, контроля и т. д.)',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработаны методические рекомендации (использования оборудования приборов и т. д.)',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработан проект нормативного акта',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработана программа, план, концепция',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработаны методические рекомендации (документ, пособие, положение и т. д.)',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработаны новые нормативы',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'разработаны рекомендации',
+        resultCharacter: ResultSpecificEnum.APPLIED,
+        workType: [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR],
+        description: 'Справочная информация'
+    },
+    {
+        expectedResultType: 'другое',
+        resultCharacter: '',
+        workType: [
+            TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR,
+            TypeOfWorkEnum.BUSINESS_PLAN, TypeOfWorkEnum.INNOVATIVE_PROJECT,
+            TypeOfWorkEnum.DOCUMENTS_SET, TypeOfWorkEnum.INCLUDE_PROPOSAL,
+            TypeOfWorkEnum.SPECIFICATION, TypeOfWorkEnum.OTHER],
+        description: 'Введите свой вид ожидаемого результата в дополнительном текстовом поле.'
+    },
 ]
