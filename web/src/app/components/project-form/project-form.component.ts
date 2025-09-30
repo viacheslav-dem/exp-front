@@ -202,6 +202,24 @@ export class ProjectFormComponent implements OnInit {
         this._project.otherWorkType = '';
         this.showTechnologyType = false;
         this._project.technologicalOrder = ''
+
+        this.clearCommerceFields()
+    }
+
+    clearCommerceFields() {
+        this.isCommerceSubject = undefined;
+
+        this._project.resultCommercialization = '';
+
+        this._project.commercializationMethod = '';
+        this._project.commercializationDescription = '';
+
+        this._project.implementationResult = '';
+        this._project.implementationDescription = '';
+        this._project.implementationSpecifying = '';
+
+        this._project.technologicalOrder = '';
+        this._project.otherTechnologicalOrder = '';
     }
 
     clearFunctionalFields() {
@@ -266,6 +284,9 @@ export class ProjectFormComponent implements OnInit {
 
     selectResultSpecific(resultSpecific) {
         this._project.selectedResultSpecific = resultSpecific;
+        if (this._project.selectedResultSpecific !== ResultSpecificEnum.APPLIED) {
+            this.clearCommerceFields();
+        }
     }
 
 
