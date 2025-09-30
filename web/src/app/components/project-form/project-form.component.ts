@@ -55,6 +55,34 @@ export class ProjectFormComponent implements OnInit {
     if (!project) project = new ProjectDto();
     if (!project.period) project.period = new PeriodDto();
     this._project = project;
+    this.directions = this.dispDir();
+  }
+
+  private dispDir() {
+    let directionsToDisplay: DirectionDto[] = [];
+    let projectDirections = this._project.directions;
+    for (let i = 0; i < projectDirections.length; i++) {
+      let proDir = projectDirections[i] as DirectionDto;
+      proDir.subDirectionDtos = [];
+      directionsToDisplay.push(proDir);
+    }
+    if (this._project.subDirections === null){
+      return directionsToDisplay;
+    } else {
+      let projectSubDirections = this._project.subDirections;
+      for (let i = 0; i < projectSubDirections.length; i++) {
+        let proSubDir = projectSubDirections[i];
+        for (let j = 0; j < directionsToDisplay.length; j++) {
+          let dirToDis = directionsToDisplay[j];
+          let proDirId = proSubDir.direction.id;
+          let dirToDisId = dirToDis.id;
+          if(proDirId == dirToDisId){
+            dirToDis.subDirectionDtos.push(proSubDir);
+          }
+        }
+      }
+    }
+    return directionsToDisplay;
   }
 
   getProjectCodes() {
@@ -67,6 +95,7 @@ export class ProjectFormComponent implements OnInit {
 
   onSave() {
     this._project.directions = this.directions;
+    this._project.subDirections = [];
     for (let i = 0; i < this.directions.length; i++) {
       for (let j = 0; j < this.directions[i].subDirectionDtos.length; j++) {
         this._project.subDirections.push(this.directions[i].subDirectionDtos[j]);
@@ -204,5 +233,10 @@ export class ProjectFormComponent implements OnInit {
       this.directions.splice(indexDir, 1);
     }
     return dir.subDirectionDtos;
+  }
+
+  deleteDirection(dir: DirectionDto, i: number) {
+      dir.subDirectionDtos = [];
+      this.directions.splice(i, 1);
   }
 }

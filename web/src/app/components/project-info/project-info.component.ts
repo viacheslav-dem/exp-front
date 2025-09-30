@@ -689,8 +689,6 @@ export class ProjectInfoComponent implements OnInit {
         this.copyProjectModal.hide();
         this.router.navigate(['/projects', res.id]);
       });
-
-
   }
 
   getAllReferrals() {

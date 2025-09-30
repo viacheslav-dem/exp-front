@@ -20,6 +20,7 @@ import {LifecycleGroupDto} from "@app/dto/LifecycleGroupDto";
 import {LifecycleGroupState} from "@app/pipes/lifecycle-group-state.pipe";
 import {DirectionDto} from "@app/dto/DirectionDto";
 import {Catalog, DataService} from "@app/services/data.service";
+import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 
 @Component({
   selector: 'app-basic-project-info',
@@ -209,4 +210,32 @@ export class BasicProjectInfoComponent implements OnInit {
     }
     return newDirections;
   }
+
+    displayDirectionOrSubDirection() {
+    let directionsToDisplay: DirectionDto[] = [];
+    let projectDirections = this.project.directions;
+    for (let i = 0; i < projectDirections.length; i++) {
+      let proDir = projectDirections[i] as DirectionDto;
+      proDir.subDirectionDtos = [];
+      directionsToDisplay.push(proDir);
+    }
+    if (this.project.subDirections === null){
+      return directionsToDisplay;
+    } else {
+      let projectSubDirections = this.project.subDirections;
+      for (let i = 0; i < projectSubDirections.length; i++) {
+        let proSubDir = projectSubDirections[i];
+        for (let j = 0; j < directionsToDisplay.length; j++) {
+          let dirToDis = directionsToDisplay[j];
+          let proDirId = proSubDir.direction.id;
+          let dirToDisId = dirToDis.id;
+          if(proDirId == dirToDisId){
+            dirToDis.subDirectionDtos.push(proSubDir);
+          }
+        }
+      }
+    }
+    return directionsToDisplay;
+  }
+
 }

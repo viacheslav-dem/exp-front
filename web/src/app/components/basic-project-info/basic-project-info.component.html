@@ -81,8 +81,14 @@
       Приоритетное направление научных исследований и (или) научно-технической деятельности:
     </span>
     <ul class="mb-0 pl-4">
-      <li *ngFor="let dir of project.subDirections">
-        <span class="italic">{{dir.directionName}} ({{dir.direction.name}})</span>
+      <li *ngFor="let dir of displayDirectionOrSubDirection()">
+        <span class="italic">{{dir.name}}</span>
+        <ul *ngIf="dir.subDirectionDtos.length != 0">
+          <li *ngFor="let subDir of dir.subDirectionDtos">
+            {{subDir.directionName}}
+          </li>
+        </ul>
+
       </li>
     </ul>
   </div>

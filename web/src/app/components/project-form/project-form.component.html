@@ -155,7 +155,11 @@
       <div class="form-sub-group italic">
         <div *ngIf="directions.length != 0">
           <div *ngFor="let dir of displayDirection(); let i = index">
-            {{dir.name}} <br>
+            {{dir.name}}
+            <a class="btn btn-icon btn-icon-sm" (click)="deleteDirection(dir, i)">
+              <fa-icon icon="minus"></fa-icon>
+            </a>
+            <br>
               <ul>
                 <li *ngFor="let subDir of dir.subDirectionDtos; let j = index">
                   {{subDir.directionName}}
