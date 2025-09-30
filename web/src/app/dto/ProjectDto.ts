@@ -58,16 +58,21 @@ export class ProjectDto extends HasState {
   otherExpectedResult: string;
   expectedResultDescription: string;
 
+  selectedResultSpecific: string;
+
   workType: string;
   otherWorkType: string;
 
   resultCommercialization: string;
+
   commercializationMethod: string;
+  commercializationDescription: string;
 
   implementationResult: string;
   implementationDescription: string;
   implementationSpecifying: string;
 
   technologicalOrder: string;
+  otherTechnologicalOrder: string;
 
 }
