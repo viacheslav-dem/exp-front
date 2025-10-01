@@ -40,7 +40,6 @@ export class ProjectFormComponent implements OnInit {
     disableResultSpecificButton: boolean = false;
     disableExpectedResultButton: boolean = false;
     showTechnologyType: boolean = false;
-    isCommerceSubject: boolean;
     isAnotherTechnologyType: boolean = false;
 
     expectedResultList: any[] = [];
@@ -198,63 +197,66 @@ export class ProjectFormComponent implements OnInit {
     }
 
     clearAppliedFields() {
-        this._project.otherExpectedResult = '';
-        this._project.otherWorkType = '';
+        this._project.otherExpectedResult = undefined;
+        this._project.otherWorkType = undefined;
         this.showTechnologyType = false;
-        this._project.technologicalOrder = ''
+        this._project.technologicalOrder = undefined;
 
         this.clearCommerceFields()
     }
 
     clearCommerceFields() {
-        this.isCommerceSubject = undefined;
+        this._project.resultCommercialization = undefined;
 
-        this._project.resultCommercialization = '';
+        this._project.commercializationMethod = undefined;
+        this._project.commercializationDescription = undefined;
 
-        this._project.commercializationMethod = '';
-        this._project.commercializationDescription = '';
-
-        this._project.implementationResult = '';
-        this._project.implementationDescription = '';
+        this._project.implementationResult = undefined;
+        this._project.implementationDescription = undefined;
         this._project.implementationSpecifying = '';
 
-        this._project.technologicalOrder = '';
-        this._project.otherTechnologicalOrder = '';
+        this._project.technologicalOrder = undefined;
+        this._project.otherTechnologicalOrder = undefined;
     }
 
     clearFunctionalFields() {
-        this._project.otherExpectedResult = '';
-        this._project.otherWorkType = '';
+        this._project.otherExpectedResult = undefined;
+        this._project.otherWorkType = undefined;
         this.showTechnologyType = false;
-        this._project.technologicalOrder = ''
+        this._project.technologicalOrder = undefined;
     }
 
     selectExpectedResult(result) {
         this._project.expectedResult = result;
         this._project.workType = '';
         this.resultSpecificList = resultSpecificList;
-            if (this._project.expectedResult && this._project.expectedResult.resultCharacter === ResultSpecificEnum.APPLIED) {
-                this.clearFunctionalFields();
-                this.resultSpecificList = [ResultSpecificEnum.APPLIED];
-                this.outputTypeOfWorkList = [TypeOfWorkEnum.NIR, TypeOfWorkEnum.OKR, TypeOfWorkEnum.OTR]
-                this.disableTypeOfWorkButton = false;
-                this._project.selectedResultSpecific = ResultSpecificEnum.APPLIED;
-                this._project.workType = '';
-                this.disableResultSpecificButton = true;
-            } else if (this._project.expectedResult &&  this._project.expectedResult.resultCharacter === ResultSpecificEnum.FUNDAMENTAL) {
-                this.clearAppliedFields();
-                this.resultSpecificList = [ResultSpecificEnum.FUNDAMENTAL];
-                this.disableTypeOfWorkButton = true;
-                this._project.selectedResultSpecific = ResultSpecificEnum.FUNDAMENTAL;
-                this.disableResultSpecificButton = true;
-                this._project.workType = TypeOfWorkEnum.NIR;
-            } else {
-                this.disableTypeOfWorkButton = false;
-                this.disableResultSpecificButton = false;
-                this.outputTypeOfWorkList = typeOfWorkList;
-                this._project.workType = '';
-                this._project.selectedResultSpecific = '';
-            }
+
+        if (this._project.expectedResult) {
+            this.outputTypeOfWorkList = this._project.expectedResult.workTypeDtos
+        } else {
+            this.outputTypeOfWorkList = typeOfWorkList;
+        }
+
+        if (this._project.expectedResult && this._project.expectedResult.resultCharacter === ResultSpecificEnum.APPLIED) {
+            this.clearFunctionalFields();
+            this.resultSpecificList = [ResultSpecificEnum.APPLIED];
+            this.disableTypeOfWorkButton = false;
+            this._project.selectedResultSpecific = ResultSpecificEnum.APPLIED;
+            this._project.workType = '';
+            this.disableResultSpecificButton = true;
+        } else if (this._project.expectedResult && this._project.expectedResult.resultCharacter === ResultSpecificEnum.FUNDAMENTAL) {
+            this.clearAppliedFields();
+            this.resultSpecificList = [ResultSpecificEnum.FUNDAMENTAL];
+            this.disableTypeOfWorkButton = true;
+            this._project.selectedResultSpecific = ResultSpecificEnum.FUNDAMENTAL;
+            this.disableResultSpecificButton = true;
+            this._project.workType = TypeOfWorkEnum.NIR;
+        } else {
+            this.disableTypeOfWorkButton = false;
+            this.disableResultSpecificButton = false;
+            this._project.workType = '';
+            this._project.selectedResultSpecific = '';
+        }
     }
 
     selectTypeOfWork(typeOfWork) {
@@ -264,7 +266,7 @@ export class ProjectFormComponent implements OnInit {
             this._project.otherWorkType = '';
         }
 
-        if (this._project.expectedResult.expectedResultType === 'другое') {
+        if (this._project.expectedResult && this._project.expectedResult.expectedResultType === 'другое') {
             this.disableResultSpecificButton = false;
             if (typeOfWork === TypeOfWorkEnum.BUSINESS_PLAN ||
                 typeOfWork === TypeOfWorkEnum.INNOVATIVE_PROJECT ||
@@ -291,9 +293,9 @@ export class ProjectFormComponent implements OnInit {
 
 
     isCommerce(flag: boolean) {
-        this.isCommerceSubject = flag;
+        // this.isCommerceSubject = flag;
         this.showTechnologyType = true;
-        if (this.isCommerceSubject) {
+        if (flag) {
             this._project.resultCommercialization = 'Подлежит';
             this._project.implementationResult = '';
             this._project.implementationDescription = '';
@@ -383,15 +385,16 @@ export enum ResultSpecificEnum {
 }
 
 export const typeOfWorkList: any = [
-     TypeOfWorkEnum.NIR,
-     TypeOfWorkEnum.OKR,
-     TypeOfWorkEnum.OTR,
-     TypeOfWorkEnum.BUSINESS_PLAN,
-     TypeOfWorkEnum.INNOVATIVE_PROJECT,
-     TypeOfWorkEnum.DOCUMENTS_SET,
-     TypeOfWorkEnum.INCLUDE_PROPOSAL,
-     TypeOfWorkEnum.SPECIFICATION,
-     TypeOfWorkEnum.OTHER
+    {name: 'NIR', description: TypeOfWorkEnum.NIR},
+    {name: 'OKR', description: TypeOfWorkEnum.OKR},
+    {name: 'OTR', description: TypeOfWorkEnum.OTR},
+    {name: 'BUSINESS_PLAN', description: TypeOfWorkEnum.BUSINESS_PLAN},
+    {name: 'INNOVATIVE_PROJECT', description: TypeOfWorkEnum.INNOVATIVE_PROJECT},
+    {name: 'DOCUMENTS_SET', description: TypeOfWorkEnum.DOCUMENTS_SET},
+    {name: 'INCLUDE_PROPOSAL', description: TypeOfWorkEnum.INCLUDE_PROPOSAL},
+    {name: 'SPECIFICATION', description: TypeOfWorkEnum.SPECIFICATION},
+    {name: 'OTHER', description: TypeOfWorkEnum.OTHER},
+
 ];
 
 export const resultSpecificList: any = [ResultSpecificEnum.FUNDAMENTAL, ResultSpecificEnum.APPLIED, ResultSpecificEnum.MISSING];

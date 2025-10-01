@@ -2,6 +2,6 @@ export class ExpectedResultDto{
     id: number;
     expectedResultType: string;
     resultCharacter: string;
-    workTypes: [];
+    workTypeDtos: [];
     description: string;
 }
