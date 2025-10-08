@@ -31,6 +31,12 @@
     <span class="italic">{{project.code?.code | orElse : 'не указан'}}</span>
   </div>
 
+  <div class="text-sm" *ngIf="project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'">
+    <span *ngIf="project.code?.code != '8.4'">Наименование программы (подпрограммы): </span>
+    <span *ngIf="project.code?.code == '8.4'">Наименование двусторонней научно-технической программы с: </span>
+    <span class="italic">{{project.program | orElse : 'не указан'}}</span>
+  </div>
+
   <div class="text-sm" *ngIf="project.customer!=null">
     <span>Заказчик экспертизы: </span>
     <span class="italic">{{project.customer?.org?.name | orElse : 'организация не указана' }}</span>
