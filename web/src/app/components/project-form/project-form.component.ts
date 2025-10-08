@@ -269,6 +269,7 @@ export class ProjectFormComponent implements OnInit {
         if (this._project.expectedResult && this._project.expectedResult.expectedResultType === 'другое') {
             this.disableResultSpecificButton = false;
             if (typeOfWork === TypeOfWorkEnum.INVESTMENT_PROJECT ||
+                typeOfWork === TypeOfWorkEnum.INNOVATIVE_PROJECT ||
                 typeOfWork === TypeOfWorkEnum.VENTURE_PROJECT ||
                 typeOfWork === TypeOfWorkEnum.WORK_ON_ORGANIZATION ||
                 typeOfWork === TypeOfWorkEnum.DOCUMENTS_SET ||
@@ -372,6 +373,7 @@ export enum TypeOfWorkEnum {
     OKR = 'ОКР',
     OTR = 'ОТР',
     INVESTMENT_PROJECT = 'Инвестиционный проект',
+    INNOVATIVE_PROJECT = 'Инновационный проект',
     VENTURE_PROJECT = 'Венчурный проект',
     WORK_ON_ORGANIZATION = 'Работы по организации и освоению в производстве',
     DOCUMENTS_SET = 'Комплект заявочных документов',
@@ -390,6 +392,7 @@ export const typeOfWorkList: any = [
     {name: 'NIR', description: TypeOfWorkEnum.NIR},
     {name: 'OKR', description: TypeOfWorkEnum.OKR},
     {name: 'OTR', description: TypeOfWorkEnum.OTR},
+    {name: 'INNOVATIVE_PROJECT', description: TypeOfWorkEnum.INNOVATIVE_PROJECT},
     {name: 'INVESTMENT_PROJECT', description: TypeOfWorkEnum.INVESTMENT_PROJECT},
     {name: 'VENTURE_PROJECT', description: TypeOfWorkEnum.VENTURE_PROJECT},
     {name: 'WORK_ON_ORGANIZATION', description: TypeOfWorkEnum.WORK_ON_ORGANIZATION},
