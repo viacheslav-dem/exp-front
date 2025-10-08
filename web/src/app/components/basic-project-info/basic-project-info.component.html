@@ -151,9 +151,9 @@
 
     <div class="text-sm">
         <span>Ожидаемый результат экспертизы: </span>
-        <span *ngIf="project.expectedResult.expectedResultType !== 'другое'"
+        <span *ngIf="project.expectedResult && project.expectedResult.expectedResultType !== 'другое'"
               class="italic">{{ project.expectedResult.expectedResultType }}</span>
-        <span *ngIf="project.expectedResult.expectedResultType === 'другое'"
+        <span *ngIf="project.expectedResult && project.expectedResult.expectedResultType === 'другое'"
               class="italic">{{ project.otherExpectedResult }}</span>
     </div>
     <div class="text-sm">

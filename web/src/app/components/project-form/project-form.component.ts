@@ -268,8 +268,9 @@ export class ProjectFormComponent implements OnInit {
 
         if (this._project.expectedResult && this._project.expectedResult.expectedResultType === 'другое') {
             this.disableResultSpecificButton = false;
-            if (typeOfWork === TypeOfWorkEnum.BUSINESS_PLAN ||
-                typeOfWork === TypeOfWorkEnum.INNOVATIVE_PROJECT ||
+            if (typeOfWork === TypeOfWorkEnum.INVESTMENT_PROJECT ||
+                typeOfWork === TypeOfWorkEnum.VENTURE_PROJECT ||
+                typeOfWork === TypeOfWorkEnum.WORK_ON_ORGANIZATION ||
                 typeOfWork === TypeOfWorkEnum.DOCUMENTS_SET ||
                 typeOfWork === TypeOfWorkEnum.INCLUDE_PROPOSAL ||
                 typeOfWork === TypeOfWorkEnum.OTHER) {
@@ -370,8 +371,9 @@ export enum TypeOfWorkEnum {
     NIR = 'НИР',
     OKR = 'ОКР',
     OTR = 'ОТР',
-    BUSINESS_PLAN = 'Бизнес план',
-    INNOVATIVE_PROJECT = 'Инновационный проект',
+    INVESTMENT_PROJECT = 'Инвестиционный проект',
+    VENTURE_PROJECT = 'Венчурный проект',
+    WORK_ON_ORGANIZATION = 'Работы по организации и освоению в производстве',
     DOCUMENTS_SET = 'Комплект заявочных документов',
     INCLUDE_PROPOSAL = 'Предложение о включении товаров в перечень высокотехнологичных',
     SPECIFICATION = 'Техническое задание',
@@ -388,8 +390,9 @@ export const typeOfWorkList: any = [
     {name: 'NIR', description: TypeOfWorkEnum.NIR},
     {name: 'OKR', description: TypeOfWorkEnum.OKR},
     {name: 'OTR', description: TypeOfWorkEnum.OTR},
-    {name: 'BUSINESS_PLAN', description: TypeOfWorkEnum.BUSINESS_PLAN},
-    {name: 'INNOVATIVE_PROJECT', description: TypeOfWorkEnum.INNOVATIVE_PROJECT},
+    {name: 'INVESTMENT_PROJECT', description: TypeOfWorkEnum.INVESTMENT_PROJECT},
+    {name: 'VENTURE_PROJECT', description: TypeOfWorkEnum.VENTURE_PROJECT},
+    {name: 'WORK_ON_ORGANIZATION', description: TypeOfWorkEnum.WORK_ON_ORGANIZATION},
     {name: 'DOCUMENTS_SET', description: TypeOfWorkEnum.DOCUMENTS_SET},
     {name: 'INCLUDE_PROPOSAL', description: TypeOfWorkEnum.INCLUDE_PROPOSAL},
     {name: 'SPECIFICATION', description: TypeOfWorkEnum.SPECIFICATION},
