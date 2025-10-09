@@ -219,12 +219,12 @@ export class ProjectFormComponent implements OnInit {
     // }
   }
 
-    addSocialEconomicGoal() {
-        if (this.newSocialEconomicGoal) {
-            this._project.socialEconomicGoals.push(this.newSocialEconomicGoal);
-            this.newSocialEconomicGoal = null;
-        }
-    }
+    // addSocialEconomicGoal() {
+    //     if (this.newSocialEconomicGoal) {
+    //         this._project.socialEconomicGoals.push(this.newSocialEconomicGoal);
+    //         this.newSocialEconomicGoal = null;
+    //     }
+    // }
 
     canAddSocialEconomicGoals() {
         return this._project.code && this._project.code.code == '8.13';
