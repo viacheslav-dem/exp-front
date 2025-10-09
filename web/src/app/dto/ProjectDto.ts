@@ -12,6 +12,7 @@ import {DirectionDto} from "@app/dto/DirectionDto";
 import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 import {PeriodNIOKTRDto} from "@app/dto/PeriodNIOKTRDto";
 import {PeriodInnovationDto} from "@app/dto/PeriodInnovationDto";
+import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
 
 export class ProjectDto extends HasState {
   title: string;
@@ -52,5 +53,26 @@ export class ProjectDto extends HasState {
   highTechProduction: string;
   productionOnRB: number;
   exportAndImport: number;
+
+  expectedResult: ExpectedResultDto;
+  otherExpectedResult: string;
+  expectedResultDescription: string;
+
+  selectedResultSpecific: string;
+
+  workType: string;
+  otherWorkType: string;
+
+  resultCommercialization: string;
+
+  commercializationMethod: string;
+  commercializationDescription: string;
+
+  implementationResult: string;
+  implementationDescription: string;
+  implementationSpecifying: string;
+
+  technologicalOrder: string;
+  otherTechnologicalOrder: string;
 
 }

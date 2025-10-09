@@ -159,6 +159,69 @@
     <span>Общий объем экспорта и импорта:</span>
     <span class="italic">{{project.exportAndImport}}</span>
   </div>
+
+
+    <div class="text-sm">
+        <span>Ожидаемый результат экспертизы: </span>
+        <span *ngIf="project.expectedResult && project.expectedResult.expectedResultType !== 'другое'"
+              class="italic">{{ project.expectedResult.expectedResultType }}</span>
+        <span *ngIf="project.expectedResult && project.expectedResult.expectedResultType === 'другое'"
+              class="italic">{{ project.otherExpectedResult }}</span>
+    </div>
+    <div class="text-sm">
+        <span>Описание ожидаемого результата экспертизы: </span>
+        <span class="italic">{{ project.expectedResultDescription }}</span>
+    </div>
+
+    <div class="text-sm">
+        <span>Вид работ: </span>
+        <span *ngIf="project.workType !== 'другое'" class="italic">{{ project.workType }}</span>
+        <span *ngIf="project.workType === 'другое'" class="italic">{{ project.otherWorkType }}</span>
+    </div>
+
+    <div class="text-sm">
+        <span>Характер результата: </span>
+        <span class="italic">{{ project.selectedResultSpecific }}</span>
+    </div>
+
+    <div class="text-sm" *ngIf="project.selectedResultSpecific === 'прикладной'">
+        <div class="text-sm">
+            <span>Результат подлежит коммерциализации: </span>
+            <span>{{ project.resultCommercialization }}</span>
+        </div>
+        <div class="text-sm" *ngIf="project.resultCommercialization === 'Подлежит'">
+            <span>Объект коммерциализации: </span>
+            <span>{{ project.commercializationDescription }}</span>
+            <br>
+            <span>Способ коммерциализации: </span>
+            <span>{{ project.commercializationMethod }}</span>
+            <br>
+        </div>
+        <div class="text-sm" *ngIf="project.resultCommercialization === 'Не подлежит'">
+            <span>Характер результата - прикладной:  </span>
+            <span>{{ project.implementationResult }}</span>
+            <br>
+            <span>Объект внедрения:  </span>
+            <span>{{ project.implementationDescription }}</span>
+            <br>
+            <span>Способ внедрения:  </span>
+            <span>{{ project.implementationSpecifying }}</span>
+        </div>
+        <div class="text-sm">
+            <span>Технологический уклад: </span>
+            <span class="italic" *ngIf="project.technologicalOrder !== 'другое'">{{ project.technologicalOrder }}</span>
+            <span class="italic" *ngIf="project.technologicalOrder === 'другое'">{{ project.otherTechnologicalOrder }}</span>
+        </div>
+
+    </div>
+
+    <div class="text-sm" *ngIf="project.selectedResultSpecific === 'не предусмотрен'">
+        <span>Технологический уклад: </span>
+        <span class="italic" *ngIf="project.technologicalOrder !== 'другое'">{{ project.technologicalOrder }}</span>
+        <span class="italic"
+              *ngIf="project.technologicalOrder === 'другое'">{{ project.otherTechnologicalOrder }}</span>
+    </div>
+
 </div>
 
 

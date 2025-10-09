@@ -16,6 +16,7 @@ import {CatalogDto} from "@app/dto/CatalogDto";
 import {AuthPolicy, PropertyDto} from "@app/dto/PropertyDto";
 import {PropertyPlainDto} from "@app/dto/PropertyPlainDto";
 import {DirectionDto} from "@app/dto/DirectionDto";
+import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
 
 @Injectable()
 export class DataService {
@@ -112,6 +113,11 @@ export class DataService {
   getAutoSaveTime(): Observable<number> {
     return this._http.get(`${this.url}/get-save-time`);
   }
+
+  getExpectedResult(): Observable<ExpectedResultDto[]> {
+    return this._http.get(`${this.url}/expected-result`);
+  }
+
 }
 
 export enum Catalog {

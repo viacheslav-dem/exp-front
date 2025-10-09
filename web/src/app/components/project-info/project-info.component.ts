@@ -680,6 +680,7 @@ export class ProjectInfoComponent implements OnInit {
 
   onCopy(project) {
     this.editedProject = project;
+    this.editedProject.id = this.project.id;
     this.copiedProject = new ProjectCopyDto();
     this.copiedProject.title = this.editedProject.title;
     this.copiedProject.documents = this.editedProject.documents;
