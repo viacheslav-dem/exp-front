@@ -307,7 +307,7 @@
     <div class="form-group">
         <!--   Ожидаемый результат экспертизы   -->
         <div class="form-sub-group">
-            <label class="form-group-label">Ожидаемый результат экспертизы</label>
+            <label class="form-group-label">Ожидаемый результат объекта экспертизы</label>
             <div class="form-sub-group">
                 <div class="dropdown">
                     <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
@@ -327,7 +327,12 @@
             </div>
             <p class="font-italic" *ngIf="_project.expectedResult">
                 <b>Подсказка.</b>
-                {{ _project.expectedResult.description }}
+
+                <!--  Пока что фиксированная подсказка, возможно потом добавится динамическая для каждого выбранного элемента -->
+                <!-- {{ _project.expectedResult.description }}-->
+                Введите описание ожидаемого результата: «Вид ожидаемого результата», будет получен с использованием
+                метода(-ов) научных исследований, (отечественной, зарубежной) технологии, новшества (указывается
+                наименование метода(-ов) научных исследований, (отечественной, зарубежной) технологии, новшества).
             </p>
             <div class="form-sub-group"
                  *ngIf="_project.expectedResult && _project.expectedResult.expectedResultType == 'другое'">
