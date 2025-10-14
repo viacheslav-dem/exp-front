@@ -139,8 +139,62 @@ export class ProjectFormComponent implements OnInit {
     if (!this.canAddSocialEconomicGoals()) {
       this._project.socialEconomicGoals = [];
     }
+    this.validateExpectedResultBlock();
     this.save.emit(this._project);
   }
+
+    validateExpectedResultBlock() {
+        if (this._project.expectedResult) {
+            if (this._project.expectedResult.expectedResultType === 'другое' && isEmptyOrNull(this._project.otherExpectedResult)) {
+                throw 'Вид ожидаемого результата экспертизы не может быть пустым.';
+            }
+            if (isEmptyOrNull(this._project.expectedResultDescription)) {
+                throw 'Описание ожидаемого результата экспертизы не может быть пустым.';
+            }
+            if (isEmptyOrNull(this._project.workType)) {
+                throw 'Пожалуйста, выберите вид работ/Способ реализации объекта экспертизы.';
+            }
+            if (this._project.workType === 'другое' && isEmptyOrNull(this._project.otherWorkType)) {
+                throw 'Вид работ/Способ реализации объекта экспертизы не может быть пустым.';
+            }
+            if (isEmptyOrNull(this._project.selectedResultSpecific)) {
+                throw 'Пожалуйста, выберите характер результата.';
+            }
+            if (this._project.selectedResultSpecific === ResultSpecificEnum.APPLIED) {
+                if (isEmptyOrNull(this._project.resultCommercialization)) {
+                    throw 'Пожалуйста, выберите результат подлежит коммерциализации или нет.';
+                } else {
+                    if (this._project.resultCommercialization === 'Подлежит') {
+                        if (isEmptyOrNull(this._project.commercializationDescription)) {
+                            throw 'Описание объекта коммерциализации не может быть пустым.';
+                        }
+                        if (isEmptyOrNull(this._project.commercializationMethod)) {
+                            throw 'Пожалуйста, выберите способ коммерциализации.';
+                        }
+                    }
+                    if (this._project.resultCommercialization === 'Не подлежит') {
+                        if (isEmptyOrNull(this._project.implementationResult)) {
+                            throw 'Пожалуйста, выберите характер результата - прикладной.';
+                        }
+                        if (isEmptyOrNull(this._project.implementationDescription)) {
+                            throw 'Описание объекта внедрения не может быть пустым.';
+                        }
+                        if (isEmptyOrNull(this._project.implementationSpecifying)) {
+                            throw 'Указание способа внедрения не может быть пустым.';
+                        }
+                    }
+                }
+            }
+            if (this.showTechnologyType) {
+                if (isEmptyOrNull(this._project.technologicalOrder)) {
+                    throw 'Пожалуйста, выберите технологический уклад.';
+                }
+                if (this.isAnotherTechnologyType && isEmptyOrNull(this._project.otherTechnologicalOrder)) {
+                    throw 'Технологический уклад не может быть пустым.';
+                }
+            }
+        } else throw 'Пожалуйста, выберите вид ожидаемого результата экспертизы.';
+    }
 
     validate() {
         if (this._project.code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025') {
