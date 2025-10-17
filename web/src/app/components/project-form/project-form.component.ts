@@ -350,8 +350,7 @@ export class ProjectFormComponent implements OnInit {
                 typeOfWork === TypeOfWorkEnum.VENTURE_PROJECT ||
                 typeOfWork === TypeOfWorkEnum.WORK_ON_ORGANIZATION ||
                 typeOfWork === TypeOfWorkEnum.DOCUMENTS_SET ||
-                typeOfWork === TypeOfWorkEnum.INCLUDE_PROPOSAL ||
-                typeOfWork === TypeOfWorkEnum.OTHER) {
+                typeOfWork === TypeOfWorkEnum.INCLUDE_PROPOSAL) {
                 this.showTechnologyType = true;
                 this.selectResultSpecific(ResultSpecificEnum.MISSING)
                 this.disableResultSpecificButton = true;

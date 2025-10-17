@@ -5,6 +5,7 @@ export class ProjectCodePlainDto extends IdNameDto {
 
   code: string;
   expertReviewType: TemplateType;
+  description: string;
 
   static isCodeIn(code: string, ...numArr) {
     return numArr.some(num => ProjectCodePlainDto.isCode(code, num));

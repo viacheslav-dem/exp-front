@@ -23,6 +23,13 @@
                 </li>
             </ul>
         </div>
+        <div class="hint" *ngIf="this._project.code && this._project.code.description">
+            <p class="font-italic">
+                <b>Подсказка.</b>
+                {{this._project.code.description}}
+            </p>
+
+        </div>
     </div>
 
     <div class="form-group"
