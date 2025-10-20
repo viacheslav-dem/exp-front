@@ -65,7 +65,7 @@ export class ProjectDto extends HasState {
 
   resultCommercialization: string;
 
-  commercializationMethod: string;
+  commercializationMethods: string[];
   commercializationDescription: string;
 
   implementationResult: string;
