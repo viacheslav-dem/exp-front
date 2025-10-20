@@ -50,6 +50,9 @@ export class ProjectFormComponent implements OnInit {
     choiceOfResultCharacterAppliedList: any[] = choiceOfResultCharacterApplied;
     technologyTypeList: any[] = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'другое'];
 
+    commercializationMethods: string[] = [];
+    selectedCommercializationMethod: string;
+
     constructor(private viewContainerRef: ViewContainerRef,
                 private _dataService: DataService,
                 private _personService: PersonService,
@@ -113,10 +116,8 @@ export class ProjectFormComponent implements OnInit {
             this._project.code.code == '8.8ВПБИФ' ||
             this._project.code.code == '8.8ИПБИФ' ||
             this._project.code.code == '8.9' ||
-            this._project.code.code == '8.10' ||
             this._project.code.code == '8.12ИП' ||
-            this._project.code.code == '8.13' ||
-            this._project.code.code == '8.16'
+            this._project.code.code == '8.13'
         ) {
             this.disableExpectedResultButton = true;
             this.selectExpectedResult( this.expectedResultList.find(result => result.expectedResultType === 'другое'));
@@ -144,56 +145,58 @@ export class ProjectFormComponent implements OnInit {
   }
 
     validateExpectedResultBlock() {
-        if (this._project.expectedResult) {
-            if (this._project.expectedResult.expectedResultType === 'другое' && isEmptyOrNull(this._project.otherExpectedResult)) {
-                throw 'Вид ожидаемого результата экспертизы не может быть пустым.';
-            }
-            if (isEmptyOrNull(this._project.expectedResultDescription)) {
-                throw 'Описание ожидаемого результата экспертизы не может быть пустым.';
-            }
-            if (isEmptyOrNull(this._project.workType)) {
-                throw 'Пожалуйста, выберите вид работ/Способ реализации объекта экспертизы.';
-            }
-            if (this._project.workType === 'другое' && isEmptyOrNull(this._project.otherWorkType)) {
-                throw 'Вид работ/Способ реализации объекта экспертизы не может быть пустым.';
-            }
-            if (isEmptyOrNull(this._project.selectedResultSpecific)) {
-                throw 'Пожалуйста, выберите характер результата.';
-            }
-            if (this._project.selectedResultSpecific === ResultSpecificEnum.APPLIED) {
-                if (isEmptyOrNull(this._project.resultCommercialization)) {
-                    throw 'Пожалуйста, выберите результат подлежит коммерциализации или нет.';
-                } else {
-                    if (this._project.resultCommercialization === 'Подлежит') {
-                        if (isEmptyOrNull(this._project.commercializationDescription)) {
-                            throw 'Описание объекта коммерциализации не может быть пустым.';
+        if (!this._project.code.code.startsWith('8.10') && !this._project.code.code.startsWith('8.16')) {
+            if (this._project.expectedResult) {
+                if (this._project.expectedResult.expectedResultType === 'другое' && isEmptyOrNull(this._project.otherExpectedResult)) {
+                    throw 'Вид ожидаемого результата экспертизы не может быть пустым.';
+                }
+                if (isEmptyOrNull(this._project.expectedResultDescription)) {
+                    throw 'Описание ожидаемого результата экспертизы не может быть пустым.';
+                }
+                if (isEmptyOrNull(this._project.workType)) {
+                    throw 'Пожалуйста, выберите вид работ/Способ реализации объекта экспертизы.';
+                }
+                if (this._project.workType === 'другое' && isEmptyOrNull(this._project.otherWorkType)) {
+                    throw 'Вид работ/Способ реализации объекта экспертизы не может быть пустым.';
+                }
+                if (isEmptyOrNull(this._project.selectedResultSpecific)) {
+                    throw 'Пожалуйста, выберите характер результата.';
+                }
+                if (this._project.selectedResultSpecific === ResultSpecificEnum.APPLIED) {
+                    if (isEmptyOrNull(this._project.resultCommercialization)) {
+                        throw 'Пожалуйста, выберите результат подлежит коммерциализации или нет.';
+                    } else {
+                        if (this._project.resultCommercialization === 'Подлежит') {
+                            if (isEmptyOrNull(this._project.commercializationDescription)) {
+                                throw 'Описание объекта коммерциализации не может быть пустым.';
+                            }
+                            if (this._project.commercializationMethods.length === 0) {
+                                throw 'Пожалуйста, выберите способ коммерциализации.';
+                            }
                         }
-                        if (isEmptyOrNull(this._project.commercializationMethod)) {
-                            throw 'Пожалуйста, выберите способ коммерциализации.';
+                        if (this._project.resultCommercialization === 'Не подлежит') {
+                            if (isEmptyOrNull(this._project.implementationResult)) {
+                                throw 'Пожалуйста, выберите характер результата - прикладной.';
+                            }
+                            if (isEmptyOrNull(this._project.implementationDescription)) {
+                                throw 'Описание объекта внедрения не может быть пустым.';
+                            }
+                            if (isEmptyOrNull(this._project.implementationSpecifying)) {
+                                throw 'Указание способа внедрения не может быть пустым.';
+                            }
                         }
                     }
-                    if (this._project.resultCommercialization === 'Не подлежит') {
-                        if (isEmptyOrNull(this._project.implementationResult)) {
-                            throw 'Пожалуйста, выберите характер результата - прикладной.';
-                        }
-                        if (isEmptyOrNull(this._project.implementationDescription)) {
-                            throw 'Описание объекта внедрения не может быть пустым.';
-                        }
-                        if (isEmptyOrNull(this._project.implementationSpecifying)) {
-                            throw 'Указание способа внедрения не может быть пустым.';
-                        }
+                }
+                if (this.showTechnologyType) {
+                    if (isEmptyOrNull(this._project.technologicalOrder)) {
+                        throw 'Пожалуйста, выберите технологический уклад.';
+                    }
+                    if (this.isAnotherTechnologyType && isEmptyOrNull(this._project.otherTechnologicalOrder)) {
+                        throw 'Технологический уклад не может быть пустым.';
                     }
                 }
-            }
-            if (this.showTechnologyType) {
-                if (isEmptyOrNull(this._project.technologicalOrder)) {
-                    throw 'Пожалуйста, выберите технологический уклад.';
-                }
-                if (this.isAnotherTechnologyType && isEmptyOrNull(this._project.otherTechnologicalOrder)) {
-                    throw 'Технологический уклад не может быть пустым.';
-                }
-            }
-        } else throw 'Пожалуйста, выберите вид ожидаемого результата экспертизы.';
+            } else throw 'Пожалуйста, выберите вид ожидаемого результата экспертизы.';
+        }
     }
 
     validate() {
@@ -340,7 +343,7 @@ export class ProjectFormComponent implements OnInit {
     clearCommerceFields() {
         this._project.resultCommercialization = undefined;
 
-        this._project.commercializationMethod = undefined;
+        this._project.commercializationMethods = [];
         this._project.commercializationDescription = undefined;
 
         this._project.implementationResult = undefined;
@@ -432,13 +435,17 @@ export class ProjectFormComponent implements OnInit {
             this._project.implementationSpecifying = '';
         } else {
             this._project.resultCommercialization = 'Не подлежит'
-            this._project.commercializationMethod = '';
+            this._project.commercializationMethods = [];
             this._project.commercializationDescription = '';
         }
     }
 
-    selectCommerceResult(commerce) {
-        this._project.commercializationMethod = commerce;
+    selectCommerceResult() {
+        if (!this.selectedCommercializationMethod ) {
+            throw 'Пожалуйста, выберите способ коммерциализации.';
+        }
+        this._project.commercializationMethods.push(this.selectedCommercializationMethod);
+        this.selectedCommercializationMethod = null;
     }
 
     selectChoiceOfResultCharacterAppliedResult(selectedElement) {
