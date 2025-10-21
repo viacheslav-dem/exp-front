@@ -367,6 +367,13 @@ export class ProjectFormComponent implements OnInit {
         this.resultSpecificList = resultSpecificList;
 
         if (this._project.expectedResult) {
+            if (this._project.expectedResult.workTypeDtos.length === 1) {
+                this.disableTypeOfWorkButton = true;
+                this._project.workType = this._project.expectedResult.workTypeDtos[0].description;
+            } else {
+                this.disableTypeOfWorkButton = false;
+                this._project.workType = '';
+            }
             this.outputTypeOfWorkList = this._project.expectedResult.workTypeDtos
         } else {
             this.outputTypeOfWorkList = typeOfWorkList;
@@ -375,21 +382,15 @@ export class ProjectFormComponent implements OnInit {
         if (this._project.expectedResult && this._project.expectedResult.resultCharacter === ResultSpecificEnum.APPLIED) {
             this.clearFunctionalFields();
             this.resultSpecificList = [ResultSpecificEnum.APPLIED];
-            this.disableTypeOfWorkButton = false;
             this._project.selectedResultSpecific = ResultSpecificEnum.APPLIED;
-            this._project.workType = '';
             this.disableResultSpecificButton = true;
         } else if (this._project.expectedResult && this._project.expectedResult.resultCharacter === ResultSpecificEnum.FUNDAMENTAL) {
             this.clearAppliedFields();
             this.resultSpecificList = [ResultSpecificEnum.FUNDAMENTAL];
-            this.disableTypeOfWorkButton = true;
             this._project.selectedResultSpecific = ResultSpecificEnum.FUNDAMENTAL;
             this.disableResultSpecificButton = true;
-            this._project.workType = TypeOfWorkEnum.NIR;
         } else {
-            this.disableTypeOfWorkButton = false;
             this.disableResultSpecificButton = false;
-            this._project.workType = '';
             this._project.selectedResultSpecific = '';
         }
     }
