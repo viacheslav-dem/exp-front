@@ -199,7 +199,6 @@
                         <span class="italic">{{item}}</span>
                     </li>
                 </ul>
-                <br>
             </div>
             <div class="text-sm" *ngIf="project.resultCommercialization === 'Не подлежит'">
                 <span>Характер результата - прикладной:  </span>
@@ -216,9 +215,7 @@
                 <span class="italic" *ngIf="project.technologicalOrder !== 'другое'">{{ project.technologicalOrder }}</span>
                 <span class="italic" *ngIf="project.technologicalOrder === 'другое'">{{ project.otherTechnologicalOrder }}</span>
             </div>
-
         </div>
-
         <div class="text-sm" *ngIf="project.selectedResultSpecific === 'не предусмотрен'">
             <span>Технологический уклад: </span>
             <span class="italic" *ngIf="project.technologicalOrder !== 'другое'">{{ project.technologicalOrder }}</span>
