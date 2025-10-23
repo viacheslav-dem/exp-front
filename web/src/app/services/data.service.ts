@@ -138,4 +138,5 @@ export enum Catalog {
   SPECIALIZATION = 'specialization',
   INDUSTRIAL_PROPERTY = 'industrial-property',
   TARIFF = 'tariff',
+  COMMERCIALIZATION_METHODS = 'commercialization-methods'
 }

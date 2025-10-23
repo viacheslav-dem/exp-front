@@ -24,6 +24,9 @@ import {SocialEconomicGoalsComponent} from "@app/components/data-management/cata
 import {TariffComponent} from "@app/components/data-management/catalog/tariff/tariff.component";
 import {CurrencyComponent} from "@app/components/data-management/catalog/currency/currency.component";
 import {MethRecComponent} from "@app/components/data-management/catalog/meth-rec/meth-rec.component";
+import {
+  CommercializationMethodsComponent
+} from "@app/components/data-management/catalog/commercialization-methods/commercialization-methods.component";
 
 export const DataManagementRoutes: Route = {
   path: 'data-management',
@@ -47,7 +50,8 @@ export const DataManagementRoutes: Route = {
     {path: 'specialization', component: SpecializationComponent},
     {path: 'industrial-property', component: IndustrialPropertyComponent},
     {path: 'tariff', component: TariffComponent},
-    {path: 'meth-rec', component: MethRecComponent}
+    {path: 'meth-rec', component: MethRecComponent},
+    {path: 'commercialization-methods', component: CommercializationMethodsComponent}
   ]
 };
 
@@ -77,7 +81,8 @@ export const DataManagementRoutes: Route = {
     SocialEconomicGoalsComponent,
     TariffComponent,
     CurrencyComponent,
-    MethRecComponent
+    MethRecComponent,
+    CommercializationMethodsComponent
   ],
   providers: [],
   exports: [
@@ -98,7 +103,8 @@ export const DataManagementRoutes: Route = {
     SocialEconomicGoalsComponent,
     TariffComponent,
     CurrencyComponent,
-    MethRecComponent
+    MethRecComponent,
+    CommercializationMethodsComponent
   ]
 })
 export class DataManagementModule {
