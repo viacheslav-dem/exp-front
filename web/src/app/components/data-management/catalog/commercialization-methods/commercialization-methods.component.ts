@@ -2,7 +2,7 @@ import {Component} from "@angular/core";
 import {Catalog} from "app/services/data.service";
 
 @Component({
-    selector: 'app-areas-of-competence',
+    selector: 'app-commercialization-methods',
     template: `<app-simple-catalog
         header="Справочник способов коммерциализации"
         addLabel="Добавить способ коммерциализации"
