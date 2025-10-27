@@ -36,8 +36,6 @@ export class AgendaFormResolver {
 
   // noinspection JSMethodCanBeStatic
   getFormRenderer(code: string): Type<AgendaNewForm> {
-
-
     if (ProjectCodePlainDto.isCode(code, '12ИП')) {
       return Agenda_8_12IP_2025FormComponent;
     } else if (ProjectCodePlainDto.isCodeIn(code, 1, 2, 3, 4, 5, 7, 8, 12, 14)) {
@@ -54,7 +52,7 @@ export class AgendaFormResolver {
       return Agenda_8_13_NewFormComponent;
     } else if (ProjectCodePlainDto.isCode(code, 16)) {
       return Agenda_8_16_NewFormComponent;
-    } else if (ProjectCodePlainDto.isCodeIn(code, 8, '8БИФ', '8ЕАС')) {
+    } else if (ProjectCodePlainDto.isCodeIn(code, '8БИФ', '8ЕАС')) {
       return Agenda_8_8_Bif_Eac_FormComponent;
     } else {
       return Agenda_8_15_2025FormComponent;
