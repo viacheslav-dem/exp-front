@@ -157,7 +157,7 @@ export class ProjectFormComponent implements OnInit {
                     throw "В пункте 'Вид ожидаемого результата экспертизы.' комментарий должен быть не менее 30 символов.";
                 }
                 if (this._project.expectedResultDescription.length > 256){
-                    throw "В пункте 'Вид ожидаемого результата экспертизы.' комментарий должен быть не менее 30 символов.";
+                    throw "В пункте 'Вид ожидаемого результата экспертизы.' комментарий должен быть не более 256 символов.";
                 }
                 if (isEmptyOrNull(this._project.workType)) {
                     throw 'Пожалуйста, выберите вид работ/Способ реализации объекта экспертизы.';
@@ -180,7 +180,7 @@ export class ProjectFormComponent implements OnInit {
                                 throw "В пункте 'Описание объекта коммерциализации.' комментарий должен быть не менее 30 символов.";
                             }
                             if (this._project.commercializationDescription.length > 256){
-                                throw "В пункте 'Описание объекта коммерциализации.' комментарий должен быть не менее 30 символов.";
+                                throw "В пункте 'Описание объекта коммерциализации.' комментарий должен быть не более 256 символов.";
                             }
                             if (this._project.commercializationMethods.length === 0) {
                                 throw 'Пожалуйста, выберите способ коммерциализации.';
@@ -197,7 +197,7 @@ export class ProjectFormComponent implements OnInit {
                                 throw "В пункте 'Описание объекта внедрения.' комментарий должен быть не менее 30 символов.";
                             }
                             if (this._project.implementationDescription.length > 256){
-                                throw "В пункте 'Описание объекта внедрения.' комментарий должен быть не менее 30 символов.";
+                                throw "В пункте 'Описание объекта внедрения.' комментарий должен быть не более 256 символов.";
                             }
                             if (isEmptyOrNull(this._project.implementationSpecifying)) {
                                 throw 'Указание способа внедрения не может быть пустым.';

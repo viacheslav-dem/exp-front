@@ -50,8 +50,8 @@ export const DataManagementRoutes: Route = {
     {path: 'specialization', component: SpecializationComponent},
     {path: 'industrial-property', component: IndustrialPropertyComponent},
     {path: 'tariff', component: TariffComponent},
-    {path: 'meth-rec', component: MethRecComponent},
-    {path: 'commercialization-methods', component: CommercializationMethodsComponent}
+    {path: 'meth-rec', component: MethRecComponent}
+    // {path: 'commercialization-methods', component: CommercializationMethodsComponent}
   ]
 };
 
