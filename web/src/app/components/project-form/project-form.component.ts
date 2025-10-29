@@ -46,12 +46,12 @@ export class ProjectFormComponent implements OnInit {
     expectedResultList: any[] = [];
     outputTypeOfWorkList: any[] = typeOfWorkList;
     resultSpecificList: any[] = resultSpecificList;
-    commerceList: any[] = commerceList;
+    // commerceList: CatalogDto[] = [];
     choiceOfResultCharacterAppliedList: any[] = choiceOfResultCharacterApplied;
     technologyTypeList: any[] = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'другое'];
 
-    commercializationMethods: string[] = [];
-    selectedCommercializationMethod: string;
+    commercializationMethods: CatalogDto[] = [];
+    selectedCommercializationMethod: CatalogDto;
 
     constructor(private viewContainerRef: ViewContainerRef,
                 private _dataService: DataService,
@@ -67,6 +67,9 @@ export class ProjectFormComponent implements OnInit {
         });
         this._dataService.getExpectedResult().subscribe((res => {
             this.expectedResultList = res;
+        }))
+        this._dataService.getCommercializationMethods().subscribe((res => {
+            this.commercializationMethods = res;
         }))
     }
 

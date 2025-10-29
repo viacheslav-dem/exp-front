@@ -429,9 +429,11 @@
                     </div>
 
                     <div class="row">
-                        <app-dropdown class="dropdown btn-group col-10" [options]="(commerceList)"
-                                      [notSelected]="'Выберите способ коммерциализации'"
-                                      [(ngModel)]="selectedCommercializationMethod"></app-dropdown>
+                        <app-select-catalog [catalog]="Catalog.COMMERCIALIZATION_METHODS" [(ngModel)]="selectedCommercializationMethod"
+                                            [notSelected]="'Выберите способ коммерциализации'"></app-select-catalog>
+<!--                        <app-dropdown class="dropdown btn-group col-10" [options]="(commercializationMethods)"-->
+<!--                                      [notSelected]="'Выберите способ коммерциализации'"-->
+<!--                                      [(ngModel)]="selectedCommercializationMethod.name"></app-dropdown>-->
 
                         <div class="col-2">
                             <button class="btn btn-primary w-100" (click)="selectCommerceResult()">Добавить</button>
