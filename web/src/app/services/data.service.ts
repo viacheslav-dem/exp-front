@@ -118,6 +118,9 @@ export class DataService {
     return this._http.get(`${this.url}/expected-result`);
   }
 
+  getCommercializationMethods(): Observable<CatalogDto[]> {
+    return this._http.get(`${this.url}/commercialization-methods`)
+  }
 }
 
 export enum Catalog {

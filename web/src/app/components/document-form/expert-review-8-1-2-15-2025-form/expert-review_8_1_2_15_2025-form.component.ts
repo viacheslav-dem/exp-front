@@ -8,12 +8,26 @@ import {ExpertReviewForm} from "@app/components/document-form/expert-review-form
 import {
   ExpertReview_8_1_2_15_2025FormContent
 } from "@app/components/document-form/form-model/ExpertReview_8_1_2_15_2025FormContent";
+import {DataService} from "@app/services/data.service";
 
 @Component({
   selector: 'app-expert-review-8-1-2-15-2025-form',
   templateUrl: './expert-review_8_1_2_15_2025-form.component.html'
 })
 export class ExpertReview_8_1_2_15_2025FormComponent extends ExpertReviewForm<ExpertReview_8_1_2_15_2025FormContent> {
+
+  noveltyOptions: string[] = [];
+
+  constructor(private _dataService: DataService) {
+    super();
+  }
+
+  ngOnInit() {
+    this._dataService.getCommercializationMethods().subscribe(res => {
+      res.forEach(option => this.noveltyOptions.push(option.name))
+    })
+  }
+
   validate() {
     super.validate();
     this.validationConclusionAnalysisAndEvaluation();

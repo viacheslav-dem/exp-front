@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {anyMatch, isEmptyOrNull} from "@app/support/utils";
 import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form/agenda-new-form.service";
+import {DataService} from "@app/services/data.service";
 
 @Component({
     selector: 'app-agenda-8-1-2-3-4-5-7-8-12NIOKTR-14-2025-form',
@@ -8,9 +9,17 @@ import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form
 })
 export class Agenda_8_1_2_3_4_5_7_8_12NIOKTR_14_2025_FormComponent extends AgendaNewForm {
 
-    constructor() {
+    noveltyOptions: string[] = [];
+
+    constructor(private _dataService: DataService) {
         super();
         this.financeConclusionNum = '19.5';
+    }
+
+    ngOnInit() {
+        this._dataService.getCommercializationMethods().subscribe(res => {
+            res.forEach(option => this.noveltyOptions.push(option.name))
+        })
     }
 
     validate() {

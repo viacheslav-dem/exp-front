@@ -331,21 +331,27 @@
                     </ul>
                 </div>
             </div>
+
+
+            <div class="form-sub-group"
+                 *ngIf="_project.expectedResult && _project.expectedResult.expectedResultType == 'другое'">
+                <p class="font-italic">
+                    <b>Подсказка.</b>
+                    Введите вид ожидаемого результата: Создание новой продукции; Создание усовершенствованной продукции;
+                    Создание новой технологии; Усовершенствование технологии; Создание новой услуги; Создание нового
+                    организационно-технического решения. Допускается ввод по нескольким видам ожидаемого результата.
+                </p>
+                <textarea class="form-control" rows="2" placeholder="Введите вид ожидаемого результата"
+                          [(ngModel)]="_project.otherExpectedResult"></textarea>
+            </div>
             <p class="font-italic" *ngIf="_project.expectedResult">
                 <b>Подсказка.</b>
-
                 <!--  Пока что фиксированная подсказка, возможно потом добавится динамическая для каждого выбранного элемента -->
                 <!-- {{ _project.expectedResult.description }}-->
                 Введите описание ожидаемого результата: «Вид ожидаемого результата», будет получен с использованием
                 метода(-ов) научных исследований, (отечественной, зарубежной) технологии, новшества (указывается
                 наименование метода(-ов) научных исследований, (отечественной, зарубежной) технологии, новшества).
             </p>
-            <div class="form-sub-group"
-                 *ngIf="_project.expectedResult && _project.expectedResult.expectedResultType == 'другое'">
-                <textarea class="form-control" rows="2" placeholder="Введите вид ожидаемого результата"
-                          [(ngModel)]="_project.otherExpectedResult"></textarea>
-            </div>
-
             <div class="form-sub-group">
             <textarea class="form-control" rows="2" placeholder="Описание ожидаемого результата"
                       [(ngModel)]="_project.expectedResultDescription"></textarea>
@@ -427,7 +433,7 @@
                     <div class="form-sub-group italic">
                         <ul *ngIf="_project.commercializationMethods.length != 0">
                             <li *ngFor="let method of _project.commercializationMethods; let i = index">
-                                <span>{{ method }}: </span>
+                                <span>{{ method.name }}: </span>
                                 <a class="btn btn-icon btn-icon-sm" (click)="_project.commercializationMethods.splice(i, 1)">
                                     <fa-icon icon="minus"></fa-icon>
                                 </a>
@@ -436,10 +442,10 @@
                     </div>
 
                     <div class="row">
-                        <app-dropdown class="dropdown btn-group col-10" [options]="(commerceList)"
-                                      [notSelected]="'Выберите способ коммерциализации'"
-                                      [(ngModel)]="selectedCommercializationMethod"></app-dropdown>
-
+                        <div class="col-10">
+                            <app-select-catalog [catalog]="Catalog.COMMERCIALIZATION_METHODS" [(ngModel)]="selectedCommercializationMethod"
+                                                [notSelected]="'Выберите способ коммерциализации'"></app-select-catalog>
+                        </div>
                         <div class="col-2">
                             <button class="btn btn-primary w-100" (click)="selectCommerceResult()">Добавить</button>
                         </div>
