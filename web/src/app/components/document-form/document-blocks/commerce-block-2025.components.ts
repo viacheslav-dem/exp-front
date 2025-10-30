@@ -52,7 +52,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
 })
 export class CommerceBlock2025Component {
 
-    noveltyOptions = noveltyOptions;
+    @Input()
+    noveltyOptions: string[] = noveltyOptions;
 
     @Input()
     num: string = "3";

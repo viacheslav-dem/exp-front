@@ -4,16 +4,27 @@ import {
   ExpertReview_8_3_4_12NIOKTR_2025FormContent
 } from "@app/components/document-form/form-model/ExpertReview_8_3_4_12NIOKTR_2025FormContent";
 import {anyMatch, isEmptyOrNull} from "@app/support/utils";
-import {
-  ExpertReview_8_3_4_12NIOKTR_NewFormContent
-} from "@app/components/document-form/form-model/ExpertReview_8_3_4_12NIOKTR_NewFormContent";
 import {PeriodDto} from "@app/dto/PeriodDto";
+import {DataService} from "@app/services/data.service";
+import {CatalogDto} from "@app/dto/CatalogDto";
 
 @Component({
   selector: 'app-expert-review-8-3-4-12NIOKRT-2025-form',
   templateUrl: './expert-review_8_3_4_12-n-i-o-k-t-r_2025-form.component.html'
 })
 export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewForm<ExpertReview_8_3_4_12NIOKTR_2025FormContent> {
+
+  noveltyOptions: string[] = [];
+
+  constructor(private _dataService: DataService) {
+    super();
+  }
+
+  ngOnInit() {
+    this._dataService.getCommercializationMethods().subscribe(res => {
+      res.forEach(option => this.noveltyOptions.push(option.name))
+    })
+  }
 
   validate() {
     super.validate();

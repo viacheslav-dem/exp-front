@@ -169,12 +169,12 @@
                   class="italic">{{ project.otherExpectedResult }}</span>
         </div>
         <div class="text-sm">
-            <span>Описание ожидаемого результата экспертизы: </span>
+            <span>Ожидаемый результат объекта экспертизы: </span>
             <span class="italic">{{ project.expectedResultDescription }}</span>
         </div>
 
         <div class="text-sm">
-            <span>Вид работ: </span>
+            <span>Вид работ/Способ реализации объекта экспертизы: </span>
             <span *ngIf="project.workType !== 'другое'" class="italic">{{ project.workType }}</span>
             <span *ngIf="project.workType === 'другое'" class="italic">{{ project.otherWorkType }}</span>
         </div>
@@ -196,7 +196,7 @@
                 <span>Способ коммерциализации: </span>
                 <ul class="mb-0 pl-4">
                     <li *ngFor="let item of project.commercializationMethods">
-                        <span class="italic">{{item}}</span>
+                        <span class="italic">{{item.name}}</span>
                     </li>
                 </ul>
             </div>
