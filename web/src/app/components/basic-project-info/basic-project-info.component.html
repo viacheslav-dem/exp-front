@@ -162,14 +162,14 @@
 
     <div *ngIf="!project.code?.code.startsWith('8.10') && !project.code?.code.startsWith('8.16')">
         <div class="text-sm">
-            <span>Ожидаемый результат экспертизы: </span>
+            <span>Ожидаемый результат объекта экспертизы: </span>
             <span *ngIf="project.expectedResult && project.expectedResult.expectedResultType !== 'другое'"
                   class="italic">{{ project.expectedResult.expectedResultType }}</span>
             <span *ngIf="project.expectedResult && project.expectedResult.expectedResultType === 'другое'"
                   class="italic">{{ project.otherExpectedResult }}</span>
         </div>
         <div class="text-sm">
-            <span>Ожидаемый результат объекта экспертизы: </span>
+            <span>Описание ожидаемого результата экспертизы: </span>
             <span class="italic">{{ project.expectedResultDescription }}</span>
         </div>
 
