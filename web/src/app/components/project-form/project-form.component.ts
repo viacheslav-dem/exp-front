@@ -159,8 +159,8 @@ export class ProjectFormComponent implements OnInit {
                 if (this._project.expectedResultDescription.length < 30){
                     throw "В пункте 'Описание ожидаемого результата экспертизы.' комментарий должен быть не менее 30 символов.";
                 }
-                if (this._project.expectedResultDescription.length > 256){
-                    throw "В пункте 'Описание ожидаемого результата экспертизы.' комментарий должен быть не более 256 символов.";
+                if (this._project.expectedResultDescription.length > 500){
+                    throw "В пункте 'Описание ожидаемого результата экспертизы.' комментарий должен быть не более 500 символов.";
                 }
                 if (isEmptyOrNull(this._project.workType)) {
                     throw 'Пожалуйста, выберите вид работ/Способ реализации объекта экспертизы.';
