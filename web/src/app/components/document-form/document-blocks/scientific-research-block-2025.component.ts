@@ -9,8 +9,10 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <label>
         {{num}}. Вид научного исследования:
       </label>
-      <app-dropdown [options]="scientificResearchOptions" [(ngModel)]="_form.scientificResearch"
+        <app-dropdown *ngIf="showTarget8_3() || showTarget8_4()" [options]="scientificResearchOptions2" [(ngModel)]="_form.scientificResearch"
                     (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+        <app-dropdown *ngIf="!(showTarget8_3() || showTarget8_4())" [options]="scientificResearchOptions" [(ngModel)]="_form.scientificResearch"
+                      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       <textarea *ngIf="full" [(ngModel)]="_form.scientificResearchText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст."></textarea>
       <div *ngIf="full" class="hint">
@@ -39,6 +41,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
 export class ScientificResearchBlock2025Component {
 
     scientificResearchOptions = scientificResearchOptions;
+    scientificResearchOptions2 = scientificResearchOptions2;
 
     @Input()
     num: string = "1";
@@ -57,9 +60,25 @@ export class ScientificResearchBlock2025Component {
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+    showTarget8_3() {
+        return this.project.code.code.startsWith('8.3');
+    }
+
+    showTarget8_4() {
+        return this.project.code.code.startsWith('8.4');
+    }
+
 }
 
 export const scientificResearchOptions: string[] = [
     'фундаментальное',
     'прикладное'
+];
+
+export const scientificResearchOptions2: string[] = [
+    'фундаментальное',
+    'прикладное',
+    'ОКР',
+    'ОТР'
 ];
