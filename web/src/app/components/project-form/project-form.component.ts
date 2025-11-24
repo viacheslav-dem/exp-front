@@ -10,13 +10,14 @@ import {FundingTypePipe, getAllFundingType} from "@app/pipes/funding-type.pipe";
 import {DirectionDto} from "@app/dto/DirectionDto";
 import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
+import {SelectItem} from "@app/components/common-components/page-and-filter/model/SearchField";
 
 
 @Component({
     selector: 'app-project-form',
     templateUrl: 'project-form.component.html'
 })
-export class ProjectFormComponent implements OnInit {
+export class ProjectFormComponent implements OnInit  {
 
     @Input() optionToString: Function;
 
@@ -46,12 +47,17 @@ export class ProjectFormComponent implements OnInit {
     expectedResultList: any[] = [];
     outputTypeOfWorkList: any[] = typeOfWorkList;
     resultSpecificList: any[] = resultSpecificList;
-    // commerceList: CatalogDto[] = [];
     choiceOfResultCharacterAppliedList: any[] = choiceOfResultCharacterApplied;
     technologyTypeList: any[] = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'другое'];
 
     commercializationMethods: CatalogDto[] = [];
     selectedCommercializationMethod: CatalogDto;
+
+    specializationList: SelectItem[] = [];
+    specializationListItem: SelectItem[] = [];
+    selectedSpecialization: CatalogDto;
+
+    addSpecializationCodeDisabled: boolean = true;
 
     constructor(private viewContainerRef: ViewContainerRef,
                 private _dataService: DataService,
@@ -71,6 +77,9 @@ export class ProjectFormComponent implements OnInit {
         this._dataService.getCommercializationMethods().subscribe((res => {
             this.commercializationMethods = res;
         }))
+        this._dataService.getCatalog(Catalog.SPECIALIZATION).subscribe(res => {
+            this.specializationList = res.map((item, ind) => new SelectItem(item, item.name, item.id));
+        })
     }
 
     @Input() set project(project: ProjectDto) {
@@ -139,6 +148,7 @@ export class ProjectFormComponent implements OnInit {
         this._project.subDirections.push(this.directions[i].subDirectionDtos[j]);
       }
     }
+    this.specializationListItem = [];
     this.validate();
     if (!this.canAddSocialEconomicGoals()) {
       this._project.socialEconomicGoals = [];
@@ -231,6 +241,9 @@ export class ProjectFormComponent implements OnInit {
         }
         if (!this._project.code) {
             throw 'Пожалуйста, выберите код объекта экспертизы.';
+        }
+        if (this._project.projectSpecialization.length == 0) {
+            throw 'Пожалуйста, выберите код специализации.'
         }
         if (isEmptyOrNull(this._project.executor)) {
             throw 'Пожалуйста, укажите исполнителей и соисполнителей объекта экспертизы.';
@@ -476,6 +489,34 @@ export class ProjectFormComponent implements OnInit {
     selectTechnologyType(technologyType) {
         this._project.technologicalOrder = technologyType;
         this.isAnotherTechnologyType = this._project.technologicalOrder === 'другое';
+    }
+
+    addSpecializationCode() {
+        if (this._project.projectSpecialization) {
+            if (this._project.projectSpecialization.length >= 10) {
+                throw 'Количество выбранных кодов не может быть больше 10';
+            } else if (this._project.projectSpecialization.find(specialization => specialization.id == this.selectedSpecialization.id)) {
+                throw 'Коды не могут дублироваться'
+            } else {
+                this._project.projectSpecialization.push(this.selectedSpecialization);
+                this.specializationListItem = [];
+                this.addSpecializationCodeDisabled = true;
+            }
+        } else {
+            this._project.projectSpecialization.push(this.selectedSpecialization);
+            this.specializationListItem = [];
+            this.addSpecializationCodeDisabled = true;
+        }
+    }
+
+    selectSpecialization(specialization: SelectItem) {
+        this.selectedSpecialization = specialization.value;
+        this.addSpecializationCodeDisabled = false;
+
+    }
+    deSelectSpecialization () {
+        this.selectedSpecialization = undefined;
+        this.addSpecializationCodeDisabled = true;
     }
 }
 

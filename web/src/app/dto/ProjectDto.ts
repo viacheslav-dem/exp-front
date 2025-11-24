@@ -75,4 +75,5 @@ export class ProjectDto extends HasState {
   technologicalOrder: string;
   otherTechnologicalOrder: string;
 
+  projectSpecialization: CatalogDto[] = [];
 }

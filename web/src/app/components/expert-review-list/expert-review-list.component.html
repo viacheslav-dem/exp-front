@@ -5,6 +5,10 @@
           (click)="searchExpertComponent.show()">
     Добавить эксперта
   </button>
+    <button *ngIf="canChooseExperts" class="btn btn-sm btn-primary btn-right mr-2"
+            (click)="automaticExpertSelection()">
+        Автоматический выбор эксперта
+    </button>
 </div>
 
 <!--BODY-->

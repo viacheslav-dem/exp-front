@@ -31,6 +31,44 @@
 
         </div>
     </div>
+    <div class="form-group">
+        <div class="form-group-label"> Коды специализации:</div>
+        <div class="form-sub-group italic">
+            <ul  *ngIf="_project.projectSpecialization && _project.projectSpecialization.length != 0">
+                <li *ngFor="let specialization of _project.projectSpecialization; let i = index">
+                    <span>{{ specialization.name }}: </span>
+                    <a class="btn btn-icon btn-icon-sm" (click)="_project.projectSpecialization.splice(i, 1)">
+                        <fa-icon icon="minus"></fa-icon>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="row">
+            <div class="col-sm-10 pr-0 dropdown ">
+                <angular2-multiselect
+                        [data]="specializationList"
+                        [ngModel]="specializationListItem"
+                        [settings]="{
+                              classes: '',
+                              singleSelection: true,
+                              enableSearchFilter: true,
+                              enableFilterSelectAll: false,
+                              text: 'Выберите специализацию',
+                              searchPlaceholderText: 'Поиск...'
+                            }"
+                        (onSelect)="selectSpecialization($event)"
+                        (onDeSelect)="deSelectSpecialization()">
+                </angular2-multiselect>
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-primary w-100" [disabled]="addSpecializationCodeDisabled"
+                        (click)="addSpecializationCode()">Добавить
+                </button>
+            </div>
+        </div>
+
+
+    </div>
 
     <div class="form-group"
          *ngIf="_project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || _project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'">
