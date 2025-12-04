@@ -4,8 +4,9 @@ import {isEmptyOrNull} from "@app/support/utils";
 import {Catalog} from "@app/services/data.service";
 
 @Component({
-  selector: 'app-review-8-2-form',
-  templateUrl: './expert-review-8-2-form.component.html'
+    selector: 'app-review-8-2-form',
+    templateUrl: './expert-review-8-2-form.component.html',
+    standalone: false
 })
 export class ExpertReview_8_2_FormComponent extends ExpertReviewForm<any> {
 

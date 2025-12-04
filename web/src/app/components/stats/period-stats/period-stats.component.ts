@@ -1,41 +1,95 @@
-import {Component, ElementRef, OnInit, ViewChild} from "@angular/core";
+import {Component, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/core";
 import {StatsService} from "@app/services/stats.service";
 import {StatsDto} from "@app/dto/StatsDto";
-import * as moment from "moment";
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
+import {BsDatepickerConfig} from 'ngx-bootstrap/datepicker';
 
 @Component({
-  selector: 'app-period-stats',
-  templateUrl: './period-stats.component.html',
+    selector: 'app-period-stats',
+    templateUrl: './period-stats.component.html',
+    standalone: false
 })
-export class PeriodStatsComponent implements OnInit {
+export class PeriodStatsComponent implements OnInit, AfterViewInit {
 
-  dateFrom: number = moment().add(-1, 'year').valueOf();
-  dateTo: number = moment().valueOf();
+  dateFrom: number = dayjs().subtract(1, 'year').valueOf();
+  dateTo: number = dayjs().valueOf();
   stats: StatsDto[];
-  @ViewChild("dateFromInput") dateFromInput: ElementRef;
-  @ViewChild("dateToInput") dateToInput: ElementRef;
+  
+  dateFromValue: Date = new Date(this.dateFrom);
+  dateToValue: Date = new Date(this.dateTo);
+  
+  @ViewChild('dateFromInput', { static: false }) dateFromInput: ElementRef<HTMLInputElement>;
+  @ViewChild('dateToInput', { static: false }) dateToInput: ElementRef<HTMLInputElement>;
+  
+  datePickerConfig: Partial<BsDatepickerConfig> = {
+    minMode: 'month',
+    dateInputFormat: 'MM.yyyy', // для ngx-bootstrap (date-fns формат)
+    containerClass: 'theme-default',
+    showWeekNumbers: false
+  };
 
   constructor(private _statsService: StatsService) {
   }
 
   ngOnInit(): void {
-    this.dateFromInput.nativeElement.onchange = (e) => this.changeDateFrom(e.target.value);
-    this.dateToInput.nativeElement.onchange = (e) => this.changeDateTo(e.target.value);
     this.update();
+  }
+
+  ngAfterViewInit(): void {
+    // Обновляем отображение после инициализации
+    requestAnimationFrame(() => {
+      this.updateInputDisplay();
+    });
+  }
+
+  private updateInputDisplay(): void {
+    if (this.dateFromInput?.nativeElement && this.dateFromValue) {
+      const formatted = dayjs(this.dateFromValue).locale('ru').format('MM.YYYY');
+      if (this.dateFromInput.nativeElement.value !== formatted) {
+        this.dateFromInput.nativeElement.value = formatted;
+      }
+    }
+    if (this.dateToInput?.nativeElement && this.dateToValue) {
+      const formatted = dayjs(this.dateToValue).locale('ru').format('MM.YYYY');
+      if (this.dateToInput.nativeElement.value !== formatted) {
+        this.dateToInput.nativeElement.value = formatted;
+      }
+    }
   }
 
   update() {
-    let dateToExclusive = moment(this.dateTo).add(1, 'month').valueOf();
+    let dateToExclusive = dayjs(this.dateTo).add(1, 'month').valueOf();
     this._statsService.getStatsByMonths(this.dateFrom, dateToExclusive).subscribe(res => this.stats = res);
   }
 
-  changeDateTo(dateTo) {
-    this.dateTo = moment(dateTo, 'MMMM YYYY').valueOf();
-    this.update();
+  changeDateTo(date: Date) {
+    if (date) {
+      this.dateTo = dayjs(date).startOf('month').valueOf();
+      this.dateToValue = new Date(this.dateTo);
+      this.update();
+      // Обновляем отображение после изменения даты
+      requestAnimationFrame(() => {
+        if (this.dateToInput?.nativeElement) {
+          const formatted = dayjs(date).locale('ru').format('MM.YYYY');
+          this.dateToInput.nativeElement.value = formatted;
+        }
+      });
+    }
   }
 
-  changeDateFrom(dateFrom) {
-    this.dateFrom = moment(dateFrom, 'MMMM YYYY').valueOf();
-    this.update();
+  changeDateFrom(date: Date) {
+    if (date) {
+      this.dateFrom = dayjs(date).startOf('month').valueOf();
+      this.dateFromValue = new Date(this.dateFrom);
+      this.update();
+      // Обновляем отображение после изменения даты
+      requestAnimationFrame(() => {
+        if (this.dateFromInput?.nativeElement) {
+          const formatted = dayjs(date).locale('ru').format('MM.YYYY');
+          this.dateFromInput.nativeElement.value = formatted;
+        }
+      });
+    }
   }
 }

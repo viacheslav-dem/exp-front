@@ -118,8 +118,12 @@ export class AuthService implements OnInit {
   }
 
   updateGroupStats(): Observable<any> {
-    return this.http.getBlock<UserCredentials>(`${SERVER_URL}/info/groups`)
-      .map(credentials => this.updateCredentials(credentials));
+    return this.http.getBlock<UserCredentials>(`${SERVER_URL}/info/groups`).pipe(
+      map(credentials => {
+        this.updateCredentials(credentials);
+        return credentials;
+      })
+    );
   }
 
   updateCredentials(credentials: UserCredentials) {

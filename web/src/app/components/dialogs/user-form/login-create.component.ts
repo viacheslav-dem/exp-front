@@ -10,24 +10,25 @@ export const LC_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-login-create',
-  template: `
-    <ng-container *ngIf="_value == null">
+    selector: 'app-login-create',
+    template: `
+    @if (_value == null) {
       <button class="btn btn-primary" (click)="create()">Предоставить доступ</button>
-    </ng-container>
-    <ng-container *ngIf="_value != null">
-      <ng-container *ngIf="_value.id == 0">
+    }
+    @if (_value != null) {
+      @if (_value.id == 0) {
         <label>Логин</label>
         <div class="text-sm italic">По умолчанию будет использован первый адрес электронной почты</div>
         <input type="text" id="login" class="form-control" [(ngModel)]="_value.login" placeholder="login">
         <button class="btn btn-danger mt-05" (click)="reset()">Отмена</button>
-      </ng-container>
-      <ng-container *ngIf="_value.id != 0">
+      }
+      @if (_value.id != 0) {
         Логин: <i>{{_value.login}}</i>
-      </ng-container>
-    </ng-container>
-  `,
-  providers: [LC_CONTROL_VALUE_ACCESSOR]
+      }
+    }
+    `,
+    providers: [LC_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class LoginCreateComponent extends ControlComponent<UserDto> {
 

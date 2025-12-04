@@ -1,11 +1,12 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {ModalDirective} from "ngx-bootstrap";
+import {ModalDirective} from "ngx-bootstrap/modal";
 import {DocumentDto} from "@app/dto/DocumentDto";
 import * as _ from "lodash";
 
 @Component({
-  selector: 'app-file-editor',
-  templateUrl: './file-editor.component.html'
+    selector: 'app-file-editor',
+    templateUrl: './file-editor.component.html',
+    standalone: false
 })
 export class FileEditorComponent implements OnInit {
 

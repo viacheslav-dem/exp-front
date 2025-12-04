@@ -4,10 +4,10 @@ import {UserFormComponent} from "@app/components/dialogs/user-form/user-form.com
 
 
 @Component({
-  selector: 'app-user-info-read',
-  templateUrl: './user-info-read.component.html',
-  styles: [
-      `.img-holder
+    selector: 'app-user-info-read',
+    templateUrl: './user-info-read.component.html',
+    styles: [
+        `.img-holder
       img {
           opacity: 1;
           -webkit-transition: .3s ease-in-out;
@@ -16,7 +16,8 @@ import {UserFormComponent} from "@app/components/dialogs/user-form/user-form.com
           width: 200px;
       }
     `
-  ]
+    ],
+    standalone: false
 })
 
 

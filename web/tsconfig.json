@@ -1,0 +1,14 @@
+{
+  "extends": "./src/tsconfig.json",
+  "compileOnSave": false,
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
+    "outDir": "./out-tsc/app",
+    "types": []
+  },
+  "files": [
+    "src/main.ts",
+    "src/polyfills.ts"
+  ]
+}

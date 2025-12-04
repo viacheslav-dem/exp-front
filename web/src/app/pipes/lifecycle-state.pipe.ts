@@ -1,7 +1,10 @@
 import {Pipe} from "@angular/core";
 import {AbstractEnumPipe} from "@app/pipes/abstract-enum.pipe";
 
-@Pipe({name: 'lifecycleState'})
+@Pipe({
+    name: 'lifecycleState',
+    standalone: false
+})
 export class LifecycleStatePipe extends AbstractEnumPipe<ProjectLifecycleState> {
 
   init() {

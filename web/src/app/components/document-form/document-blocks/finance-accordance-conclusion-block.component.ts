@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 
@@ -7,9 +7,9 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Соответствие заявленного финансирования планируемому объему выполняемых работ:
+        {{num()}}. Соответствие заявленного финансирования планируемому объему выполняемых работ:
       </label>
-      <app-boolean-button [(ngModel)]="_form.financeAccordance" [trueLabel]="'соответствует'"
+      <app-boolean-button [(ngModel)]="_form().financeAccordance" [trueLabel]="'соответствует'"
                           [falseLabel]="'не соответствует'" 
                           (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
         <div class="form-sub-group">
@@ -17,26 +17,26 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
                 Обоснованность расходов по сравнению с аналогичными технологиями и (или) продукцией,
                 применяемыми и (или) выпускаемой в Республике Беларусь и (или) мире:
             </label>
-            <textarea [(ngModel)]="_form.financeValidity" rows="3" class="form-control"
+            <textarea [(ngModel)]="_form().financeValidity" rows="3" class="form-control"
                       placeholder="анализ и оценка обоснованности расходов во внедряемые технологии по объекту экспертизы">
     </textarea>
         </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class FinanceAccordanceConclusionBlockComponent {
 
-    @Input()
-    num: string = "9.3";
+    readonly num = input<string>("9.3");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    isTextRequired: boolean = false;
+    readonly isTextRequired = input<boolean>(false);
 
-    @Input()
-    _form: { financeAccordance: boolean, financeValidity: string };
+    readonly _form = input<{
+    financeAccordance: boolean;
+    financeValidity: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

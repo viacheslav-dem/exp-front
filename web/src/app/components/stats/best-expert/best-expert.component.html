@@ -1,42 +1,52 @@
 <div class="form-container">
-    <form (ngSubmit)="onSubmit()">
-        <div class="form-group">
-            <label for="startDate">Дата начала:</label>
-            <input type="date" id="startDate" [(ngModel)]="startDate" name="startDate" required>
-        </div>
-        <div class="form-group">
-            <label for="endDate">Дата конца:</label>
-            <input type="date" id="endDate" [(ngModel)]="endDate" name="endDate" required>
-        </div>
-        <div class="button-container">
-            <button type="submit">Подтвердить</button>
-        </div>
-    </form>
+  <form (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="startDate">Дата начала:</label>
+      <input type="date" id="startDate" [(ngModel)]="startDate" name="startDate" required>
+    </div>
+    <div class="form-group">
+      <label for="endDate">Дата конца:</label>
+      <input type="date" id="endDate" [(ngModel)]="endDate" name="endDate" required>
+    </div>
+    <div class="button-container">
+      <button type="submit">Подтвердить</button>
+    </div>
+  </form>
 </div>
 
-<div *ngIf="loading" class="spinner"></div>
+@if (loading()) {
+  <div class="spinner"></div>
+}
 
-<div *ngIf="expertsList.length > 0">
+@if (expertsList().length > 0) {
+  <div>
     <table class="experts-table">
-        <thead>
+      <thead>
         <tr>
-            <th>Контактные данные</th>
-            <th>Области компетенции</th>
+          <th>Контактные данные</th>
+          <th>Области компетенции</th>
         </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let expert of expertsList">
+      </thead>
+      <tbody>
+        @for (expert of expertsList(); track expert) {
+          <tr>
             <td>
-                <div>{{ expert|fullName }}</div>
-                <div class="text-sm italic text-muted">{{ expert.personInfo | academicInfo }}</div>
-                <div class="text-sm italic">{{ expert.email }}</div>
-                <div class="text-sm italic">{{ expert.phones | phones }}</div>
+              <div>{{ expert|fullName }}</div>
+              <div class="text-sm italic text-muted">{{ expert.personInfo | academicInfo }}</div>
+              <div class="text-sm italic">{{ expert.email }}</div>
+              <div class="text-sm italic">{{ expert.phones | phones }}</div>
             </td>
             <td class="text-sm">
-                <div *ngIf="expert.org?.name"> Организация:&nbsp;<span class="italic">{{ expert.org?.name }}</span> </div>
-                <div *ngIf="expert.post"> Должность:&nbsp;<span class="italic">{{ expert.post }}</span> </div>
+              @if (expert.org?.name) {
+                <div> Организация:&nbsp;<span class="italic">{{ expert.org?.name }}</span> </div>
+              }
+              @if (expert.post) {
+                <div> Должность:&nbsp;<span class="italic">{{ expert.post }}</span> </div>
+              }
             </td>
-        </tr>
-        </tbody>
+          </tr>
+        }
+      </tbody>
     </table>
-</div>
+  </div>
+}

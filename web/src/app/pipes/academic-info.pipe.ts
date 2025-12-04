@@ -5,7 +5,10 @@ import {AcademicTitlePipe, AcademicTitleType} from "@app/pipes/academic-title.pi
 import {FullDegreePipe} from "@app/pipes/full-degree.pipe";
 
 
-@Pipe({name: 'academicInfo'})
+@Pipe({
+    name: 'academicInfo',
+    standalone: false
+})
 export class AcademicInfoPipe implements PipeTransform {
 
   constructor(private _degreePipe: DegreePipe,

@@ -11,8 +11,9 @@ import {ModalComponent} from "@app/components/common-components/modal/modal.comp
 import {SearchOrgComponent} from "@app/components/search/search-org/search-org.component";
 
 @Component({
-  selector: 'app-orgs',
-  templateUrl: './orgs.component.html'
+    selector: 'app-orgs',
+    templateUrl: './orgs.component.html',
+    standalone: false
 })
 export class OrgsComponent extends FilterAndPages<OrgDto> {
 

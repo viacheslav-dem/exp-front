@@ -1,7 +1,10 @@
 import {Pipe} from "@angular/core";
 import {AbstractEnumPipe} from "@app/pipes/abstract-enum.pipe";
 
-@Pipe({name: 'lifecycleGroupState'})
+@Pipe({
+    name: 'lifecycleGroupState',
+    standalone: false
+})
 export class LifecycleGroupStatePipe extends AbstractEnumPipe<LifecycleGroupState> {
 
   init() {

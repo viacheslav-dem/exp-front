@@ -2,10 +2,7 @@ import {Filter} from "app/components/common-components/page-and-filter/model/Fil
 import {Operation} from "app/components/common-components/page-and-filter/model/FilterBuilder";
 import {DateRange, DoubleRange, Range} from "@app/components/common-components/page-and-filter/model/Range";
 import {SortOrder} from "@app/components/common-components/page-and-filter/model/SortOrder";
-// import {ListItem} from "angular2-multiselect-dropdown/multiselect.model";
-// import {DropdownSettings} from "angular2-multiselect-dropdown/multiselect.interface";
 import {Catalog} from "@app/services/data.service";
-import {isArray} from "util";
 
 export enum SearchFieldType {
   TEXT,
@@ -94,6 +91,17 @@ export class SearchField {
   }
 
   isEmpty() {
+    // Для текстовых полей пустая строка считается пустым значением
+    if (this.type === SearchFieldType.TEXT) {
+      if (this.value === null || this.value === undefined) {
+        return true;
+      }
+      if (typeof this.value === 'string') {
+        return this.value.trim().length === 0;
+      }
+      // Если значение не строка, считаем его пустым для текстового поля
+      return true;
+    }
     return !this.value;
   }
 
@@ -332,7 +340,7 @@ export class MultiSelectField extends SearchField {
   selectChanged() {
     let result = [];
     this.selectedItems.forEach(selectItem => {
-      if (!isArray(selectItem.value)) {
+      if (!Array.isArray(selectItem.value)) {
         return result.push(selectItem.value);
       } else {
         result = result.concat(selectItem.value);
@@ -351,7 +359,8 @@ export class MultiSelectField extends SearchField {
   }
 
   isEmpty() {
-    return !this.value || this.value.length == 0;
+    // Для MultiSelectField значение - это массив
+    return !this.value || !Array.isArray(this.value) || this.value.length === 0;
   }
 
   getItemAsString(item: any) {

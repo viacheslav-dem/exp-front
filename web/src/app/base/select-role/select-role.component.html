@@ -1,20 +1,47 @@
-<div class="card card-login py-3">
-  <h5 class="card-title">Выберите роль</h5>
-  <ul class="list-group">
-    <li [ngClass]="{'list-group-item list-group-item-action selectable': true,
-       'alert-danger': mapInfoRole[r].color=='red',
-       'alert-warning': mapInfoRole[r].color=='yellow',
-       'alert-primary': mapInfoRole[r].color=='blue'
-     }" *ngFor="let r of roles"
-        (click)="enterHow(r)">
-      <span class="row">
-        <div class="col-10">{{r | role}}</div>
-        <span *ngIf="mapInfoRole[r].count!=0" class="col-2 badge badge-info badge-pill">{{mapInfoRole[r].count}}</span>
-      </span>
-    <li class="list-group-item" *ngIf="roles.length == 0">Вам не назначена ни одна роль</li>
-  </ul>
-  <div class="mt-3">
-    <button class="btn btn-primary" *ngIf="currRole" (click)="cancel()">Отмена</button>
-    <button class="btn btn-primary" style="margin-left: 10px" (click)="exit()">Выход из системы</button>
+<div class="container-fluid d-flex justify-content-center align-items-center min-vh-100 py-4 px-3">
+  <div class="card border-0 shadow-lg rounded-4" [style.max-width]="roles.length >= 6 ? '700px' : '550px'" style="width: 100%;">
+    <div class="card-body p-4">
+      <h4 class="card-title fw-bold mb-3 text-center text-dark">Выберите роль</h4>
+      @if (roles.length == 0) {
+        <div class="text-center text-body-secondary py-4">
+          <i class="fas fa-info-circle me-2"></i>Вам не назначена ни одна роль
+        </div>
+      } @else {
+        <div class="roles-container">
+          <div [class]="roles.length >= 6 ? 'row g-2' : 'd-flex flex-column gap-2'">
+            @for (r of roles; track r) {
+              <div [class]="roles.length >= 6 ? 'col-12 col-md-6' : 'w-100'">
+                <div [ngClass]="{'role-item rounded-3 transition-all': true,
+                   'alert-danger': mapInfoRole[r]?.color=='red',
+                   'alert-warning': mapInfoRole[r]?.color=='yellow',
+                   'alert-primary': mapInfoRole[r]?.color=='blue'
+                 }"
+                    (click)="enterHow(r)"
+                    role="button"
+                    tabindex="0"
+                    (keyup.enter)="enterHow(r)">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="flex-grow-1 fw-semibold text-dark small">{{r | role}}</span>
+                      @if (mapInfoRole[r]?.count != 0) {
+                        <span class="badge bg-info rounded-pill ms-2 px-2 py-1 fw-semibold shadow-sm">{{mapInfoRole[r].count}}</span>
+                      }
+                    </div>
+                  </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      <div class="mt-4 pt-3 border-top d-flex gap-2 justify-content-center flex-wrap">
+        @if (currRole) {
+          <button class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-medium" (click)="cancel()">
+            <i class="fas fa-times me-2"></i>Отмена
+          </button>
+        }
+        <button class="btn btn-outline-danger rounded-pill px-4 py-2 fw-medium" (click)="exit()">
+          <i class="fas fa-sign-out-alt me-2"></i>Выход из системы
+        </button>
+      </div>
+    </div>
   </div>
 </div>

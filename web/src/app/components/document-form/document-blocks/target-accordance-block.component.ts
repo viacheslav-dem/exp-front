@@ -1,36 +1,40 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
-  selector: 'app-target-accordance-block',
-  template: `
+    selector: 'app-target-accordance-block',
+    template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Соответствие объекта государственной экспертизы заявленным целям:
+        {{num()}}. Соответствие объекта государственной экспертизы заявленным целям:
       </label>
-      <app-boolean-button [(ngModel)]="_form.targetAccordance" [trueLabel]="'соответствует'"
-                          [falseLabel]="'не соответствует'"
-                          (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <ng-container *ngIf="!_form.targetAccordance">
+      <app-boolean-button [(ngModel)]="_form().targetAccordance" [trueLabel]="'соответствует'"
+        [falseLabel]="'не соответствует'"
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      @if (!_form().targetAccordance) {
         <label>Рекомендуемые цели:</label>
-        <textarea [(ngModel)]="_form.targetSuggestion" rows="2" class="form-control"
-                  title="Рекомендуемые цели"
-                  placeholder="Рекомендуемые цели"></textarea>
-      </ng-container>
-      <textarea *ngIf="full" [(ngModel)]="_form.targetAccordanceText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
+        <textarea [(ngModel)]="_form().targetSuggestion" rows="2" class="form-control"
+          title="Рекомендуемые цели"
+        placeholder="Рекомендуемые цели"></textarea>
+      }
+      @if (full()) {
+        <textarea [(ngModel)]="_form().targetAccordanceText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
+      }
     </div>
-  `
+    `,
+    standalone: false
 })
 export class TargetAccordanceBlockComponent {
 
-  @Input()
-  num: string = "9.5";
+  readonly num = input<string>("9.5");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { targetAccordance: boolean, targetSuggestion: string, targetAccordanceText: string };
+  readonly _form = input<{
+    targetAccordance: boolean;
+    targetSuggestion: string;
+    targetAccordanceText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

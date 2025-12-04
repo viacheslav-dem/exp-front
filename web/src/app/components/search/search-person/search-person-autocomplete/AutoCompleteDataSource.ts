@@ -1,8 +1,7 @@
-import {CompleterData, CompleterItem} from "ng2-completer";
 import {Observable, Subject} from "rxjs";
 
-export class AutoCompleteDataSource extends Subject<CompleterItem[]> implements CompleterData {
-  constructor(private searchFunc: (term: string) => Observable<CompleterItem[]>) {
+export class AutoCompleteDataSource<T = any> extends Subject<T[]> {
+  constructor(private searchFunc: (term: string) => Observable<T[]>) {
     super();
   }
 

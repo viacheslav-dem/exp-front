@@ -1,11 +1,11 @@
-import {debounceTime} from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 import {Component, OnInit} from '@angular/core';
 import {ProgressService} from "./progress.service";
-import "rxjs/add/operator/debounceTime";
 
 @Component({
-  selector: 'app-progress',
-  templateUrl: './progress.component.html'
+    selector: 'app-progress',
+    templateUrl: './progress.component.html',
+    standalone: false
 })
 export class ProgressComponent implements OnInit {
 

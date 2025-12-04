@@ -6,8 +6,9 @@ import {
 } from "@app/components/document-form/form-model/ExpertReview_8_13_2025FormContent";
 
 @Component({
-  selector: 'app-review-8-13-2025-form',
-  templateUrl: './expert-review_8_13_2025-form.component.html'
+    selector: 'app-review-8-13-2025-form',
+    templateUrl: './expert-review_8_13_2025-form.component.html',
+    standalone: false
 })
 export class ExpertReview_8_13_2025FormComponent extends ExpertReviewForm<ExpertReview_8_13_2025FormContent> {
 
@@ -21,7 +22,6 @@ export class ExpertReview_8_13_2025FormComponent extends ExpertReviewForm<Expert
     if (disabled) {
       this._form.conclusion = false;
     }
-    console.log(disabled);
     return disabled;
   }
 

@@ -9,8 +9,9 @@ import {CatalogTemplate} from "app/components/data-management/catalog/CatalogTem
 import {TariffRateDto} from "@app/dto/TariffRateDto";
 
 @Component({
-  selector: 'app-project-codes',
-  templateUrl: './project-codes.component.html'
+    selector: 'app-project-codes',
+    templateUrl: './project-codes.component.html',
+    standalone: false
 })
 export class ProjectCodesComponent extends CatalogTemplate<ProjectCodeDto> {
 
@@ -20,7 +21,7 @@ export class ProjectCodesComponent extends CatalogTemplate<ProjectCodeDto> {
   constructor(public _toasty: GlobalToastyService,
               public _dataService: DataService) {
     super(_toasty, _dataService);
-    this.type = Catalog.PROJECT_CODE;
+    this._type = Catalog.PROJECT_CODE;
   }
 
   ngOnInit() {

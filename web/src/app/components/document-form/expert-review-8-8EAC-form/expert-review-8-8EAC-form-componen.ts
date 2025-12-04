@@ -9,8 +9,9 @@ import {anyMatch, isEmptyOrNull} from "@app/support/utils";
 
 
 @Component({
-  selector: 'app-review-8-8EAC-form',
-  templateUrl: './expert-review-8-8EAC-form.component.html'
+    selector: 'app-review-8-8EAC-form',
+    templateUrl: './expert-review-8-8EAC-form.component.html',
+    standalone: false
 })
 export class ExpertReview_8_8EAC_FormComponent extends ExpertReviewForm<ExpertReview_8_8EAC_FormContent> {
 

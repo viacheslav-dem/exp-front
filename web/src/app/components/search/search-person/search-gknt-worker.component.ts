@@ -4,8 +4,9 @@ import {SearchPersonComponent} from "app/components/search/search-person/search-
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 
 @Component({
-  selector: 'app-search-gknt-worker',
-  templateUrl: './search-person.component.html'
+    selector: 'app-search-gknt-worker',
+    templateUrl: './search-person.component.html',
+    standalone: false
 })
 export class SearchGkntWorkerComponent extends SearchPersonComponent {
 

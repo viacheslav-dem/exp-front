@@ -2,8 +2,9 @@ import {Component} from '@angular/core';
 import {AgendaForm} from "@app/components/document-form/meeting-protocol-form/agenda-form";
 
 @Component({
-  selector: 'app-agenda-8-6-form',
-  templateUrl: './agenda-8-6-form.component.html'
+    selector: 'app-agenda-8-6-form',
+    templateUrl: './agenda-8-6-form.component.html',
+    standalone: false
 })
 export class Agenda_8_6_FormComponent extends AgendaForm {
 

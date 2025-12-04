@@ -47,6 +47,7 @@ import {
   ExpertReview_8_13_2025FormComponent
 } from "@app/components/document-form/expert-review-8-13-2025-form/expert-review_8_13_2025-form.component";
 
+@Injectable()
 export class ExpertReviewFormResolver {
 
   private formRenderers: any = {

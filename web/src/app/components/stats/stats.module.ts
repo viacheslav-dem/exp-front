@@ -2,7 +2,6 @@ import {CommonComponentsModule} from "@app/components/common-components/componen
 import {NgModule} from "@angular/core";
 import {RealTimeStatsComponent} from "@app/components/stats/real-time-stats/real-time-stats.component";
 import {ViolationChart} from "@app/components/stats/real-time-stats/violation.chart";
-import {HighchartComponent} from "@app/components/highchart/highchart.component";
 import {PeriodStatsComponent} from "@app/components/stats/period-stats/period-stats.component";
 import {ProjectResultsChart} from "@app/components/stats/period-stats/project-results.chart";
 import {ReviewResultsChart} from "@app/components/stats/period-stats/review-results.chart";
@@ -24,15 +23,16 @@ import {CouncilProjectsChart} from "@app/components/stats/council-stats/council-
 import {SearchModule} from "@app/components/search/search.module";
 import {ResultFunComponent} from './result-fun/result-fun.component';
 import {BestExpertComponent} from './best-expert/best-expert.component';
+import {StatsRoutingModule} from './stats-routing.module';
 
 
 @NgModule({
     imports: [
         CommonComponentsModule,
-        SearchModule
+        SearchModule,
+        StatsRoutingModule
     ],
     declarations: [
-        HighchartComponent,
         ViolationChart,
         RealTimeStatsComponent,
         PeriodStatsComponent,
@@ -50,17 +50,7 @@ import {BestExpertComponent} from './best-expert/best-expert.component';
         CouncilResultsChart,
         CouncilProjectsChart,
         BestExpertComponent,
-        ResultFunComponent,
-
-    ],
-    providers: [],
-    exports: [
-        HighchartComponent,
-        RealTimeStatsComponent,
-        PeriodStatsComponent,
-        CouncilStatsComponent,
-        ResultFunComponent,
-        BestExpertComponent,
+        ResultFunComponent
     ]
 })
 export class StatsModule {

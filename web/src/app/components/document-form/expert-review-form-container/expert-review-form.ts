@@ -57,6 +57,5 @@ export class ExpertReviewForm<Form extends ExpertReviewFormContent> extends Docu
     this.notes = this._form.notes.map(name => {
       return {name: name};
     });
-    console.log(this.project);
   }
 }

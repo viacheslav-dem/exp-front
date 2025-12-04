@@ -9,53 +9,50 @@
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist",
+            "outputPath": {
+              "base": "dist"
+            },
             "index": "src/index.html",
-            "main": "src/main.ts",
             "tsConfig": "src/tsconfig.json",
             "assets": [
               "src/assets",
-              "src/WEB-INF"
+              "src/WEB-INF",
+              {
+                "glob": "pdf.worker.min.mjs",
+                "input": "node_modules/pdfjs-dist/build",
+                "output": "/assets"
+              }
             ],
             "styles": [
-              "node_modules/ng2-toasty/style-bootstrap.css",
-              "node_modules/ion-rangeslider/css/normalize.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
-              "node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.standalone.css",
               "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
-              "node_modules/angular2-multiselect-dropdown/themes/default.theme.css",
+              "node_modules/@ng-select/ng-select/themes/default.theme.css",
               "src/resources/css/style.scss"
             ],
+
             "scripts": [
               "node_modules/highcharts/highcharts.js",
               "node_modules/highcharts/modules/exporting.js",
               "node_modules/highcharts/modules/no-data-to-display.js",
               "node_modules/highcharts/highcharts-more.js",
-              "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/moment/min/moment.min.js",
-              "node_modules/moment/locale/ru.js",
-              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js",
-              "node_modules/popper.js/dist/umd/popper.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.min.js",
-              "src/resources/avest/avcmxwebp-1.1.5.js",
-              "node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js",
-              "node_modules/bootstrap-datepicker/dist/locales/bootstrap-datepicker.ru.min.js"
-            ]
+              "src/resources/avest/avcmxwebp-1.1.5.js"
+            ],
+            "aot": false,
+            "extractLicenses": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true,
+            "browser": "src/main.ts"
           },
           "configurations": {
             "production": {
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
+              "baseHref": "/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -66,27 +63,36 @@
           }
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
-            "browserTarget": "examination-web:build"
+            "buildTarget": "examination-web:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "examination-web:build:production"
+              "buildTarget": "examination-web:build:production"
             }
           }
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
-            "browserTarget": "examination-web:build"
+            "buildTarget": "examination-web:build"
           }
         },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+        "test": {
+          "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": [],
-            "exclude": []
+            "main": "src/test.ts",
+            "tsConfig": "src/tsconfig.spec.json",
+            "karmaConfig": "src/karma.conf.js",
+            "styles": [
+              "src/resources/css/style.scss"
+            ],
+            "scripts": [],
+            "assets": [
+              "src/assets",
+              "src/WEB-INF"
+            ]
           }
         }
       }
@@ -97,20 +103,42 @@
       "projectType": "application"
     }
   },
-  "defaultProject": "examination-web",
   "schematics": {
     "@schematics/angular:component": {
-      "spec": false,
+      "skipTests": true,
       "inlineTemplate": true,
       "inlineStyle": true,
       "prefix": "app",
-      "styleext": "scss"
+      "style": "scss",
+      "type": "component"
     },
     "@schematics/angular:directive": {
-      "spec": false,
+      "skipTests": true,
       "inlineTemplate": true,
       "inlineStyle": true,
-      "prefix": "app"
+      "prefix": "app",
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
     }
+  },
+  "cli": {
+    "analytics": "fb38048d-e815-4937-8740-c840a35ecc4a"
   }
 }

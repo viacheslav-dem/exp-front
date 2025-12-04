@@ -3,7 +3,7 @@ import {DocumentForm} from "@app/components/document-form/document-form";
 import {SearchPersonByRolesComponent} from "@app/components/search/search-person/search-person-by-role.component";
 import {Role} from "@app/pipes/role.pipe";
 import {PersonPlainDto} from "@app/dto/PersonPlainDto";
-import * as moment from "moment";
+import dayjs from 'dayjs';
 import {PersonService} from "@app/services/person.service";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {LifecycleGroupDto} from "@app/dto/LifecycleGroupDto";
@@ -16,9 +16,9 @@ import {Text} from "@app/components/document-form/form-model/Text";
 import {CouncilConclusionFormResolver} from "@app/components/document-form/council-conclusion-form/council-conclusion-form-resolver.service";
 
 @Component({
-  selector: 'app-council-conclusion-form',
-  templateUrl: './council-conclusion-form-container.component.html',
-  styles: [`
+    selector: 'app-council-conclusion-form',
+    templateUrl: './council-conclusion-form-container.component.html',
+    styles: [`
       ::ng-deep .hint {
           margin-top: 0.5rem;
           font-style: italic;
@@ -32,7 +32,8 @@ import {CouncilConclusionFormResolver} from "@app/components/document-form/counc
       ::ng-deep .hint ul {
           margin-bottom: 0.5rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class CouncilConclusionFormContainerComponent extends DocumentForm<CouncilConclusionFormContent> {
 
@@ -44,8 +45,8 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   _project: ProjectDto;
   _group: LifecycleGroupDto;
 
-  @ViewChild(SearchPersonByRolesComponent) public searchPersonModal: SearchPersonByRolesComponent;
-  @ViewChild('form', {read: ViewContainerRef}) formContainer: any;
+  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
+  @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
 
   constructor(private _personService: PersonService,
               private resolver: ComponentFactoryResolver,
@@ -92,8 +93,8 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
       this.formContainer.get(0).destroy();
     }
     let componentFactory = this.resolver.resolveComponentFactory(_formRenderer);
-    this.formComponent = this.formContainer.createComponent(componentFactory)._component;
-    this.formComponent.setForm(this._form.projectProtocol);
+    const componentRef = this.formContainer.createComponent(componentFactory);
+    this.formComponent = componentRef.instance as CouncilConclusionForm;
     this.formComponent.parent = this;
     this.formComponent.project = this.project;
     this.formComponent.group = this.group;
@@ -118,7 +119,7 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     this._form.chairman = this._form.chairman || this._group.bureauChairman;
     this._form.documents = this._form.documents || [];
     this.documents = this._form.documents.map(d => new Text(d));
-    this._form.innerExpertiseDate = this._form.innerExpertiseDate || moment().valueOf();
+    this._form.innerExpertiseDate = this._form.innerExpertiseDate || dayjs().valueOf();
     if (this.formComponent) {
       this.formComponent.setForm(this._form.projectProtocol);
     }

@@ -1,26 +1,168 @@
+.user-form-container {
+  padding: 0.5rem;
+}
+
 .img-holder {
-  //background: #747474;
+  position: relative;
+  
   &:hover {
     .hover-btn {
       display: block;
       position: absolute;
-      top: 0px;
-      //color: #cccccc;
-      //background: black;
-      //opacity: 0.6;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
     }
     img {
-      opacity: .5;
+      opacity: 0.6;
+      filter: blur(2px);
     }
   }
+  
   .hover-btn {
     display: none;
   }
+  
   img {
     opacity: 1;
-    -webkit-transition: .3s ease-in-out;
-    transition: .3s ease-in-out;
+    transition: all 0.3s ease-in-out;
     height: 200px;
     width: 200px;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+    object-fit: cover;
   }
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  
+  &.small {
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  &.fw-semibold {
+    font-weight: 600;
+    color: #212529;
+  }
+}
+
+.input-group {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  width: 100%;
+  
+  .form-control {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  
+  .dropdown {
+    position: static;
+    
+    &.flex-grow-1 {
+      flex: 1 1 auto;
+      min-width: 0;
+      position: relative;
+      
+      .dropdown-toggle {
+        width: 100%;
+        text-align: left;
+      }
+      
+      .dropdown-menu {
+        width: 100%;
+        min-width: 100%;
+      }
+    }
+    
+    .dropdown-toggle {
+      white-space: nowrap;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+  
+  .btn {
+    flex: 0 0 auto;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+  }
+  
+  .btn-outline-danger {
+    border-left: 0;
+  }
+  
+  // Правильное скругление для input-group
+  > .form-control:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  
+  > .dropdown:not(:first-child):not(:last-child) .dropdown-toggle {
+    border-radius: 0;
+    border-left: 0;
+  }
+  
+  > .dropdown:first-child .dropdown-toggle {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  
+  > .dropdown:last-child:not(:first-child) .dropdown-toggle {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
+  }
+  
+  > .btn-outline-danger:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
+  }
+}
+
+.degree-entry {
+  .card {
+    transition: all 0.3s ease;
+    
+    &:hover {
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Улучшение валидации Bootstrap 5
+.form-control:invalid {
+  border-color: #dc3545;
+}
+
+.form-control:valid {
+  border-color: #198754;
+}
+
+.form-control:focus:invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+.form-control:focus:valid {
+  border-color: #198754;
+  box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
 }

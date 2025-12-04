@@ -1,3 +1,12 @@
-<app-choose-files
-  [typesAccept]="typesAccept" (onFilesChosen)="onFilesChosen($event)" [controlClass]="controlClass">
-</app-choose-files>
+<div class="file-drop-zone"
+     (dragover)="onDragOver($event)"
+     (dragleave)="onDragLeave($event)"
+     (drop)="onDrop($event)"
+     [class.drag-over]="isDragOver">
+  <app-choose-files
+    [typesAccept]="typesAccept()"
+    (onFilesChosen)="onFilesChosen($event)"
+    [controlClass]="controlClass()">
+  </app-choose-files>
+  <div class="small text-muted mt-1">Перетащите файл сюда или выберите через диалог</div>
+</div>

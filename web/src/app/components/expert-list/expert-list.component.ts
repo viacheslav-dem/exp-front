@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, ViewChild, ChangeDetectionStrategy, signal, ChangeDetectorRef, AfterViewInit, OnDestroy, ElementRef, QueryList, ViewChildren} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {PersonService} from "@app/services/person.service";
 import {DialogService} from "@app/components/dialogs/dialog.service";
@@ -13,7 +13,7 @@ import {ExpertReviewState} from "@app/pipes/review-state.pipe";
 import {ProjectService} from "@app/services/project.service";
 import {Router} from "@angular/router";
 import {PersonFullNamePipe} from "@app/pipes/person-full-name.pipe";
-import * as moment from "moment";
+import dayjs from 'dayjs';
 import {AcademicTitleTypePipe, getAllAcademicTitleTypes} from "@app/pipes/academic-title.pipe";
 import {Role} from "@app/pipes/role.pipe";
 import {AuthService} from "@app/services/auth.service";
@@ -21,17 +21,25 @@ import {ExpertReviewService} from "@app/services/expert-review.service";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 
 @Component({
-  selector: 'app-expert-list',
-  templateUrl: './expert-list.component.html',
-  styleUrls: ['./expert-list.component.scss']
+    selector: 'app-expert-list',
+    templateUrl: './expert-list.component.html',
+    styleUrls: ['./expert-list.component.scss'],
+    standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ExpertListComponent extends FilterAndPages<PersonExpertDto> {
+export class ExpertListComponent extends FilterAndPages<PersonExpertDto> implements AfterViewInit, OnDestroy {
 
-  experts: PersonExpertDto[] = [];
+  experts = signal<PersonExpertDto[]>([]);
   sortOrder: SortOrder = new SortOrder('person', Direction.ASC);
   Role = Role;
-  expertId: number;
-  @ViewChild('expertPayInfo') expertPayInfoModal: ModalComponent;
+  expertId = signal<number | undefined>(undefined);
+  showFilter = signal<boolean>(false);
+  @ViewChild('expertPayInfo', { static: false }) expertPayInfoModal: ModalComponent;
+  @ViewChildren('chartContainer') chartContainers!: QueryList<ElementRef>;
+  
+  // Map для отслеживания загруженных графиков по ID эксперта
+  chartsLoaded = signal<Set<number>>(new Set());
+  private observer?: IntersectionObserver;
 
   constructor(
     private toasty: GlobalToastyService,
@@ -45,6 +53,7 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> {
     private _personPipe: PersonFullNamePipe,
     private _authService: AuthService,
     private _expertReviewService: ExpertReviewService,
+    private cdr: ChangeDetectorRef,
   ) {
     super(5);
   }
@@ -66,18 +75,105 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> {
       SearchField.contains('post').setPlaceholder('Поиск по должности...'),
       SearchField.multiSelect('areas', Catalog.AREA_OF_COMPETENCE).setSelectText('область компетенции').setSearchFilterEnabled(true),
     ];
-    this._dataService.getOrgs().subscribe(orgs => {
-      this.getSearchField('org').setItems(orgs);
+    // Load orgs after fields are initialized
+    this._dataService.getOrgs().subscribe({
+      next: (orgs) => {
+        this.getSearchField('org').setItems(orgs);
+        this.cdr.markForCheck();
+      }
     });
+    
+    // Включаем кэш фильтров и загружаем начальные данные
     this.enableFilterCache("experts");
+    
+    // Initial load - update будет вызван автоматически в enableFilterCache если есть сохраненное состояние
+    // Если нет сохраненного состояния, вызываем update после небольшой задержки
+    setTimeout(() => {
+      // Проверяем, был ли уже вызван update через enableFilterCache
+      // Используем флаг _initialLoadDone вместо _loading, так как setLoading использует setTimeout
+      if (!(this as any)._initialLoadDone) {
+        (this as any)._initialLoadDone = true;
+        this.update();
+      }
+    }, 150);
   }
 
   loadPage() {
-    this._personService.searchExperts(this._searchRequest).subscribe(res => {
-      this._page = res;
-      this.experts = res.content;
-      this.setLoading(false);
-    }, () => this.setLoading(false));
+    // Очищаем список экспертов при начале новой загрузки
+    this.experts.set([]);
+    this._personService.searchExperts(this._searchRequest).subscribe({
+      next: (res) => {
+        this._page = res;
+        this.experts.set(res.content);
+        this.setLoading(false);
+        this.cdr.markForCheck();
+        // После обновления списка экспертов, обновляем observer
+        // Используем requestAnimationFrame для гарантии, что DOM обновлен
+        requestAnimationFrame(() => {
+          this.observeChartContainers();
+        });
+      },
+      error: () => {
+        this.setLoading(false);
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  ngAfterViewInit() {
+    this.setupIntersectionObserver();
+    // Подписываемся на изменения QueryList
+    this.chartContainers.changes.subscribe(() => {
+      this.observeChartContainers();
+    });
+    // Первоначальная установка observer
+    setTimeout(() => this.observeChartContainers(), 0);
+  }
+
+  ngOnDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  }
+
+  private setupIntersectionObserver() {
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const expertId = parseInt(entry.target.getAttribute('data-expert-id') || '0', 10);
+          if (expertId && !this.chartsLoaded().has(expertId)) {
+            const loaded = new Set(this.chartsLoaded());
+            loaded.add(expertId);
+            this.chartsLoaded.set(loaded);
+            this.cdr.markForCheck();
+            // Отключаем наблюдение для этого элемента после загрузки
+            this.observer?.unobserve(entry.target);
+          }
+        }
+      });
+    }, {
+      rootMargin: '100px' // Начинаем загрузку за 100px до появления в viewport
+    });
+  }
+
+  private observeChartContainers() {
+    if (!this.observer) {
+      return;
+    }
+    
+    // Очищаем предыдущие наблюдения
+    this.observer.disconnect();
+    
+    // Добавляем наблюдение за новыми контейнерами
+    this.chartContainers.forEach(container => {
+      if (container.nativeElement) {
+        this.observer?.observe(container.nativeElement);
+      }
+    });
+  }
+
+  isChartsLoaded(expertId: number): boolean {
+    return this.chartsLoaded().has(expertId);
   }
 
   getSortOrders() {
@@ -116,7 +212,7 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> {
     this._projectService.filter = FilterBuilder.and('', [
       FilterBuilder.equals('expertReviews.expert', expert.id),
       FilterBuilder.equals('expertReviews.state', ExpertReviewState.ON_EXAMINATION),
-      FilterBuilder.dateRange('expertReviews.stateEndDate', null, moment().add(-1, 'days').valueOf())
+      FilterBuilder.dateRange('expertReviews.stateEndDate', null, dayjs().subtract(1, 'day').valueOf())
     ]);
     this._router.navigateByUrl('projects-filtered').then();
   }
@@ -126,7 +222,7 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> {
   }
 
   showExpertPayInfoDialog(expert: PersonExpertDto) {
-    this.expertId = expert.id;
+    this.expertId.set(expert.id);
     this.expertPayInfoModal.show();
   }
 }

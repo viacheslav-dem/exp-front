@@ -1,18 +1,19 @@
 <div class="row">
   <!--data-->
   <div class="card mx-3" style="display: block">
-    <h5 class="card-title">Бухгалтерский учёт<span *ngIf="filterName">: {{filterName}}</span></h5>
+    <h5 class="card-title">Бухгалтерский учёт@if (filterName()) {
+      <span>: {{filterName()}}</span>
+    }</h5>
     <h6 class="card-title">Сведения по ФСЗН</h6>
     <div>
       <div class="row">
         <div class="col">
-          <div class="input-group input-group-sm date input-daterange"
-               data-date-autoclose="true" data-date-language="ru" data-provide="datepicker" data-date-format="dd.mm.yyyy">
-            <input #dateFromInput class="form-control" title="Начальная дата" [value]="dateFrom | mdate">
+          <div class="input-group input-group-sm">
+            <app-date-input [ngModel]="dateFrom()" (ngModelChange)="dateFrom.set($event)" (onSelect)="changeDateFromValue($event)" title="Начальная дата"></app-date-input>
             <div class="input-group-append input-group-prepend">
               <div class="input-group-text">-</div>
             </div>
-            <input #dateToInput class="form-control" title="Конечная дата" [value]="dateTo | mdate">
+            <app-date-input [ngModel]="dateTo()" (ngModelChange)="dateTo.set($event)" (onSelect)="changeDateToValue($event)" title="Конечная дата"></app-date-input>
             <div class="input-group-append">
               <div class="input-group-text">
                 <fa-icon icon="calendar"></fa-icon>
@@ -28,194 +29,239 @@
     </div>
     <h6 class="card-title">Сведения по оплате</h6>
     <app-filter
-        [fieldClass]="'d-inline-block mr-3 align-top'" [fields]="_searchFields"
-        (onFilterChanged)="onFilterChanged()">
+      [fieldClass]="'d-inline-block mr-3 align-top'" [fields]="_searchFields"
+      (onFilterChanged)="onFilterChanged()">
     </app-filter>
     <div [loadingData]="_loading" class="mt-2">
-      <table *ngIf="accounting.length > 0" class="table table-responsive mb-0">
-        <thead>
-        <tr>
-          <th (click)="sortBy('id')" class="text-nowrap selectable">
-            <span>ID</span>
-            <fa-icon class="fa-active" *ngIf="sortOrder.property == 'id'"
-                     [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
-          </th>
-          <th (click)="sortBy('contractDate')" class="text-nowrap selectable">
-            <div>Дата</div>
-            <div>выставления</div>
-            <div>оплаты</div>
-            <fa-icon class="fa-active" *ngIf="sortOrder.property == 'contractDate'"
-                     [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
-          </th>
-          <th (click)="sortBy('payDate')" class="text-nowrap selectable">
-            <div>Дата</div>
-            <div>оплаты</div>
-            <fa-icon class="fa-active" *ngIf="sortOrder.property == 'payDate'"
-                     [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
-          </th>
-<!--          <th (click)="sortBy('stateStartDate')" class="text-nowrap selectable">-->
-<!--            <div>Дата </div>-->
-<!--            <span>изменения </span>-->
-<!--            <fa-icon class="fa-active" *ngIf="sortOrder.property == 'stateStartDate'"-->
-<!--                     [icon]="SortClass[this.sortOrder.direction]"></fa-icon>-->
-<!--          </th>-->
+      @if (accounting().length > 0) {
+        <table class="table table-responsive mb-0">
+          <thead>
+            <tr>
+              <th (click)="sortBy('id')" class="text-nowrap selectable">
+                <span>ID</span>
+                @if (sortOrder.property == 'id') {
+                  <fa-icon class="fa-active"
+                  [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+                }
+              </th>
+              <th (click)="sortBy('contractDate')" class="text-nowrap selectable">
+                <div>Дата</div>
+                <div>выставления</div>
+                <div>оплаты</div>
+                @if (sortOrder.property == 'contractDate') {
+                  <fa-icon class="fa-active"
+                  [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+                }
+              </th>
+              <th (click)="sortBy('payDate')" class="text-nowrap selectable">
+                <div>Дата</div>
+                <div>оплаты</div>
+                @if (sortOrder.property == 'payDate') {
+                  <fa-icon class="fa-active"
+                  [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+                }
+              </th>
+              <!--          <th (click)="sortBy('stateStartDate')" class="text-nowrap selectable">-->
+              <!--            <div>Дата </div>-->
+              <!--            <span>изменения </span>-->
+              <!--            <fa-icon class="fa-active" *ngIf="sortOrder.property == 'stateStartDate'"-->
+            <!--                     [icon]="SortClass[this.sortOrder.direction]"></fa-icon>-->
+          <!--          </th>-->
           <th (click)="sortBy('person')" class="text-nowrap selectable">
             <div>Получатель </div>
             <span>платежа </span>
-            <fa-icon class="fa-active" *ngIf="sortOrder.property == 'person'"
-                     [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            @if (sortOrder.property == 'person') {
+              <fa-icon class="fa-active"
+              [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            }
           </th>
           <th (click)="sortBy('paySum')" class="text-nowrap selectable">
             <span>Сумма, BYN </span>
-            <fa-icon class="fa-active" *ngIf="sortOrder.property == 'paySum'"
-                     [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            @if (sortOrder.property == 'paySum') {
+              <fa-icon class="fa-active"
+              [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            }
           </th>
           <th (click)="sortBy('state')" class="selectable text-nowrap">
             <span>Статус </span>
-            <fa-icon class="fa-active" *ngIf="sortOrder.property == 'state'"
-                     [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            @if (sortOrder.property == 'state') {
+              <fa-icon class="fa-active"
+              [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            }
           </th>
           <th (click)="sortBy('contractDate')" class="text-nowrap selectable">
             <span>Договор </span>
-            <fa-icon class="fa-active" *ngIf="sortOrder.property == 'contractDate'"
-                     [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            @if (sortOrder.property == 'contractDate') {
+              <fa-icon class="fa-active"
+              [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            }
           </th>
           <th (click)="sortBy('actDate')" class="text-nowrap selectable">
             <span>Акт </span>
-            <fa-icon class="fa-active" *ngIf="sortOrder.property == 'actDate'"
-                     [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            @if (sortOrder.property == 'actDate') {
+              <fa-icon class="fa-active"
+              [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            }
           </th>
           <th (click)="sortBy('accountingType')" class="selectable text-nowrap">
             <span>Тип </span>
-            <fa-icon class="fa-active" *ngIf="sortOrder.property == 'accountingType'"
-                     [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            @if (sortOrder.property == 'accountingType') {
+              <fa-icon class="fa-active"
+              [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            }
           </th>
           <th (click)="sortBy('description')" class="text-nowrap selectable" style="width: 100%;min-width: 170px">
             <span>Описание </span>
-            <fa-icon class="fa-active" *ngIf="sortOrder.property == 'description'"
-                     [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            @if (sortOrder.property == 'description') {
+              <fa-icon class="fa-active"
+              [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+            }
           </th>
         </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let record of accounting" class="list-group-item-action"
+      </thead>
+      <tbody>
+        @for (record of accounting(); track record) {
+          <tr class="list-group-item-action"
             [ngClass]="{'alert-danger': record.red,'alert-warning': record.yellow,'alert-primary': record.blue}">
-          <td class="text-nowrap">
-            <div>{{record.id}}</div>
-          </td>
-          <td class="text-nowrap">
-            <div>{{record.contractDate | mdate}}</div>
-          </td>
-          <td class="text-nowrap">
-            <div>{{record.payDate | mdate: 2 | orElse: 'не оплачено'}}</div>
-          </td>
-<!--          <td>-->
-<!--            <div class="text-nowrap">{{record.stateStartDate | date:'dd.MM.yyyy HH:mm'}}</div>-->
-<!--            <div *ngIf="record.termsMessage" class="text-sm bold italic text-muted">{{record.termsMessage}}</div>-->
-<!--          </td>-->
+            <td class="text-nowrap">
+              <div>{{record.id}}</div>
+            </td>
+            <td class="text-nowrap">
+              <div>{{record.contractDate | mdate}}</div>
+            </td>
+            <td class="text-nowrap">
+              <div>{{record.payDate | mdate: 2 | orElse: 'не оплачено'}}</div>
+            </td>
+            <!--          <td>-->
+            <!--            <div class="text-nowrap">{{record.stateStartDate | date:'dd.MM.yyyy HH:mm'}}</div>-->
+            <!--            <div *ngIf="record.termsMessage" class="text-sm bold italic text-muted">{{record.termsMessage}}</div>-->
+          <!--          </td>-->
           <td>{{record.person | fullName}}</td>
           <td class="text-nowrap">
             <div>
               К оплате:
               <span class="italic">{{record.paySum | number: 2 | orElse: 'не начислено'}}</span>
             </div>
-<!--            <div>-->
-<!--              Пенс. страхование:-->
-<!--              <span class="italic">{{record.pensionInsurance | number: 2 | orElse: 'не начислено'}}</span>-->
-<!--            </div>-->
-<!--            <div>-->
-<!--              Соц. страхование:-->
-<!--              <span class="italic">{{record.socialInsurance | number: 2 | orElse: 'не начислено'}}</span>-->
-<!--            </div>-->
-
-            <div *ngIf="record.state == AccountingState.PAYMENT_WAITING || record.state == AccountingState.FINISHED">
-              Оплачено:
-              <span class="italic">{{record.actuallyPaid}}</span>
-            </div>
-          </td>
-          <td>
-            <div *ngIf="record.state == AccountingState.FINISHED" class="alert-success px-1">
-              {{record.state | accountingState}}
-            </div>
-            <div *ngIf="record.state == AccountingState.CONTRACT_CREATED">
-              {{record.state | accountingState}}
-            </div>
-            <div *ngIf="record.state == AccountingState.PAYMENT_WAITING" class="link selectable"
-                 (click)="showFinishAccountingModal(record)">
-              {{record.state | accountingState}}
-            </div>
-          </td>
-          <td class="text-nowrap">
-            <div *ngIf="!record.contract || record.accountingType == 'COUNCIL_ASSESSOR'">отсутствует</div>
-            <div *ngIf="record.contract && !(record.accountingType == 'COUNCIL_ASSESSOR')">
-              <div>
-                <a class="btn btn-icon" (click)="downloadDocument(record.contract)">
-                  <fa-icon icon="arrow-down"></fa-icon>
-                </a>
-                <a *ngIf="record.contract.hasDocx" class="btn btn-icon" (click)="downloadDocxDocument(record.contract)">
+            <!--            <div>-->
+            <!--              Пенс. страхование:-->
+            <!--              <span class="italic">{{record.pensionInsurance | number: 2 | orElse: 'не начислено'}}</span>-->
+          <!--            </div>-->
+          <!--            <div>-->
+          <!--              Соц. страхование:-->
+          <!--              <span class="italic">{{record.socialInsurance | number: 2 | orElse: 'не начислено'}}</span>-->
+        <!--            </div>-->
+        @if (record.state == AccountingState.PAYMENT_WAITING || record.state == AccountingState.FINISHED) {
+          <div>
+            Оплачено:
+            <span class="italic">{{record.actuallyPaid}}</span>
+          </div>
+        }
+      </td>
+      <td>
+        @if (record.state == AccountingState.FINISHED) {
+          <div class="alert-success px-1">
+            {{record.state | accountingState}}
+          </div>
+        }
+        @if (record.state == AccountingState.CONTRACT_CREATED) {
+          <div>
+            {{record.state | accountingState}}
+          </div>
+        }
+        @if (record.state == AccountingState.PAYMENT_WAITING) {
+          <div class="link selectable"
+            (click)="showFinishAccountingModal(record)">
+            {{record.state | accountingState}}
+          </div>
+        }
+      </td>
+      <td class="text-nowrap">
+        @if (!record.contract || record.accountingType == 'COUNCIL_ASSESSOR') {
+          <div>отсутствует</div>
+        }
+        @if (record.contract && !(record.accountingType == 'COUNCIL_ASSESSOR')) {
+          <div>
+            <div>
+              <a class="btn btn-icon" (click)="downloadDocument(record.contract)">
+                <fa-icon icon="arrow-down"></fa-icon>
+              </a>
+              @if (record.contract.hasDocx) {
+                <a class="btn btn-icon" (click)="downloadDocxDocument(record.contract)">
                   <fa-icon icon="file-word"></fa-icon>
                 </a>
-                <a class="btn btn-icon" (click)="showDocument(record.contract)">
-                  <fa-icon icon="eye"></fa-icon>
-                </a>
-              </div>
-              <div>{{record.contractDate | mdate}}</div>
-              <div>
-                <button class="btn btn-sm btn-primary p-0 text-mini" (click)="refreshContract(record)"
-                        style="">Пересоздать
-                </button>
-              </div>
+              }
+              <a class="btn btn-icon" (click)="showDocument(record.contract)">
+                <fa-icon icon="eye"></fa-icon>
+              </a>
             </div>
-          </td>
-          <td class="text-nowrap">
-            <div *ngIf="!record.act">отсутствует</div>
-            <div *ngIf="record.act">
-              <div>
-                <a class="btn btn-icon" (click)="downloadDocument(record.act)">
-                  <fa-icon icon="arrow-down"></fa-icon>
-                </a>
-                <a *ngIf="record.act.hasDocx" class="btn btn-icon" (click)="downloadDocxDocument(record.act)">
+            <div>{{record.contractDate | mdate}}</div>
+            <div>
+              <button class="btn btn-sm btn-primary p-0 text-mini" (click)="refreshContract(record)"
+                style="">Пересоздать
+              </button>
+            </div>
+          </div>
+        }
+      </td>
+      <td class="text-nowrap">
+        @if (!record.act) {
+          <div>отсутствует</div>
+        }
+        @if (record.act) {
+          <div>
+            <div>
+              <a class="btn btn-icon" (click)="downloadDocument(record.act)">
+                <fa-icon icon="arrow-down"></fa-icon>
+              </a>
+              @if (record.act.hasDocx) {
+                <a class="btn btn-icon" (click)="downloadDocxDocument(record.act)">
                   <fa-icon icon="file-word"></fa-icon>
                 </a>
-                <a class="btn btn-icon" (click)="showDocument(record.act)">
-                  <fa-icon icon="eye"></fa-icon>
-                </a>
-              </div>
-              <div>{{record.actDate | mdate}}</div>
-              <div>
-                <button class="btn btn-sm btn-primary p-0 text-mini" (click)="refreshAct(record)">Пересоздать</button>
-              </div>
+              }
+              <a class="btn btn-icon" (click)="showDocument(record.act)">
+                <fa-icon icon="eye"></fa-icon>
+              </a>
             </div>
-          </td>
-          <td class="text-nowrap">{{record.accountingType | accountingType}}</td>
-          <td>{{record.description}}</td>
-        </tr>
-        </tbody>
-      </table>
-      <div *ngIf="accounting.length == 0" class="alert alert-info italic mb-0">Записи отсутствуют</div>
-      <app-pagination [page]="_page" [pagination]="_pagination"
-                      (onPageChanged)="onPageChanged($event)"></app-pagination>
-    </div>
-  </div>
+            <div>{{record.actDate | mdate}}</div>
+            <div>
+              <button class="btn btn-sm btn-primary p-0 text-mini" (click)="refreshAct(record)">Пересоздать</button>
+            </div>
+          </div>
+        }
+      </td>
+      <td class="text-nowrap">{{record.accountingType | accountingType}}</td>
+      <td>{{record.description}}</td>
+    </tr>
+  }
+</tbody>
+</table>
+}
+@if (_page.totalElements != null && _page.totalElements === 0 && accounting().length == 0) {
+  <div class="alert alert-info italic mb-0">Записи отсутствуют</div>
+}
+<app-pagination [page]="_page" [pagination]="_pagination"
+(onPageChanged)="onPageChanged($event)"></app-pagination>
+</div>
+</div>
 </div>
 
 
 <div bsModal #fileViewerModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <app-pdf-viewer [doc]="selectedDocument"></app-pdf-viewer>
+      <app-pdf-viewer [doc]="selectedDocument()"></app-pdf-viewer>
     </div>
   </div>
 </div>
 
 <app-modal #confirmFinishAccountingModal [title]="'Отметить проведение оплаты?'">
-  <div>Получатель платежа: <span class="italic">{{selectedRecord?.person | fullName}}</span></div>
-  <div>Тип: <span class="italic">{{selectedRecord?.accountingType | accountingType}}</span></div>
-  <div>Описание: <span class="italic">{{selectedRecord?.description}}</span></div>
-  <div>Всего к оплате: <span class="italic">{{fixed(selectedRecord?.paySum)}}</span></div>
-  <input #paySumInput name="_pay_sum" type="text" class="form-control" placeholder="{{fixed(selectedRecord?.paySum)}}" value="{{fixed(selectedRecord?.paySum)}}">
-  <div>Дата проведения оплаты ({{selectedRecord?.stateStartDate | date:'dd.MM.yyyy HH:mm'}} {{selectedRecord?.termsMessage}}):</div>
-  <app-date-input [(ngModel)]="payDate"></app-date-input>
+  <div>Получатель платежа: <span class="italic">{{selectedRecord()?.person | fullName}}</span></div>
+  <div>Тип: <span class="italic">{{selectedRecord()?.accountingType | accountingType}}</span></div>
+  <div>Описание: <span class="italic">{{selectedRecord()?.description}}</span></div>
+  <div>Всего к оплате: <span class="italic">{{fixed(selectedRecord()?.paySum)}}</span></div>
+  <input #paySumInput name="_pay_sum" type="text" class="form-control" placeholder="{{fixed(selectedRecord()?.paySum)}}" value="{{fixed(selectedRecord()?.paySum)}}">
+  <div>Дата проведения оплаты ({{selectedRecord()?.stateStartDate | date:'dd.MM.yyyy HH:mm'}} {{selectedRecord()?.termsMessage}}):</div>
+  <app-date-input [ngModel]="payDate()" (ngModelChange)="payDate.set($event)"></app-date-input>
   <div class="mt-4">
     <button type="button" class="btn btn-danger" (click)="closeFinishAccountingModal()">Отмена</button>
     <button type="button" class="btn btn-primary" (click)="finishAccounting()">Оплачено</button>

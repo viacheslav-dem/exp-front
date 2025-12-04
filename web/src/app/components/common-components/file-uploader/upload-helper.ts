@@ -1,27 +1,26 @@
-import {OnInit} from "@angular/core";
-import {FileUploader} from "ng2-file-upload";
+import {OnInit, Directive} from "@angular/core";
 import {AuthService} from "@app/services/auth.service";
+import { HttpClient, HttpEvent, HttpEventType, HttpHeaders, HttpRequest, HttpBackend } from "@angular/common/http";
 
+@Directive()
 export abstract class UploadHelper implements OnInit {
 
-  fileUploader: FileUploader;
   progressValue: number = 0;
   file: File;
 
-  constructor(protected _authService: AuthService) {
-    this.fileUploader = new FileUploader({
-      authToken: _authService.getToken(),
-      autoUpload: true,
-    });
+  // HttpClient без интерсепторов
+  protected _httpRaw: HttpClient;
+
+  constructor(protected _authService: AuthService,
+              httpBackend: HttpBackend) {
+    this._httpRaw = new HttpClient(httpBackend);
   }
 
   ngOnInit(): void {
   }
 
-  onSuccess: any = () => {
-  };
-  onError: any = () => {
-  };
+  onSuccess: any = () => {};
+  onError: any = () => {};
   onProgress: any = (fileItem: any, progress: any) => {
     this.progressValue = progress;
   };
@@ -33,10 +32,48 @@ export abstract class UploadHelper implements OnInit {
   abstract getUrl(): string;
 
   saveFile() {
-    this.fileUploader.onSuccessItem = this.onSuccess;
-    this.fileUploader.onProgressItem = this.onProgress;
-    this.fileUploader.onErrorItem = this.onError;
-    this.fileUploader.options.url = this.getUrl();
-    this.fileUploader.addToQueue([this.file], this.getOptions());
+    if (!this.file) {
+      return;
+    }
+
+    const url = this.getUrl();
+    const formData = new FormData();
+    formData.append("file", this.file);
+
+    const extraOptions: any = this.getOptions() || {};
+    const extraHeaders = extraOptions.headers || {};
+
+    // ВАЖНО: не задаём Content-Type вручную, чтобы браузер поставил multipart/form-data
+    const headers = new HttpHeaders({
+      Authorization: this._authService.getToken(),
+      ...extraHeaders
+    });
+
+    const req = new HttpRequest("POST", url, formData, {
+      reportProgress: true,
+      headers
+    });
+
+    this._httpRaw.request(req).subscribe({
+      next: (event: HttpEvent<any>) => {
+        if (event.type === HttpEventType.UploadProgress && event.total) {
+          const progress = Math.round((100 * event.loaded) / event.total);
+          this.onProgress(null, progress);
+        }
+        if (event.type === HttpEventType.Response) {
+          const body =
+            typeof event.body === "string"
+              ? event.body
+              : JSON.stringify(event.body);
+          this.onSuccess(null, body);
+        }
+      },
+      error: (err) => {
+        const status = err.status;
+        const response =
+          typeof err.error === "string" ? err.error : err.message || "";
+        this.onError(null, response, status);
+      }
+    });
   }
 }

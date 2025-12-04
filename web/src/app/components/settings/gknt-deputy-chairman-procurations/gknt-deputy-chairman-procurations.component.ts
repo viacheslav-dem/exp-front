@@ -1,5 +1,7 @@
 import {Component, ViewChild} from '@angular/core';
 import {PropertyComponent} from "@app/components/settings/property.component";
+import {DataService} from "@app/services/data.service";
+import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {PropertyDto} from "@app/dto/PropertyDto";
 import * as _ from "lodash";
 import {Role} from "@app/pipes/role.pipe";
@@ -7,10 +9,16 @@ import {PersonPlainDto} from "@app/dto/PersonPlainDto";
 import {SearchPersonByRolesComponent} from "@app/components/search/search-person/search-person-by-role.component";
 
 @Component({
-  selector: 'app-gknt-deputy-chairman-procurations',
-  templateUrl: './gknt-deputy-chairman-procurations.component.html'
+    selector: 'app-gknt-deputy-chairman-procurations',
+    templateUrl: './gknt-deputy-chairman-procurations.component.html',
+    standalone: false
 })
 export class GkntDeputyChairmanProcurationsComponent extends PropertyComponent<Procurations> {
+
+  constructor(protected _dataService: DataService,
+              protected _toasty: GlobalToastyService) {
+    super(_dataService, _toasty);
+  }
 
   Role = Role;
 
@@ -19,7 +27,7 @@ export class GkntDeputyChairmanProcurationsComponent extends PropertyComponent<P
   editedPerson: string;
   editedProcuration: Procuration;
 
-  @ViewChild(SearchPersonByRolesComponent) public searchPersonModal: SearchPersonByRolesComponent;
+  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
 
   setProperty(property: PropertyDto) {
     super.setProperty(property);

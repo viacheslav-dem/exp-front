@@ -4,13 +4,14 @@ import {ProjectState, ProjectStateBadge} from "app/pipes/project-state.pipe";
 import {TransitionDto} from "@app/dto/TransitionDto";
 
 @Component({
-  selector: 'app-project-transition-history',
-  templateUrl: './project-transition-history.component.html',
-  styles: [`
+    selector: 'app-project-transition-history',
+    templateUrl: './project-transition-history.component.html',
+    styles: [`
       table {
           font-size: 0.875rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class ProjectTransitionHistoryComponent implements OnInit {
 

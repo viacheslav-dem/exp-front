@@ -1,14 +1,16 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, input} from "@angular/core";
 import {DocumentFormContainerComponent} from "@app/components/document-form/document-form-container/document-form-container.component";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ExpertReviewFormContent} from "@app/components/document-form/form-model/ExpertReviewFormContent";
 import {ExpertReviewForm} from "@app/components/document-form/expert-review-form-container/expert-review-form";
 import {TemplateType} from "@app/components/document-form/form-model/TemplateType";
+import {DraftService} from "@app/components/document-form/draft.service";
+import {IdDto} from "@app/dto/IdDto";
 
 @Component({
-  selector: 'app-expert-review-form',
-  templateUrl: 'expert-review-form-container.component.html',
-  styles: [`
+    selector: 'app-expert-review-form',
+    templateUrl: 'expert-review-form-container.component.html',
+    styles: [`
       ::ng-deep .hint {
           margin-top: 0.5rem;
           font-style: italic;
@@ -22,11 +24,16 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
       ::ng-deep .hint ul {
           margin-bottom: 0.5rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormContent> extends DocumentFormContainerComponent<Form> {
 
   _project: ProjectDto;
+
+  // Override parent @Input to expose as component input (parent field is used directly)
+  readonly draftService = input<DraftService<Form>>(undefined);
+  readonly draftOwner = input<IdDto>(undefined);
 
   @Input()
   set project(project) {

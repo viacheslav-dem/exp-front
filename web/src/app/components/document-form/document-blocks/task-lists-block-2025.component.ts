@@ -1,18 +1,21 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 
 @Component({
     selector: 'app-task-lists-block-2025',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Оценка перечня задач проекта, планируемый способ их реализации и обеспечение достижения поставленных целей проекта:
+        {{num()}}. Оценка перечня задач проекта, планируемый способ их реализации и обеспечение достижения поставленных целей проекта:
       </label>
-      <app-dropdown [options]="taskListsOptions" [(ngModel)]="_form.taskLists"
-                    (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      <textarea *ngIf="full" [(ngModel)]="_form.taskListsText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
+      <app-dropdown [options]="taskListsOptions" [(ngModel)]="_form().taskLists"
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      @if (full()) {
+        <textarea [(ngModel)]="_form().taskListsText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
+      }
     </div>
-  `
+    `,
+    standalone: false
 })
 export class TaskListsBlock2025Component {
 
@@ -21,14 +24,14 @@ export class TaskListsBlock2025Component {
         'недостаточна',
     ];
 
-    @Input()
-    num: string = "3.2";
+    readonly num = input<string>("3.2");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { taskLists: string, taskListsText: string };
+    readonly _form = input<{
+    taskLists: string;
+    taskListsText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

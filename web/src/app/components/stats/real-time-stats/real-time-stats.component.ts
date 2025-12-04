@@ -10,9 +10,10 @@ import {AccountingState} from "@app/pipes/accounting.pipe";
 import {ExpertReviewState} from "@app/pipes/review-state.pipe";
 
 @Component({
-  selector: 'app-real-time-stats',
-  templateUrl: './real-time-stats.component.html',
-  styleUrls: ['./real-time-stats.component.scss']
+    selector: 'app-real-time-stats',
+    templateUrl: './real-time-stats.component.html',
+    styleUrls: ['./real-time-stats.component.scss'],
+    standalone: false
 })
 export class RealTimeStatsComponent {
 

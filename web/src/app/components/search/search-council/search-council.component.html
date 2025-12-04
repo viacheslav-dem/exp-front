@@ -1,8 +1,10 @@
 <app-modal #searchModal [title]="'ГЭС'">
   <ul class="list-group selectable">
-    <li class="list-group-item list-group-item-action selectable list-group-item-sm" (click)="onSelected(council)"
-        *ngFor="let council of data">
-      {{council | councilCodeAndName}}
-    </li>
+    @for (council of data; track council) {
+      <li class="list-group-item list-group-item-action selectable list-group-item-sm" (click)="onSelected(council)"
+        >
+        {{council | councilCodeAndName}}
+      </li>
+    }
   </ul>
 </app-modal>

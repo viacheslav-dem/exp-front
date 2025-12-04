@@ -10,12 +10,14 @@ import {SearchField} from "@app/components/common-components/page-and-filter/mod
 import {ProjectService} from "@app/services/project.service";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {Router} from "@angular/router";
-import * as moment from "moment";
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
 
 
 @Component({
     selector: 'project-list-from-stats',
-    templateUrl: 'project-list-from-stats.component.html'
+    templateUrl: 'project-list-from-stats.component.html',
+    standalone: false
 })
 export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
 
@@ -32,7 +34,7 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
     SortClass = SortClass;
     sortDirection = Direction.ASC;
     @Output() selected = new EventEmitter<ProjectDto>();
-    @ViewChild('searchModal') searchProjectModal: ModalComponent;
+    @ViewChild('searchModal', { static: false }) searchProjectModal: ModalComponent;
 
     constructor(protected service: ProjectService,
                 private router: Router) {
@@ -61,7 +63,7 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
 
                 this.setLoading(false);
             }, () => this.setLoading(false));
-            this.period = moment(this.startOfMonth).startOf('month').format('MMMM YYYY');
+            this.period = dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY');
             this.searchProjectModal.show();
         }
     }
@@ -77,7 +79,7 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
 
                 this.setLoading(false);
             }, () => this.setLoading(false));
-            this.period = moment(this.startOfMonth).startOf('month').format('MMMM YYYY');
+            this.period = dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY');
             this.searchProjectModal.show();
         }
     }

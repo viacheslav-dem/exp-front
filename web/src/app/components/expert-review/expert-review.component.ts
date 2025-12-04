@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, Type, ViewChild} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output, Type, ViewChild, input} from "@angular/core";
 import {ExpertReviewState, ExpertReviewStateBadge} from "@app/pipes/review-state.pipe";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
@@ -24,15 +24,16 @@ import {
     ExpertReviewFormContainerComponent
 } from "@app/components/document-form/expert-review-form-container/expert-review-form-container.component";
 import {DataService} from "@app/services/data.service";
-import "rxjs-compat/add/operator/takeWhile";
+//import { takeWhile } from 'rxjs/operators';
 import {PeriodDto} from "@app/dto/PeriodDto";
-import * as moment from "moment";
+import dayjs from 'dayjs';
 import {AccountingPlainDto} from "@app/dto/AccountingPlainDto";
 import {TemplateType} from "@app/components/document-form/form-model/TemplateType";
 
 @Component({
     selector: 'app-expert-review',
-    templateUrl: './expert-review.component.html'
+    templateUrl: './expert-review.component.html',
+    standalone: false
 })
 export class ExpertReviewComponent implements OnInit {
 
@@ -40,19 +41,19 @@ export class ExpertReviewComponent implements OnInit {
     ExpertReviewState = ExpertReviewState;
     SERVER_URL = SERVER_URL;
     DocType = DocType;
-    period = new PeriodDto(moment().valueOf(), moment().valueOf());
+    period = new PeriodDto(dayjs().valueOf(), dayjs().valueOf());
 
     expertReview: ExpertReviewDto = new ExpertReviewDto();
     transitionHistory: ExpertTransitionHistoryDto;
 
-    @Input() role: string;
-    @Input() project: any = {};
+    readonly role = input<string>(undefined);
+    readonly project = input<any>({});
 
     formRenderer: Type<ExpertReviewForm<any>>;
 
-    @ViewChild('reviewFormModal') reviewFormModal: ModalComponent;
-    @ViewChild('transitionHistoryModal') transitionHistoryModal: ModalComponent;
-    @ViewChild(ExpertReviewFormContainerComponent) expertReviewForm: ExpertReviewFormContainerComponent<any>;
+    @ViewChild('reviewFormModal', { static: false }) reviewFormModal: ModalComponent;
+    @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
+    @ViewChild(ExpertReviewFormContainerComponent, { static: false }) expertReviewForm: ExpertReviewFormContainerComponent<any>;
 
     @Output() onChanged: EventEmitter<any> = new EventEmitter();
 
@@ -89,7 +90,7 @@ export class ExpertReviewComponent implements OnInit {
     }
 
     showReviewFormModal() {
-        this.formRenderer = this._formResolver.getFormRenderer(this.project.code.expertReviewType);
+        this.formRenderer = this._formResolver.getFormRenderer(this.project().code.expertReviewType);
         if (!this.formRenderer) {
             this._toasty.warn("Не найдено подходящей формы экспертного заключения. Будет сегенерирован документ по умолчанию.");
             this.generateReviewDocument({});
@@ -100,12 +101,12 @@ export class ExpertReviewComponent implements OnInit {
     }
 
     canEditReviewDocument() {
-        return anyMatch(this.role, Role.EXPERT, Role.BELISA_EDIT) &&
+        return anyMatch(this.role(), Role.EXPERT, Role.BELISA_EDIT) &&
             this.expertReview.state == ExpertReviewState.ON_EXAMINATION;
     }
 
     canEditReviewScan() {
-        return this.role == Role.BELISA_EDIT &&
+        return this.role() == Role.BELISA_EDIT &&
             this.expertReview.state == ExpertReviewState.ON_EXAMINATION;
     }
 
@@ -180,7 +181,7 @@ export class ExpertReviewComponent implements OnInit {
     acceptExpertByBelisa() {
         this._dialogService.showConfirmDialog(
             'Подтверждение согласия эксперта на проект',
-            `Эксперт ${this._personPipe.transform(this.expertReview.expert)} согласился провести экспертизу объекта "${this.project.title}"?`,
+            `Эксперт ${this._personPipe.transform(this.expertReview.expert)} согласился провести экспертизу объекта "${this.project().title}"?`,
             'Он сможет приступить к работе после согласования зам. Председателя ГКНТ ' +
             'и обязан будет завершить экспертизу в течение установленного нормативными актами срока.'
         ).subscribe(() => {
@@ -194,14 +195,14 @@ export class ExpertReviewComponent implements OnInit {
 
     canReassignExpert() {
         return this.expertReview.state == ExpertReviewState.REJECTED &&
-            anyMatch(this.role, Role.BELISA_EDIT, Role.SECTION_CHAIRMAN, Role.BUREAU_CHAIRMAN) &&
-            this.project.state == ProjectState.ON_EXPERT_EXAMINATION;
+            anyMatch(this.role(), Role.BELISA_EDIT, Role.SECTION_CHAIRMAN, Role.BUREAU_CHAIRMAN) &&
+            this.project().state == ProjectState.ON_EXPERT_EXAMINATION;
     }
 
     reassignExpert() {
         this._dialogService.showConfirmDialog(
             'Переназначение эксперта',
-            `Назначить повторно эксперта "${this._personPipe.transform(this.expertReview.expert)}" на объект экспертизы "${this.project.title}"?`,
+            `Назначить повторно эксперта "${this._personPipe.transform(this.expertReview.expert)}" на объект экспертизы "${this.project().title}"?`,
             ''
         ).subscribe(() => {
             this._reviewService.reassignExpert(this.expertReview).subscribe(res => {
@@ -216,7 +217,7 @@ export class ExpertReviewComponent implements OnInit {
         this._dialogService.showConfirmDialogWithFields(
             [new ConfirmDialogField<string>('reason', 'Причина отказа')],
             'Отказ эксперта от проведения экспертизы',
-            `Эксперт ${this._personPipe.transform(this.expertReview.expert)} отказался от проведения экспертизы объекта "${this.project.title}"?`)
+            `Эксперт ${this._personPipe.transform(this.expertReview.expert)} отказался от проведения экспертизы объекта "${this.project().title}"?`)
             .subscribe((dlgResult: DialogResult<any>) => {
                 let reason = "";
                 if (dlgResult != null && dlgResult.value != null)
@@ -230,17 +231,17 @@ export class ExpertReviewComponent implements OnInit {
     }
 
     canBelisaFinishExamination() {
-        return this.role == Role.BELISA_EDIT && this.expertReview.state == ExpertReviewState.ON_EXAMINATION
+        return this.role() == Role.BELISA_EDIT && this.expertReview.state == ExpertReviewState.ON_EXAMINATION
             && this.expertReview.documents.length > 0 && this.expertReview.reviewScan;
     }
     canRollbackExpertReview() {
-        return this.role == Role.BELISA_EDIT;
+        return this.role() == Role.BELISA_EDIT;
     }
 
     finishExpertExaminationByBelisa() {
         this._dialogService.showConfirmDialog(
             'Завершение экспертизы',
-            `Завершить экспертизу объекта "${this.project.title} экспертом ${this._personPipe.transform(this.expertReview.expert)}"?`
+            `Завершить экспертизу объекта "${this.project().title} экспертом ${this._personPipe.transform(this.expertReview.expert)}"?`
         ).subscribe(() => {
             this._reviewService.finishReview(this.expertReview).subscribe(res => {
                 this.review = res;

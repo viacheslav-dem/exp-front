@@ -1,7 +1,10 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {AbstractEnumPipe} from "@app/pipes/abstract-enum.pipe";
 
-@Pipe({name: 'sectionType'})
+@Pipe({
+    name: 'sectionType',
+    standalone: false
+})
 export class SectionTypePipe extends AbstractEnumPipe<SectionType> {
   init() {
     this.map[SectionType.SCIENTIFIC] = 'научная';

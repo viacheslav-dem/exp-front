@@ -56,6 +56,9 @@ export abstract class AgendaNewForm extends DocumentForm<AgendaNewFormContent> {
   }
 
   getAllParticipants() {
+    if (!this.parent || !this.parent['_form'] || !this.parent['_form'].participants) {
+      return 0;
+    }
     return this.parent._form.participants.length;
   }
 

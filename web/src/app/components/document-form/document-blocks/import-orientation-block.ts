@@ -1,31 +1,34 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-import-orientation-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Импортозамещающая ориентированность товара:
+        {{num()}}. Импортозамещающая ориентированность товара:
       </label><br>
-        <app-boolean-button [(ngModel)]="_form.importOrientation" [trueLabel]="'соответствует'"
-                            [falseLabel]="'не соответствует'"
-                            (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <textarea *ngIf="full || _form.importOrientation" 
-                [(ngModel)]="_form.importOrientationText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст."></textarea>
+      <app-boolean-button [(ngModel)]="_form().importOrientation" [trueLabel]="'соответствует'"
+        [falseLabel]="'не соответствует'"
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      @if (full() || _form().importOrientation) {
+        <textarea
+          [(ngModel)]="_form().importOrientationText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст."></textarea>
+      }
     </div>
-  `
+    `,
+    standalone: false
 })
 export class ImportOrientationBlockComponent {
 
-    @Input()
-    num: string = "9.4";
+    readonly num = input<string>("9.4");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { importOrientation: boolean, importOrientationText: string };
+    readonly _form = input<{
+    importOrientation: boolean;
+    importOrientationText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

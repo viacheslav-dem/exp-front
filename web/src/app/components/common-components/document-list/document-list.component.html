@@ -1,41 +1,51 @@
 <div class="list-group w-100 documents">
-  <div *ngIf="!_documents.length" class="list-group-item">
-    <div style="width: 100%;">
-      <span class="text-sm text-muted">Документы отсутствуют</span><br><span></span>
+  @if (!_documents.length) {
+    <div class="list-group-item">
+      <div style="width: 100%;">
+        <span class="text-sm text-muted">Документы отсутствуют</span><br><span></span>
+      </div>
+      <div></div>
     </div>
-    <div></div>
-  </div>
-  <div *ngFor="let doc of _documents" class="list-group-item list-group-item-action selectable">
-    <table style="width: 100%">
-    <tr>
-      <td (click)="viewDocument(doc)" style="width: 100%">
-        <div class="text-sm">{{doc?.name}}</div>
-        <div class="text-sm text-muted">{{doc?.description}}</div>
-      </td>
-      <td class="actions">
-        <!--<app-sign-doc [docId]="doc.id"></app-sign-doc>-->
-        <a class="btn btn-icon" (click)="downloadDocument(doc)">
-          <fa-icon icon="arrow-down"></fa-icon>
-        </a>
-        <a *ngIf="doc.hasDocx" class="btn btn-icon" (click)="downloadDocxDocument(doc)">
-          <fa-icon icon="file-word"></fa-icon>
-        </a>
-        <a *ngIf="canUpdate" class="btn btn-icon" (click)="editDocument(doc)">
-          <fa-icon icon="pencil-alt"></fa-icon>
-        </a>
-        <a *ngIf="canDelete" class="btn btn-icon" (click)="deleteDocument(doc)">
-          <fa-icon icon="trash-alt"></fa-icon>
-        </a>
-      </td>
-    </tr>
-    </table>
-  </div>
+  }
+  @for (doc of _documents; track doc) {
+    <div class="list-group-item list-group-item-action selectable">
+      <table style="width: 100%">
+        <tr>
+          <td (click)="viewDocument(doc)" style="width: 100%">
+            <div class="text-sm">{{doc?.name}}</div>
+            <div class="text-sm text-muted">{{doc?.description}}</div>
+          </td>
+          <td class="actions">
+            <!--<app-sign-doc [docId]="doc.id"></app-sign-doc>-->
+            <a class="btn btn-icon" (click)="downloadDocument(doc)">
+              <fa-icon icon="arrow-down"></fa-icon>
+            </a>
+            @if (doc.hasDocx) {
+              <a class="btn btn-icon" (click)="downloadDocxDocument(doc)">
+                <fa-icon icon="file-word"></fa-icon>
+              </a>
+            }
+            @if (canUpdate()) {
+              <a class="btn btn-icon" (click)="editDocument(doc)">
+                <fa-icon icon="pencil-alt"></fa-icon>
+              </a>
+            }
+            @if (canDelete()) {
+              <a class="btn btn-icon" (click)="deleteDocument(doc)">
+                <fa-icon icon="trash-alt"></fa-icon>
+              </a>
+            }
+          </td>
+        </tr>
+      </table>
+    </div>
+  }
 </div>
 
 <div bsModal #fileViewerModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <app-pdf-viewer [url]="url" [doc]="selectedDocument"></app-pdf-viewer>
+      <app-pdf-viewer [url]="url()" [doc]="selectedDocument"></app-pdf-viewer>
     </div>
   </div>
 </div>

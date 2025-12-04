@@ -1,53 +1,58 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
-  selector: 'app-assessment-conclusion-block-2025',
-  template: `
+    selector: 'app-assessment-conclusion-block-2025',
+    template: `
     <div class="form-sub-group">
       <label>
-        {{ num }}. Оценка соответствия предложений поставщиков (подрядчиков, исполнителей), претендующих на участие в
+        {{ num() }}. Оценка соответствия предложений поставщиков (подрядчиков, исполнителей), претендующих на участие в
         реализации мероприятий, целям названных мероприятий:
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.assessment === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().assessment === true}" (click)="stateButton(true)">
           Соответствует
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.assessment === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().assessment === false}" (click)="stateButton(false)">
           Несоответствует
         </button>
       </div>
-      <textarea *ngIf="full" [(ngModel)]="_form.assessmentText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст."></textarea>
-      <div *ngIf="full" class="hint">
-        <p>
-          <b>Подсказка.</b>
-          Дайте конкретную оценку по указанным параметрам для объекта экспертизы
-          по представленным материалам объекта экспертизы.
-        </p>
-        <p>
-          Укажите ссылки на наименования документов и номера страниц, в которых приводится соответствующая информация,
-          или сделайте пометку "не представлено в материалах по объекту государственной экспертизы".
-        </p>
-      </div>
+      @if (full()) {
+        <textarea [(ngModel)]="_form().assessmentText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст."></textarea>
+      }
+      @if (full()) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
+            Дайте конкретную оценку по указанным параметрам для объекта экспертизы
+            по представленным материалам объекта экспертизы.
+          </p>
+          <p>
+            Укажите ссылки на наименования документов и номера страниц, в которых приводится соответствующая информация,
+            или сделайте пометку "не представлено в материалах по объекту государственной экспертизы".
+          </p>
+        </div>
+      }
     </div>
-  `
+    `,
+    standalone: false
 })
 export class AssessmentConclusionBlock2025Component {
 
-  @Input()
-  num: string = "12.3";
+  readonly num = input<string>("12.3");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { assessment: boolean, assessmentText: string };
+  readonly _form = input<{
+    assessment: boolean;
+    assessmentText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   stateButton(flag: boolean){
-    this._form.assessment = flag;
+    this._form().assessment = flag;
   }
 
 }

@@ -8,8 +8,9 @@ import {AuditService} from "@app/services/audit.service";
 import {Router} from "@angular/router";
 
 @Component({
-  selector: 'app-root-page',
-  templateUrl: 'root-page.component.html'
+    selector: 'app-root-page',
+    templateUrl: 'root-page.component.html',
+    standalone: false
 })
 export class RootPageComponent implements OnInit {
 

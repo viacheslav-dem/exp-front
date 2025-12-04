@@ -1,36 +1,51 @@
 import {Pipe, PipeTransform} from "@angular/core";
-import * as moment from 'moment';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
 import {firstCharToUpperCase} from "../support/utils";
 
-@Pipe({name: 'mdate'})
+@Pipe({
+    name: 'mdate',
+    standalone: false
+})
 export class MdatePipe implements PipeTransform {
 
   transform(value: number): any {
-    return value ? moment(value, 'x').format('DD.MM.YYYY') : value;
+    return value ? dayjs(value).locale('ru').format('DD.MM.YYYY') : value;
   }
 }
 
-@Pipe({name: 'mtime'})
+@Pipe({
+    name: 'mtime',
+    standalone: false
+})
 export class MTimePipe implements PipeTransform {
 
   transform(value: number): any {
-    return value ? moment(value, 'x').format('HH:mm') : value;
+    return value ? dayjs(value).locale('ru').format('HH:mm') : value;
   }
 }
 
-@Pipe({name: 'formatDate'})
+@Pipe({
+    name: 'formatDate',
+    standalone: false
+})
 export class FormatDatePipe implements PipeTransform {
 
-  transform(value: number, format: string = 'DD.MM.YYYY HH:mm:ss'): any {
-    return value ? moment(value, 'x').format(format) : value;
+  transform(value: number, formatStr: string = 'DD.MM.YYYY HH:mm:ss'): any {
+    if (!value) return value;
+    // dayjs использует формат Moment.js, поэтому формат уже правильный
+    return dayjs(value).locale('ru').format(formatStr);
   }
 }
 
-@Pipe({name: 'monthYear'})
+@Pipe({
+    name: 'monthYear',
+    standalone: false
+})
 export class MonthYearPipe implements PipeTransform {
 
   transform(value:any): any {
-    return value ? firstCharToUpperCase(moment(value).format("MMMM YYYY")) : '';
+    return value ? firstCharToUpperCase(dayjs(value).locale('ru').format("MMMM YYYY")) : '';
   }
 }
 

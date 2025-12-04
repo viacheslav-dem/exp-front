@@ -9,11 +9,13 @@ export const MONTH_YEAR_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-month-year',
-  template: `
+    selector: 'app-month-year',
+    template: `
     <div class="input-group" style="width: 160px">
       <select class="form-control form-control-sm">
-        <option *ngFor="let month of months">{{month}}</option>
+        @for (month of months; track month) {
+          <option>{{month}}</option>
+        }
       </select>
       <select class="form-control form-control-sm">
         <option>1</option>
@@ -23,8 +25,9 @@ export const MONTH_YEAR_VALUE_ACCESSOR: any = {
         <option>5</option>
       </select>
     </div>
-  `,
-  providers: [MONTH_YEAR_VALUE_ACCESSOR]
+    `,
+    providers: [MONTH_YEAR_VALUE_ACCESSOR],
+    standalone: false
 })
 export class MonthYearComponent extends ControlComponent<number> {
 

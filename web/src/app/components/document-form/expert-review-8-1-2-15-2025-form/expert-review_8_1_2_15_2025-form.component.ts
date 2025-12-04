@@ -11,8 +11,9 @@ import {
 import {DataService} from "@app/services/data.service";
 
 @Component({
-  selector: 'app-expert-review-8-1-2-15-2025-form',
-  templateUrl: './expert-review_8_1_2_15_2025-form.component.html'
+    selector: 'app-expert-review-8-1-2-15-2025-form',
+    templateUrl: './expert-review_8_1_2_15_2025-form.component.html',
+    standalone: false
 })
 export class ExpertReview_8_1_2_15_2025FormComponent extends ExpertReviewForm<ExpertReview_8_1_2_15_2025FormContent> {
 

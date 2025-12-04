@@ -27,7 +27,7 @@
     по стимулированию научной, научно-технической и инновационной деятельности»:
   </label>
   <app-vote-results [display]="isAccepted()"
-                    [(ngModel)]="_form.promotion" [all]="parent._form.participants.length"></app-vote-results>
+  [(ngModel)]="_form.promotion" [all]="parent._form.participants.length"></app-vote-results>
   <div [class.d-none]="!isAccepted()" class="italic">
     Голосование не проводилось по причине принятого отрицательного решения в п.{{ind + 1}}.1
   </div>
@@ -43,7 +43,7 @@
     и опытно-технологических работ»:
   </label>
   <app-vote-results [display]="isAccepted()"
-                    [(ngModel)]="_form.registration" [all]="parent._form.participants.length">
+    [(ngModel)]="_form.registration" [all]="parent._form.participants.length">
   </app-vote-results>
   <div [class.d-none]="!isAccepted()" class="italic">
     Голосование не проводилось по причине принятого отрицательного решения в п.{{ind + 1}}.1
@@ -61,11 +61,15 @@
     Голосование не проводилось по причине принятого отрицательного решения в п.{{ind + 1}}.1
   </div>
   <div [class.d-none]="isAccepted()">
-    <div *ngIf="stages.length == 0" class="mb-1 italic">Не имеются</div>
-    <div *ngFor="let stage of stages; let i = index" class="input-group input-group-sm btn-group mb-2">
-      <input [(ngModel)]="stage.name" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
-      <button (click)="stages.splice(i, 1)" type="button" class="btn btn-sm btn-outline-danger">&times;</button>
-    </div>
+    @if (stages.length == 0) {
+      <div class="mb-1 italic">Не имеются</div>
+    }
+    @for (stage of stages; track stage; let i = $index) {
+      <div class="input-group input-group-sm btn-group mb-2">
+        <input [(ngModel)]="stage.name" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
+        <button (click)="stages.splice(i, 1)" type="button" class="btn btn-sm btn-outline-danger">&times;</button>
+      </div>
+    }
     <div class="mb-2">
       <button (click)="stages.push({name: ''})" type="button" class="btn btn-primary btn-sm">
         Добавить этап
@@ -80,14 +84,18 @@
     <b>{{ind + 1}}.4.</b> Создание объектов права промышленной собственности
     при реализации объекта государственной экспертизы:
   </label>
-  <div *ngIf="privacyObjects.length == 0" class="mb-1 italic">Не предусматривается</div>
-  <div *ngFor="let privacyObject of privacyObjects; let i = index" class="input-group btn-group input-group-sm mb-2">
-    <app-select-catalog
+  @if (privacyObjects.length == 0) {
+    <div class="mb-1 italic">Не предусматривается</div>
+  }
+  @for (privacyObject of privacyObjects; track privacyObject; let i = $index) {
+    <div class="input-group btn-group input-group-sm mb-2">
+      <app-select-catalog
         [catalog]="Catalog.INDUSTRIAL_PROPERTY"
         [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
-    ></app-select-catalog>
-    <button type="button" class="btn btn-sm btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
-  </div>
+      ></app-select-catalog>
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+    </div>
+  }
   <div class="mb-2">
     <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
       Добавить объект права
@@ -95,7 +103,7 @@
   </div>
   <app-vote-results [(ngModel)]="_form.privacy" [all]="parent._form.participants.length"></app-vote-results>
   <app-vote-results #singleVote [(ngModel)]="singleVoteResult"
-                    [all]="parent._form.participants.length"
-                    [display]="singleVoteMode"
+    [all]="parent._form.participants.length"
+    [display]="singleVoteMode"
   ></app-vote-results>
 </div>

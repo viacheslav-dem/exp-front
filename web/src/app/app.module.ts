@@ -1,15 +1,17 @@
 import {ErrorHandler, NgModule} from "@angular/core";
-import {routing} from "./app.routing";
+import {RouterModule} from "@angular/router";
+import {appRoutes} from "./app.routing";
 import {AppComponent} from "./app.component";
 import {HttpClientSecure} from "./services/http.client";
-import {ToastyConfig, ToastyModule, ToastyService} from "ng2-toasty";
 import {GlobalToastyService} from "./services/global-toasty.service";
 import {AuthGuardService} from "./services/auth-guard.service";
 import {AuthService} from "./services/auth.service";
 import {DefineRole} from "./services/define-role";
 import {LoginComponent} from "./base/login/login.component";
 import {StorageService} from "./services/storage.service";
-import {HashLocationStrategy, LocationStrategy} from "@angular/common";
+import {HashLocationStrategy, LocationStrategy, registerLocaleData} from "@angular/common";
+import localeRu from '@angular/common/locales/ru';
+import localeRuExtra from '@angular/common/locales/extra/ru';
 import {ProgressService} from "./components/common-components/progress/progress.service";
 import {HelloComponent} from "./base/hello/hello.component";
 import {ErrorPageComponent} from "./base/error-page/error-page.component";
@@ -29,7 +31,7 @@ import {MenuComponent} from "./components/menu/menu.component";
 import {CommonComponentsModule} from "./components/common-components/components.module";
 import {AuditComponent} from "./components/audit/audit.component";
 import {AuditService} from "./services/audit.service";
-import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import {CryptoModule} from "@app/crypto/crypto.module";
 import {DocumentFormModule} from "@app/components/document-form/document-form.module";
 import {BasicProjectInfoComponent} from "@app/components/basic-project-info/basic-project-info.component";
@@ -56,7 +58,6 @@ import {GroupTransitionHistoryComponent} from "@app/components/transition-histor
 import {LifecycleTransitionHistoryComponent} from "@app/components/transition-history/lifecycle-transition-history/lifecycle-transition-history.component";
 import {ExpertTransitionHistoryComponent} from "@app/components/transition-history/expert-transition-history/expert-transition-history.component";
 import {StatsService} from "@app/services/stats.service";
-import {StatsModule} from "@app/components/stats/stats.module";
 import {ExpertListComponent} from "@app/components/expert-list/expert-list.component";
 import {FinishedReviewsSparklineChart} from "@app/components/expert-list/finished-reviews.sparkline.chart";
 import {ReviewResultsSparklineChart} from "@app/components/expert-list/review-results.sparkline.chart";
@@ -64,6 +65,7 @@ import {ReviewsViolationSparklineChart} from "@app/components/expert-list/review
 import {DataManagementModule} from "@app/components/data-management/data-management.module";
 import {SearchModule} from "@app/components/search/search.module";
 import {BrowserModule} from "@angular/platform-browser";
+import {CommonModule} from "@angular/common";
 import {SelectRoleComponent} from "@app/base/select-role/select-role.component";
 import {SettingsModule} from "@app/components/settings/settings.module";
 import {MeetingFormComponent} from "@app/components/meeting-form/meeting-form.component";
@@ -90,24 +92,23 @@ import { NotificationComponent } from './components/notification/notification.co
 import {SystemNotificationComponent} from "@app/components/system-notification/system-notification.component";
 import {SystemNotificationService} from "@app/services/system-notification.service";
 import {ErrorInterceptor} from "@app/http-interceptors/error-interceptor";
-import {BsDatepickerModule} from "ngx-bootstrap";
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { defineLocale } from 'ngx-bootstrap/chronos';
+import { ruLocale } from 'ngx-bootstrap/locale';
+defineLocale('ru', ruLocale);
+import { TimepickerModule } from 'ngx-bootstrap/timepicker';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { LOCALE_ID } from '@angular/core';
 
-@NgModule({
-    imports: [
-        BrowserModule,
-        routing,
-        ToastyModule.forRoot(),
-        DialogModule.forRoot(),
+// Регистрация русской локали для Angular
+registerLocaleData(localeRu, 'ru', localeRuExtra);
+
+@NgModule({ exports: [
+        RouterModule,
         CommonComponentsModule,
-        HttpClientModule,
-        CryptoModule,
-        DocumentFormModule,
-        StatsModule,
-        SearchModule,
-        DataManagementModule,
-        SettingsModule,
-        FontAwesomeModule,
-        BsDatepickerModule,
+        DialogModule,
     ],
     declarations: [
         AppComponent,
@@ -165,17 +166,30 @@ import {BsDatepickerModule} from "ngx-bootstrap";
     bootstrap: [
         AppComponent
     ],
-    providers: [
-        {provide: LocationStrategy, useClass: HashLocationStrategy},
-        {provide: ErrorHandler, useClass: CustomErrorHandler},
-        {provide: HTTP_INTERCEPTORS, useClass: AuthErrorInterceptor, multi: true},
-        {provide: HTTP_INTERCEPTORS, useClass: LoggingInterceptor, multi: true},
-        {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
+    imports: [BrowserModule,
+        RouterModule.forRoot(appRoutes),
+        NgSelectModule,
+        DialogModule.forRoot(),
+        CommonComponentsModule,
+        CryptoModule,
+        DocumentFormModule,
+        SearchModule,
+        DataManagementModule,
+        SettingsModule,
+        FontAwesomeModule,
+        TooltipModule.forRoot(),
+        BsDatepickerModule.forRoot(),
+        TimepickerModule.forRoot(),
+        BsDropdownModule.forRoot()], providers: [
+        { provide: LocationStrategy, useClass: HashLocationStrategy },
+        { provide: ErrorHandler, useClass: CustomErrorHandler },
+        { provide: LOCALE_ID, useValue: 'ru' },
+        { provide: HTTP_INTERCEPTORS, useClass: AuthErrorInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: LoggingInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
         StorageService,
         HttpClientSecure,
         AuthService,
-        ToastyService,
-        ToastyConfig,
         GlobalToastyService,
         AuthGuardService,
         DefineRole,
@@ -194,8 +208,8 @@ import {BsDatepickerModule} from "ngx-bootstrap";
         MeetingService,
         AgendaService,
         ChartService,
-        SystemNotificationService
-    ]
-})
+        SystemNotificationService,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule {
 }

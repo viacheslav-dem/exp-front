@@ -35,10 +35,12 @@ import {ProjectLifecycleDto} from "@app/dto/ProjectLifecycleDto";
 import {ReturnFromCouncilWithoutExpertiseFormContent} from "@app/components/document-form/form-model/ReturnFromCouncilWithoutExpertiseFormContent";
 import {DocumentDto} from "@app/dto/DocumentDto";
 import {DocumentService} from "@app/services/document.service";
+import {ActionButtonMetadata} from "./action-button-metadata";
 
 @Component({
-  selector: 'app-project-info',
-  templateUrl: 'project-info.component.html'
+    selector: 'app-project-info',
+    templateUrl: 'project-info.component.html',
+    standalone: false
 })
 export class ProjectInfoComponent implements OnInit {
 
@@ -74,15 +76,15 @@ export class ProjectInfoComponent implements OnInit {
 
   buttons: ActionButtonMetadata[] = [];
 
-  @ViewChild(SearchExpertComponent) public searchExpertComponent: SearchExpertComponent;
-  @ViewChild(SearchGkntWorkerComponent) searchGkntWorkerComponent: SearchGkntWorkerComponent;
-  @ViewChild('editProjectModal') editProjectModal: ModalComponent;
-  @ViewChild('returnFromCouncilWithoutExpertiseModal') returnFromCouncilWithoutExpertiseModal: ModalComponent;
-  @ViewChild('copyProjectModal') copyProjectModal: ModalComponent;
-  @ViewChild('expertRejectProject') expertRejectProject: ModalComponent;
-  @ViewChild('expertAgreement') expertAgreement: ModalComponent;
-  @ViewChild('listProjects') listProjects: ModalComponent;
-  @ViewChild(SameProjectListComponent) sameProjectList: SameProjectListComponent;
+  @ViewChild(SearchExpertComponent, { static: false }) public searchExpertComponent: SearchExpertComponent;
+  @ViewChild(SearchGkntWorkerComponent, { static: false }) searchGkntWorkerComponent: SearchGkntWorkerComponent;
+  @ViewChild('editProjectModal', { static: false }) editProjectModal: ModalComponent;
+  @ViewChild('returnFromCouncilWithoutExpertiseModal', { static: false }) returnFromCouncilWithoutExpertiseModal: ModalComponent;
+  @ViewChild('copyProjectModal', { static: false }) copyProjectModal: ModalComponent;
+  @ViewChild('expertRejectProject', { static: false }) expertRejectProject: ModalComponent;
+  @ViewChild('expertAgreement', { static: false }) expertAgreement: ModalComponent;
+  @ViewChild('listProjects', { static: false }) listProjects: ModalComponent;
+  @ViewChild(SameProjectListComponent, { static: false }) sameProjectList: SameProjectListComponent;
 
   constructor(private route: ActivatedRoute,
               private _toasty: GlobalToastyService,
@@ -137,33 +139,40 @@ export class ProjectInfoComponent implements OnInit {
   }
 
   loadProject(idDto: IdDto, group: string) {
-    this._projectService.getProject(idDto).subscribe(res => {
-      this.project = res;
-      if (group != null && group != 'null') {
-        this._projectService.markViewed(this.project, group).subscribe();
-      }
-      this.initActionButtons();
-      this.showProjectDocuments();
-      if (this.role == Role.BUREAU_ASSESSOR) {
-        this.loadAnonymousExpertReviews();
-        this.loadSectionReports();
-        this.loadLifecycleGroup();
-      } else if (this.role == Role.SECTION_ASSESSOR) {
-        this.loadAnonymousExpertReviews();
-      } else if (this.role == Role.BUREAU_CHAIRMAN) {
-        this.loadLifecycleGroup();
-      } else if (this.role == Role.SECTION_CHAIRMAN) {
-        this.loadLifecycle();
-      } else if (anyMatch(this.role,
-        Role.GKNT_WORKER, Role.GKNT_CHAIRMAN, Role.GKNT_DEPARTMENT_CHAIRMAN,
-        Role.BELISA_READ, Role.BELISA_EDIT, Role.CUSTOMER)
-      ) {
-        this.loadLifecycleGroups();
-        if (this.role == Role.CUSTOMER) {
-          this.loadAnonymousExpertReviews();
+    this._projectService.getProject(idDto).subscribe({
+      next: (res) => {
+        this.project = res;
+        if (group != null && group != 'null' && typeof group === 'string' && !group.includes('=>')) {
+          this._projectService.markViewed(this.project, group).subscribe();
         }
-      } else if (this.role == Role.EXPERT) {
-        this.loadExpertReview();
+        this.initActionButtons();
+        this.showProjectDocuments();
+        if (this.role == Role.BUREAU_ASSESSOR) {
+          this.loadAnonymousExpertReviews();
+          this.loadSectionReports();
+          this.loadLifecycleGroup();
+        } else if (this.role == Role.SECTION_ASSESSOR) {
+          this.loadAnonymousExpertReviews();
+        } else if (this.role == Role.BUREAU_CHAIRMAN) {
+          this.loadLifecycleGroup();
+        } else if (this.role == Role.SECTION_CHAIRMAN) {
+          this.loadLifecycle();
+        } else if (anyMatch(this.role,
+          Role.GKNT_WORKER, Role.GKNT_CHAIRMAN, Role.GKNT_DEPARTMENT_CHAIRMAN,
+          Role.BELISA_READ, Role.BELISA_EDIT, Role.CUSTOMER)
+        ) {
+          this.loadLifecycleGroups();
+          if (this.role == Role.CUSTOMER) {
+            this.loadAnonymousExpertReviews();
+          }
+        } else if (this.role == Role.EXPERT) {
+          this.loadExpertReview();
+        }
+      },
+      error: (err) => {
+        // Error is already handled by HttpClientSecure.handleError which shows toast
+        // Just prevent it from propagating to global error handler
+        console.error('Error loading project:', err);
       }
     })
   }
@@ -609,7 +618,7 @@ export class ProjectInfoComponent implements OnInit {
   }
 
   findTheSameProjects(title: string) {
-    this.sameProjectList.title = title;
+    this.sameProjectList.titleValue = title;
     this._projectService.getTheSameProjectsByTitle(title).subscribe(value => {
       this.listSameProjects = value;
       this.listProjects.show();
@@ -938,16 +947,5 @@ export class ProjectInfoComponent implements OnInit {
   }
 }
 
-export class ActionButtonMetadata {
-  title: string;
-  styleClass: string = 'btn btn-sm';
-  onclick: any;
-
-  constructor(title: string, onclick: any, style: string) {
-    this.title = title;
-    this.onclick = onclick;
-    if (style) {
-      this.styleClass += ' ' + style;
-    }
-  }
-}
+// Re-export for backward compatibility
+export {ActionButtonMetadata} from './action-button-metadata';

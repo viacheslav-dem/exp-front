@@ -1,40 +1,73 @@
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output} from "@angular/core";
-import Timer = NodeJS.Timer;
-
-declare let $;
+import {Component, EventEmitter, OnInit, Output, OnChanges, SimpleChanges, input} from "@angular/core";
+import {Options} from '@angular-slider/ngx-slider';
 
 @Component({
-  selector: 'app-slider',
-  templateUrl: './slider.component.html'
+    selector: 'app-slider',
+    templateUrl: './slider.component.html',
+    standalone: false
 })
-export class SliderComponent implements OnInit {
+export class SliderComponent implements OnInit, OnChanges {
 
-  private timer: Timer;
   @Output() onChange = new EventEmitter();
 
-  @Input()
-  public set slider(slider: any) {
-    if (slider) {
-      let id = '_' + Math.random().toString(36).substr(2, 9);
-      this.el.nativeElement.firstElementChild.id = id;
-      slider.onChange =  ($event)=> {
-        clearTimeout(this.timer);
-        this.timer = setTimeout(()=> {
-          console.log($event);
-          let result = {
-            from: $event.from == $event.min? null : $event.from,
-            to: $event.to == $event.max? null : $event.to
-          };
-          this.onChange.emit(result);
-        }, 500);
-      }
-      $(`#${id}`).ionRangeSlider(slider);
-    }
-  }
+  public readonly slider = input<any>(undefined);
 
-  constructor(private el: ElementRef) {
+  value: number = 0;
+  highValue: number = 100;
+  options: Options = {
+    floor: 0,
+    ceil: 100,
+    step: 1
+  };
+
+  private timer: any;
+
+  constructor() {
   }
 
   ngOnInit() {
+    this.updateSlider();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['slider'] && !changes['slider'].firstChange) {
+      this.updateSlider();
+    }
+  }
+
+  private updateSlider() {
+    const slider = this.slider();
+    if (slider) {
+      this.value = slider.from !== undefined ? slider.from : slider.min || 0;
+      this.highValue = slider.to !== undefined ? slider.to : slider.max || 100;
+      
+      this.options = {
+        floor: slider.min || 0,
+        ceil: slider.max || 100,
+        step: slider.step || 1,
+        ...slider.options
+      };
+    }
+  }
+
+  onUserChangeEnd(changeContext: any) {
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+    this.timer = setTimeout(() => {
+      const result = {
+        from: this.value === this.options.floor ? null : this.value,
+        to: this.highValue === this.options.ceil ? null : this.highValue
+      };
+      this.onChange.emit(result);
+    }, 500);
+  }
+
+  onValueChange(value: number) {
+    this.value = value;
+  }
+
+  onHighValueChange(highValue: number) {
+    this.highValue = highValue;
   }
 }

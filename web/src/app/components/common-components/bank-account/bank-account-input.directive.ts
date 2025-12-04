@@ -9,8 +9,9 @@ export const NI_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Directive({
-  selector: 'input[accountInput]',
-  providers: [NI_CONTROL_VALUE_ACCESSOR]
+    selector: 'input[accountInput]',
+    providers: [NI_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class BankAccountInputDirective extends ControlComponent<string> {
   private regex: RegExp = new RegExp(/^BY[0-9]{0,2}$|^BY[0-9]{0,2}AKBB(([0-9]{0,4}){0,4})[0-9]{0,4}$/g);

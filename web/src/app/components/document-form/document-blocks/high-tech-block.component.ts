@@ -1,34 +1,37 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
-  selector: 'app-high-tech-block',
-  template: `
+    selector: 'app-high-tech-block',
+    template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Возможность отнесения товаров (работ, услуг) к категории высокотехнологичных: <br>
+        {{num()}}. Возможность отнесения товаров (работ, услуг) к категории высокотехнологичных: <br>
         (отнесение товаров (работ, услуг) к высокотехнологичным возможно,
         если в подпункте 5.6 пункта 5 настоящего заключения значение коэффициента технологичности товара (работы, услуги) получено на уровне не менее 50 баллов).
       </label>
       <app-boolean-button
-        [(ngModel)]="_form.highTech"
+        [(ngModel)]="_form().highTech"
         [trueLabel]="'возможно'"
         [falseLabel]="'невозможно'"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <textarea *ngIf="full" [(ngModel)]="_form.highTechText" rows="3" class="form-control"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      @if (full()) {
+        <textarea [(ngModel)]="_form().highTechText" rows="3" class="form-control"
+        placeholder="Пояснительный текст (при необходимости)."></textarea>
+      }
     </div>
-  `
+    `,
+    standalone: false
 })
 export class HighTechBlockComponent {
 
-  @Input()
-  num: string = "1";
+  readonly num = input<string>("1");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { highTech: boolean, highTechText: string };
+  readonly _form = input<{
+    highTech: boolean;
+    highTechText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

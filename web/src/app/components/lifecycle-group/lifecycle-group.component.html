@@ -134,12 +134,12 @@
 
 <!--SEARCH SECTION MODAL-->
 <app-search-section #searchSection
-                    *ngIf="canEditSections()|| this._group.state == LifecycleGroupState.IN_PROCESSING && this.role == Role.BUREAU_CHAIRMAN"
+                    *ngIf="canEditSections()|| this._group.state == LifecycleGroupState.IN_PROCESSING && this.role() == Role.BUREAU_CHAIRMAN"
                     (selected)="onSelectedSection($event)"></app-search-section>
 
 <!--CHANGE SECTION MODAL-->
 <app-search-section #changeSection
-                    *ngIf="this._group.state == LifecycleGroupState.IN_PROCESSING && this.role == Role.BUREAU_CHAIRMAN"
+                    *ngIf="this._group.state == LifecycleGroupState.IN_PROCESSING && this.role() == Role.BUREAU_CHAIRMAN"
                     (selected)="onChangeSection($event)"></app-search-section>
 
 <!--REFERRAL MODAL-->

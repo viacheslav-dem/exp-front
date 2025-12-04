@@ -1,37 +1,44 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
-  selector: 'app-result-accordance-block',
-  template: `
+    selector: 'app-result-accordance-block',
+    template: `
     <div class="form-sub-group">
       <label>
-        <span *ngIf="num">{{num}}.</span>
+        @if (num()) {
+          <span>{{num()}}.</span>
+        }
         Соответствие достигнутого результата запланированному:
       </label>
-      <app-boolean-button [(ngModel)]="_form.accordance" [trueLabel]="'соответствует'"
-                          [falseLabel]="'не соответствует'"
-                          (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <textarea *ngIf="full" [(ngModel)]="_form.accordanceText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
-      <div *ngIf="full" class="hint">
-        <p>
-          <b>Подсказка.</b>
-          Если при проведении сопоставительного анализа выявлены несоответствия, то сделайте вывод о несоответствии.
-        </p>
-      </div>
+      <app-boolean-button [(ngModel)]="_form().accordance" [trueLabel]="'соответствует'"
+        [falseLabel]="'не соответствует'"
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      @if (full()) {
+        <textarea [(ngModel)]="_form().accordanceText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
+      }
+      @if (full()) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
+            Если при проведении сопоставительного анализа выявлены несоответствия, то сделайте вывод о несоответствии.
+          </p>
+        </div>
+      }
     </div>
-  `
+    `,
+    standalone: false
 })
 export class ResultAccordanceBlockComponent {
 
-  @Input()
-  num: string;
+  readonly num = input<string>(undefined);
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { accordance: boolean, accordanceText: string };
+  readonly _form = input<{
+    accordance: boolean;
+    accordanceText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

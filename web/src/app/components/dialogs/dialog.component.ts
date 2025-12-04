@@ -5,12 +5,12 @@ import {DialogResult} from "@app/components/dialogs/dialog-result";
 import {DialogContainer, DialogType} from "@app/components/dialogs/dialog-container";
 import {UserFormComponent} from "@app/components/dialogs/user-form/user-form.component";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
-import {ExpertReviewComponent} from "@app/components/expert-review/expert-review.component";
 
 @Component({
-  selector: 'app-dialogs',
-  templateUrl: './dialog.component.html',
-  styles: []
+    selector: 'app-dialogs',
+    templateUrl: './dialog.component.html',
+    styles: [],
+    standalone: false
 })
 export class DialogComponent implements OnInit {
 
@@ -20,10 +20,8 @@ export class DialogComponent implements OnInit {
   title: string;
   titleMap = {};
 
-  @ViewChild('modalComponent') public modalComponent: ModalComponent;
-  @ViewChild(UserFormComponent) userForm: UserFormComponent;
-
-  @ViewChild(ExpertReviewComponent) reviewForm: ExpertReviewComponent;
+  @ViewChild('modalComponent', { static: false }) public modalComponent: ModalComponent;
+  @ViewChild(UserFormComponent, { static: false }) userForm: UserFormComponent;
 
   constructor(private dialogService: DialogService, private toastService: GlobalToastyService) {
     this.titleMap[DialogType.USER] = 'Редактирование пользователя';

@@ -81,8 +81,9 @@ Highcharts.wrap(Highcharts.Chart.prototype, 'getContainer', function (proceed) {
 });
 
 @Component({
-  selector: "highchart",
-  template: '<div (mouseleave)="onMouseLeave()" (mouseenter)="onMouseEnter()"></div>'
+    selector: "highchart",
+    template: '<div (mouseleave)="onMouseLeave()" (mouseenter)="onMouseEnter()"></div>',
+    standalone: false
 })
 export class HighchartComponent {
 
@@ -107,12 +108,18 @@ export class HighchartComponent {
   }
 
   showExportButton() {
-    $(this.el.nativeElement).find('.highcharts-contextbutton').removeAttr('hidden');
+    const button: HTMLElement | null = this.el.nativeElement.querySelector('.highcharts-contextbutton');
+    if (button) {
+      button.removeAttribute('hidden');
+    }
   }
 
   hideExportButton() {
     if (!this.hover) {
-      $(this.el.nativeElement).find('.highcharts-contextbutton').attr('hidden', "true");
+      const button: HTMLElement | null = this.el.nativeElement.querySelector('.highcharts-contextbutton');
+      if (button) {
+        button.setAttribute('hidden', 'true');
+      }
     }
   }
 

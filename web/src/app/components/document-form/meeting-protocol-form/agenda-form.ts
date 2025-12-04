@@ -18,8 +18,8 @@ export abstract class AgendaForm extends DocumentForm<AgendaOldFormContent> {
   privacyObjects: { name: string }[] = [];
   @ViewChildren(VoteResultsComponent) voteComponents: QueryList<VoteResultsComponent>;
 
-  @ViewChild('singleVote') singleVoteComponent: VoteResultsComponent;
-  @ViewChild('rescheduled') rescheduled: VoteResultsComponent;
+  @ViewChild('singleVote', { static: false }) singleVoteComponent: VoteResultsComponent;
+  @ViewChild('rescheduled', { static: false }) rescheduled: VoteResultsComponent;
 
   singleVoteResult: VoteResults = new VoteResults();
 

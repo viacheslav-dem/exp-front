@@ -22,24 +22,130 @@ import {ModalComponent} from "@app/components/common-components/modal/modal.comp
 import {LastSignEnumPipe} from "@app/pipes/last-sign.pipe";
 
 @Component({
-  selector: 'app-user-list',
-  templateUrl: './user-list.component.html',
-  styles: [`
-      table {
-          font-size: 0.875rem;
-          background-color: white;
-          margin-bottom: 0;
+    selector: 'app-user-list',
+    templateUrl: './user-list.component.html',
+    styles: [`
+      .table-wrapper {
+          overflow-x: visible;
+          overflow-y: visible;
       }
 
-      td, th {
-          padding: 0.75rem 0.5rem;
+      .table-responsive {
+          overflow-x: visible !important;
       }
-  `]
+
+      table {
+          font-size: 0.9375rem;
+          background-color: white;
+          margin-bottom: 0;
+          table-layout: auto;
+          width: 100%;
+      }
+
+      thead th {
+          padding: 1rem 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-size: 0.8125rem;
+          border-bottom: 2px solid #dee2e6;
+          white-space: nowrap;
+      }
+
+      tbody td, tbody th {
+          padding: 1rem 0.75rem;
+          vertical-align: middle;
+          border-bottom: 1px solid #f0f0f0;
+      }
+
+      .user-name-cell {
+          max-width: 250px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+      }
+
+      .user-email-cell {
+          max-width: 200px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+      }
+
+      .user-table-row {
+          transition: all 0.2s ease;
+      }
+
+      .user-table-row:hover {
+          background-color: #f8f9fa !important;
+          transform: scale(1.01);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .user-table-row.alert-danger {
+          background-color: #f8d7da;
+          border-left: 3px solid #dc3545;
+      }
+
+      .user-table-row.alert-danger:hover {
+          background-color: #f1aeb5 !important;
+      }
+
+      .user-table-row.alert-dark {
+          background-color: #d1d3d4;
+      }
+
+      .user-table-row.alert-deleted {
+          text-decoration: line-through;
+          opacity: 0.6;
+      }
+
+      .cursor-pointer {
+          cursor: pointer;
+      }
+
+      .cursor-pointer:hover {
+          color: #0d6efd !important;
+      }
+
+      .badge {
+          font-size: 0.7rem;
+          padding: 0.35rem 0.65rem;
+      }
+
+      .btn-link {
+          text-decoration: none;
+          transition: all 0.2s ease;
+      }
+
+      .btn-link:hover {
+          transform: scale(1.2);
+      }
+
+      .btn-link.text-primary:hover {
+          color: #0b5ed7 !important;
+      }
+
+      .btn-link.text-danger:hover {
+          color: #bb2d3b !important;
+      }
+
+      @media (max-width: 991.98px) {
+          table {
+              font-size: 0.8rem;
+          }
+          
+          thead th, tbody td, tbody th {
+              padding: 0.75rem 0.5rem;
+          }
+      }
+  `],
+    standalone: false
 })
 export class UserListComponent extends FilterAndPages<PersonDto> implements OnDestroy {
 
   SortClass = SortClass;
-  @ViewChild('showUserInfo') showUserInfo: ModalComponent;
+  @ViewChild('showUserInfo', { static: false }) showUserInfo: ModalComponent;
   users: PersonDto[] = [];
   selectedUser: PersonDto;
   sortOrder: SortOrder = new SortOrder('person', Direction.ASC);

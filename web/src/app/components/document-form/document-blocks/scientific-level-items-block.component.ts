@@ -1,20 +1,25 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output, input} from '@angular/core';
 import {Text} from "@app/components/document-form/form-model/Text";
 
 @Component({
-  selector: 'app-scientific-level-items-block',
-  template: `
+    selector: 'app-scientific-level-items-block',
+    template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Выберите пункты, наличие которых подтверждает научно-технический уровень внедряемых технологий:
+        {{num()}}. Выберите пункты, наличие которых подтверждает научно-технический уровень внедряемых технологий:
       </label>
-      <div *ngFor="let opt of scientificLevelItems">
-        <app-checkbox [(ngModel)]="opt.isChecked" (onChecked)="onChecked()"> {{opt.text}}</app-checkbox>
-      </div>
-      <textarea *ngIf="full" [(ngModel)]="_form.scientificLevelItemsText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст."></textarea>
+      @for (opt of scientificLevelItems; track opt) {
+        <div>
+          <app-checkbox [(ngModel)]="opt.isChecked" (onChecked)="onChecked()"> {{opt.text}}</app-checkbox>
+        </div>
+      }
+      @if (full()) {
+        <textarea [(ngModel)]="_form.scientificLevelItemsText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст."></textarea>
+      }
     </div>
-  `
+    `,
+    standalone: false
 })
 export class ScientificLevelItemsBlockComponent {
 
@@ -28,11 +33,9 @@ export class ScientificLevelItemsBlockComponent {
   ];
   _form: { scientificLevelItems: Text[], scientificLevelItemsText: string };
 
-  @Input()
-  num: string = "5.2";
+  readonly num = input<string>("5.2");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

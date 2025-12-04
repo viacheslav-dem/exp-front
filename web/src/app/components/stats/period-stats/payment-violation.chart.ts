@@ -10,8 +10,9 @@ import {NumberPipe} from "@app/pipes/number.pipe";
 import {TermsStatsDto} from "@app/dto/TermsStatsDto";
 
 @Component({
-  selector: 'app-payment-violation-chart',
-  template: '<highchart [options]="chart"></highchart>'
+    selector: 'app-payment-violation-chart',
+    template: '<highchart [options]="chart"></highchart>',
+    standalone: false
 })
 export class PaymentViolationChart implements OnInit {
 

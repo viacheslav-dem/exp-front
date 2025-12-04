@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Input, Output, input} from "@angular/core";
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
 import {PeriodDto} from "@app/dto/PeriodDto";
 
@@ -7,38 +7,39 @@ import {PeriodDto} from "@app/dto/PeriodDto";
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Соответствие сроков выполнения объекта государственной экспертизы необходимым:
+        {{num()}}. Соответствие сроков выполнения объекта государственной экспертизы необходимым:
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.termsAccordance === true}" (click)="stateButton(true)">
           Соответсвует
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.termsAccordance === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.termsAccordance === false && _form.termsAccordance !== undefined}" (click)="stateButton(false)">
           Не соотвествует
         </button>
       </div>
-      <ng-container *ngIf="!_form.termsAccordance">
+      @if (!_form.termsAccordance) {
         <label class="ml-2">Рекомендуемые сроки реализации:</label>
         <div class="input-group">
           <app-date-period class="form-control mt-2" [(ngModel)]="_terms"
-                           (ngModelChange)="onTermsChanged()"></app-date-period>
+          (ngModelChange)="onTermsChanged()"></app-date-period>
         </div>
-      </ng-container>
-      <textarea *ngIf="full" [(ngModel)]="_form.termsAccordanceText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
+      }
+      @if (full()) {
+        <textarea [(ngModel)]="_form.termsAccordanceText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
+      }
     </div>
-  `
+    `,
+    standalone: false
 })
 export class TermsAccordanceBlock2025Component {
 
     _terms: DateRange;
     _form: { termsAccordance: boolean, termsSuggestion: PeriodDto, termsAccordanceText: string };
 
-    @Input()
-    num: string = "10.2";
+    readonly num = input<string>("10.2");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

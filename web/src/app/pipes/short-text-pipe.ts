@@ -3,7 +3,10 @@
  */
 import {Pipe, PipeTransform} from "@angular/core";
 
-@Pipe({name: 'short'})
+@Pipe({
+    name: 'short',
+    standalone: false
+})
 export class ShortTextPipe implements PipeTransform {
 
   transform(value: string, length: number): any {

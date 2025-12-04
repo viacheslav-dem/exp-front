@@ -1,35 +1,36 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, OnInit, input} from "@angular/core";
 
 @Component({
-  selector: 'app-checkbox-list',
-  template: `
+    selector: 'app-checkbox-list',
+    template: `
     <div>
-      <div *ngFor="let opt of options">
-        <app-checkbox [(ngModel)]="opt.selected" (onChecked)="select(opt)"> {{opt.label}}</app-checkbox>
-      </div>
+      @for (opt of options(); track opt) {
+        <div>
+          <app-checkbox [(ngModel)]="opt.selected" (onChecked)="select(opt)"> {{opt.label}}</app-checkbox>
+        </div>
+      }
     </div>
-  `
+    `,
+    standalone: false
 })
 export class CheckBoxListComponent implements OnInit {
 
 
-  @Input()
-  selected: any[];
+  readonly selected = input<any[]>(undefined);
 
-  @Input()
-  options: ListItem[] = [];
+  readonly options = input<ListItem[]>([]);
 
   ngOnInit(): void {
   }
 
   private getIndex(item: any): number {
     if (item.id) {
-      for (let i = 0; i < this.selected.length; i++)
-        if (item.id == this.selected[i].id)
+      for (let i = 0; i < this.selected().length; i++)
+        if (item.id == this.selected()[i].id)
           return i;
       return -1;
     } else {
-      return this.selected.indexOf(item);
+      return this.selected().indexOf(item);
     }
   }
 
@@ -37,12 +38,12 @@ export class CheckBoxListComponent implements OnInit {
     //Value updates after this method called
     if (item.selected) {
       if (this.getIndex(item.value) < 0) {
-        this.selected.push(item.value);
+        this.selected().push(item.value);
       }
     } else {
       let index = this.getIndex(item.value);
       if (index >= 0) {
-        this.selected.splice(index, 1);
+        this.selected().splice(index, 1);
       }
     }
   }

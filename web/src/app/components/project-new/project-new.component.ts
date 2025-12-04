@@ -4,8 +4,9 @@ import {Router} from "@angular/router";
 import {ProjectService} from "@app/services/project.service";
 
 @Component({
-  selector: 'app-project-new',
-  templateUrl: 'project-new.component.html'
+    selector: 'app-project-new',
+    templateUrl: 'project-new.component.html',
+    standalone: false
 })
 export class ProjectNewComponent implements OnInit {
 

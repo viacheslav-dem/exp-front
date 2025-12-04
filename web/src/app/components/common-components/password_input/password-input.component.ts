@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, forwardRef, input} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "app/components/common-components/control-component";
 import * as _ from "lodash";
@@ -10,68 +10,125 @@ export const PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-password-input',
-  template: `
+    selector: 'app-password-input',
+    template: `
     <ng-container *ngIf="value" ngForm appNestableForm>
-      <label>Текущий пароль</label>
-      <input [(ngModel)]="value.currentPassword" name="currentPassword" class="form-control" type="password" required
-             (change)="onChange()" (input)="onInput()"/>
-      <label>Новый пароль</label>
-      <input [(ngModel)]="value.password" name="password" class="form-control" type="password" required
-             [pattern]="pattern" (change)="onChange()" (input)="onInputNumber2()" #currentPasswordNgModel="ngModel"/>
-      <app-control-error-messages [control]="currentPasswordNgModel.control"></app-control-error-messages>
-      <div>
-        <div class="row p-l-3 m-0">
-          <div class="col p-0 m-0">
-            <hr *ngIf="colors.get('GREY1')" style="border: 4px solid #a0a0a0">
-            <hr *ngIf="colors.get('RED1')" style="border: 4px solid #dc143c">
-            <hr *ngIf="colors.get('YELLOW1')" style="border: 4px solid #ffd700">
-            <hr *ngIf="colors.get('BLUE1')" style="border: 4px solid #1e90ff">
-            <hr *ngIf="colors.get('GREEN1')" style="border: 4px solid #008000">
-          </div>
-          <div class="col p-0 m-0">
-            <hr *ngIf="colors.get('GREY2')" style="border: 4px solid #a0a0a0">
-            <hr *ngIf="colors.get('YELLOW2')" style="border: 4px solid #ffd700">
-            <hr *ngIf="colors.get('BLUE2')" style="border: 4px solid #1e90ff">
-            <hr *ngIf="colors.get('GREEN2')" style="border: 4px solid #008000">
-          </div>
-          <div class="col p-0 m-0">
-            <hr *ngIf="colors.get('GREY3')" style="border: 4px solid #a0a0a0">
-            <hr *ngIf="colors.get('BLUE3')" style="border: 4px solid #1e90ff">
-            <hr *ngIf="colors.get('GREEN3')" style="border: 4px solid #008000">
-          </div>
-          <div class="col p-0 m-0">
-            <hr *ngIf="colors.get('GREY4')" style="border: 4px solid #a0a0a0">
-            <hr *ngIf="colors.get('GREEN4')" style="border: 4px solid #008000">
+      <div class="mb-3">
+        <label class="form-label fw-semibold mb-2">Текущий пароль</label>
+        <input [(ngModel)]="value.currentPassword" name="currentPassword" class="form-control form-control-lg rounded-3" type="password" required
+               (change)="onChange()" (input)="onInput()" placeholder="Введите текущий пароль"/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold mb-2">Новый пароль</label>
+        <input [(ngModel)]="value.password" name="password" class="form-control form-control-lg rounded-3" type="password" required
+               [pattern]="pattern()" (change)="onChange()" (input)="onInputNumber2()" #currentPasswordNgModel="ngModel" placeholder="Введите новый пароль"/>
+        <app-control-error-messages [control]="currentPasswordNgModel.control"></app-control-error-messages>
+      </div>
+      <div class="mb-3">
+        <div class="password-strength-indicator">
+          <div class="row g-2 m-0">
+            <div class="col p-0">
+              <div class="strength-bar" 
+                   [class.bg-secondary]="colors.get('GREY1')"
+                   [class.bg-danger]="colors.get('RED1')"
+                   [class.bg-warning]="colors.get('YELLOW1')"
+                   [class.bg-info]="colors.get('BLUE1')"
+                   [class.bg-success]="colors.get('GREEN1')"></div>
+            </div>
+            <div class="col p-0">
+              <div class="strength-bar"
+                   [class.bg-secondary]="colors.get('GREY2')"
+                   [class.bg-warning]="colors.get('YELLOW2')"
+                   [class.bg-info]="colors.get('BLUE2')"
+                   [class.bg-success]="colors.get('GREEN2')"></div>
+            </div>
+            <div class="col p-0">
+              <div class="strength-bar"
+                   [class.bg-secondary]="colors.get('GREY3')"
+                   [class.bg-info]="colors.get('BLUE3')"
+                   [class.bg-success]="colors.get('GREEN3')"></div>
+            </div>
+            <div class="col p-0">
+              <div class="strength-bar"
+                   [class.bg-secondary]="colors.get('GREY4')"
+                   [class.bg-success]="colors.get('GREEN4')"></div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="p-3">
-        <div class="row">
-          <div class="col">
-            <button *ngIf=!number type="button" class="btn btn-danger rounded-circle" style="padding: 0.10em 1em;" >цифры</button>
-            <button *ngIf=number type="button" class="btn btn-success rounded-circle" style="padding: 0.15em 1em;">цифры</button>
+      <div class="mb-3">
+        <div class="row g-2">
+          <div class="col-6 col-md-3">
+            <div class="password-requirement" [class.requirement-met]="number">
+              <i class="fas me-2" [class.fa-check-circle]="number" [class.fa-times-circle]="!number"></i>
+              <span class="small">Цифры</span>
+            </div>
           </div>
-          <div class="col">
-            <button *ngIf=!uppercase type="button" class="btn btn-danger rounded-circle" style="padding: 0.10em 1em;">заглавные</button>
-            <button *ngIf=uppercase type="button" class="btn btn-success rounded-circle" style="padding: 0.10em 1em;">заглавные</button>
+          <div class="col-6 col-md-3">
+            <div class="password-requirement" [class.requirement-met]="uppercase">
+              <i class="fas me-2" [class.fa-check-circle]="uppercase" [class.fa-times-circle]="!uppercase"></i>
+              <span class="small">Заглавные</span>
+            </div>
           </div>
-          <div class="col">
-            <button *ngIf=!lowercase type="button" class="btn btn-danger rounded-circle" style="padding: 0.10em 1em;">строчные</button>
-            <button *ngIf=lowercase type="button" class="btn btn-success rounded-circle" style="padding: 0.10em 1em;">строчные</button>
+          <div class="col-6 col-md-3">
+            <div class="password-requirement" [class.requirement-met]="lowercase">
+              <i class="fas me-2" [class.fa-check-circle]="lowercase" [class.fa-times-circle]="!lowercase"></i>
+              <span class="small">Строчные</span>
+            </div>
           </div>
-          <div class="col">
-            <button *ngIf=!eightPlus type="button" class="btn btn-danger rounded-circle" style="padding: 0.10em 1em;">8+ символов</button>
-            <button *ngIf=eightPlus type="button" class="btn btn-success rounded-circle" style="padding: 0.10em 1em;">8+ символов</button>
+          <div class="col-6 col-md-3">
+            <div class="password-requirement" [class.requirement-met]="eightPlus">
+              <i class="fas me-2" [class.fa-check-circle]="eightPlus" [class.fa-times-circle]="!eightPlus"></i>
+              <span class="small">8+ символов</span>
+            </div>
           </div>
         </div>
       </div>
-      <label>Повторите новый пароль</label>
-      <input [(ngModel)]="value.passwordConfirmation" name="passwordConfirmation" class="form-control" type="password"
-             required [pattern]="pattern" (change)="onChange()" (input)="onInput()"/>
+      <div class="mb-3">
+        <label class="form-label fw-semibold mb-2">Повторите новый пароль</label>
+        <input [(ngModel)]="value.passwordConfirmation" name="passwordConfirmation" class="form-control form-control-lg rounded-3" type="password"
+               required [pattern]="pattern()" (change)="onChange()" (input)="onInput()" placeholder="Повторите новый пароль"/>
+      </div>
     </ng-container>
   `,
-  providers: [PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR]
+    providers: [PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR],
+    styles: [`
+      .password-strength-indicator {
+        margin: 0.75rem 0;
+      }
+      
+      .strength-bar {
+        height: 4px;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+      
+      .password-requirement {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+      }
+      
+      .password-requirement i.fa-times-circle {
+        color: #dc3545;
+      }
+      
+      .password-requirement i.fa-check-circle {
+        color: #198754;
+      }
+      
+      .password-requirement.requirement-met {
+        background-color: #d1e7dd;
+      }
+      
+      .password-requirement:not(.requirement-met) {
+        background-color: #f8d7da;
+      }
+    `],
+    standalone: false
 })
 export class PasswordInputComponent extends ControlComponent<PasswordDto> {
 
@@ -102,14 +159,12 @@ export class PasswordInputComponent extends ControlComponent<PasswordDto> {
     this.colors.set('GREEN4', false);
   }
 
-  @Input()
-  changeValueAfterBlur = true;
+  readonly changeValueAfterBlur = input(true);
 
-  @Input()
-  pattern: string = "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20})$";
+  readonly pattern = input<string>("^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20})$");
 
   onInput() {
-    if (!this.changeValueAfterBlur) {
+    if (!this.changeValueAfterBlur()) {
       this.onChange();
     }
   }
@@ -121,7 +176,7 @@ export class PasswordInputComponent extends ControlComponent<PasswordDto> {
     this.secondLineLevel();
     this.thirdLineLevel();
     this.fourthLineLevel();
-    if (!this.changeValueAfterBlur) {
+    if (!this.changeValueAfterBlur()) {
       this.onChange();
     }
   }

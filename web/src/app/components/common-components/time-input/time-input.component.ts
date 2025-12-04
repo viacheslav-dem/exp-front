@@ -1,7 +1,7 @@
 import {Component, forwardRef} from '@angular/core';
-import * as moment from "moment";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
+import dayjs from 'dayjs';
 
 export const TIME_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -10,8 +10,8 @@ export const TIME_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-time-input',
-  template: `
+    selector: 'app-time-input',
+    template: `
     <div>
       <app-dropdown class="btn-group" (onSelected)="onHourSelect()" [options]="allHours" [resetEnabled]="false"
                     [(ngModel)]="_hour" [optionToString]="formatTime"></app-dropdown>
@@ -20,7 +20,8 @@ export const TIME_CONTROL_VALUE_ACCESSOR: any = {
                     [(ngModel)]="_minute" [optionToString]="formatTime"></app-dropdown>
     </div>
   `,
-  providers: [TIME_CONTROL_VALUE_ACCESSOR]
+    providers: [TIME_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class TimeInputComponent extends ControlComponent<number> {
 
@@ -42,7 +43,7 @@ export class TimeInputComponent extends ControlComponent<number> {
 
   prepareValue() {
     if (this.value != null) {
-      let date = moment(this.value);
+      let date = dayjs(this.value);
       this._hour = date.hour();
       this._minute = date.minute();
     }
@@ -53,10 +54,22 @@ export class TimeInputComponent extends ControlComponent<number> {
   }
 
   onMinuteSelect() {
-    this.value = moment(this.value).minute(this._minute).valueOf();
+    if (this.value != null) {
+      this.value = dayjs(this.value).minute(this._minute).valueOf();
+    } else {
+      // Если значение null, создаем новую дату с текущим временем
+      let date = dayjs().hour(this._hour).minute(this._minute).second(0).millisecond(0);
+      this.value = date.valueOf();
+    }
   }
 
   onHourSelect() {
-    this.value = moment(this.value).hour(this._hour).valueOf();
+    if (this.value != null) {
+      this.value = dayjs(this.value).hour(this._hour).valueOf();
+    } else {
+      // Если значение null, создаем новую дату с текущим временем
+      let date = dayjs().hour(this._hour).minute(this._minute).second(0).millisecond(0);
+      this.value = date.valueOf();
+    }
   }
 }

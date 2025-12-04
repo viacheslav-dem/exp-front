@@ -9,8 +9,9 @@ import {NumberPipe} from "@app/pipes/number.pipe";
 import {Catalog, DataService} from "@app/services/data.service";
 
 @Component({
-  selector: 'app-review-8-10PVT-form',
-  templateUrl: './expert-review-8-10PVT-form.component.html',
+    selector: 'app-review-8-10PVT-form',
+    templateUrl: './expert-review-8-10PVT-form.component.html',
+    standalone: false
 })
 export class ExpertReview_8_10PVT_FormComponent extends ExpertReviewForm<any> {
 

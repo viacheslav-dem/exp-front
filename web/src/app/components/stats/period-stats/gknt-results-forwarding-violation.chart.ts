@@ -10,8 +10,9 @@ import {NumberPipe} from "@app/pipes/number.pipe";
 import {TermsStatsDto} from "@app/dto/TermsStatsDto";
 
 @Component({
-  selector: 'app-gknt-results-forwarding-violation-chart',
-  template: '<highchart [options]="chart"></highchart>'
+    selector: 'app-gknt-results-forwarding-violation-chart',
+    template: '<highchart [options]="chart"></highchart>',
+    standalone: false
 })
 export class GkntResultsForwardingViolationChart implements OnInit {
 

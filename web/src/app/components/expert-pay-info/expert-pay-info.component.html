@@ -1,56 +1,59 @@
-<ng-container *ngIf="expertInfoDtos.length>0">
-    <table class="border">
-        <tr>
-            <th class="border " style="width: 35%">
-                <div class="m-2">Наименование объекта экспертизы</div>
-            </th>
-            <th class="border " style="width: 13%">
-                <div class="m-2">ГЭС</div>
-            </th>
-            <th class="border " style="width: 13%">
-                <div class="m-2">Дата заключения договора</div>
-            </th>
-            <th class="border " style="width: 13%">
-                <div class="m-2">Дата окончания договора</div>
-            </th>
-            <th class="border " style="width: 13%">
-                <div class="m-2">Дата передачи договора на оплату</div>
-            </th>
-            <th class="border " style="width: 13%">
-                <div class="m-2">Дата оплаты</div>
-            </th>
-        </tr>
-        <tr *ngFor="let project of expertInfoDtos">
-            <td class="border" style="width: 35%">
-                <a target="_blank"
-                   [routerLink]="['/projects/',project.project.id]">
-                    <div class="m-2">{{project.project.title}} ({{project.project.code.code}})</div>
-                </a>
-            </td>
-            <td class="border" style="width: 13%">
-                <div class="m-2" *ngFor="let council of project.councils">
-                    ГЭС №{{council.code}}
-                </div>
-            </td>
-            <td class="border" style="width: 13%">
-                <div class="m-2">{{project.contractDate | date:'dd.MM.yyyy'}}</div>
-            </td>
-            <td class="border" style="width: 13%">
-                <div class="m-2">{{project.contractEnd | date:'dd.MM.yyyy'}}</div>
-            </td>
-            <td class="border" style="width: 13%">
-                <div class="m-2">{{project.actDate | date:'dd.MM.yyyy'}}</div>
-            </td>
-            <td class="border" style="width: 13%">
-                <div class="m-2">{{project.payDate | date:'dd.MM.yyyy'}}</div>
-            </td>
-        </tr>
-
-    </table>
-</ng-container>
-<ng-container *ngIf="expertInfoDtos.length==0">
-    <div>Информация об эксперте отсутствует</div>
-</ng-container>
+@if (expertInfoDtos().length>0) {
+  <table class="border">
+    <tr>
+      <th class="border " style="width: 35%">
+        <div class="m-2">Наименование объекта экспертизы</div>
+      </th>
+      <th class="border " style="width: 13%">
+        <div class="m-2">ГЭС</div>
+      </th>
+      <th class="border " style="width: 13%">
+        <div class="m-2">Дата заключения договора</div>
+      </th>
+      <th class="border " style="width: 13%">
+        <div class="m-2">Дата окончания договора</div>
+      </th>
+      <th class="border " style="width: 13%">
+        <div class="m-2">Дата передачи договора на оплату</div>
+      </th>
+      <th class="border " style="width: 13%">
+        <div class="m-2">Дата оплаты</div>
+      </th>
+    </tr>
+    @for (project of expertInfoDtos(); track project) {
+      <tr>
+        <td class="border" style="width: 35%">
+          <a target="_blank"
+            [routerLink]="['/projects/',project.project.id]">
+            <div class="m-2">{{project.project.title}} ({{project.project.code.code}})</div>
+          </a>
+        </td>
+        <td class="border" style="width: 13%">
+          @for (council of project.councils; track council) {
+            <div class="m-2">
+              ГЭС №{{council.code}}
+            </div>
+          }
+        </td>
+        <td class="border" style="width: 13%">
+          <div class="m-2">{{project.contractDate | date:'dd.MM.yyyy'}}</div>
+        </td>
+        <td class="border" style="width: 13%">
+          <div class="m-2">{{project.contractEnd | date:'dd.MM.yyyy'}}</div>
+        </td>
+        <td class="border" style="width: 13%">
+          <div class="m-2">{{project.actDate | date:'dd.MM.yyyy'}}</div>
+        </td>
+        <td class="border" style="width: 13%">
+          <div class="m-2">{{project.payDate | date:'dd.MM.yyyy'}}</div>
+        </td>
+      </tr>
+    }
+  </table>
+}
+@if (_page.totalElements != null && _page.totalElements === 0 && expertInfoDtos().length == 0) {
+  <div>Информация об эксперте отсутствует</div>
+}
 <app-pagination [page]="_page" [pagination]="_pagination"
-                (onPageChanged)="onPageChanged($event)"></app-pagination>
+(onPageChanged)="onPageChanged($event)"></app-pagination>
 

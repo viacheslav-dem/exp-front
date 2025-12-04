@@ -1,7 +1,10 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {AbstractEnumPipe} from "@app/pipes/abstract-enum.pipe";
 
-@Pipe({name: 'phoneType'})
+@Pipe({
+    name: 'phoneType',
+    standalone: false
+})
 export class PhoneTypePipe extends AbstractEnumPipe<PhoneType> {
 
   init(){

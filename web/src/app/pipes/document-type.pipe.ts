@@ -1,7 +1,10 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {AbstractEnumPipe} from "@app/pipes/abstract-enum.pipe";
 
-@Pipe({name: 'documentType'})
+@Pipe({
+    name: 'documentType',
+    standalone: false
+})
 export class DocumentTypePipe extends AbstractEnumPipe<DocumentType> {
 
   init() {

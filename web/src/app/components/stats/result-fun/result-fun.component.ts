@@ -1,5 +1,5 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
-import * as moment from "moment";
+import dayjs from 'dayjs';
 import {StatsService} from "@app/services/stats.service";
 import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO";
 import {EMPTY, Subscription, throwError} from "rxjs";
@@ -7,9 +7,10 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {CouncilStatsV2ResponseDTO} from "@app/dto/response/CouncilStatsV2ResponseDTO";
 
 @Component({
-  selector: 'app-result-fun',
-  templateUrl: './result-fun.component.html',
-  styles: []
+    selector: 'app-result-fun',
+    templateUrl: './result-fun.component.html',
+    styles: [],
+    standalone: false
 })
 export class ResultFunComponent implements OnInit, OnDestroy {
 
@@ -129,7 +130,7 @@ export class ResultFunComponent implements OnInit, OnDestroy {
 
   private getResFunMonth() {
     let date = new Date(this.year, this.months.indexOf(this.mouth), 1);
-    let dateToExclusive = moment(date).valueOf();
+    let dateToExclusive = dayjs(date).valueOf();
     this.subscription = this.statsService.getResFunMonth(dateToExclusive).subscribe(
         res => {
           this.councilStatsResponseDTOs = res;
@@ -153,8 +154,8 @@ export class ResultFunComponent implements OnInit, OnDestroy {
   private getResFunYear() {
     let date = new Date(this.year, 0, 1);
 
-    let dateFrom = moment(date).valueOf();
-    let dateTo = moment(date).add(1, 'year').valueOf();
+    let dateFrom = dayjs(date).valueOf();
+    let dateTo = dayjs(date).add(1, 'year').valueOf();
     this.subscription = this.statsService.getResFunYear(dateFrom, dateTo).subscribe(
         res => {
           this.councilStatsResponseDTOs = res;

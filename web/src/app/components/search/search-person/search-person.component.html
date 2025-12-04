@@ -7,18 +7,22 @@
   <div [loadingData]="_loading">
     <!--PAGE-->
     <ul class="list-group list-group-sm mt-3">
-      <li class="list-group-item list-group-item-action selectable"
-          *ngFor="let user of _page.content" (click)="onSelected(user)">
-        {{user | fullName}}
-      </li>
+      @for (user of _page.content; track user) {
+        <li class="list-group-item list-group-item-action selectable"
+          (click)="onSelected(user)">
+          {{user | fullName}}
+        </li>
+      }
     </ul>
 
-    <div *ngIf="_page.totalElements == 0" class="alert alert-info italic mb-0">
-      Никто не найден
-    </div>
+    @if (_page.totalElements == 0) {
+      <div class="alert alert-info italic mb-0">
+        Никто не найден
+      </div>
+    }
 
     <!--PAGINATION-->
     <app-pagination [page]="_page" [pagination]="_pagination"
-                    (onPageChanged)="onPageChanged($event)"></app-pagination>
+    (onPageChanged)="onPageChanged($event)"></app-pagination>
   </div>
 </app-modal>

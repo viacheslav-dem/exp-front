@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 
@@ -7,33 +7,31 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
     template: `
         <div class="form-sub-group">
             <label>
-                {{num}} Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
+                {{num()}} Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
                 научно-технической деятельности в Республики Беларусь:
             </label>
             <app-boolean-button class="d-inline-block"
-                                [(ngModel)]="_form.isAccordance"
+                                [(ngModel)]="_form().isAccordance"
                                 [trueLabel]="'да'"
                                 [falseLabel]="'нет'"
                                 (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
         </div>
-  `
+  `,
+    standalone: false
 })
 export class DocumentAccordanceBlock {
 
-    @Input()
-    num: string = "9.3";
+    readonly num = input<string>("9.3");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    isTextRequired: boolean = false;
+    readonly isTextRequired = input<boolean>(false);
 
-    @Input()
-    _form: { isAccordance: boolean};
+    readonly _form = input<{
+    isAccordance: boolean;
+}>(undefined);
 
-    @Input()
-    project: ProjectPlainDto | ProjectDto;
+    readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

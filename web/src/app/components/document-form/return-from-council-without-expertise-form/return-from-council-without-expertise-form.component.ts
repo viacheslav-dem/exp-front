@@ -1,4 +1,4 @@
-import {Component, Input, ViewChild} from '@angular/core';
+import {Component, ViewChild, input} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {Role} from "@app/pipes/role.pipe";
@@ -10,29 +10,29 @@ import {CouncilPlainDto} from "@app/dto/CouncilPlainDto";
 import {Catalog} from "@app/services/data.service";
 
 @Component({
-  selector: 'app-return-from-council-without-expertise-form',
-  templateUrl: './return-from-council-without-expertise-form.component.html',
-  styles: [``]
+    selector: 'app-return-from-council-without-expertise-form',
+    templateUrl: './return-from-council-without-expertise-form.component.html',
+    standalone: false
 })
 export class ReturnFromCouncilWithoutExpertiseFormComponent extends DocumentForm<ReturnFromCouncilWithoutExpertiseFormContent> {
 
   Role = Role;
   Catalog = Catalog;
 
-  @Input() project: ProjectDto;
-  @Input() group: LifecycleGroupDto;
-  @Input() council: CouncilPlainDto;
+  readonly project = input<ProjectDto>(undefined);
+  readonly group = input<LifecycleGroupDto>(undefined);
+  readonly council = input<CouncilPlainDto>(undefined);
 
-  @ViewChild(SearchPersonByRolesComponent) public searchPersonModal: SearchPersonByRolesComponent;
+  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
 
   ngOnInit() {
     super.ngOnInit();
-    this._form.chairman = this.group.bureauChairman;
+    this._form.chairman = this.group().bureauChairman;
   }
 
   validate() {
     super.validate();
-    if (this._form.targetCouncil && this._form.targetCouncil.id == this.council.id) {
+    if (this._form.targetCouncil && this._form.targetCouncil.id == this.council().id) {
       throw 'Рекомендуемый ГЭС совпадает с Вашим.';
     }
   }

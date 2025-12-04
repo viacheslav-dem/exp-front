@@ -1,7 +1,10 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {AbstractEnumPipe} from "@app/pipes/abstract-enum.pipe";
 
-@Pipe({name: 'bankAccountType'})
+@Pipe({
+    name: 'bankAccountType',
+    standalone: false
+})
 export class BankAccountTypePipe extends AbstractEnumPipe<BankAccountType> {
 
   init() {

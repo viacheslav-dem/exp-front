@@ -1,7 +1,116 @@
+@use "bootstrap" as *;
+
+.project-list-item {
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.375rem;
+  margin-bottom: 0.75rem;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  
+  // Ссылка внутри не должна выглядеть как обычная ссылка
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+  
+  // Структура inline - элементы идут друг за другом
+  .float-end {
+    float: right;
+  }
+  
+  // Badge с отступом справа
+  .badge {
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
+    padding: 0.35em 0.65em;
+    white-space: nowrap;
+    font-weight: 500;
+    vertical-align: middle;
+  }
+  
+  // Заголовок - темно-серый, не синий
+  .font-weight-bold {
+    font-weight: 700 !important;
+    color: #212529 !important;
+  }
+  
+  .font-weight-normal {
+    font-weight: 400 !important;
+    color: #212529 !important;
+  }
+  
+  // Бейдж слева - teal цвет как на эталоне
+  .badge-info {
+    background-color: #17a2b8 !important; // teal/cyan цвет
+    color: #fff !important;
+  }
+  
+  .badge-success {
+    background-color: #28a745 !important;
+    color: #fff !important;
+  }
+  
+  .badge-danger {
+    background-color: #dc3545 !important;
+    color: #fff !important;
+  }
+  
+  &.alert-primary {
+    background-color: #e7f3ff;
+    border-color: #b3d9ff;
+  }
+  
+  &.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+  }
+  
+  &.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffecb5;
+  }
+  
+  // Улучшаем отображение текста
+  .text-sm {
+    line-height: 1.5;
+  }
+  
+  // Номер проекта - светло-серый
+  .text-muted {
+    color: #6c757d !important;
+  }
+  
+  // Текст мини
+  .text-mini {
+    font-size: 0.875rem;
+  }
+  
+  // Bold класс
+  .bold {
+    font-weight: 700 !important;
+  }
+}
+
 .list-group-item {
   margin-bottom: 0 !important;
   .text-mini, .badge {
     margin-right: 0.3rem;
+  }
+  
+  // Ссылки внутри list-group-item должны выглядеть как обычные ссылки
+  a:not(.list-group-item-action):not(.btn):not(.nav-link) {
+    color: var(--bs-link-color, #0d6efd);
+    text-decoration: underline;
+    
+    &:hover {
+      color: var(--bs-link-hover-color, #0a58ca);
+      text-decoration: underline;
+    }
+  }
+  
+  // Улучшаем читаемость элементов списка
+  .badge {
+    flex-shrink: 0;
   }
 }
 

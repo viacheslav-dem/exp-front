@@ -1,69 +1,128 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
-import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
+import {Component, EventEmitter, Output, input, OnDestroy, OnInit} from "@angular/core";
 import {StorageService} from "@app/services/storage.service";
 import {SERVER_URL} from "@app/config";
-import {DocumentDto} from "@app/dto/DocumentDto";
 import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/ConfirmDialogField";
+import {HttpClientSecure} from "@app/services/http.client";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'app-meth-rec-pdf',
     template: `
         <div>
-            <div class="mb-2">{{message}}</div>
-            <div class="form-sub-group" *ngFor="let field of fields">
-                <label>{{field.label}}</label>
-                <input class="form-control" [type]="field.type" [(ngModel)]="field.value" required [name]="field.name"/>
+          <div class="mb-2">{{message()}}</div>
+          @for (field of (fields() ?? []); track field) {
+            <div class="form-sub-group">
+              <label>{{field.label}}</label>
+              <input class="form-control" [type]="field.type" [(ngModel)]="field.value" required [name]="field.name"/>
             </div>
-            <iframe [src]="getFileUrl()" class="viewer" align="left" allowfullscreen>
-                Ваш браузер не поддерживает плавающие фреймы!
-            </iframe>
-            <div class="text-sm">{{description}}</div>
-            <div class="mt-3">
-                <button class="btn btn-primary mr-1" (click)="confirm()">{{okBtnMessage}}</button>
-                <button class="btn btn-dark" (click)="cancel()">{{cancelBtnMessage}}</button>
-            </div>
+          }
+          @if (pdfSrc) {
+            <pdf-viewer 
+                  [src]="pdfSrc" 
+                  [render-text]="true"
+                  [original-size]="false"
+                  [show-all]="true"
+                  [zoom]="1"
+                  [zoom-scale]="'page-width'"
+                  style="width: 100%; height: 60vh; display: block;"
+                  class="pdf-viewer-container">
+            </pdf-viewer>
+          }
+          <div class="text-sm">{{description()}}</div>
+          <div class="mt-3">
+            <button class="btn btn-primary me-1" (click)="confirm()">{{okBtnMessage()}}</button>
+            <button class="btn btn-dark" (click)="cancel()">{{cancelBtnMessage()}}</button>
+          </div>
         </div>
-  `
+        `,
+    standalone: false,
+    styles: [`
+        .pdf-viewer-container {
+            width: 100%;
+            display: block;
+        }
+        ::ng-deep .pdf-viewer-container canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+    `]
 })
-export class MethRecPdfComponent {
+export class MethRecPdfComponent implements OnInit, OnDestroy {
 
-    @Input() message: string = 'Вы действительно хотите выполнить данную операцию?';
-    @Input() description: string = 'Пожалуйста, перепроверьте данные, поскольку обратить действие будет невозможно.';
-    @Input() okBtnMessage: string = 'Подтвердить';
-    @Input() cancelBtnMessage: string = 'Отмена';
-    @Input() fields: ConfirmDialogField<any>[] = [];
+    readonly message = input<string>('Вы действительно хотите выполнить данную операцию?');
+    readonly description = input<string>('Пожалуйста, перепроверьте данные, поскольку обратить действие будет невозможно.');
+    readonly okBtnMessage = input<string>('Подтвердить');
+    readonly cancelBtnMessage = input<string>('Отмена');
+    readonly fields = input<ConfirmDialogField<any>[]>([]);
 
     @Output() onSave = new EventEmitter<any>();
     @Output() canceled = new EventEmitter();
 
+    pdfSrc: string | Uint8Array | ArrayBuffer;
+    private subscription: Subscription;
+
+    constructor(private _storage: StorageService,
+                private _http: HttpClientSecure) {
+    }
+
+    ngOnInit(): void {
+        // Настройка worker для PDF.js (ng2-pdf-viewer использует pdfjs-dist)
+        if (typeof window !== 'undefined') {
+            import('pdfjs-dist').then((pdfjsLib) => {
+                try {
+                    // Используем локальный worker файл
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = './assets/pdf.worker.min.mjs';
+                } catch (e) {
+                    // Если не удалось установить, используем CDN
+                    console.warn('Could not set local PDF.js worker, using CDN:', e);
+                    try {
+                        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+                    } catch (e2) {
+                        console.error('Could not set PDF.js worker:', e2);
+                    }
+                }
+            }).catch((err) => {
+                console.warn('Could not load pdfjs-dist:', err);
+            });
+        }
+        this.loadPdf();
+    }
+
     confirm() {
         let result = {};
-        if (this.fields != null)
-            this.fields.forEach(field => result[field.name] = field.value);
+        const fieldsValue = this.fields();
+        if (fieldsValue != null && Array.isArray(fieldsValue)) {
+            fieldsValue.forEach(field => result[field.name] = field.value);
+        }
         this.onSave.next(result);
     }
 
     cancel() {
-        this.canceled.next();
+        this.canceled.next(null);
     }
 
-    documentUrl: SafeResourceUrl;
-    @Input() url: string = 'document';
-
-    constructor(private sanitizer: DomSanitizer,
-                private _storage: StorageService) {
+    private loadPdf(): void {
+        const url = `${SERVER_URL}/document/get/meth_rec`;
+        
+        this.subscription = this._http.getBlock<Blob>(url, {
+            responseType: 'blob'
+        }).subscribe(
+            (blob: Blob) => {
+                // Конвертируем Blob в ArrayBuffer для ng2-pdf-viewer
+                blob.arrayBuffer().then(buffer => {
+                    this.pdfSrc = new Uint8Array(buffer);
+                });
+            },
+            (error) => {
+                console.error('Error loading PDF:', error);
+                this.pdfSrc = null;
+            }
+        );
     }
 
-    // @Input() set doc(doc: DocumentDto) {
-    //     this.documentUrl = doc ? this.sanitizer.bypassSecurityTrustResourceUrl(this.getFileUrl(doc)) : null;
-    // }
-
-    public getFileUrl() {
-        //
-        // let filename = encodeURIComponent(doc.name + '.pdf');
-        // let args = `token=${this._storage.getAccessToken()}&convert=true&id=${doc.id}&filename=${filename}`;
-        let serverUrl = `${SERVER_URL}/document/get/meth_rec`;
-        return this.sanitizer.bypassSecurityTrustResourceUrl(
-            `${location.origin}${location.pathname}/assets/pdfjs/web/viewer.html?file=${encodeURIComponent(serverUrl)}`);
+    ngOnDestroy(): void {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
     }
 }

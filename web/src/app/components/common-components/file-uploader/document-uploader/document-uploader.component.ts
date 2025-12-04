@@ -1,30 +1,56 @@
-import {Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
+import {Component, EventEmitter, Output, ViewChild, input} from "@angular/core";
 import {AuthService} from "app/services/auth.service";
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {ModalComponent} from "app/components/common-components/modal/modal.component";
 import {UploadHelper} from "app/components/common-components/file-uploader/upload-helper";
 import {removeFileSuffix} from "app/support/utils";
 import {IdDto} from "@app/dto/IdDto";
+import { HttpBackend } from "@angular/common/http";
 
 @Component({
-  selector: 'app-document-uploader',
-  templateUrl: 'document-uploader.component.html'
+    selector: 'app-document-uploader',
+    templateUrl: 'document-uploader.component.html',
+    standalone: false
 })
 export class DocumentUploaderComponent extends UploadHelper {
 
   fileName: string;
   fileDescription: string;
+  isDragOver: boolean = false;
 
-  @Input() url: string;
-  @Input() idDto: IdDto;
-  @Input() typesAccept: string;
+  readonly url = input<string>(undefined);
+  readonly idDto = input<IdDto>(undefined);
+  readonly typesAccept = input<string>(undefined);
   @Output() saved = new EventEmitter();
 
   @ViewChild('fileLoaderModal') fileLoaderModal: ModalComponent;
 
   constructor(private _toasty: GlobalToastyService,
-              protected _authService: AuthService) {
-    super(_authService);
+              protected _authService: AuthService,
+              httpBackend: HttpBackend) {
+    super(_authService, httpBackend);
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+    const files = event.dataTransfer && event.dataTransfer.files;
+    if (files && files.length) {
+      this.onFilesChosen(Array.from(files) as File[]);
+    }
   }
 
   ngOnInit() {
@@ -61,7 +87,7 @@ export class DocumentUploaderComponent extends UploadHelper {
   }
 
   getUrl() {
-    return `${this.url}?id=${this.idDto.id}&name=${encodeURIComponent(this.fileName)}`
+    return `${this.url()}?id=${this.idDto().id}&name=${encodeURIComponent(this.fileName)}`
       + `&description=${this.fileDescription ? encodeURIComponent(this.fileDescription) : ''}`;
   }
 

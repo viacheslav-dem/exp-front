@@ -1,8 +1,8 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
-  selector: 'app-conclusion-8-10PIT-block',
-  template: `
+    selector: 'app-conclusion-8-10PIT-block',
+    template: `
     <div class="form-group">
 
       <label class="font-weight-bold">
@@ -10,7 +10,7 @@ import {Component, Input} from '@angular/core';
       </label>
 
       <label>Отнесение товара (работы, услуги) к категории инновационных товаров:</label>
-      <app-boolean-button [ngModel]="_form.patents && _form.advantage && _form.competitiveness"
+      <app-boolean-button [ngModel]="_form().patents && _form().advantage && _form().competitiveness"
                           [disabled]="true"
                           [showDisabledSelection]="true"
                           [trueLabel]="'относится'"
@@ -23,10 +23,14 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class Conclusion810PITBlockComponent {
 
-  @Input()
-  _form: { patents: boolean, advantage: boolean, competitiveness: boolean };
+  readonly _form = input<{
+    patents: boolean;
+    advantage: boolean;
+    competitiveness: boolean;
+}>(undefined);
 }

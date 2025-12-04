@@ -1,7 +1,10 @@
 import {Directive, Input, TemplateRef, ViewContainerRef} from '@angular/core';
 import {AuthService} from "@app/services/auth.service";
 
-@Directive({selector: '[ifRole]'})
+@Directive({
+    selector: '[ifRole]',
+    standalone: false
+})
 export class IfRoleDirective {
     constructor(private templateRef: TemplateRef<any>,
                 private _authService: AuthService,

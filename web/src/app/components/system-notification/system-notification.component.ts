@@ -7,6 +7,7 @@ import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
 @Component({
     selector: 'system-notification',
     templateUrl: './system-notification.component.html',
+    standalone: false
 })
 export class SystemNotificationComponent {
 

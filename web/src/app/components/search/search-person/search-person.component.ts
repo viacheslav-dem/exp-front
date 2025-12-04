@@ -6,16 +6,16 @@ import {SearchField} from "@app/components/common-components/page-and-filter/mod
 import {Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
 import {Filter} from "@app/components/common-components/page-and-filter/model/Filter";
 import {PersonPlainDto} from "@app/dto/PersonPlainDto";
-import {isArray} from "util";
 
 @Component({
-  selector: 'app-search-person',
-  templateUrl: './search-person.component.html'
+    selector: 'app-search-person',
+    templateUrl: './search-person.component.html',
+    standalone: false
 })
 export class SearchPersonComponent extends FilterAndPages<PersonPlainDto> {
 
   @Output() selected = new EventEmitter<PersonPlainDto>();
-  @ViewChild('searchModal') searchPersonModal: ModalComponent;
+  @ViewChild('searchModal', { static: false }) searchPersonModal: ModalComponent;
 
   constructor(protected _service: PersonService) {
     super();
@@ -32,7 +32,7 @@ export class SearchPersonComponent extends FilterAndPages<PersonPlainDto> {
   }
 
   @Input() set filters(filters: Filter<any>[] | Filter<any>) {
-    if (!isArray(filters)) {
+    if (!Array.isArray(filters)) {
       filters = [filters];
     }
     this._filters = filters;

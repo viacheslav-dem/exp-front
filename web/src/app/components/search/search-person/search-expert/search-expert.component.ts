@@ -12,8 +12,9 @@ import {FilterAndPages} from "@app/components/common-components/page-and-filter/
 import {PersonExpertDto} from "@app/dto/PersonExpertDto";
 
 @Component({
-  selector: 'app-search-expert',
-  templateUrl: 'search-expert.component.html'
+    selector: 'app-search-expert',
+    templateUrl: 'search-expert.component.html',
+    standalone: false
 })
 export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
 
@@ -21,7 +22,7 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
   experts: PersonExpertDto[] = [];
   sortDirection = Direction.ASC;
   @Output() selected = new EventEmitter<PersonExpertDto>();
-  @ViewChild('searchModal') searchPersonModal: ModalComponent;
+  @ViewChild('searchModal', { static: false }) searchPersonModal: ModalComponent;
 
   constructor(protected _service: PersonService) {
     super();

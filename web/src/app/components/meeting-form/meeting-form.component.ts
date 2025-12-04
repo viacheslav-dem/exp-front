@@ -1,6 +1,6 @@
 import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
-import {ModalDirective} from "ngx-bootstrap";
-import * as moment from "moment";
+import {ModalDirective} from "ngx-bootstrap/modal";
+import dayjs from 'dayjs';
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {PeriodDto} from "@app/dto/PeriodDto";
 import {MeetingPostDto} from "@app/dto/MeetingPostDto";
@@ -11,17 +11,18 @@ import {MeetingService} from "@app/services/meeting.service";
 import {isEmptyOrNull} from "@app/support/utils";
 
 @Component({
-  selector: 'app-meeting-form',
-  templateUrl: './meeting-form.component.html'
+    selector: 'app-meeting-form',
+    templateUrl: './meeting-form.component.html',
+    standalone: false
 })
 export class MeetingFormComponent {
 
-  period = new PeriodDto(moment().valueOf(), moment().valueOf());
+  period = new PeriodDto(dayjs().valueOf(), dayjs().valueOf());
   projects: ProjectPlainDto[] = [];
   id: number;
   place: string;
   isEdit: boolean;
-  @ViewChild('modal') modal: ModalDirective;
+  @ViewChild('modal', { static: false }) modal: ModalDirective;
   @Output() onAdd: EventEmitter<MeetingDto> = new EventEmitter<MeetingDto>();
 
   constructor(private _meetingService: MeetingService,
@@ -34,8 +35,8 @@ export class MeetingFormComponent {
   }
 
   save() {
-    let endDate = moment(this.period.end);
-    this.period.end = moment(this.period.start).hour(endDate.hour()).minute(endDate.minute()).valueOf();
+    let endDate = dayjs(this.period.end);
+    this.period.end = dayjs(this.period.start).hour(endDate.hour()).minute(endDate.minute()).valueOf();
     this.validateProject();
     this.validateData();
     let meeting = new MeetingPostDto(this.period, this.place, this.projects.filter(project => project.isChecked));
@@ -48,8 +49,8 @@ export class MeetingFormComponent {
   }
 
   edit() {
-    let endDate = moment(this.period.end);
-    this.period.end = moment(this.period.start).hour(endDate.hour()).minute(endDate.minute()).valueOf();
+    let endDate = dayjs(this.period.end);
+    this.period.end = dayjs(this.period.start).hour(endDate.hour()).minute(endDate.minute()).valueOf();
     this.validateProject();
     this.validateData();
     let meeting = new MeetingPostDto(this.period, this.place, this.projects.filter(project => project.isChecked), this.id);
@@ -97,7 +98,7 @@ export class MeetingFormComponent {
 
     }
     else {
-      this.period = new PeriodDto(moment().valueOf(), moment().valueOf());
+      this.period = new PeriodDto(dayjs().valueOf(), dayjs().valueOf());
       this.place = null;
       this.isEdit = false;
       this.loadProjectsForMeeting();

@@ -1,4 +1,7 @@
-import * as moment from "moment";
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
 
 export class PeriodInnovationDto {
 
@@ -11,8 +14,11 @@ export class PeriodInnovationDto {
     }
 
     parse(date: number | string): number {
+        if (date == null || date === undefined) {
+            return null;
+        }
         if (typeof date === 'string') {
-            return moment(date, 'YYYY-MM-DD HH:mm:ss').toDate().getTime();
+            return dayjs(date, 'YYYY-MM-DD HH:mm:ss').valueOf();
         }
         return date;
     }

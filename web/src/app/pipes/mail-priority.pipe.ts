@@ -1,7 +1,10 @@
 import {Pipe} from "@angular/core";
 import {AbstractEnumPipe} from "@app/pipes/abstract-enum.pipe";
 
-@Pipe({name: 'mailPriority'})
+@Pipe({
+    name: 'mailPriority',
+    standalone: false
+})
 export class MailPriorityPipe extends AbstractEnumPipe<MailPriority> {
 
   init() {

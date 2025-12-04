@@ -10,9 +10,9 @@ import {StorageService} from "@app/services/storage.service";
 import {RoleInfoDto} from "@app/dto/RoleInfoDto";
 
 @Component({
-  selector: 'app-loginoff',
-  templateUrl: './loginoff.component.html',
-  styles: [`
+    selector: 'app-loginoff',
+    templateUrl: './loginoff.component.html',
+    styles: [`
       .dropdown-menu {
           width: 260px;
       }
@@ -25,7 +25,8 @@ import {RoleInfoDto} from "@app/dto/RoleInfoDto";
         color: #212529;
         text-decoration: none
     }
-  `]
+  `],
+    standalone: false
 })
 export class LoginoffComponent implements OnInit, OnDestroy {
   public roles: string[] = [];

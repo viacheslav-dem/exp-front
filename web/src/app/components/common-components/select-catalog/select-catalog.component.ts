@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, forwardRef, input} from '@angular/core';
 import {DataService} from "@app/services/data.service";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
@@ -11,21 +11,22 @@ export const CATALOG_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-select-catalog',
-  template: `
+    selector: 'app-select-catalog',
+    template: `
     <app-dropdown 
-      [(ngModel)]="value" [notSelected]="notSelected" [options]="options"
-      [resetEnabled]="resetEnabled" [optionToString]="optionToString"
+      [(ngModel)]="value" [notSelected]="notSelected()" [options]="options"
+      [resetEnabled]="resetEnabled()" [optionToString]="optionToString()"
     ></app-dropdown>
   `,
-  providers: [CATALOG_CONTROL_VALUE_ACCESSOR]
+    providers: [CATALOG_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class SelectCatalogComponent extends ControlComponent<CatalogDto> {
 
-  @Input() resetEnabled: boolean = true;
-  @Input() catalog: string;
-  @Input() notSelected: string = 'Ничего не выбрано';
-  @Input() optionToString: Function;
+  readonly resetEnabled = input<boolean>(true);
+  readonly catalog = input<string>(undefined);
+  readonly notSelected = input<string>('Ничего не выбрано');
+  readonly optionToString = input<Function>(undefined);
 
   options: CatalogDto[] = [];
 
@@ -34,7 +35,7 @@ export class SelectCatalogComponent extends ControlComponent<CatalogDto> {
   }
 
   ngOnInit(): void {
-    this.dataService.getCatalog<CatalogDto>(this.catalog).subscribe(res => {
+    this.dataService.getCatalog<CatalogDto>(this.catalog()).subscribe(res => {
       this.options = res
     });
   }

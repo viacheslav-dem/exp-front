@@ -1,17 +1,19 @@
-import {EventEmitter, Injectable, Input, OnDestroy, OnInit, Output} from "@angular/core";
+import {Directive, EventEmitter, Input, OnDestroy, OnInit, Output, input} from "@angular/core";
 import {FormContent} from "@app/components/document-form/form-model/FormContent";
 import {DraftService} from "@app/components/document-form/draft.service";
 import {IdDto} from "@app/dto/IdDto";
-import {Observable} from "rxjs";
+import {Observable, timer} from "rxjs";
+import {takeWhile} from "rxjs/operators";
 import {deepClone} from "@app/support/utils";
-@Injectable()
+
+@Directive()
 export class DocumentForm<Form extends FormContent> implements OnInit, OnDestroy {
 
   _form: Form = this.createNewForm();
   @Output() onSave = new EventEmitter<Form>();
   @Output() onClose = new EventEmitter();
-  @Input() draftService: DraftService<Form>;
-  @Input() draftOwner: IdDto;
+  readonly draftService = input<DraftService<Form>>(undefined);
+  readonly draftOwner = input<IdDto>(undefined);
   _draftAutoSaveAlive: boolean = false;
   _draftAutoSaveStartTimeMillis = 30000;
   _draftAutoSavePeriodMillis = 30000;
@@ -25,14 +27,16 @@ export class DocumentForm<Form extends FormContent> implements OnInit, OnDestroy
   }
 
   startAutoSave() {
-    if (!(this.draftService && this.draftOwner)) {
+    const draftService = this.draftService();
+    const draftOwner = this.draftOwner();
+    if (!(draftService && draftOwner)) {
       return;
     }
     this._draftAutoSaveAlive = true;
-    this.draftService.getDraft(this.draftOwner).subscribe(res => {
+    draftService.getDraft(draftOwner).subscribe(res => {
       this.setForm(res);
-      Observable.timer(this._draftAutoSaveStartTimeMillis, this._draftAutoSavePeriodMillis)
-        .takeWhile(() => this._draftAutoSaveAlive)
+      timer(this._draftAutoSaveStartTimeMillis, this._draftAutoSavePeriodMillis)
+        .pipe(takeWhile(() => this._draftAutoSaveAlive))
         .subscribe(() => this.saveDraft());
     });
   }
@@ -42,8 +46,10 @@ export class DocumentForm<Form extends FormContent> implements OnInit, OnDestroy
   }
 
   saveDraft() {
-    if (this.draftService && this.draftOwner) {
-      this.draftService.saveDraft(this.draftOwner, this.getForm()).subscribe();
+    const draftService = this.draftService();
+    const draftOwner = this.draftOwner();
+    if (draftService && draftOwner) {
+      draftService.saveDraft(draftOwner, this.getForm()).subscribe();
     }
   }
 

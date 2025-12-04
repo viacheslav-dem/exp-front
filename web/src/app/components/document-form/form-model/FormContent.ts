@@ -1,6 +1,6 @@
-import * as moment from "moment";
+import dayjs from 'dayjs';
 
 export class FormContent {
-  date: number = moment().valueOf();
+  date: number = dayjs().valueOf();
   isDefault: boolean = true;
 }

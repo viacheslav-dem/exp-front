@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 import {EconomicActivityBlockComponent} from "@app/components/document-form/document-blocks/economic-activity-block";
 
 @Component({
@@ -6,32 +6,33 @@ import {EconomicActivityBlockComponent} from "@app/components/document-form/docu
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Производство товара на основе новых и высоких технологий и (или) с использованием высокотехнологичных производств:
+        {{num()}}. Производство товара на основе новых и высоких технологий и (или) с использованием высокотехнологичных производств:
       </label>
-        <app-boolean-button [(ngModel)]="_form.basedOnHighTech" [trueLabel]="trueLabel"
-                            [falseLabel]="falseLabel"
-                            (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <textarea *ngIf="full || _form.basedOnHighTech" 
-                [(ngModel)]="_form.basedOnHighTechText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст."></textarea>
+      <app-boolean-button [(ngModel)]="_form().basedOnHighTech" [trueLabel]="trueLabel()"
+        [falseLabel]="falseLabel()"
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      @if (full() || _form().basedOnHighTech) {
+        <textarea
+          [(ngModel)]="_form().basedOnHighTechText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст."></textarea>
+      }
     </div>
-  `
+    `,
+    standalone: false
 })
 export class BasedOnHighTechBlockComponent {
 
-    @Input()
-    num: string = "9.2";
+    readonly num = input<string>("9.2");
 
-    @Input()
-    full: boolean = true;
-    @Input()
-    trueLabel : string = "осуществляется";
+    readonly full = input<boolean>(true);
+    readonly trueLabel = input<string>("осуществляется");
 
-    @Input()
-    falseLabel : string = "не осуществляется";
+    readonly falseLabel = input<string>("не осуществляется");
 
-    @Input()
-    _form: { basedOnHighTech: boolean, basedOnHighTechText: string };
+    readonly _form = input<{
+    basedOnHighTech: boolean;
+    basedOnHighTechText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

@@ -1,37 +1,41 @@
 <div class="dropdown">
-    <div *ngIf="user" class="link dropdown-toggle pl-2" data-toggle="dropdown">
-        {{user | fullName}}
-        <br>
+  @if (user) {
+    <div class="link dropdown-toggle ps-2" data-bs-toggle="dropdown">
+      {{user | fullName}}
+      <br>
         ({{role | role}})
-    </div>
-    <ul class="dropdown-menu dropdown-menu-right shadow">
-        <li class="dropdown-item selectable" (click)="showEditUserModal()">
-            <fa-icon icon="user" [fixedWidth]="true"></fa-icon>
-            Редактировать профиль
+      </div>
+    }
+    <ul class="dropdown-menu dropdown-menu-end shadow" #dropdownMenu>
+      <li class="dropdown-item selectable" (click)="showEditUserModal()">
+        <fa-icon icon="user" [fixedWidth]="true"></fa-icon>
+        Редактировать профиль
+      </li>
+      <li class="dropdown-item selectable" (click)="changePassword()">
+        <fa-icon icon="key" [fixedWidth]="true"></fa-icon>
+        Сменить пароль
+      </li>
+      @if (roles.length > 1) {
+        <li class="dropdown-item selectable" (click)="changeRole()">
+          <fa-icon icon="list" [fixedWidth]="true"></fa-icon>
+          Сменить роль
         </li>
-        <li class="dropdown-item selectable" (click)="changePassword()">
-            <fa-icon icon="key" [fixedWidth]="true"></fa-icon>
-            Сменить пароль
-        </li>
-        <li class="dropdown-item selectable" *ngIf="roles.length > 1" (click)="changeRole()">
-            <fa-icon icon="list" [fixedWidth]="true"></fa-icon>
-            Сменить роль
-        </li>
-        <li class="dropdown-divider"></li>
-        <li class="dropdown-item selectable" (click)="getUserManual()">
-            <fa-icon icon="info-circle" [fixedWidth]="true"></fa-icon>
-            Руководство пользователя
-        </li>
-        <li class="dropdown-item selectable">
-            <fa-icon icon="play-circle" [fixedWidth]="true"></fa-icon>
-            <a class="not-link" target="_blank" href="https://www.youtube.com/channel/UCoBl4G26Um6JuSbkX3HeJVw/videos">
-                Видеоинструкции</a>
-        </li>
-        <li class="dropdown-divider"></li>
-        <li class="dropdown-item selectable" (click)="toLogout()">
-            <fa-icon icon="power-off" [fixedWidth]="true"></fa-icon>
-            Выйти
-        </li>
+      }
+      <li class="dropdown-divider"></li>
+      <li class="dropdown-item selectable" (click)="getUserManual()">
+        <fa-icon icon="info-circle" [fixedWidth]="true"></fa-icon>
+        Руководство пользователя
+      </li>
+      <li class="dropdown-item selectable">
+        <fa-icon icon="play-circle" [fixedWidth]="true"></fa-icon>
+        <a class="not-link" target="_blank" href="https://www.youtube.com/channel/UCoBl4G26Um6JuSbkX3HeJVw/videos">
+        Видеоинструкции</a>
+      </li>
+      <li class="dropdown-divider"></li>
+      <li class="dropdown-item selectable" (click)="toLogout()">
+        <fa-icon icon="power-off" [fixedWidth]="true"></fa-icon>
+        Выйти
+      </li>
     </ul>
-</div>
+  </div>
 

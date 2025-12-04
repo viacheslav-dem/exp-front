@@ -3,186 +3,188 @@
 <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
 <app-novelty-block
-        [_form]="_form"
-        [num]="'1'"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'1'"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-novelty-block>
 
 <hr/>
 
 <app-economic-significance-block
-        [_form]="_form"
-        [num]="'2'"
-        [project]="project"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'2'"
+  [project]="project"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-economic-significance-block>
 
 <hr/>
 
 <app-resources-sufficiency-block
-        [_form]="_form"
-        [num]="'3'"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'3'"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-resources-sufficiency-block>
 
 <hr/>
 
 <app-competence-sufficiency-block
-        [_form]="_form"
-        [num]="'4'"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'4'"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-competence-sufficiency-block>
 
 <hr/>
 
 <app-marketing-research-block
-        [_form]="_form"
-        [num]="'5'"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'5'"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-marketing-research-block>
 
 <hr/>
 
 <app-risks-block
-        [_form]="_form"
-        [num]="'6'"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'6'"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-risks-block>
 
 <hr/>
 
 <app-privacy-block
-        [_form]="_form"
-        [num]="'7'"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'7'"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-privacy-block>
 
 <hr/>
 
 <label class="mb-0">
-    8. Льготирование реализации объекта государственной экспертизы
+  8. Льготирование реализации объекта государственной экспертизы
 </label>
 
 <hr/>
 
 <app-stages-exists-block
-        [_form]="_form"
-        [num]="'8.1'"
-        [askStages]="false"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'8.1'"
+  [askStages]="false"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-stages-exists-block>
 
 <hr/>
 
 <app-stages-block
-        [_form]="_form"
-        [num]="'8.2'"
-        [isTextRequired]="true"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'8.2'"
+  [isTextRequired]="true"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-stages-block>
 
 <hr/>
 
 <label class="mb-0">
-    9. Реализация и финансирование объекта государственной экспертизы
+  9. Реализация и финансирование объекта государственной экспертизы
 </label>
 
 <hr/>
 
 <app-name-accordance-block
-        [_form]="_form"
-        [num]="'9.1'"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'9.1'"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-name-accordance-block>
 
 <hr/>
 
 <app-terms-accordance-block
-        [form]="_form"
-        [num]="'9.2'"
-        (onConditionsChanged)="onConditionsChanged()"
+  [form]="_form"
+  [num]="'9.2'"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-terms-accordance-block>
 
 <hr/>
 
 
 <app-finance-accordance-block
-        [_form]="_form"
-        [num]="'9.3'"
-        [project]="project"
-        [isTextRequired]="true"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'9.3'"
+  [project]="project"
+  [isTextRequired]="true"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-finance-accordance-block>
 
 <app-finance-conclusion-block
-        [_form]="_form"
-        [num]="'9.4'"
-        [noveltyNum]="'1'"
-        [project]="project"
-        [economicSignificanceNum]="'2'"
-        (onConditionsChanged)="onConditionsChanged()"
-        [disabled]="isFinanceConclusionDisabled()"
+  [_form]="_form"
+  [num]="'9.4'"
+  [noveltyNum]="'1'"
+  [project]="project"
+  [economicSignificanceNum]="'2'"
+  (onConditionsChanged)="onConditionsChanged()"
+  [disabled]="isFinanceConclusionDisabled()"
 ></app-finance-conclusion-block>
 
 <hr/>
 
-<app-commerce-block-2025
-        *ngIf="showTarget8_1() || showTarget8_2() || showTarget8_3() || showTarget8_4() || showTarget8_15()"
-        [_form]="_form"
-        [project]="project"
-        [num]="'9.5'"
-        [noveltyOptions]="noveltyOptions"
-        (onConditionsChanged)="onConditionsChanged()"
-></app-commerce-block-2025>
+@if (showTarget8_1() || showTarget8_2() || showTarget8_3() || showTarget8_4() || showTarget8_15()) {
+  <app-commerce-block-2025
+    [_form]="_form"
+    [project]="project"
+    [num]="'9.5'"
+    [noveltyOptions]="noveltyOptions"
+    (onConditionsChanged)="onConditionsChanged()"
+  ></app-commerce-block-2025>
+}
 
 <hr/>
 
 <app-competitiveness-block-agenda-2025
-        [_form]="_form"
-        [num]="'9.6'"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'9.6'"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-competitiveness-block-agenda-2025>
 
 <hr/>
 
 <app-analog-params-block-2025
-        [_form]="_form"
-        [num]="'9.7'"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'9.7'"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-analog-params-block-2025>
 
 <hr/>
 
 <app-needs-block-2025
-        [_form]="_form"
-        [num]="'9.8'"
-        (onConditionsChanged)="onConditionsChanged()">
+  [_form]="_form"
+  [num]="'9.8'"
+  (onConditionsChanged)="onConditionsChanged()">
 </app-needs-block-2025>
 <hr/>
 
 
-<app-technology-type-block-2025
-        *ngIf="showTarget8_3() || showTarget8_4() || showTarget8_8()"
-        [_form]="_form"
-        [num]="'9.9'"
-        (onConditionsChanged)="onConditionsChanged()">
-</app-technology-type-block-2025>
+@if (showTarget8_3() || showTarget8_4() || showTarget8_8()) {
+  <app-technology-type-block-2025
+    [_form]="_form"
+    [num]="'9.9'"
+    (onConditionsChanged)="onConditionsChanged()">
+  </app-technology-type-block-2025>
+}
 
 
 <hr/>
 
 <app-social-or-security-block-2025
-        [_form]="_form"
-        [num]="'9.10'"
-        (onConditionsChanged)="onConditionsChanged()"
+  [_form]="_form"
+  [num]="'9.10'"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-social-or-security-block-2025>
 
 <hr/>
 
 
 <app-conclusion-council-block
-        [form]="_form"
-        [financeConclusionNum]="financeConclusionNum"
-        [project]="project"
-        [group]="group"
+  [form]="_form"
+  [financeConclusionNum]="financeConclusionNum"
+  [project]="project"
+  [group]="group"
 ></app-conclusion-council-block>

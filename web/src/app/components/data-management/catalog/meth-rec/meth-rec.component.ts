@@ -11,7 +11,8 @@ import {SERVER_URL} from "@app/config";
 
 @Component({
     selector: 'app-meth-rec',
-    templateUrl: './meth-rec.component.html'
+    templateUrl: './meth-rec.component.html',
+    standalone: false
 })
 export class MethRecComponent extends FilterAndPages<TemplateDocumentDto> {
 
@@ -44,7 +45,6 @@ export class MethRecComponent extends FilterAndPages<TemplateDocumentDto> {
             this._page = res;
             this.templates = this._page.content;
             // show tooltips
-            setTimeout(() => $('.templateType[data-toggle="tooltip"]')['tooltip'](), 500);
         }, () => this.setLoading(false));
     }
 

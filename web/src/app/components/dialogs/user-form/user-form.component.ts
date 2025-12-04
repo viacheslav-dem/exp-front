@@ -24,9 +24,10 @@ import {SectionPipe} from "@app/pipes/section.pipe";
 import {SelectItem} from "@app/components/common-components/page-and-filter/model/SearchField";
 
 @Component({
-  selector: 'app-user-form',
-  templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.scss']
+    selector: 'app-user-form',
+    templateUrl: './user-form.component.html',
+    styleUrls: ['./user-form.component.scss'],
+    standalone: false
 })
 export class UserFormComponent {
 
@@ -36,7 +37,7 @@ export class UserFormComponent {
   role: string;
   _user: PersonDto;
   _originalUser: PersonDto;
-  _userSelectedOrg: SelectItem[] = [];
+  _userSelectedOrg: SelectItem = null;
   photo: string = 'assets/abstract_profile.jpg';
   current: boolean = false;
   Catalog = Catalog;
@@ -109,7 +110,9 @@ export class UserFormComponent {
       this.current = this._user.current;
     }
     if (this._user.org) {
-      this._userSelectedOrg = [new SelectItem(this._user.org, this._user.org.name, this._user.org.id)];
+      this._userSelectedOrg = new SelectItem(this._user.org, this._user.org.name, this._user.org.id);
+    } else {
+      this._userSelectedOrg = null;
     }
   };
 

@@ -1,6 +1,9 @@
 import {Pipe, PipeTransform} from "@angular/core";
 
-@Pipe({name: 'areas'})
+@Pipe({
+    name: 'areas',
+    standalone: false
+})
 export class AreasPipe implements PipeTransform {
 
   transform(person): string {

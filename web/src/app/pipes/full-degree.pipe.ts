@@ -2,7 +2,10 @@ import {Pipe, PipeTransform} from "@angular/core";
 import {DegreeType} from "@app/pipes/degree.pipe";
 
 
-@Pipe({name: 'fullDegreeType'})
+@Pipe({
+    name: 'fullDegreeType',
+    standalone: false
+})
 export class FullDegreePipe implements PipeTransform {
 
   transform(personInfo): any {

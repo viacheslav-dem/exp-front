@@ -25,7 +25,6 @@ import {
     SearchOrgComponent,
     ProjectListFromStatsComponent,
   ],
-  providers: [],
   exports: [
     SearchExpertComponent,
     SearchPersonByRolesComponent,
@@ -37,6 +36,5 @@ import {
     ProjectListFromStatsComponent,
   ]
 })
-export class SearchModule{
-
+export class SearchModule {
 }

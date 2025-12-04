@@ -6,7 +6,7 @@
       научно-технической деятельности в Республики Беларусь:
     </label>
     <textarea [(ngModel)]="_form.accordance" rows="3" class="form-control"
-              placeholder="cоответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
+      placeholder="cоответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
     </textarea>
   </div>
 
@@ -15,7 +15,7 @@
       2. Сведения о проведении маркетинговых и патентных исследований и их результаты:
     </label>
     <textarea [(ngModel)]="_form.marketing" rows="3" class="form-control"
-              placeholder="результаты проведения маркетинговых и патентных исследований по объекту экспертизы">
+      placeholder="результаты проведения маркетинговых и патентных исследований по объекту экспертизы">
     </textarea>
   </div>
 
@@ -24,7 +24,7 @@
       3. Приоритетность направления инвестиций во внедряемые технологии:
     </label>
     <textarea [(ngModel)]="_form.investments" rows="3" class="form-control"
-              placeholder="анализ и оценка приоритетности направления инвестиций во внедряемые технологии по объекту экспертизы">
+      placeholder="анализ и оценка приоритетности направления инвестиций во внедряемые технологии по объекту экспертизы">
     </textarea>
   </div>
 
@@ -33,7 +33,7 @@
       4. Обоснованность расходов по внедряемым технологиям:
     </label>
     <textarea [(ngModel)]="_form.costJustification" rows="3" class="form-control"
-              placeholder="анализ и оценка обоснованности расходов во внедряемые технологии по объекту экспертизы">
+      placeholder="анализ и оценка обоснованности расходов во внедряемые технологии по объекту экспертизы">
     </textarea>
   </div>
 
@@ -42,7 +42,7 @@
       5. Оценка возможности применения внедряемых технологий на соответствующем производстве:
     </label>
     <textarea [(ngModel)]="_form.application" rows="3" class="form-control"
-              placeholder="анализ и оценка возможности применения внедряемых технологий по объекту экспертизы ">
+      placeholder="анализ и оценка возможности применения внедряемых технологий по объекту экспертизы ">
     </textarea>
   </div>
 
@@ -51,20 +51,24 @@
       6. Оптимальность выбранных технологий и их инновационность для Республики Беларусь:
     </label>
     <textarea [(ngModel)]="_form.optimality" rows="3" class="form-control"
-              placeholder="анализ и оценка оптимальности и инновационности для Республики Беларусь выбранных технологий по объекту экспертизы">
+      placeholder="анализ и оценка оптимальности и инновационности для Республики Беларусь выбранных технологий по объекту экспертизы">
     </textarea>
   </div>
 
   <div class="form-sub-group">
     <label>7. Создание объектов права промышленной собственности:</label>
-    <div *ngIf="privacyObjects.length == 0" class="mb-2 italic">не предусматривается</div>
-    <div *ngFor="let privacyObject of privacyObjects; let i = index" class="input-group btn-group mb-2">
-      <app-select-catalog
+    @if (privacyObjects.length == 0) {
+      <div class="mb-2 italic">не предусматривается</div>
+    }
+    @for (privacyObject of privacyObjects; track privacyObject; let i = $index) {
+      <div class="input-group btn-group mb-2">
+        <app-select-catalog
           [catalog]="Catalog.INDUSTRIAL_PROPERTY"
           [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
-      ></app-select-catalog>
-      <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
-    </div>
+        ></app-select-catalog>
+        <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+      </div>
+    }
     <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
       Добавить объект права
     </button>
@@ -76,7 +80,7 @@
       с передовыми технологиями, используемыми в мире:
     </label>
     <textarea [(ngModel)]="_form.technologyLevel" rows="3" class="form-control"
-              placeholder="оценка научно-технического уровня внедряемых технологий по сравнению с передовыми технологиями для объекта экспертизы">
+      placeholder="оценка научно-технического уровня внедряемых технологий по сравнению с передовыми технологиями для объекта экспертизы">
     </textarea>
   </div>
 
@@ -86,7 +90,7 @@
       и необходимости модернизации (реконструкции) взаимосвязанных действующих производственных объектов:
     </label>
     <textarea [(ngModel)]="_form.consequences" rows="3" class="form-control"
-              placeholder="оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий">
+      placeholder="оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий">
     </textarea>
   </div>
 </div>
@@ -98,7 +102,7 @@
       1. Целесообразность реализации внедряемых технологий с учетом их оптимальности и инновационности:
     </label>
     <app-boolean-button [(ngModel)]="_form.realization" [falseLabel]="'нецелесообразно'"
-                        [trueLabel]="'целесообразно'"></app-boolean-button>
+    [trueLabel]="'целесообразно'"></app-boolean-button>
   </div>
 
   <div class="form-sub-group">
@@ -106,12 +110,16 @@
       2. Замечания по материалам объекта экспертизы, конкретные предложения о необходимости доработки и (или)
       корректировки материалов по объекту экспертизы:
     </label>
-    <div *ngIf="notes.length == 0" class="mb-2 italic">не имеются</div>
-    <div *ngFor="let note of notes; let i = index" class="input-group btn-group mb-2">
+    @if (notes.length == 0) {
+      <div class="mb-2 italic">не имеются</div>
+    }
+    @for (note of notes; track note; let i = $index) {
+      <div class="input-group btn-group mb-2">
         <textarea [(ngModel)]="note.name" rows="2" class="form-control"
-                  placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
-      <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
-    </div>
+        placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
+        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+      </div>
+    }
     <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
       Добавить замечание
     </button>

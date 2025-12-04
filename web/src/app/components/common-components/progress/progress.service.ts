@@ -16,10 +16,10 @@ export class ProgressService {
   }
 
   public show() {
-    this.showProgress.next();
+    this.showProgress.next(true);
   }
 
   public hide() {
-    this.hideProgress.next();
+    this.hideProgress.next(false);
   }
 }

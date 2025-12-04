@@ -8,9 +8,9 @@ import {MailTemplateDto} from "@app/dto/MailTemplateDto";
 import {getAllMailPriorities, MailPriorityPipe} from "@app/pipes/mail-priority.pipe";
 
 @Component({
-  selector: 'app-mail-template',
-  templateUrl: './mail-template.component.html',
-  styles: [`
+    selector: 'app-mail-template',
+    templateUrl: './mail-template.component.html',
+    styles: [`
       pre {
           white-space: pre-wrap; /* Since CSS 2.1 */
           white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
@@ -19,7 +19,8 @@ import {getAllMailPriorities, MailPriorityPipe} from "@app/pipes/mail-priority.p
           white-space: -o-pre-wrap; /* Opera 7 */
           word-wrap: break-word; /* Internet Explorer 5.5+ */
       }
-  `]
+  `],
+    standalone: false
 })
 export class MailTemplateComponent extends CatalogTemplate<MailTemplateDto> {
 
@@ -30,7 +31,7 @@ export class MailTemplateComponent extends CatalogTemplate<MailTemplateDto> {
               public _dataService: DataService,
               public _mailPriorityPipe: MailPriorityPipe) {
     super(_toasty, _dataService);
-    this.type = Catalog.MAIL_TEMPLATE;
+    this._type = Catalog.MAIL_TEMPLATE;
   }
 
   ngOnInit() {

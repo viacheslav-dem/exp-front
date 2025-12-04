@@ -9,8 +9,9 @@ import {blue05Clr, blueClr} from "@app/components/stats/colors";
 import {NumberPipe} from "@app/pipes/number.pipe";
 
 @Component({
-  selector: 'app-payment-chart',
-  template: '<highchart [options]="chart"></highchart>'
+    selector: 'app-payment-chart',
+    template: '<highchart [options]="chart"></highchart>',
+    standalone: false
 })
 export class PaymentChart implements OnInit {
 

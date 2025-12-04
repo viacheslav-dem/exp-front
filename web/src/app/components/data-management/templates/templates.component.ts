@@ -9,8 +9,9 @@ import {DocType} from "@app/components/common-components/file-uploader/doc-type"
 import {SERVER_URL} from "@app/config";
 
 @Component({
-  selector: 'app-templates',
-  templateUrl: './templates.component.html'
+    selector: 'app-templates',
+    templateUrl: './templates.component.html',
+    standalone: false
 })
 export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> {
 
@@ -43,7 +44,6 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> {
       this._page = res;
       this.templates = this._page.content;
       // show tooltips
-      setTimeout(() => $('.templateType[data-toggle="tooltip"]')['tooltip'](), 500);
     }, () => this.setLoading(false));
   }
 

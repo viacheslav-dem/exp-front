@@ -1,107 +1,116 @@
-<div *ngIf="highTechCriteria" class="form-group">
-  <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
-  <div class="form-sub-group">
-    <div class="label form-sub-group-label">1. {{highTechCriteria.highTech.name}}</div>
-    <div class="label">{{highTechCriteria.highTech.description}}</div>
-    <div class="dropdown">
-      <!-- attention! pre-line class is used here: don't break the text -->
-      <button type="button" class="btn btn-block btn-outline-info dropdown-toggle pre-line"
-              data-toggle="dropdown">{{_form.highTech.name}} <span
-              class="bold">({{_form.highTech.score | number: 3}} баллов)</span></button>
-      <ul class="dropdown-menu">
+@if (highTechCriteria) {
+  <div class="form-group">
+    <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
+    <div class="form-sub-group">
+      <div class="label form-sub-group-label">1. {{highTechCriteria.highTech.name}}</div>
+      <div class="label">{{highTechCriteria.highTech.description}}</div>
+      <div class="dropdown">
         <!-- attention! pre-line class is used here: don't break the text -->
-        <li class="dropdown-item pre-line"
+        <button type="button" class="btn btn-block btn-outline-info dropdown-toggle pre-line"
+          data-bs-toggle="dropdown">{{_form.highTech.name}} <span
+        class="bold">({{_form.highTech.score | number: 3}} баллов)</span></button>
+        <ul class="dropdown-menu">
+          <!-- attention! pre-line class is used here: don't break the text -->
+          <li class="dropdown-item pre-line"
             (click)="_form.highTech = highTechCriteria.highTech.items[0]">{{highTechCriteria.highTech.items[0].name}}<span
           class="bold">({{highTechCriteria.highTech.items[0].score | number: 3}} баллов)</span></li>
-        <li class="dropdown-divider"></li>
-        <li class="dropdown-item" (click)="_form.highTech = highTechCriteria.highTech.items[1]">
-          {{highTechCriteria.highTech.items[1].name}}
-          <span class="bold">({{highTechCriteria.highTech.items[1].score | number: 3}} баллов)</span>
-        </li>
-      </ul>
+          <li class="dropdown-divider"></li>
+          <li class="dropdown-item" (click)="_form.highTech = highTechCriteria.highTech.items[1]">
+            {{highTechCriteria.highTech.items[1].name}}
+            <span class="bold">({{highTechCriteria.highTech.items[1].score | number: 3}} баллов)</span>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-
-  <div class="form-sub-group">
-    <div class="label form-sub-group-label">4. {{highTechCriteria.exportOrientation.name}}</div>
-    <div class="label">{{highTechCriteria.exportOrientation.description}}</div>
-    <div class="dropdown">
-      <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-toggle="dropdown">
-        {{_form.exportOrientation.name}} <span class="bold">({{_form.exportOrientation.score | number: 3}} баллов)</span>
+    <div class="form-sub-group">
+      <div class="label form-sub-group-label">4. {{highTechCriteria.exportOrientation.name}}</div>
+      <div class="label">{{highTechCriteria.exportOrientation.description}}</div>
+      <div class="dropdown">
+        <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-bs-toggle="dropdown">
+          {{_form.exportOrientation.name}} <span class="bold">({{_form.exportOrientation.score | number: 3}} баллов)</span>
+        </button>
+        <ul class="dropdown-menu scrollable-menu">
+          @for (item of highTechCriteria.exportOrientation.items; track item) {
+            <li class="dropdown-item"
+              (click)="_form.exportOrientation = item">
+              {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+    <div class="form-sub-group">
+      <div class="label form-sub-group-label">5. {{highTechCriteria.science.name}}</div>
+      <div class="label">{{highTechCriteria.science.description}}</div>
+      <div class="dropdown">
+        <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-bs-toggle="dropdown">
+          {{_form.science.name}} <span class="bold">({{_form.science.score | number: 3}} баллов)</span>
+        </button>
+        <ul class="dropdown-menu scrollable-menu">
+          @for (item of highTechCriteria.science.items; track item) {
+            <li class="dropdown-item"
+              (click)="_form.science = item">
+              {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+    <div class="form-sub-group">
+      <div class="label form-sub-group-label">6. {{highTechCriteria.addedValue.name}}</div>
+      <div class="label">{{highTechCriteria.addedValue.description}}</div>
+      <div class="dropdown">
+        <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-bs-toggle="dropdown">
+          {{_form.addedValue.name}} <span class="bold">({{_form.addedValue.score | number: 3}} баллов)</span>
+        </button>
+        <ul class="dropdown-menu scrollable-menu">
+          @for (item of highTechCriteria.addedValue.items; track item) {
+            <li class="dropdown-item"
+              (click)="_form.addedValue = item">
+              {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+    <div class="form-sub-group">
+      <div class="label form-sub-group-label">7. {{highTechCriteria.isTitleProtection.name}}</div>
+      <div class="label">{{highTechCriteria.isTitleProtection.description}}</div>
+      <div class="dropdown">
+        <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-bs-toggle="dropdown">
+          {{_form.intellectualProperty.name}}
+          <span class="bold">({{_form.intellectualProperty.score | number: 3}} баллов)</span>
+        </button>
+        <ul class="dropdown-menu scrollable-menu">
+          @for (item of highTechCriteria.isTitleProtection.items; track item) {
+            <li class="dropdown-item"
+              (click)="_form.intellectualProperty = item">
+              {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+    <div class="form-sub-group">
+      <label>9. Создание объектов права промышленной собственности:</label>
+      @if (privacyObjects.length == 0) {
+        <div class="mb-2 italic">не предусматривается</div>
+      }
+      @for (privacyObject of privacyObjects; track privacyObject; let i = $index) {
+        <div class="input-group btn-group mb-2">
+          <app-select-catalog
+            [catalog]="Catalog.INDUSTRIAL_PROPERTY"
+            [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+          ></app-select-catalog>
+          <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+        </div>
+      }
+      <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+        Добавить объект права
       </button>
-      <ul class="dropdown-menu scrollable-menu">
-        <li *ngFor="let item of highTechCriteria.exportOrientation.items" class="dropdown-item"
-            (click)="_form.exportOrientation = item">
-          {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
-        </li>
-      </ul>
     </div>
   </div>
-
-  <div class="form-sub-group">
-    <div class="label form-sub-group-label">5. {{highTechCriteria.science.name}}</div>
-    <div class="label">{{highTechCriteria.science.description}}</div>
-    <div class="dropdown">
-      <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-toggle="dropdown">
-        {{_form.science.name}} <span class="bold">({{_form.science.score | number: 3}} баллов)</span>
-      </button>
-      <ul class="dropdown-menu scrollable-menu">
-        <li *ngFor="let item of highTechCriteria.science.items" class="dropdown-item"
-            (click)="_form.science = item">
-          {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="form-sub-group">
-    <div class="label form-sub-group-label">6. {{highTechCriteria.addedValue.name}}</div>
-    <div class="label">{{highTechCriteria.addedValue.description}}</div>
-    <div class="dropdown">
-      <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-toggle="dropdown">
-        {{_form.addedValue.name}} <span class="bold">({{_form.addedValue.score | number: 3}} баллов)</span>
-      </button>
-      <ul class="dropdown-menu scrollable-menu">
-        <li *ngFor="let item of highTechCriteria.addedValue.items" class="dropdown-item"
-            (click)="_form.addedValue = item">
-          {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="form-sub-group">
-    <div class="label form-sub-group-label">7. {{highTechCriteria.isTitleProtection.name}}</div>
-    <div class="label">{{highTechCriteria.isTitleProtection.description}}</div>
-    <div class="dropdown">
-      <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-toggle="dropdown">
-        {{_form.intellectualProperty.name}}
-        <span class="bold">({{_form.intellectualProperty.score | number: 3}} баллов)</span>
-      </button>
-      <ul class="dropdown-menu scrollable-menu">
-        <li *ngFor="let item of highTechCriteria.isTitleProtection.items" class="dropdown-item"
-            (click)="_form.intellectualProperty = item">
-          {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="form-sub-group">
-    <label>9. Создание объектов права промышленной собственности:</label>
-    <div *ngIf="privacyObjects.length == 0" class="mb-2 italic">не предусматривается</div>
-    <div *ngFor="let privacyObject of privacyObjects; let i = index" class="input-group btn-group mb-2">
-      <app-select-catalog
-          [catalog]="Catalog.INDUSTRIAL_PROPERTY"
-          [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
-      ></app-select-catalog>
-      <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
-    </div>
-    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
-      Добавить объект права
-    </button>
-  </div>
-</div>
+}
 
 <div class="form-group">
   <label class="form-group-label">Выводы и предложения эксперта</label>
@@ -117,12 +126,16 @@
       2. Замечания по материалам объекта экспертизы, конкретные предложения о необходимости доработки и (или)
       корректировки материалов по объекту экспертизы:
     </label>
-    <div *ngIf="notes.length == 0" class="mb-2 italic">не имеются</div>
-    <div *ngFor="let note of notes; let i = index" class="input-group btn-group mb-2">
+    @if (notes.length == 0) {
+      <div class="mb-2 italic">не имеются</div>
+    }
+    @for (note of notes; track note; let i = $index) {
+      <div class="input-group btn-group mb-2">
         <textarea [(ngModel)]="note.name" rows="2" class="form-control"
-                  placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
-      <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
-    </div>
+        placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
+        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+      </div>
+    }
     <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
       Добавить замечание
     </button>

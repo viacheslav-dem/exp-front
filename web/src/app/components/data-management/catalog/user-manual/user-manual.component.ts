@@ -11,49 +11,54 @@ import {DocType} from "@app/components/common-components/file-uploader/doc-type"
 import {DocumentService} from "@app/services/document.service";
 
 @Component({
-  selector: 'app-user-manual',
-  template: `
+    selector: 'app-user-manual',
+    template: `
     <h5 class="mb-3">Руководства пользователя</h5>
     <div class="list-group">
-
+    
       <div [loadingData]="_loading">
         <!--MANUALS-->
-        <div *ngFor="let manual of items">
-          <!--MANUAL HEADER-->
-          <div class="list-group-item border-bottom-none">
-            <div class="text-mini font-weight-bold" style="height: 1.5rem">
-              руководство пользователя
+        @for (manual of items; track manual) {
+          <div>
+            <!--MANUAL HEADER-->
+            <div class="list-group-item border-bottom-none">
+              <div class="text-mini font-weight-bold" style="height: 1.5rem">
+                руководство пользователя
+              </div>
+              <div class="form-sub-group">
+                <div class="d-inline-block" style="width: 350px;">{{manual.role | role}}:</div>
+                @if (manual.document) {
+                  <button class="btn btn-sm btn-outline-primary" (click)="downloadDocument(manual)">
+                    Скачать <fa-icon icon="arrow-down"></fa-icon>
+                  </button>
+                  или
+                }
+                <app-silent-file-uploader
+                  [controlClass]="'width-auto custom-file-inline'"
+                  [typesAccept]="DocType.PDF.extension"
+                  (saved)="addDocument($event,  manual)"
+                  [url]="SERVER_URL + '/data/manual/' + manual.id + '/document'">
+                </app-silent-file-uploader>
+              </div>
             </div>
-            <div class="form-sub-group">
-              <div class="d-inline-block" style="width: 350px;">{{manual.role | role}}:</div>
-              <ng-container *ngIf="manual.document">
-                <button class="btn btn-sm btn-outline-primary" (click)="downloadDocument(manual)">
-                  Скачать <fa-icon icon="arrow-down"></fa-icon>
-                </button>
-                или
-              </ng-container>
-              <app-silent-file-uploader
-                [controlClass]="'width-auto custom-file-inline'"
-                [typesAccept]="DocType.PDF.extension"
-                (saved)="addDocument($event,  manual)"
-                [url]="SERVER_URL + '/data/manual/' + manual.id + '/document'">
-              </app-silent-file-uploader>
-            </div>          
           </div>
-        </div>
-        <div *ngIf="!items || items.length == 0">
-          <div class="italic list-group-item background-light-blue">
-            Сообщения отсутствуют
+        }
+        @if (!items || items.length == 0) {
+          <div>
+            <div class="italic list-group-item background-light-blue">
+              Сообщения отсутствуют
+            </div>
           </div>
-        </div>
+        }
         <app-pagination
           [page]="_page" [pagination]="_pagination"
           (onPageChanged)="onPageChanged($event)">
         </app-pagination>
       </div>
     </div>
-  `,
-  styles: []
+    `,
+    styles: [],
+    standalone: false
 })
 export class UserManualComponent extends CatalogTemplate<ManualDto> {
   DocType = DocType;
@@ -64,7 +69,7 @@ export class UserManualComponent extends CatalogTemplate<ManualDto> {
               private _rolePipe: RolePipe,
               private _documentService: DocumentService) {
     super(_toasty, _dataService,20);
-    this.type = Catalog.MANUAL;
+    this._type = Catalog.MANUAL;
   }
 
   ngOnInit() {

@@ -1,6 +1,9 @@
 import {Pipe, PipeTransform} from "@angular/core";
 
-@Pipe({name: 'academicTitleType'})
+@Pipe({
+    name: 'academicTitleType',
+    standalone: false
+})
 export class AcademicTitleTypePipe implements PipeTransform {
   transform(value): any {
     switch (value) {
@@ -15,7 +18,10 @@ export class AcademicTitleTypePipe implements PipeTransform {
     }
   }
 }
-@Pipe({name: 'academicTitle'})
+@Pipe({
+    name: 'academicTitle',
+    standalone: false
+})
 export class AcademicTitlePipe implements PipeTransform {
 
   transform(personInfo): any {

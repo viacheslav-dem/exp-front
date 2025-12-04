@@ -16,23 +16,31 @@
       <div class="form-group">
         <label>Место проведения</label>
         <textarea rows="2" class="form-control" placeholder="Место проведения заседания"
-                  [(ngModel)]="place"></textarea>
+        [(ngModel)]="place"></textarea>
       </div>
     </div>
     <div class="col-8">
       <h5>Объекты экспертизы</h5>
-      <div *ngFor="let project of projects">
-        <ng-container>
-          <app-checkbox [(ngModel)]="project.isChecked">{{project | titleAndCode}}</app-checkbox>
-        </ng-container>
-      </div>
-      <div class="italic" *ngIf="projects.length == 0">Объектов экспертизы для рассмотрения нет</div>
+      @for (project of projects; track project) {
+        <div>
+          <ng-container>
+            <app-checkbox [(ngModel)]="project.isChecked">{{project | titleAndCode}}</app-checkbox>
+          </ng-container>
+        </div>
+      }
+      @if (projects.length == 0) {
+        <div class="italic">Объектов экспертизы для рассмотрения нет</div>
+      }
     </div>
   </div>
 
   <div class="mt-2">
     <button type="button" class="btn btn-secondary" (click)="cancel()">Отмена</button>
-    <button *ngIf="!isEdit" type="button" class="btn btn-primary" (click)="save()">Создать</button>
-    <button *ngIf="isEdit" type="button" class="btn btn-primary" (click)="edit()">Сохранить</button>
+    @if (!isEdit) {
+      <button type="button" class="btn btn-primary" (click)="save()">Создать</button>
+    }
+    @if (isEdit) {
+      <button type="button" class="btn btn-primary" (click)="edit()">Сохранить</button>
+    }
   </div>
 </app-modal>

@@ -12,8 +12,9 @@ import {SearchField} from "@app/components/common-components/page-and-filter/mod
 import {Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
 
 @Component({
-  selector: 'app-meeting-list',
-  templateUrl: 'meeting-list.component.html'
+    selector: 'app-meeting-list',
+    templateUrl: 'meeting-list.component.html',
+    standalone: false
 })
 export class MeetingListComponent extends FilterAndPages<MeetingDto> {
 
@@ -23,7 +24,7 @@ export class MeetingListComponent extends FilterAndPages<MeetingDto> {
   role: string;
   meetings: MeetingDto[] = [];
 
-  @ViewChild(MeetingFormComponent) createMeetingModal: MeetingFormComponent;
+  @ViewChild(MeetingFormComponent, { static: false }) createMeetingModal: MeetingFormComponent;
 
   constructor(private _toasty: GlobalToastyService,
               private _authService: AuthService,

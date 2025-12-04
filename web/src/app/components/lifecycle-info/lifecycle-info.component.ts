@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild, input} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {ProjectLifecycleStateBadge} from "@app/pipes/lifecycle-state.pipe";
@@ -11,8 +11,9 @@ import {LifecycleGroupState} from "@app/pipes/lifecycle-group-state.pipe";
 import {ProjectDto} from "@app/dto/ProjectDto";
 
 @Component({
-  selector: 'app-lifecycle-info',
-  templateUrl: './lifecycle-info.component.html',
+    selector: 'app-lifecycle-info',
+    templateUrl: './lifecycle-info.component.html',
+    standalone: false
 })
 export class LifecycleInfoComponent implements OnInit {
 
@@ -24,11 +25,11 @@ export class LifecycleInfoComponent implements OnInit {
   _lifecycle: any;
   transitionHistory: ProjectLifecycleTransitionHistoryDto;
 
-  @Input() role: string;
-  @Input() project: ProjectDto;
+  readonly role = input<string>(undefined);
+  readonly project = input<ProjectDto>(undefined);
   @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
 
-  @ViewChild('transitionHistoryModal') transitionHistoryModal: ModalComponent;
+  @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
 
   constructor(private route: ActivatedRoute,
               private _toasty: GlobalToastyService,

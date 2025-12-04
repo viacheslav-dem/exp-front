@@ -7,7 +7,7 @@ import {RealTimeStatsDto} from "@app/dto/RealTimeStatsDto";
 import {IdDto} from "@app/dto/IdDto";
 import {CouncilStatsDto} from "@app/dto/CouncilStatsDto";
 import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO";
-import {HttpErrorResponse} from "@angular/common/http";
+import { HttpErrorResponse } from "@angular/common/http";
 import {CouncilStatsV2ResponseDTO} from "@app/dto/response/CouncilStatsV2ResponseDTO";
 
 @Injectable()

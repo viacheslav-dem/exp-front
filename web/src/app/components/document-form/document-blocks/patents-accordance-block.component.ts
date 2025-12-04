@@ -1,37 +1,37 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
-  selector: 'app-patents-accordance-block',
-  template: `
+    selector: 'app-patents-accordance-block',
+    template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Соответствие объекта экспертизы критерию, указанному в абзаце 2 пункта 2 Положения о порядке
+        {{num()}}. Соответствие объекта экспертизы критерию, указанному в абзаце 2 пункта 2 Положения о порядке
         формирования перечня инновационных товаров, утвержденного постановлением Совета Министров Республики Беларусь от
         31 октября 2012 г. № 995 (использование способных к правовой охране результатов интеллектуальной деятельности):
       </label>
       <app-boolean-button
-        [(ngModel)]="_form.patents"
+        [(ngModel)]="_form().patents"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <textarea *ngIf="full" [(ngModel)]="_form.patentsText" rows="3" class="form-control"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      @if (full()) {
+        <textarea [(ngModel)]="_form().patentsText" rows="3" class="form-control"
+        placeholder="Пояснительный текст (при необходимости)."></textarea>
+      }
     </div>
-  `
+    `,
+    standalone: false
 })
 export class PatentsAccordanceBlockComponent {
 
-  @Input()
-  num: string = "1";
+  readonly num = input<string>("1");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: {
+  readonly _form = input<{
     patents: boolean;
     patentsText: string;
-  };
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

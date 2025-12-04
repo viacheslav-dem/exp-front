@@ -1,78 +1,120 @@
-<div class="row">
-  <div class="col-8 pr-0">
-    <div class="card pt-3">
-      <h5 class="card-title">
-        Пользователи
-        <button class="btn btn-sm btn-primary float-right" (click)="showEditUserModal(null)">
-          Добавить нового пользователя
-        </button>
-      </h5>
+<div class="container-fluid px-4 py-4">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="card-title mb-0 fw-bold text-dark">Пользователи</h4>
+            <button class="btn btn-primary rounded-pill px-4 py-2 fw-medium shadow-sm" (click)="showEditUserModal(null)">
+              <i class="fas fa-plus me-2"></i>Добавить нового пользователя
+            </button>
+          </div>
 
-      <div [loadingData]="_loading">
-        <table *ngIf="users.length > 0" class="table table-responsive mb-0">
-          <thead>
-          <tr>
-            <th>#id</th>
-            <th (click)="sortBy('person')" class="text-nowrap selectable" style="width: 33%">
-              <span>ФИО </span>
-              <fa-icon class="fa-active" *ngIf="sortOrder.property == 'person'"
-                       [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
-            </th>
-            <th class="text-nowrap" style="width: 33%">
-              <span>Роли</span>
-            </th>
-            <th (click)="sortBy('email')" class="text-nowrap selectable" style="width: 34%">
-              <span>Email </span>
-              <fa-icon class="fa-active" *ngIf="sortOrder.property == 'email'"
-                       [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
-            </th>
-            <th></th>
-            <th></th>
-          </tr>
-          </thead>
-          <tbody>
-          <ng-container *ngFor="let user of users">
-            <tr class="list-group-item-action" [class.alert-danger]="user.user?.blocked"
-                [class.alert-dark]="user.user==null" [class.alert-deleted]="user.deleted">
-              <th scope="row">{{user.id}}</th>
-              <td>{{user | fullName}}</td>
-              <td>
-                <div *ngFor="let role of user.roles">{{role | role}}</div>
-              </td>
-              <td>{{user.email}}</td>
-              <td>
-                <a class="btn btn-icon" *ngIf="!user.deleted" (click)="showReadUserModal(user)">
-                  <fa-icon icon="info-circle"></fa-icon>
-                </a>
-              </td>
-              <td>
-                <a class="btn btn-icon" *ngIf="!user.deleted" (click)="showEditUserModal(user)">
-                  <fa-icon icon="pencil-alt"></fa-icon>
-                </a>
-
-              </td>
-              <td *ifRole="'ADMIN'">
-                <a class="btn btn-icon" *ngIf="!user.deleted" (click)="deletePerson(user)">
-                  <fa-icon icon="trash-alt"></fa-icon>
-                </a>
-              </td>
-            </tr>
-          </ng-container>
-          </tbody>
-        </table>
-        <div *ngIf="users.length == 0" class="alert alert-info italic mb-0">Пользователи отсутствуют</div>
-        <app-pagination [page]="_page" [pagination]="_pagination"
-                        (onPageChanged)="onPageChanged($event)"></app-pagination>
+          <div [loadingData]="_loading">
+            @if (users.length > 0) {
+              <div class="table-responsive table-wrapper">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="border-0 fw-semibold small text-muted" style="min-width: 80px;">#id</th>
+                      <th (click)="sortBy('person')" class="selectable border-0 fw-semibold small text-muted cursor-pointer">
+                        <span>ФИО</span>
+                        @if (sortOrder.property == 'person') {
+                          <fa-icon class="fa-active ms-1 text-primary"
+                          [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+                        } @else {
+                          <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
+                        }
+                      </th>
+                      <th class="border-0 fw-semibold small text-muted">
+                        <span>Роли</span>
+                      </th>
+                      <th (click)="sortBy('email')" class="selectable border-0 fw-semibold small text-muted cursor-pointer">
+                        <span>Email</span>
+                        @if (sortOrder.property == 'email') {
+                          <fa-icon class="fa-active ms-1 text-primary"
+                          [icon]="SortClass[this.sortOrder.direction]"></fa-icon>
+                        } @else {
+                          <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
+                        }
+                      </th>
+                      <th class="border-0 fw-semibold small text-muted text-center" style="min-width: 120px;">Действия</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (user of users; track user) {
+                      <tr class="user-table-row" 
+                          [class.alert-danger]="user.user?.blocked"
+                          [class.alert-dark]="user.user==null" 
+                          [class.alert-deleted]="user.deleted">
+                        <th scope="row" class="fw-normal text-body-secondary small">{{user.id}}</th>
+                        <td class="fw-medium user-name-cell" [title]="user | fullName">
+                          {{user | fullName}}
+                        </td>
+                        <td>
+                          <div class="d-flex flex-wrap gap-1">
+                            @for (role of user.roles; track role) {
+                              <span class="badge bg-secondary bg-opacity-10 text-dark rounded-pill px-2 py-1 small fw-normal">
+                                {{role | role}}
+                              </span>
+                            }
+                          </div>
+                        </td>
+                        <td class="text-body-secondary small user-email-cell" [title]="user.email">
+                          {{user.email}}
+                        </td>
+                        <td>
+                          <div class="d-flex justify-content-center gap-2">
+                            @if (!user.deleted) {
+                              <button class="btn btn-sm btn-link text-primary p-1" 
+                                      (click)="showReadUserModal(user)"
+                                      title="Просмотр информации">
+                                <fa-icon icon="info-circle"></fa-icon>
+                              </button>
+                              <button class="btn btn-sm btn-link text-primary p-1" 
+                                      (click)="showEditUserModal(user)"
+                                      title="Редактировать">
+                                <fa-icon icon="pencil-alt"></fa-icon>
+                              </button>
+                              <ng-container *ifRole="'ADMIN'">
+                                <button class="btn btn-sm btn-link text-danger p-1" 
+                                        (click)="deletePerson(user)"
+                                        title="Удалить">
+                                  <fa-icon icon="trash-alt"></fa-icon>
+                                </button>
+                              </ng-container>
+                            }
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+            @if (users.length == 0) {
+              <div class="alert alert-info fst-italic mb-0 rounded-4 shadow-sm border-0 p-3">
+                <i class="fas fa-info-circle me-2"></i>Пользователи отсутствуют
+              </div>
+            }
+            <div class="mt-4">
+              <app-pagination [page]="_page" [pagination]="_pagination"
+              (onPageChanged)="onPageChanged($event)"></app-pagination>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <!--filter-->
-  <div class="col-4">
-    <div class="card pt-3">
-      <div class="card-title">
-        <h5 style="margin: 0">Фильтр</h5>
+    <!--filter-->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+          <div class="card-title mb-4">
+            <h5 class="mb-0 fw-bold fs-5">Фильтр</h5>
+          </div>
+          <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
+        </div>
       </div>
-      <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
     </div>
   </div>
 </div>

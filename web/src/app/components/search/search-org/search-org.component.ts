@@ -8,13 +8,14 @@ import {DataService} from "@app/services/data.service";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 
 @Component({
-  selector: 'app-search-org',
-  templateUrl: 'search-org.component.html'
+    selector: 'app-search-org',
+    templateUrl: 'search-org.component.html',
+    standalone: false
 })
 
 export class SearchOrgComponent extends FilterAndPages<OrgDto> {
 
-  @ViewChild('searchOrgModal') searchOrgModal: ModalComponent;
+  @ViewChild('searchOrgModal', { static: false }) searchOrgModal: ModalComponent;
   @Output() selected = new EventEmitter<OrgDto>();
 
   constructor(protected _service: DataService) {

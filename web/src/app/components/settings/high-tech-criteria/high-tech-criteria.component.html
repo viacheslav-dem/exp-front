@@ -1,10 +1,11 @@
 <div class="list-group-item">
 
   <!--SHOW-->
-  <div *ngIf="!isEdit">
-    <!--EDIT NOT SUPPORTED YET-->
-    <!--<a class="btn btn-icon float-right" (click)="edit()">-->
-    <!--<fa-icon icon="cog"></fa-icon>-->
+  @if (!isEdit && value && value.highTech) {
+    <div>
+      <!--EDIT NOT SUPPORTED YET-->
+      <!--<a class="btn btn-icon float-right" (click)="edit()">-->
+      <!--<fa-icon icon="cog"></fa-icon>-->
     <!--</a>-->
     <div class="form-sub-group">
       <div>1. {{value.highTech.name}}: <span class="value">{{value.highTech.w}}</span></div>
@@ -15,55 +16,60 @@
         <li class="criterion">{{value.highTech.items[1].name}}: <span class="value">{{value.highTech.items[1].w}}</span></li>
       </ul>
     </div>
-
     <div class="form-sub-group">
       <div>2. {{value.science.name}}: <span class="value">{{value.science.w}}</span></div>
       <div class="description">{{value.science.description}}</div>
       <ul class="criterion">
-        <li *ngFor="let criterionItem of value.science.items">
-          {{criterionItem.name}}: <span class="value">{{criterionItem.w}}</span>
-        </li>
+        @for (criterionItem of value.science.items; track criterionItem) {
+          <li>
+            {{criterionItem.name}}: <span class="value">{{criterionItem.w}}</span>
+          </li>
+        }
       </ul>
     </div>
-
     <div class="form-sub-group">
       <div>3. {{value.exportOrientation.name}}: <span class="value">{{value.exportOrientation.w}}</span></div>
       <div class="description">{{value.exportOrientation.description}}</div>
       <ul class="criterion">
-        <li *ngFor="let criterionItem of value.exportOrientation.items">
-          {{criterionItem.name}}: <span class="value">{{criterionItem.w}}</span>
-        </li>
+        @for (criterionItem of value.exportOrientation.items; track criterionItem) {
+          <li>
+            {{criterionItem.name}}: <span class="value">{{criterionItem.w}}</span>
+          </li>
+        }
       </ul>
     </div>
-
-
     <div class="form-sub-group">
       <div>4. {{value.addedValue.name}}: <span class="value">{{value.addedValue.w}}</span></div>
       <div class="description">{{value.addedValue.description}}</div>
       <ul class="criterion">
-        <li *ngFor="let criterionItem of value.addedValue.items">
-          {{criterionItem.name}}: <span class="value">{{criterionItem.w}}</span>
-        </li>
+        @for (criterionItem of value.addedValue.items; track criterionItem) {
+          <li>
+            {{criterionItem.name}}: <span class="value">{{criterionItem.w}}</span>
+          </li>
+        }
       </ul>
     </div>
-
     <div class="form-sub-group">
       <div>5. {{value.isTitleProtection.name}}: <span class="value">{{value.isTitleProtection.w}}</span></div>
       <div class="description">{{value.isTitleProtection.description}}</div>
       <ul class="criterion">
-        <li *ngFor="let criterionItem of value.isTitleProtection.items">
-          {{criterionItem.name}}: <span class="value">{{criterionItem.w}}</span>
-        </li>
+        @for (criterionItem of value.isTitleProtection.items; track criterionItem) {
+          <li>
+            {{criterionItem.name}}: <span class="value">{{criterionItem.w}}</span>
+          </li>
+        }
       </ul>
     </div>
-
-  <!--EDIT-->
-  <div *ngIf="isEdit">
-    <!--EDIT NOT SUPPORTED YET-->
-    <div class="mt-1">
-      <button class="btn btn-secondary" (click)="isEdit = false">Отмена</button>
-      <button class="btn btn-primary" (click)="savePropertyValue()">Сохранить</button>
-    </div>
+    <!--EDIT-->
+    @if (isEdit) {
+      <div>
+        <!--EDIT NOT SUPPORTED YET-->
+        <div class="mt-1">
+          <button class="btn btn-secondary" (click)="isEdit = false">Отмена</button>
+          <button class="btn btn-primary" (click)="savePropertyValue()">Сохранить</button>
+        </div>
+      </div>
+    }
   </div>
-  </div>
+}
 </div>

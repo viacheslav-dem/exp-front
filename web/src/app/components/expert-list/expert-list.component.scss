@@ -1,16 +1,62 @@
-.filter-collapse{
-  &.collapsed{
-    .hide-filter{
-      display:none;
-    }
-    .show-filter{
-      display:block;
-    }
-  }
-  .hide-filter{
-    display:block;
-  }
-  .show-filter{
-    display:none;
+.expert-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.expert-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  border-color: rgba(13, 110, 253, 0.25);
+}
+
+.expert-card .card-body {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.expert-card .text-break {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.btn-link {
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-link:hover {
+  transform: translateX(2px);
+  text-decoration: underline !important;
+}
+
+.btn-link.text-primary:hover {
+  color: #0b5ed7 !important;
+}
+
+.btn-link.text-danger:hover {
+  color: #bb2d3b !important;
+}
+
+.btn-link.text-success:hover {
+  color: #146c43 !important;
+}
+
+// Улучшение отступов и предотвращение наложения
+.expert-card .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.expert-card .col-lg-3 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  min-width: 0; // Позволяет колонкам сжиматься
+}
+
+@media (max-width: 991.98px) {
+  .expert-card .col-lg-3 {
+    margin-bottom: 1rem;
   }
 }

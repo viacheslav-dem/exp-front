@@ -1,9 +1,15 @@
-<div class="list-group-item text-muted text-sm" *ngIf="!comments || !comments.length">Никто еще ничего не писал</div>
-<div *ngIf="comments && comments.length" style="overflow-y: auto;max-height: 600px" class="card card-block">
-  <div *ngFor="let c of comments" class="mb-05 text-sm">
-    <span class="text-sm text-primary">{{c.person|fullName}}</span>
-    <span class="text-sm text-muted float-right">{{c.createdDate | formatDate}}</span>
-    <br>
-    {{c.text}}
-  </div>
-</div>
+@if (!comments() || !comments().length) {
+  <div class="list-group-item text-muted text-sm">Никто еще ничего не писал</div>
+}
+@if (comments() && comments().length) {
+  <div style="overflow-y: auto;max-height: 600px" class="card card-block">
+    @for (c of comments(); track c) {
+      <div class="mb-05 text-sm">
+        <span class="text-sm text-primary">{{c.person|fullName}}</span>
+        <span class="text-sm text-muted float-right">{{c.createdDate | formatDate}}</span>
+        <br>
+          {{c.text}}
+        </div>
+      }
+    </div>
+  }

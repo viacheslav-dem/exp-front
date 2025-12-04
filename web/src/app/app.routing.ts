@@ -1,5 +1,4 @@
-import {RouterModule, Routes} from "@angular/router";
-import {ModuleWithProviders} from "@angular/core";
+import {Routes} from "@angular/router";
 import {LoginComponent} from "./base/login/login.component";
 import {AuthGuardService} from "./services/auth-guard.service";
 import {DefineRole} from "./services/define-role";
@@ -15,8 +14,6 @@ import {ConfirmReviewListComponent} from "./components/confirm-review-list/confi
 import {ProjectNewComponent} from "./components/project-new/project-new.component";
 import {AuditComponent} from "./components/audit/audit.component";
 import {AccountingComponent} from "@app/components/accounting/accounting.component";
-import {PeriodStatsComponent} from "./components/stats/period-stats/period-stats.component";
-import {RealTimeStatsComponent} from "./components/stats/real-time-stats/real-time-stats.component";
 import {ExpertListComponent} from "@app/components/expert-list/expert-list.component";
 import {DataManagementRoutes} from "@app/components/data-management/data-management.module";
 import {SelectRoleComponent} from "@app/base/select-role/select-role.component";
@@ -24,14 +21,11 @@ import {SettingsComponent} from "@app/components/settings/settings.component";
 import {ProjectListFilteredComponent} from "@app/components/project-list-filtered/project-list-filtered.component";
 import {SessionsComponent} from "@app/components/sessions/sessions.component";
 import {RootPageComponent} from "@app/components/root-page/root-page.component";
-import {CouncilStatsComponent} from "@app/components/stats/council-stats/council-stats.component";
 import {SubOrgListComponent} from "@app/components/sub-org-list/sub-org-list.component";
 import {NotificationComponent} from "@app/components/notification/notification.component";
 import {SystemNotificationComponent} from "@app/components/system-notification/system-notification.component";
-import {ResultFunComponent} from "@app/components/stats/result-fun/result-fun.component";
-import {BestExpertComponent} from "@app/components/stats/best-expert/best-expert.component";
 
-const appRoutes: Routes = [
+export const appRoutes: Routes = [
   {
     path: '',
     component: HelloComponent,
@@ -58,11 +52,10 @@ const appRoutes: Routes = [
       {path: 'audit', component: AuditComponent},
       {path: 'sessions', component: SessionsComponent},
       {path: 'experts', component: ExpertListComponent},
-      {path: 'index', component: RealTimeStatsComponent},
-      {path: 'result-fun', component: ResultFunComponent},
-      {path: 'best-expert', component: BestExpertComponent},
-      {path: 'stats', component: PeriodStatsComponent},
-      {path: 'council-stats', component: CouncilStatsComponent},
+      {
+        path: '',
+        loadChildren: () => import('./components/stats/stats.module').then(m => m.StatsModule)
+      },
       {path: 'accounting', component: AccountingComponent},
       {path: 'accounting-filtered', component: AccountingComponent},
       {path: 'settings', component: SettingsComponent},
@@ -73,4 +66,3 @@ const appRoutes: Routes = [
     ]
   }
 ];
-export const routing: ModuleWithProviders = RouterModule.forRoot(appRoutes);

@@ -1,24 +1,29 @@
 import {merge as observableMerge, Observable, of as observableOf, Subscription} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {Component, Injector, Input, OnChanges, OnInit, Renderer2, SimpleChanges} from '@angular/core';
+import {Component, Injector, OnChanges, OnInit, Renderer2, SimpleChanges, input} from '@angular/core';
 import {AbstractControl} from "@angular/forms";
 import {NestableFormDirective} from "app/components/common-components/custom-forms/nestable-form.directive";
 
 
 @Component({
-  selector: 'app-control-error-messages',
-  template: `
-    <div *ngIf="messagesAvailable&&messages?.length" [class.alert]="alertClass" [class.alert-danger]="alertClass">
-      <span *ngFor="let msg of messages" style="color:#dc3545"><small>{{msg}}</small></span>
-    </div>
+    selector: 'app-control-error-messages',
+    template: `
+    @if (messagesAvailable&&messages?.length) {
+      <div [class.alert]="alertClass()" [class.alert-danger]="alertClass()">
+        @for (msg of messages; track msg) {
+          <span style="color:#dc3545"><small>{{msg}}</small></span>
+        }
+      </div>
+    }
     <!--<app-show-json [objectToShow]="control.errors"></app-show-json>-->
-  `,
+    `,
+    standalone: false
 })
 export class ControlErrorMessagesComponent implements OnInit, OnChanges {
 
-  @Input() alertClass = false;
+  readonly alertClass = input(false);
 
-  @Input() control: AbstractControl;
+  readonly control = input<AbstractControl>(undefined);
   controlValue$: Observable<any>;
   hasSubmitted: boolean;
   controlSubscription: Subscription;
@@ -42,7 +47,8 @@ export class ControlErrorMessagesComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     // console.log("  ngOnChanges(changes: SimpleChanges): void {\n", this);
-    if (this.control) {
+    const control = this.control();
+    if (control) {
       this._fg = this.injector.get(NestableFormDirective, null);
       // console.log("ControlContainer", this._fg);
       if (!!this._fg) {
@@ -54,7 +60,7 @@ export class ControlErrorMessagesComponent implements OnInit, OnChanges {
         }));
 
         //чтобы учесть resetForm
-        this.controlValue$ = observableMerge(this.control.valueChanges, observableOf(''), formSubmit$);
+        this.controlValue$ = observableMerge(control.valueChanges, observableOf(''), formSubmit$);
 
         if (this._fg.rootForm) {
           this._fg.rootForm.valueChanges.subscribe(() => {
@@ -82,12 +88,13 @@ export class ControlErrorMessagesComponent implements OnInit, OnChanges {
   };
 
   updateVisibility() {
-    if (this.control.invalid && (this.control.dirty || this.hasSubmitted)) {
-      if (this.control && this.control.errors) {
-        this.messages = Object.keys(this.control.errors).map((k) => {
+    const control = this.control();
+    if (control.invalid && (control.dirty || this.hasSubmitted)) {
+      if (control && control.errors) {
+        this.messages = Object.keys(control.errors).map((k) => {
           let msg = this.messagesMap[k];
           if (k == "pattern") {
-            let requiredPattern = this.control.errors[k]["requiredPattern"];
+            let requiredPattern = this.control().errors[k]["requiredPattern"];
             // console.log(requiredPattern);
             requiredPattern = requiredPattern.replace("\^\^", "\^");
             requiredPattern = requiredPattern.replace("\$\$", "\$");

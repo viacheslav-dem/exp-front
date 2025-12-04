@@ -14,15 +14,18 @@ import {DialogResult} from "@app/components/dialogs/dialog-result";
 import {PersonExpertDto} from "@app/dto/PersonExpertDto";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {ChartService} from "@app/services/chart.service";
+import {ActivatedRoute, Router} from '@angular/router';
+import {PageRequest} from '@app/components/common-components/page-and-filter/model/PageRequest';
 
 @Component({
-  selector: 'app-confirm-review-list',
-  templateUrl: './confirm-review-list.component.html',
-  styles: [`
+    selector: 'app-confirm-review-list',
+    templateUrl: './confirm-review-list.component.html',
+    styles: [`
     .chart {
       margin: 0;
     }
-  `]
+  `],
+    standalone: false
 })
 export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExpertsDto> {
 
@@ -38,8 +41,31 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
     private _dialogService: DialogService,
     private _personPipe: PersonFullNamePipe,
     private _chartService: ChartService,
+    private _route: ActivatedRoute,
+    private _router: Router,
   ) {
     super();
+  }
+
+  ngOnInit() {
+    // Подписка на изменения query-параметров (включая первую загрузку)
+    this._route.queryParams.subscribe(params => {
+      const pageParam = params['page'];
+      const pageFromRoute = pageParam != null ? parseInt(pageParam, 10) : NaN;
+
+      if (!isNaN(pageFromRoute) && pageFromRoute > 0) {
+        // pagination.page — 1-based для пагинатора
+        this._pagination.page = pageFromRoute;
+        // paging.page — 0-based для бэка
+        this._searchRequest.paging.page = pageFromRoute - 1;
+      } else {
+        // если параметр отсутствует или некорректен — считаем, что страница 1
+        this._pagination.page = 1;
+        this._searchRequest.paging.page = 0;
+      }
+
+      this.update();
+    });
   }
 
   loadPage() {
@@ -61,7 +87,7 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
       'Пожалуйста, проверьте данные об эксперте, поскольку отменить действие будет невозможно.').subscribe(() => {
       this._reviewService.acceptExpert(review).subscribe(res => {
         review.state = res.state;
-        this._toasty.success("Потвержден.");
+        this._toasty.success("Подтвержден.");
       });
     });
   }
@@ -102,8 +128,20 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
      this._chartService.updateCharts();
     }, 500);
   }
-    //showExpertPayInfoDialog(expert: PersonExpertDto) {
-   // this.expertId = expert.id;
-    //this.expertPayInfoModal.show();
+  //showExpertPayInfoDialog(expert: PersonExpertDto) {
+  //  this.expertId = expert.id;
+  //  this.expertPayInfoModal.show();
   //}
+
+  onPageChanged(pageRequest: PageRequest) {
+    // обновляем URL с текущей страницей
+    this._router.navigate([], {
+      relativeTo: this._route,
+      queryParams: {page: pageRequest.page + 1}, // 1-based в URL
+      queryParamsHandling: 'merge'
+    });
+
+    // базовая логика пагинации (FilterAndPages)
+    super.onPageChanged(pageRequest);
+  }
 }

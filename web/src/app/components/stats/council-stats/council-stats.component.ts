@@ -1,6 +1,9 @@
-import {Component, ElementRef, Injectable, Input, OnInit, ViewChild} from "@angular/core";
+import {Component, Injectable, Input, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/core";
 import {StatsService} from "@app/services/stats.service";
-import * as moment from "moment";
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import {BsDatepickerConfig} from 'ngx-bootstrap/datepicker';
 import {CouncilStatsDto} from "@app/dto/CouncilStatsDto";
 import {CouncilPlainDto} from "@app/dto/CouncilPlainDto";
 import {DataService} from "@app/services/data.service";
@@ -16,27 +19,38 @@ import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO
 import {FormControl} from "@angular/forms";
 
 @Component({
-  selector: 'app-council-stats',
-  templateUrl: './council-stats.component.html',
+    selector: 'app-council-stats',
+    templateUrl: './council-stats.component.html',
+    standalone: false
 })
 @Injectable({ providedIn: 'root' })
-export class CouncilStatsComponent implements OnInit {
+export class CouncilStatsComponent implements OnInit, AfterViewInit {
 
   Role = Role;
   role: Role;
 
-  dateFrom: number = moment().add(-1, 'year').valueOf();
-  dateTo: number = moment().valueOf();
+  dateFrom: number = dayjs().subtract(1, 'year').valueOf();
+  dateTo: number = dayjs().valueOf();
+
+  dateFromValue: Date = new Date(this.dateFrom);
+  dateToValue: Date = new Date(this.dateTo);
+  
+  @ViewChild('dateFromInput', { static: false }) dateFromInput: ElementRef<HTMLInputElement>;
+  @ViewChild('dateToInput', { static: false }) dateToInput: ElementRef<HTMLInputElement>;
+  
+  datePickerConfig: Partial<BsDatepickerConfig> = {
+    minMode: 'month',
+    dateInputFormat: 'MM.yyyy', // для ngx-bootstrap (date-fns формат)
+    containerClass: 'theme-default',
+    showWeekNumbers: false
+  };
 
   _council: CouncilPlainDto;
   allCouncils: CouncilPlainDto[];
   stats: CouncilStatsDto[];
   statsV2: CouncilStatsResponseDTO[];
 
-  @ViewChild("dateFromInput") dateFromInput: ElementRef;
-  @ViewChild("dateToInput") dateToInput: ElementRef;
-
-  @ViewChild(ProjectListFromStatsComponent) public listProjectsFromStats: ProjectListFromStatsComponent;
+  @ViewChild(ProjectListFromStatsComponent, { static: false }) public listProjectsFromStats: ProjectListFromStatsComponent;
 
   councilToString: Function;
 
@@ -46,6 +60,7 @@ export class CouncilStatsComponent implements OnInit {
               private dialogService: DialogService,
               private toasty: GlobalToastyService,
               private councilPipe: CouncilPipe) {
+    dayjs.extend(customParseFormat);
     this.councilToString = council => councilPipe.transform(council);
   }
 
@@ -58,12 +73,32 @@ export class CouncilStatsComponent implements OnInit {
         this.council = this.allCouncils[0];
       }
     });
-    this.dateFromInput.nativeElement.onchange = (e) => this.changeDateFrom(e.target.value);
-    this.dateToInput.nativeElement.onchange = (e) => this.changeDateTo(e.target.value);
+  }
+
+  ngAfterViewInit(): void {
+    // Обновляем отображение после инициализации
+    requestAnimationFrame(() => {
+      this.updateInputDisplay();
+    });
+  }
+
+  private updateInputDisplay(): void {
+    if (this.dateFromInput?.nativeElement && this.dateFromValue) {
+      const formatted = dayjs(this.dateFromValue).locale('ru').format('MM.YYYY');
+      if (this.dateFromInput.nativeElement.value !== formatted) {
+        this.dateFromInput.nativeElement.value = formatted;
+      }
+    }
+    if (this.dateToInput?.nativeElement && this.dateToValue) {
+      const formatted = dayjs(this.dateToValue).locale('ru').format('MM.YYYY');
+      if (this.dateToInput.nativeElement.value !== formatted) {
+        this.dateToInput.nativeElement.value = formatted;
+      }
+    }
   }
 
   update() {
-    let dateToExclusive = moment(this.dateTo).add(1, 'month').valueOf();
+    let dateToExclusive = dayjs(this.dateTo).add(1, 'month').valueOf();
     if (this.role == Role.BUREAU_CHAIRMAN) {
       this.statsService.getCouncilStatsForBureauChairman(this.dateFrom, dateToExclusive).subscribe(res => this.stats = res);
     } else if (this._council) {
@@ -75,16 +110,34 @@ export class CouncilStatsComponent implements OnInit {
     }
   }
 
-  changeDateTo(dateTo) {
-
-    this.dateTo = moment(dateTo, 'MMMM YYYY').valueOf();
-    this.update();
+  changeDateTo(date: Date) {
+    if (date) {
+      this.dateTo = dayjs(date).startOf('month').valueOf();
+      this.dateToValue = new Date(this.dateTo);
+      this.update();
+      // Обновляем отображение после изменения даты
+      requestAnimationFrame(() => {
+        if (this.dateToInput?.nativeElement) {
+          const formatted = dayjs(date).locale('ru').format('MM.YYYY');
+          this.dateToInput.nativeElement.value = formatted;
+        }
+      });
+    }
   }
 
-  changeDateFrom(dateFrom) {
-
-    this.dateFrom = moment(dateFrom, 'MMMM YYYY').valueOf();
-    this.update();
+  changeDateFrom(date: Date) {
+    if (date) {
+      this.dateFrom = dayjs(date).startOf('month').valueOf();
+      this.dateFromValue = new Date(this.dateFrom);
+      this.update();
+      // Обновляем отображение после изменения даты
+      requestAnimationFrame(() => {
+        if (this.dateFromInput?.nativeElement) {
+          const formatted = dayjs(date).locale('ru').format('MM.YYYY');
+          this.dateFromInput.nativeElement.value = formatted;
+        }
+      });
+    }
   }
 
   @Input() set council(council: CouncilPlainDto) {
@@ -93,12 +146,14 @@ export class CouncilStatsComponent implements OnInit {
   }
 
   showListProjectsFromStats(type, month) {
-    let monthValue = moment(month, 'MMMM YYYY').valueOf();
-    let startOfMonth = moment(monthValue).startOf('month').format('DD-MMMM-YYYY hh:mm');
-    let endOfMonth   = moment(monthValue).endOf('month').format('DD-MMMM-YYYY hh:mm');
+    let monthValue = dayjs(month).valueOf();
+    let startOfMonthDate = dayjs(monthValue).startOf('month');
+    let endOfMonthDate = dayjs(monthValue).endOf('month');
+    let startOfMonthStr = startOfMonthDate.locale('ru').format('DD-MMMM-YYYY HH:mm');
+    let endOfMonthStr = endOfMonthDate.locale('ru').format('DD-MMMM-YYYY HH:mm');
 
-    let startOfMonthValue = moment(startOfMonth, 'DD-MMMM-YYYY hh:mm').valueOf();
-    let endOfMonthValue = moment(endOfMonth, 'DD-MMMM-YYYY hh:mm').valueOf();
+    let startOfMonthValue = dayjs(startOfMonthStr, 'DD-MMMM-YYYY HH:mm', 'ru').valueOf();
+    let endOfMonthValue = dayjs(endOfMonthStr, 'DD-MMMM-YYYY HH:mm', 'ru').valueOf();
 
     this.listProjectsFromStats.show(type, this._council.id, startOfMonthValue, endOfMonthValue);
   }

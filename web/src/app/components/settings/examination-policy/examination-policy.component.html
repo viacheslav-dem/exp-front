@@ -1,85 +1,89 @@
 <div class="list-group-item">
 
   <!--SHOW-->
-  <div *ngIf="!isEdit">
-    <a class="btn btn-icon float-right" (click)="edit()">
-      <fa-icon icon="cog" size="lg"></fa-icon>
-    </a>
-    <div class="form-sub-group">
-      Длительность договора с экспертом: <i><b>{{value.reviewContractDays}}</b>&nbsp;(суток)</i>
+  @if (!isEdit && value) {
+    <div>
+      <a class="btn btn-icon float-right" (click)="edit()">
+        <fa-icon icon="cog" size="lg"></fa-icon>
+      </a>
+      <div class="form-sub-group">
+        Длительность договора с экспертом: <i><b>{{value.reviewContractDays}}</b>&nbsp;(суток)</i>
+      </div>
+      <div class="form-sub-group">
+        Максимально возможное количество часов, затраченных на подготовку экспертного заключения:
+        <i><b>{{value.reviewMaxHours}}</b>&nbsp;(часов)</i>
+      </div>
+      <div class="form-sub-group">
+        Периодичность автосохранения данных черновика:
+        <i><b>{{value.reviewAutoSaveTime}}</b>&nbsp;(секунд)</i>
+      </div>
+      <div class="form-sub-group">
+        Минимальное количество экспертных заключений, требуемых при рассмотрении объекта экспертизы на заседании секции:
+        <i><b>{{value.sectionMeetingMinExperts}}</b> (заключений)</i>
+      </div>
+      <div class="form-sub-group">
+        Максимальная длительность заседания в ГЭС: <i><b>{{value.councilMeetingMaxHours}}</b>&nbsp;(часов)</i>
+      </div>
+      <div class="form-sub-group">
+        Кворум заседания в ГЭС: <i><b>{{value.councilMeetingQuorum}}</b>&nbsp;%</i>
+      </div>
+      <div class="form-sub-group">
+        Почтовая рассылка важных уведомлений: <i>{{value.importantMailingEnabled ? 'включена' : 'отключена'}}</i>
+      </div>
+      <div class="form-sub-group">
+        Почтовая рассылка отчётных уведомлений: <i>{{value.reportMailingEnabled ? 'включена' : 'отключена'}}</i>
+      </div>
     </div>
-    <div class="form-sub-group">
-      Максимально возможное количество часов, затраченных на подготовку экспертного заключения:
-      <i><b>{{value.reviewMaxHours}}</b>&nbsp;(часов)</i>
-    </div>
-    <div class="form-sub-group">
-      Периодичность автосохранения данных черновика:
-      <i><b>{{value.reviewAutoSaveTime}}</b>&nbsp;(секунд)</i>
-    </div>
-    <div class="form-sub-group">
-      Минимальное количество экспертных заключений, требуемых при рассмотрении объекта экспертизы на заседании секции:
-      <i><b>{{value.sectionMeetingMinExperts}}</b> (заключений)</i>
-    </div>
-    <div class="form-sub-group">
-      Максимальная длительность заседания в ГЭС: <i><b>{{value.councilMeetingMaxHours}}</b>&nbsp;(часов)</i>
-    </div>
-    <div class="form-sub-group">
-      Кворум заседания в ГЭС: <i><b>{{value.councilMeetingQuorum}}</b>&nbsp;%</i>
-    </div>
-    <div class="form-sub-group">
-      Почтовая рассылка важных уведомлений: <i>{{value.importantMailingEnabled ? 'включена' : 'отключена'}}</i>
-    </div>
-    <div class="form-sub-group">
-      Почтовая рассылка отчётных уведомлений: <i>{{value.reportMailingEnabled ? 'включена' : 'отключена'}}</i>
-    </div>
-  </div>
+  }
 
   <!--EDIT-->
-  <div *ngIf="isEdit">
-    <div class="form-group">
-      <label>Длительность договора с экспертом, суток</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.reviewContractDays" placeholder="Количество суток"
-             class="form-control" title="Длительность договора с экспертом, суток">
-    </div>
-    <div class="form-group">
-      <label>Максимально возможное количество часов, затраченных на подготовку экспертного заключения</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.reviewMaxHours" placeholder="Количество часов"
-             class="form-control"
-             title="Максимально возможное количество часов, затраченных на подготовку экспертного заключения">
-    </div>
-    <div class="form-group">
-      <label>Периодичность автосохранения данных черновика</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.reviewAutoSaveTime" placeholder="Количество секунд"
-             class="form-control"
-             title="Периодичность автосохранения данных черновика">
-    </div>
-    <div class="form-group">
-      <label>Минимальное количество экспертных заключений,
-        требуемых при рассмотрении объекта экспертизы на заседании секции</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.sectionMeetingMinExperts"
-             placeholder="Количество экспертных заключений" class="form-control"
-             title="Минимальное количество экспертных заключений, требуемых при рассмотрении объекта экспертизы на заседании секции">
-    </div>
-    <div class="form-group">
-      <label>Максимальная длительность заседания в ГЭС, часов</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.councilMeetingMaxHours" placeholder="Количество часов"
-             class="form-control" title="Максимальная длительность заседания в ГЭС, часов">
-    </div>
-    <div class="form-group">
-      <label>Кворум заседания в ГЭС, %</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.councilMeetingQuorum" placeholder="процентов"
-             class="form-control" title="Кворум заседания в ГЭС, %">
-    </div>
-    <div class="form-group">
-      <app-checkbox [(ngModel)]="editedValue.importantMailingEnabled">Почтовая рассылка важных уведомлений
-      </app-checkbox>
-    </div>
-    <div class="form-group">
-      <app-checkbox [(ngModel)]="editedValue.reportMailingEnabled">Почтовая рассылка отчётных уведомлений</app-checkbox>
-    </div>
-    <div class="mt-1">
-      <button class="btn btn-secondary" (click)="isEdit = false">Отмена</button>
-      <button class="btn btn-primary" (click)="savePropertyValue()">Сохранить</button>
-    </div>
-  </div>
-</div>
+  @if (isEdit) {
+    <div>
+      <div class="form-group">
+        <label>Длительность договора с экспертом, суток</label>
+        <input numberInput type="text" [(ngModel)]="editedValue.reviewContractDays" placeholder="Количество суток"
+          class="form-control" title="Длительность договора с экспертом, суток">
+        </div>
+        <div class="form-group">
+          <label>Максимально возможное количество часов, затраченных на подготовку экспертного заключения</label>
+          <input numberInput type="text" [(ngModel)]="editedValue.reviewMaxHours" placeholder="Количество часов"
+            class="form-control"
+            title="Максимально возможное количество часов, затраченных на подготовку экспертного заключения">
+          </div>
+          <div class="form-group">
+            <label>Периодичность автосохранения данных черновика</label>
+            <input numberInput type="text" [(ngModel)]="editedValue.reviewAutoSaveTime" placeholder="Количество секунд"
+              class="form-control"
+              title="Периодичность автосохранения данных черновика">
+            </div>
+            <div class="form-group">
+              <label>Минимальное количество экспертных заключений,
+              требуемых при рассмотрении объекта экспертизы на заседании секции</label>
+              <input numberInput type="text" [(ngModel)]="editedValue.sectionMeetingMinExperts"
+                placeholder="Количество экспертных заключений" class="form-control"
+                title="Минимальное количество экспертных заключений, требуемых при рассмотрении объекта экспертизы на заседании секции">
+              </div>
+              <div class="form-group">
+                <label>Максимальная длительность заседания в ГЭС, часов</label>
+                <input numberInput type="text" [(ngModel)]="editedValue.councilMeetingMaxHours" placeholder="Количество часов"
+                  class="form-control" title="Максимальная длительность заседания в ГЭС, часов">
+                </div>
+                <div class="form-group">
+                  <label>Кворум заседания в ГЭС, %</label>
+                  <input numberInput type="text" [(ngModel)]="editedValue.councilMeetingQuorum" placeholder="процентов"
+                    class="form-control" title="Кворум заседания в ГЭС, %">
+                  </div>
+                  <div class="form-group">
+                    <app-checkbox [(ngModel)]="editedValue.importantMailingEnabled">Почтовая рассылка важных уведомлений
+                    </app-checkbox>
+                  </div>
+                  <div class="form-group">
+                    <app-checkbox [(ngModel)]="editedValue.reportMailingEnabled">Почтовая рассылка отчётных уведомлений</app-checkbox>
+                  </div>
+                  <div class="mt-1">
+                    <button class="btn btn-secondary" (click)="isEdit = false">Отмена</button>
+                    <button class="btn btn-primary" (click)="savePropertyValue()">Сохранить</button>
+                  </div>
+                </div>
+              }
+            </div>

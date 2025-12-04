@@ -7,7 +7,8 @@ import {
 
 @Component({
     selector: 'app-review-8-10PIT-new-form',
-    templateUrl: './expert-review-8-10PIT-new-form.component.html'
+    templateUrl: './expert-review-8-10PIT-new-form.component.html',
+    standalone: false
 })
 export class ExpertReview_8_10PIT_NewFormComponent extends ExpertReviewForm<ExpertReview_8_10PIT_NewFormContent> {
 

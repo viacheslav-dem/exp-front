@@ -9,8 +9,9 @@ export const NI_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Directive({
-  selector: 'input[numberInput]',
-  providers: [NI_CONTROL_VALUE_ACCESSOR]
+    selector: 'input[numberInput]',
+    providers: [NI_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class NumberInputDirective extends ControlComponent<number>
 {

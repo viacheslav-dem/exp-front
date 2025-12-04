@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, Input, Type, ViewChild, ViewContainerRef} from "@angular/core";
+import {Component, ComponentFactoryResolver, Input, Type, ViewChild, ViewContainerRef, input} from "@angular/core";
 import {MeetingDto} from "@app/dto/MeetingDto";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {Role} from "@app/pipes/role.pipe";
@@ -8,15 +8,15 @@ import {MeetingService} from "@app/services/meeting.service";
 import {AgendaFormResolver} from "@app/components/document-form/meeting-protocol-form/agenda-form-resolver.service";
 import {compareByField, isEmptyOrNull, sortPersonsByName} from "@app/support/utils";
 import {PersonService} from "@app/services/person.service";
-import * as moment from "moment";
+import dayjs from 'dayjs';
 import {RemarksContainerDto} from "@app/dto/RemarksContainerDto";
 import {MeetingProtocolNewFormContent} from "@app/components/document-form/meeting-protocol-form/MeetingProtocolNewFormContent";
 import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form/agenda-new-form.service";
 
 @Component({
-  selector: 'app-meeting-protocol-form',
-  templateUrl: 'meeting-protocol-form.component.html',
-  styles: [`
+    selector: 'app-meeting-protocol-form',
+    templateUrl: 'meeting-protocol-form.component.html',
+    styles: [`
       ::ng-deep .hint {
           margin-top: 0.5rem;
           font-style: italic;
@@ -30,19 +30,20 @@ import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form
       ::ng-deep .hint ul {
           margin-bottom: 0.5rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNewFormContent> {
 
   _meeting: MeetingDto;
-  @Input() role: string;
+  readonly role = input<string>(undefined);
   currentPerson: PersonPlainDto;
   assessors: PersonPlainDto[] = [];
   invited: { name: string }[] = [];
   searchPersonRoles: Role[] | string[] | string = "none";
   agendaComponents: { [key: number]: AgendaNewForm } = {};
-  @ViewChild(SearchPersonByRolesComponent) public searchPersonModal: SearchPersonByRolesComponent;
-  @ViewChild('form', {read: ViewContainerRef}) formContainer: any;
+  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
+  @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
 
   constructor(private _personService: PersonService,
               private _meetingService: MeetingService,
@@ -83,8 +84,8 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
       let formRenderer: Type<AgendaNewForm> = this._agendaFormResolver.getFormRenderer(agenda.project.code.code);
       if (formRenderer) {
         let componentFactory = this.resolver.resolveComponentFactory(formRenderer);
-        let component: AgendaNewForm = this.agendaComponents[agenda.project.id] =
-          this.formContainer.createComponent(componentFactory)._component;
+        const componentRef = this.formContainer.createComponent(componentFactory);
+        let component: AgendaNewForm = this.agendaComponents[agenda.project.id] = componentRef.instance;
         component.ind = i;
         component.project = agenda.project;
         component.parent = this;
@@ -110,7 +111,7 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
   }
 
   showSearchChairmanModal() {
-    this.searchPersonRoles = this.role;
+    this.searchPersonRoles = this.role();
     this.searchPersonModal.show();
   }
 
@@ -121,8 +122,9 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
 
   validate() {
     super.validate();
-    let endDate = moment(this._form.endDate);
-    if (moment(this._meeting.period.end).hour(endDate.hour()).minute(endDate.minute()).valueOf() <= this._meeting.period.start) {
+    let endDate = dayjs(this._form.endDate);
+    let meetingEndWithTime = dayjs(this._meeting.period.end).hour(endDate.hour()).minute(endDate.minute());
+    if (meetingEndWithTime.valueOf() <= this._meeting.period.start) {
       throw 'Время окончания должно следовать за временем начала заседания.';
     }
     if (this._form.prepareTimeBySecretary<0){
@@ -140,8 +142,8 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
     form.projectsById = {};
     this._meeting.agendas.map(agenda => agenda.project.id).forEach(projectId =>
       form.projectsById[projectId] = this.agendaComponents[projectId].getForm());
-    let endDate = moment(form.endDate);
-    form.endDate = moment(this._meeting.period.end).hour(endDate.hour()).minute(endDate.minute()).valueOf();
+    let endDate = dayjs(form.endDate);
+    form.endDate = dayjs(this._meeting.period.end).hour(endDate.hour()).minute(endDate.minute()).valueOf();
     return form;
   }
 

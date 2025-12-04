@@ -10,7 +10,7 @@
       утвержденного постановлением Совета Министров Республики Беларусь от 31 октября 2012 г. № 995:
     </label>
     <textarea [(ngModel)]="_form.privacy" rows="3" class="form-control"
-              placeholder="анализ и оценка соответствия объекта экспертизы критерию">
+      placeholder="анализ и оценка соответствия объекта экспертизы критерию">
     </textarea>
   </div>
 
@@ -22,7 +22,7 @@
       утвержденного постановлением Совета Министров Республики Беларусь от 31 октября 2012 г. № 995:
     </label>
     <textarea [(ngModel)]="_form.advantage" rows="3" class="form-control"
-              placeholder="анализ и оценка соответствия объекта экспертизы критерию">
+      placeholder="анализ и оценка соответствия объекта экспертизы критерию">
     </textarea>
   </div>
 
@@ -33,7 +33,7 @@
       утвержденного постановлением Совета Министров Республики Беларусь от 31 октября 2012 г. № 995:
     </label>
     <textarea [(ngModel)]="_form.competitiveness" rows="3" class="form-control"
-              placeholder="анализ и оценка соответствия объекта экспертизы критерию">
+      placeholder="анализ и оценка соответствия объекта экспертизы критерию">
     </textarea>
   </div>
 </div>
@@ -45,7 +45,7 @@
       1. Отнесение товара (работы, услуги) к категории инновационных товаров:
     </label>
     <app-boolean-button [(ngModel)]="_form.innovativeness" [falseLabel]="'не относится'"
-                        [trueLabel]="'относится'"></app-boolean-button>
+    [trueLabel]="'относится'"></app-boolean-button>
   </div>
 
   <div class="form-sub-group">
@@ -53,12 +53,16 @@
       2. Замечания по материалам объекта экспертизы, конкретные предложения о необходимости доработки и (или)
       корректировки материалов по объекту экспертизы:
     </label>
-    <div *ngIf="notes.length == 0" class="mb-2 italic">не имеются</div>
-    <div *ngFor="let note of notes; let i = index" class="input-group btn-group mb-2">
+    @if (notes.length == 0) {
+      <div class="mb-2 italic">не имеются</div>
+    }
+    @for (note of notes; track note; let i = $index) {
+      <div class="input-group btn-group mb-2">
         <textarea [(ngModel)]="note.name" rows="2" class="form-control"
-                  placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
-      <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
-    </div>
+        placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
+        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+      </div>
+    }
     <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
       Добавить замечание
     </button>

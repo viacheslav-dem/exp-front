@@ -1,36 +1,39 @@
 {
   "compilerOptions": {
     "declaration": false,
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "lib": [
-      "es6",
-      "dom"
-    ],
     "mapRoot": "./",
-    "module": "es6",
+    "module": "es2020",
     "baseUrl": ".",
     "paths": {
       "@app/*": [
         "app/*"
       ]
     },
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "outDir": "../dist/out-tsc",
     "sourceMap": true,
-    "target": "es5",
+    "target": "ES2022",
     "typeRoots": [
       "../node_modules/@types"
-    ]
+    ],
+    "skipLibCheck": true,
+    "useDefineForClassFields": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "angularCompilerOptions": {
-    "strictInjectionParameters":true,
-    "trace":true
+    "enableIvy": true,
+    "strictInjectionParameters": true,
+    "trace": true
   },
   "exclude": [
-    "../node_modules"
+    "../node_modules",
+    "test.ts",
+    "**/*.spec.ts",
+    "app/components/search/search-person/search-person-autocomplete/AutoCompleteDataSource.ts",
+    "app/dto/UserPostDto.ts",
+    "app/color/colors.ts"
   ],
-  "types": [
-    "node"
-  ]
+  "types": []
 }

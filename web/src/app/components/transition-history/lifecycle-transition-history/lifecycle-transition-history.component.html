@@ -1,25 +1,33 @@
-<div *ngIf="_history" class="card lifecycle-history">
-  <div class="text-muted history-type">{{_history.type | lifecycleType}}</div>
-  <div class="underline dots-overflow">{{_history.name}}</div>
-  <table *ngIf="_history.transitions.length > 0" class="">
-    <ng-container *ngFor="let transition of _history.transitions">
-      <tr>
-        <td width="20px" class="pr-2"><fa-icon icon="arrow-down"></fa-icon></td>
-        <td class="italic py-2 dots-overflow" style="min-width: 150px">
-          <div>{{transition.person | fullName}}</div>
-          <div>{{transition.role | role}}</div>
-          <div>{{transition.date | formatDate}}</div>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2" class="align-top">
-          <span class="badge" [ngClass]="ProjectLifecycleStateBadge[transition.newState]">
-            {{transition.newState | lifecycleState}}
-          </span>
-        </td>
-      </tr>
-    </ng-container>
-  </table>
-  <div class="italic mt-3" *ngIf="_history.transitions.length == 0">Данные отсутствуют</div>
-</div>
-<div class="italic" *ngIf="!_history">Загружается...</div>
+@if (_history) {
+  <div class="card lifecycle-history">
+    <div class="text-muted history-type">{{_history.type | lifecycleType}}</div>
+    <div class="underline dots-overflow">{{_history.name}}</div>
+    @if (_history.transitions.length > 0) {
+      <table class="">
+        @for (transition of _history.transitions; track transition) {
+          <tr>
+            <td width="20px" class="pr-2"><fa-icon icon="arrow-down"></fa-icon></td>
+            <td class="italic py-2 dots-overflow" style="min-width: 150px">
+              <div>{{transition.person | fullName}}</div>
+              <div>{{transition.role | role}}</div>
+              <div>{{transition.date | formatDate}}</div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" class="align-top">
+              <span class="badge" [ngClass]="ProjectLifecycleStateBadge[transition.newState]">
+                {{transition.newState | lifecycleState}}
+              </span>
+            </td>
+          </tr>
+        }
+      </table>
+    }
+    @if (_history.transitions.length == 0) {
+      <div class="italic mt-3">Данные отсутствуют</div>
+    }
+  </div>
+}
+@if (!_history) {
+  <div class="italic">Загружается...</div>
+}
