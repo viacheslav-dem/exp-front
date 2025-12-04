@@ -399,7 +399,7 @@ import {
 } from "@app/components/document-form/agenda-8-15-2025-form/agenda-8-15-2025-form.component";
 import {
   FundamentalOrAppliedResearchComponent
-} from "@app/components/document-form/document-blocks/ fundamental-or-applied-research.component";
+} from "@app/components/document-form/document-blocks/fundamental-or-applied-research.component";
 
 @NgModule({
   imports: [

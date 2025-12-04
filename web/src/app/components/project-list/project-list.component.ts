@@ -1,4 +1,5 @@
 import {Component} from '@angular/core';
+import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "@app/services/auth.service";
 import {Role} from "@app/pipes/role.pipe";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
@@ -17,6 +18,7 @@ import {noveltyOptions} from "@app/components/document-form/document-blocks/nove
 import {economicSignificanceOptions} from "@app/components/document-form/document-blocks/economic-significance-block.component";
 import {resourcesSufficiencyOptions} from "@app/components/document-form/document-blocks/resources-sufficiency-block.component";
 import {competenceSufficiencyOptions} from "@app/components/document-form/document-blocks/competence-sufficiency-block.component";
+import {PageRequest} from "@app/components/common-components/page-and-filter/model/PageRequest";
 
 @Component({
     selector: 'app-project-list',
@@ -34,7 +36,9 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
     constructor(private _projectService: ProjectService,
                 private _authService: AuthService,
                 private _dataService: DataService,
-                private _councilPipe: CouncilPipe) {
+                private _councilPipe: CouncilPipe,
+                private _route: ActivatedRoute,
+                private _router: Router) {
         super();
     }
 
@@ -119,6 +123,37 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
         });
         this.enableFilterCache("project-list");
         this._projectService.getGroups(this._authService.getCurrRole()).subscribe(res => this.groups = res);
+
+        // Чтение номера страницы из query-параметра с учётом старых версий Angular и HashLocationStrategy
+        const qpFromRoute = (this._route.snapshot && this._route.snapshot.queryParams)
+            ? this._route.snapshot.queryParams['page']
+            : undefined;
+        const qpFromRoot = this._router.routerState.snapshot.root.queryParams
+            ? this._router.routerState.snapshot.root.queryParams['page']
+            : undefined;
+
+        const pageRaw: any = qpFromRoute != null ? qpFromRoute : qpFromRoot;
+        const pageFromRoute = pageRaw != null ? parseInt(pageRaw, 10) : NaN;
+
+        console.log('projects ngOnInit URL =', this._router.url);
+        console.log('qpFromRoute.page =', qpFromRoute);
+        console.log('qpFromRoot.page =', qpFromRoot);
+        console.log('pageFromRoute =', pageFromRoute);
+
+        if (!isNaN(pageFromRoute) && pageFromRoute > 0) {
+            // pagination.page используется пагинатором (1-based)
+            this._pagination.page = pageFromRoute;
+            // paging.page уходит на бэкенд (0-based)
+            this._searchRequest.paging.page = pageFromRoute - 1;
+        }
+
+        console.log('before update: _pagination.page =', this._pagination.page);
+        console.log('before update: _searchRequest.paging.page =', this._searchRequest.paging.page);
+
+        this.update();
+
+        console.log('after update call: _pagination.page =', this._pagination.page);
+        console.log('after update call: _searchRequest.paging.page =', this._searchRequest.paging.page);
     }
 
     loadPage() {
@@ -137,6 +172,15 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
         else
             this.selectedGroup = id;
         this.loadPage();
+    }
+
+    onPageChanged(pageRequest: PageRequest) {
+        this._router.navigate([], {
+            relativeTo: this._route,
+            queryParams: {page: pageRequest.page + 1},
+            queryParamsHandling: 'merge'
+        });
+        super.onPageChanged(pageRequest);
     }
 
     private getStateField() {

@@ -19,14 +19,52 @@ export class PaginationComponent implements OnInit {
   @Output() onPageChanged = new EventEmitter<PageRequest>();
 
   constructor() {
-    this.pagination = new Pagination();
   }
 
   ngOnInit() {
-    this.pageChanged(this.pagination);
+    console.log('PaginationComponent ngOnInit, pagination.page =', this.pagination && this.pagination.page);
+  }
+
+  get pages(): number[] {
+    if (!this.page || !this.page.totalPages || this.page.totalPages < 1) {
+      return [];
+    }
+    const total = this.page.totalPages;
+    const max = this.maxSize || 10;
+
+    // если страниц меньше или равно maxSize - показываем все
+    if (total <= max) {
+      const all: number[] = [];
+      for (let i = 1; i <= total; i++) {
+        all.push(i);
+      }
+      return all;
+    }
+
+    // скользящее окно вокруг текущей страницы
+    const current = this.pagination && this.pagination.page ? this.pagination.page : 1;
+    let start = current - Math.floor(max / 2);
+    if (start < 1) {
+      start = 1;
+    }
+    let end = start + max - 1;
+    if (end > total) {
+      end = total;
+      start = end - max + 1;
+      if (start < 1) {
+        start = 1;
+      }
+    }
+
+    const windowPages: number[] = [];
+    for (let i = start; i <= end; i++) {
+      windowPages.push(i);
+    }
+    return windowPages;
   }
 
   pageChanged(event: Pagination): void {
+    console.log('PaginationComponent.pageChanged event.page =', event && event.page);
     this.onPageChanged.emit(new PageRequest(event));
   }
 }
