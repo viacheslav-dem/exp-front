@@ -23,6 +23,9 @@ export class PaginationComponent implements OnInit {
 
   ngOnInit() {
     console.log('PaginationComponent ngOnInit, pagination.page =', this.pagination && this.pagination.page);
+    if (this.pagination) {
+      this.pageChanged(this.pagination);
+    }
   }
 
   get pages(): number[] {
