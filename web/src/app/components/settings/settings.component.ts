@@ -22,7 +22,7 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> {
   selectedProperty: PropertyDto;
   editedProperty: PropertyPlainDto;
 
-  @ViewChild('propertyContainer', {read: ViewContainerRef}) propertyContainer: any;
+  @ViewChild('propertyContainer', { read: ViewContainerRef, static: false }) propertyContainer: any;
   propertyComponent: PropertyComponent<any>;
 
   constructor(private _toasty: GlobalToastyService,

@@ -20,7 +20,7 @@ export class DocumentUploaderComponent extends UploadHelper {
   @Input() typesAccept: string;
   @Output() saved = new EventEmitter();
 
-  @ViewChild('fileLoaderModal') fileLoaderModal: ModalComponent;
+  @ViewChild('fileLoaderModal', { static: false }) fileLoaderModal: ModalComponent;
 
   constructor(private _toasty: GlobalToastyService,
               protected _authService: AuthService) {

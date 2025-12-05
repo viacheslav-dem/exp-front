@@ -11,7 +11,7 @@ export class SearchSectionComponent implements OnInit {
 
   public data: SectionPlainDto[];
   @Output() selected = new EventEmitter<SectionPlainDto>();
-  @ViewChild('searchModal') public searchModal: ModalDirective;
+  @ViewChild('searchModal', { static: false }) public searchModal: ModalDirective;
 
   constructor(private _dataService: DataService) {
   }

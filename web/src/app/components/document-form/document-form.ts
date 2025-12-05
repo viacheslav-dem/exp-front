@@ -2,7 +2,8 @@ import {EventEmitter, Injectable, Input, OnDestroy, OnInit, Output} from "@angul
 import {FormContent} from "@app/components/document-form/form-model/FormContent";
 import {DraftService} from "@app/components/document-form/draft.service";
 import {IdDto} from "@app/dto/IdDto";
-import {Observable} from "rxjs";
+import {Observable, timer} from "rxjs";
+import {takeWhile} from "rxjs/operators";
 import {deepClone} from "@app/support/utils";
 @Injectable()
 export class DocumentForm<Form extends FormContent> implements OnInit, OnDestroy {
@@ -31,8 +32,8 @@ export class DocumentForm<Form extends FormContent> implements OnInit, OnDestroy
     this._draftAutoSaveAlive = true;
     this.draftService.getDraft(this.draftOwner).subscribe(res => {
       this.setForm(res);
-      Observable.timer(this._draftAutoSaveStartTimeMillis, this._draftAutoSavePeriodMillis)
-        .takeWhile(() => this._draftAutoSaveAlive)
+      timer(this._draftAutoSaveStartTimeMillis, this._draftAutoSavePeriodMillis)
+        .pipe(takeWhile(() => this._draftAutoSaveAlive))
         .subscribe(() => this.saveDraft());
     });
   }

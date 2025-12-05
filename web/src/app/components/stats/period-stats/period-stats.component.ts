@@ -12,8 +12,8 @@ export class PeriodStatsComponent implements OnInit {
   dateFrom: number = moment().add(-1, 'year').valueOf();
   dateTo: number = moment().valueOf();
   stats: StatsDto[];
-  @ViewChild("dateFromInput") dateFromInput: ElementRef;
-  @ViewChild("dateToInput") dateToInput: ElementRef;
+  @ViewChild("dateFromInput", { static: true }) dateFromInput: ElementRef;
+  @ViewChild("dateToInput", { static: true }) dateToInput: ElementRef;
 
   constructor(private _statsService: StatsService) {
   }

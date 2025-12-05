@@ -19,8 +19,8 @@ export class DocumentListComponent implements OnInit {
   @Input() url: string = 'document';
   @Output() onUpdate: EventEmitter<DocumentDto> = new EventEmitter();
   @Output() onDelete: EventEmitter<any> = new EventEmitter();
-  @ViewChild(FileEditorComponent) fileEditor: FileEditorComponent;
-  @ViewChild("fileViewerModal") fileViewerModal: ModalComponent;
+  @ViewChild(FileEditorComponent, { static: false }) fileEditor: FileEditorComponent;
+  @ViewChild("fileViewerModal", { static: false }) fileViewerModal: ModalComponent;
 
   constructor(private _documentService: DocumentService,
               private _toasty: GlobalToastyService,

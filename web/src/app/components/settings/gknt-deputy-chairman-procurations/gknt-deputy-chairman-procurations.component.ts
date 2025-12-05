@@ -19,7 +19,7 @@ export class GkntDeputyChairmanProcurationsComponent extends PropertyComponent<P
   editedPerson: string;
   editedProcuration: Procuration;
 
-  @ViewChild(SearchPersonByRolesComponent) public searchPersonModal: SearchPersonByRolesComponent;
+  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
 
   setProperty(property: PropertyDto) {
     super.setProperty(property);

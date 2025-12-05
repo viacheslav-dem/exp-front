@@ -39,7 +39,7 @@ import {LastSignEnumPipe} from "@app/pipes/last-sign.pipe";
 export class UserListComponent extends FilterAndPages<PersonDto> implements OnDestroy {
 
   SortClass = SortClass;
-  @ViewChild('showUserInfo') showUserInfo: ModalComponent;
+  @ViewChild('showUserInfo', { static: false }) showUserInfo: ModalComponent;
   users: PersonDto[] = [];
   selectedUser: PersonDto;
   sortOrder: SortOrder = new SortOrder('person', Direction.ASC);

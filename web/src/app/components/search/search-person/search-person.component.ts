@@ -15,7 +15,7 @@ import {isArray} from "util";
 export class SearchPersonComponent extends FilterAndPages<PersonPlainDto> {
 
   @Output() selected = new EventEmitter<PersonPlainDto>();
-  @ViewChild('searchModal') searchPersonModal: ModalComponent;
+  @ViewChild('searchModal', { static: false }) searchPersonModal: ModalComponent;
 
   constructor(protected _service: PersonService) {
     super();

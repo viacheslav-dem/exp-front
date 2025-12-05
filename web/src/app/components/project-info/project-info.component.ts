@@ -74,15 +74,15 @@ export class ProjectInfoComponent implements OnInit {
 
   buttons: ActionButtonMetadata[] = [];
 
-  @ViewChild(SearchExpertComponent) public searchExpertComponent: SearchExpertComponent;
-  @ViewChild(SearchGkntWorkerComponent) searchGkntWorkerComponent: SearchGkntWorkerComponent;
-  @ViewChild('editProjectModal') editProjectModal: ModalComponent;
-  @ViewChild('returnFromCouncilWithoutExpertiseModal') returnFromCouncilWithoutExpertiseModal: ModalComponent;
-  @ViewChild('copyProjectModal') copyProjectModal: ModalComponent;
-  @ViewChild('expertRejectProject') expertRejectProject: ModalComponent;
-  @ViewChild('expertAgreement') expertAgreement: ModalComponent;
-  @ViewChild('listProjects') listProjects: ModalComponent;
-  @ViewChild(SameProjectListComponent) sameProjectList: SameProjectListComponent;
+  @ViewChild(SearchExpertComponent, { static: false }) public searchExpertComponent: SearchExpertComponent;
+  @ViewChild(SearchGkntWorkerComponent, { static: false }) searchGkntWorkerComponent: SearchGkntWorkerComponent;
+  @ViewChild('editProjectModal', { static: false }) editProjectModal: ModalComponent;
+  @ViewChild('returnFromCouncilWithoutExpertiseModal', { static: false }) returnFromCouncilWithoutExpertiseModal: ModalComponent;
+  @ViewChild('copyProjectModal', { static: false }) copyProjectModal: ModalComponent;
+  @ViewChild('expertRejectProject', { static: false }) expertRejectProject: ModalComponent;
+  @ViewChild('expertAgreement', { static: false }) expertAgreement: ModalComponent;
+  @ViewChild('listProjects', { static: false }) listProjects: ModalComponent;
+  @ViewChild(SameProjectListComponent, { static: false }) sameProjectList: SameProjectListComponent;
 
   constructor(private route: ActivatedRoute,
               private _toasty: GlobalToastyService,

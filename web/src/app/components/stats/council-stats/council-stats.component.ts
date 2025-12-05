@@ -33,10 +33,10 @@ export class CouncilStatsComponent implements OnInit {
   stats: CouncilStatsDto[];
   statsV2: CouncilStatsResponseDTO[];
 
-  @ViewChild("dateFromInput") dateFromInput: ElementRef;
-  @ViewChild("dateToInput") dateToInput: ElementRef;
+  @ViewChild("dateFromInput", { static: true }) dateFromInput: ElementRef;
+  @ViewChild("dateToInput", { static: true }) dateToInput: ElementRef;
 
-  @ViewChild(ProjectListFromStatsComponent) public listProjectsFromStats: ProjectListFromStatsComponent;
+  @ViewChild(ProjectListFromStatsComponent, { static: false }) public listProjectsFromStats: ProjectListFromStatsComponent;
 
   councilToString: Function;
 

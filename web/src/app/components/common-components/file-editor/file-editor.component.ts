@@ -12,7 +12,7 @@ export class FileEditorComponent implements OnInit {
   doc: DocumentDto;
   @Output() onUpdate: EventEmitter<DocumentDto> = new EventEmitter<DocumentDto>();
 
-  @ViewChild('fileEditorModal') public fileEditorModal: ModalDirective;
+  @ViewChild('fileEditorModal', { static: false }) public fileEditorModal: ModalDirective;
 
   constructor() {
   }

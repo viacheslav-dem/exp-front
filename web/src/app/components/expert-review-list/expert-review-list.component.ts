@@ -27,7 +27,7 @@ export class ExpertReviewListComponent implements OnInit {
   @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
   @Input() canChooseExperts: boolean;
 
-  @ViewChild(SearchExpertComponent) public searchExpertComponent: SearchExpertComponent;
+  @ViewChild(SearchExpertComponent, { static: false }) public searchExpertComponent: SearchExpertComponent;
 
   constructor(private route: ActivatedRoute,
               private _toasty: GlobalToastyService,

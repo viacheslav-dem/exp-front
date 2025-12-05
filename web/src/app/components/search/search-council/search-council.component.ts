@@ -10,7 +10,7 @@ export class SearchCouncilComponent implements OnInit {
 
   public data: any[];
   @Output() selected = new EventEmitter();
-  @ViewChild('searchModal') public searchModal: ModalDirective;
+  @ViewChild('searchModal', { static: false }) public searchModal: ModalDirective;
 
   constructor(private _dataService: DataService) {
   }

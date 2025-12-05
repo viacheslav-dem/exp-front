@@ -21,9 +21,9 @@ export class OrgsComponent extends FilterAndPages<OrgDto> {
   selectedOrg: OrgDto;
   editedOrg: OrgDto;
 
-  @ViewChild(SearchPersonComponent) public searchPersonModal: SearchPersonComponent;
-  @ViewChild(SearchOrgComponent) public searchOrgModal: SearchOrgComponent;
-  @ViewChild('showSubOrgModal') showSubOrgModal: ModalComponent;
+  @ViewChild(SearchPersonComponent, { static: false }) public searchPersonModal: SearchPersonComponent;
+  @ViewChild(SearchOrgComponent, { static: false }) public searchOrgModal: SearchOrgComponent;
+  @ViewChild('showSubOrgModal', { static: false }) showSubOrgModal: ModalComponent;
 
   constructor(private _toasty: GlobalToastyService,
               private _dataService: DataService) {

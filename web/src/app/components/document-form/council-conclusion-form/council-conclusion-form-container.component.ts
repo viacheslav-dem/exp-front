@@ -44,8 +44,8 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   _project: ProjectDto;
   _group: LifecycleGroupDto;
 
-  @ViewChild(SearchPersonByRolesComponent) public searchPersonModal: SearchPersonByRolesComponent;
-  @ViewChild('form', {read: ViewContainerRef}) formContainer: any;
+  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
+  @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
 
   constructor(private _personService: PersonService,
               private resolver: ComponentFactoryResolver,

@@ -21,7 +21,7 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
   experts: PersonExpertDto[] = [];
   sortDirection = Direction.ASC;
   @Output() selected = new EventEmitter<PersonExpertDto>();
-  @ViewChild('searchModal') searchPersonModal: ModalComponent;
+  @ViewChild('searchModal', { static: false }) searchPersonModal: ModalComponent;
 
   constructor(protected _service: PersonService) {
     super();

@@ -42,10 +42,10 @@ export class BasicProjectInfoComponent implements OnInit {
   @Input() visibleDocsForExpert: boolean;
   @Output() onChanged: EventEmitter<any> = new EventEmitter();
 
-  @ViewChild('decisionFormModal') decisionFormModal: ModalComponent;
-  @ViewChild('transitionHistoryModal') transitionHistoryModal: ModalComponent;
-  @ViewChild('projectDocumentsComponent') projectDocumentsComponent: DocumentListComponent;
-  @ViewChild('projectDocumentsComponent') projectDocumentsComponent1: DocumentListComponent;
+  @ViewChild('decisionFormModal', { static: false }) decisionFormModal: ModalComponent;
+  @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
+  @ViewChild('projectDocumentsComponent', { static: false }) projectDocumentsComponent: DocumentListComponent;
+  @ViewChild('projectDocumentsComponent', { static: false }) projectDocumentsComponent1: DocumentListComponent;
 
   constructor(private _personService: PersonService,
               private _projectService: ProjectService,

@@ -14,7 +14,7 @@ import {FilterBuilder} from "@app/components/common-components/page-and-filter/m
 
 export class SearchOrgComponent extends FilterAndPages<OrgDto> {
 
-  @ViewChild('searchOrgModal') searchOrgModal: ModalComponent;
+  @ViewChild('searchOrgModal', { static: false }) searchOrgModal: ModalComponent;
   @Output() selected = new EventEmitter<OrgDto>();
 
   constructor(protected _service: DataService) {

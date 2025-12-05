@@ -46,16 +46,16 @@ export class LifecycleGroupComponent implements OnInit {
   @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
   @Output() onReplyChanged: EventEmitter<any> = new EventEmitter<any>();
 
-  @ViewChild(CouncilConclusionFormContainerComponent) conclusionForm: CouncilConclusionFormContainerComponent;
-  @ViewChild('searchSection') searchSectionListComponent: SearchSectionComponent;
-  @ViewChild('changeSection') changeSectionListComponent: SearchSectionComponent;
-  @ViewChild('referralFormModal') referralFormModal: ModalComponent;
-  @ViewChild('councilFormModal') councilFormModal: ModalComponent;
-  @ViewChild('groupDecisionFormModal') groupDecisionFormModal: ModalComponent;
-  @ViewChild('transitionHistoryModal') transitionHistoryModal: ModalComponent;
-  @ViewChild('lifecycleTransitionHistoryModal') lifecycleTransitionHistoryModal: ModalComponent;
-  @ViewChild('remarkResponseForSection') remarkResponseForSection: ModalComponent;
-  @ViewChild('remarkResponseForBureau') remarkResponseForBureau: ModalComponent;
+  @ViewChild(CouncilConclusionFormContainerComponent, { static: false }) conclusionForm: CouncilConclusionFormContainerComponent;
+  @ViewChild('searchSection', { static: false }) searchSectionListComponent: SearchSectionComponent;
+  @ViewChild('changeSection', { static: false }) changeSectionListComponent: SearchSectionComponent;
+  @ViewChild('referralFormModal', { static: false }) referralFormModal: ModalComponent;
+  @ViewChild('councilFormModal', { static: false }) councilFormModal: ModalComponent;
+  @ViewChild('groupDecisionFormModal', { static: false }) groupDecisionFormModal: ModalComponent;
+  @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
+  @ViewChild('lifecycleTransitionHistoryModal', { static: false }) lifecycleTransitionHistoryModal: ModalComponent;
+  @ViewChild('remarkResponseForSection', { static: false }) remarkResponseForSection: ModalComponent;
+  @ViewChild('remarkResponseForBureau', { static: false }) remarkResponseForBureau: ModalComponent;
 
   constructor(private _router: Router,
               public _lifecycleGroupService: LifecycleGroupService,

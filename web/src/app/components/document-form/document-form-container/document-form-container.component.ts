@@ -10,7 +10,7 @@ export class DocumentFormContainerComponent<Form extends FormContent> extends Do
 
   _formRenderer: Type<DocumentForm<Form>>;
   formComponent: DocumentForm<Form>;
-  @ViewChild('form', {read: ViewContainerRef}) formContainer: any;
+  @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
 
   constructor(private resolver: ComponentFactoryResolver) {
     super();

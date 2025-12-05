@@ -23,7 +23,7 @@ export class SelectRoleComponent implements OnInit {
   mapInfoRole: [] = [];
   user: any = {};
 
-  @ViewChild(ProjectListComponent) projectListComponent: ProjectListComponent;
+  @ViewChild(ProjectListComponent, { static: false }) projectListComponent: ProjectListComponent;
 
   constructor(private _storageService: StorageService,
               private _authService: AuthService,

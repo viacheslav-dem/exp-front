@@ -41,8 +41,8 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
   invited: { name: string }[] = [];
   searchPersonRoles: Role[] | string[] | string = "none";
   agendaComponents: { [key: number]: AgendaNewForm } = {};
-  @ViewChild(SearchPersonByRolesComponent) public searchPersonModal: SearchPersonByRolesComponent;
-  @ViewChild('form', {read: ViewContainerRef}) formContainer: any;
+  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
+  @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
 
   constructor(private _personService: PersonService,
               private _meetingService: MeetingService,

@@ -12,7 +12,7 @@ import {AreasOfCompetenceComponent} from "@app/components/data-management/catalo
 import {RouterModule} from "@angular/router";
 import {CouncilsComponent} from "@app/components/data-management/councils/councils.component";
 import {SearchModule} from "@app/components/search/search.module";
-import {Route} from "@angular/router/src/config";
+import {Route} from "@angular/router";
 import {GkntDepartmentComponent} from "@app/components/data-management/catalog/gknt-department/gknt-department.component";
 import {MailTemplateComponent} from "@app/components/data-management/catalog/mail-template/mail-template.component";
 import {UserManualComponent} from './catalog/user-manual/user-manual.component';

@@ -20,10 +20,10 @@ export class DialogComponent implements OnInit {
   title: string;
   titleMap = {};
 
-  @ViewChild('modalComponent') public modalComponent: ModalComponent;
-  @ViewChild(UserFormComponent) userForm: UserFormComponent;
+  @ViewChild('modalComponent', { static: false }) public modalComponent: ModalComponent;
+  @ViewChild(UserFormComponent, { static: false }) userForm: UserFormComponent;
 
-  @ViewChild(ExpertReviewComponent) reviewForm: ExpertReviewComponent;
+  @ViewChild(ExpertReviewComponent, { static: false }) reviewForm: ExpertReviewComponent;
 
   constructor(private dialogService: DialogService, private toastService: GlobalToastyService) {
     this.titleMap[DialogType.USER] = 'Редактирование пользователя';

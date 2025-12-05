@@ -23,7 +23,7 @@ export class MeetingListComponent extends FilterAndPages<MeetingDto> {
   role: string;
   meetings: MeetingDto[] = [];
 
-  @ViewChild(MeetingFormComponent) createMeetingModal: MeetingFormComponent;
+  @ViewChild(MeetingFormComponent, { static: false }) createMeetingModal: MeetingFormComponent;
 
   constructor(private _toasty: GlobalToastyService,
               private _authService: AuthService,

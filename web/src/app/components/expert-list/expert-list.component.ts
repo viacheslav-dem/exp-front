@@ -31,7 +31,7 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> {
   sortOrder: SortOrder = new SortOrder('person', Direction.ASC);
   Role = Role;
   expertId: number;
-  @ViewChild('expertPayInfo') expertPayInfoModal: ModalComponent;
+  @ViewChild('expertPayInfo', { static: false }) expertPayInfoModal: ModalComponent;
 
   constructor(
     private toasty: GlobalToastyService,

@@ -28,7 +28,7 @@ export class LifecycleGroupListComponent implements OnInit {
   @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() onReplyChanged: EventEmitter<ProjectDto> = new EventEmitter<ProjectDto>();
 
-  @ViewChild(SearchCouncilComponent) searchCouncilComponent: SearchCouncilComponent;
+  @ViewChild(SearchCouncilComponent, { static: false }) searchCouncilComponent: SearchCouncilComponent;
 
   constructor(private _plainService: PersonService,
               private _router: Router,

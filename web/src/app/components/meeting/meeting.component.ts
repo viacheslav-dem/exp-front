@@ -34,13 +34,13 @@ export class MeetingComponent implements OnInit {
   role: string;
   remarks: RemarksContainerDto = new RemarksContainerDto();
 
-  @ViewChild("protocolFormModal") protocolFormModal: ModalComponent;
-  @ViewChild(MeetingFormComponent) createMeetingModal: MeetingFormComponent;
-  @ViewChild("sectionRemarks") sectionRemarks: ModalComponent;
-  @ViewChild("bureauRemarks") bureauRemarks: ModalComponent;
-  @ViewChild("remarkResponseForSection") remarkResponseForSection: ModalComponent;
-  @ViewChild("remarkResponseForBureau") remarkResponseForBureau: ModalComponent;
-  @ViewChild(MeetingProtocolFormComponent) protocolForm: MeetingProtocolFormComponent;
+  @ViewChild("protocolFormModal", { static: false }) protocolFormModal: ModalComponent;
+  @ViewChild(MeetingFormComponent, { static: false }) createMeetingModal: MeetingFormComponent;
+  @ViewChild("sectionRemarks", { static: false }) sectionRemarks: ModalComponent;
+  @ViewChild("bureauRemarks", { static: false }) bureauRemarks: ModalComponent;
+  @ViewChild("remarkResponseForSection", { static: false }) remarkResponseForSection: ModalComponent;
+  @ViewChild("remarkResponseForBureau", { static: false }) remarkResponseForBureau: ModalComponent;
+  @ViewChild(MeetingProtocolFormComponent, { static: false }) protocolForm: MeetingProtocolFormComponent;
 
   constructor(private _route: ActivatedRoute,
               private _toasty: GlobalToastyService,

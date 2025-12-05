@@ -23,7 +23,7 @@ export class ReturnFromCouncilWithoutExpertiseFormComponent extends DocumentForm
   @Input() group: LifecycleGroupDto;
   @Input() council: CouncilPlainDto;
 
-  @ViewChild(SearchPersonByRolesComponent) public searchPersonModal: SearchPersonByRolesComponent;
+  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
 
   ngOnInit() {
     super.ngOnInit();

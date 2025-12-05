@@ -36,7 +36,7 @@ export class ReferralFormComponent extends DocumentForm<ReferralFormContent> {
   @Input() project: ProjectDto;
   @Input() council: any;
 
-  @ViewChild(SearchPersonByRolesComponent) public searchPersonModal: SearchPersonByRolesComponent;
+  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
 
   ngOnInit() {
     super.ngOnInit();

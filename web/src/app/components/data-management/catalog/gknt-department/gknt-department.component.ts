@@ -22,7 +22,7 @@ export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> 
   searchPersonFilter: Filter<PersonPlainDto>;
   onPersonSelected: Function;
 
-  @ViewChild(SearchPersonComponent) public searchPersonModal: SearchPersonComponent;
+  @ViewChild(SearchPersonComponent, { static: false }) public searchPersonModal: SearchPersonComponent;
 
   constructor(public _toasty: GlobalToastyService,
               public _dataService: DataService) {

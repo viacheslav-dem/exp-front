@@ -44,7 +44,7 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
 
 
   SortClass = SortClass;
-  @ViewChild('showUserInfo') showUserInfo: ModalComponent;
+  @ViewChild('showUserInfo', { static: false }) showUserInfo: ModalComponent;
   users: PersonDto[] = [];
   selectedUser: PersonDto;
   sortOrder: SortOrder = new SortOrder('person', Direction.ASC);

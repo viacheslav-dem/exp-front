@@ -31,7 +31,7 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
   ExpertReviewState = ExpertReviewState;
   projects: ProjectReviewsExpertsDto[] = [];
   expert: PersonExpertDto;
-  @ViewChild('expertInfo') expertInfoModal: ModalComponent;
+  @ViewChild('expertInfo', { static: false }) expertInfoModal: ModalComponent;
 
   constructor(
     private _toasty: GlobalToastyService,

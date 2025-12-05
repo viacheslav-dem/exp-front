@@ -13,7 +13,7 @@ export class ModalComponent implements OnInit {
   @Input() closePermission: boolean = true;
   config: ModalOptions = new ModalOptions();
 
-  @ViewChild('ng2Modal') public modal: ModalDirective;
+  @ViewChild('ng2Modal', { static: false }) public modal: ModalDirective;
 
   constructor() {
     this.config.backdrop = "static";

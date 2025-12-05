@@ -50,9 +50,9 @@ export class ExpertReviewComponent implements OnInit {
 
     formRenderer: Type<ExpertReviewForm<any>>;
 
-    @ViewChild('reviewFormModal') reviewFormModal: ModalComponent;
-    @ViewChild('transitionHistoryModal') transitionHistoryModal: ModalComponent;
-    @ViewChild(ExpertReviewFormContainerComponent) expertReviewForm: ExpertReviewFormContainerComponent<any>;
+    @ViewChild('reviewFormModal', { static: false }) reviewFormModal: ModalComponent;
+    @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
+    @ViewChild(ExpertReviewFormContainerComponent, { static: false }) expertReviewForm: ExpertReviewFormContainerComponent<any>;
 
     @Output() onChanged: EventEmitter<any> = new EventEmitter();
 

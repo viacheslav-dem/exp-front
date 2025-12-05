@@ -28,7 +28,7 @@ export class LifecycleInfoComponent implements OnInit {
   @Input() project: ProjectDto;
   @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
 
-  @ViewChild('transitionHistoryModal') transitionHistoryModal: ModalComponent;
+  @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
 
   constructor(private route: ActivatedRoute,
               private _toasty: GlobalToastyService,

@@ -21,7 +21,7 @@ export class MeetingFormComponent {
   id: number;
   place: string;
   isEdit: boolean;
-  @ViewChild('modal') modal: ModalDirective;
+  @ViewChild('modal', { static: false }) modal: ModalDirective;
   @Output() onAdd: EventEmitter<MeetingDto> = new EventEmitter<MeetingDto>();
 
   constructor(private _meetingService: MeetingService,

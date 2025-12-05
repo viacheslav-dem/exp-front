@@ -59,11 +59,11 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
   filterName: string;
   payDate: Date;
 
-  @ViewChild('fileViewerModal') fileViewer: ModalComponent;
-  @ViewChild('confirmFinishAccountingModal') confirmFinishAccountingModal: ModalComponent;
-  @ViewChild('paySumInput') paySumInput;
-  @ViewChild("dateFromInput") dateFromInput: ElementRef;
-  @ViewChild("dateToInput") dateToInput: ElementRef;
+  @ViewChild('fileViewerModal', { static: false }) fileViewer: ModalComponent;
+  @ViewChild('confirmFinishAccountingModal', { static: false }) confirmFinishAccountingModal: ModalComponent;
+  @ViewChild('paySumInput', { static: false }) paySumInput;
+  @ViewChild("dateFromInput", { static: false }) dateFromInput: ElementRef;
+  @ViewChild("dateToInput", { static: false }) dateToInput: ElementRef;
 
 
   constructor(private _accountingService: AccountingService,

@@ -32,7 +32,7 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
     SortClass = SortClass;
     sortDirection = Direction.ASC;
     @Output() selected = new EventEmitter<ProjectDto>();
-    @ViewChild('searchModal') searchProjectModal: ModalComponent;
+    @ViewChild('searchModal', { static: false }) searchProjectModal: ModalComponent;
 
     constructor(protected service: ProjectService,
                 private router: Router) {

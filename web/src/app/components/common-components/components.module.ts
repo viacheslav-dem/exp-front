@@ -26,7 +26,6 @@ import {LoadingDataDirective} from "@app/components/common-components/loading-da
 import {CheckboxComponent} from "@app/components/common-components/checkbox/checkbox.component";
 import {ProgressComponent} from "@app/components/common-components/progress/progress.component";
 import {SliderComponent} from "@app/components/common-components/slider/slider.component";
-import {HttpModule} from "@angular/http";
 import {Ng2CompleterModule} from "ng2-completer";
 import {BooleanButtonComponent} from './boolean-button/boolean-button.component';
 import {FilterComponent} from "@app/components/common-components/page-and-filter/filter/filter.component";
@@ -55,7 +54,6 @@ import {MethRecPdfComponent} from "@app/components/dialogs/meth-rec/meth-rec-pdf
     BsDatepickerModule.forRoot(),
     ModalModule.forRoot(),
     CustomFormsModule,
-    HttpModule,
     CollapseModule,
     CryptoModule,
     AngularMultiSelectModule,
