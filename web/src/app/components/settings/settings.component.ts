@@ -90,8 +90,9 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> {
     if (!renderer) {
       this.propertyComponent = null;
     } else {
-      let componentFactory = this._resolver.resolveComponentFactory(renderer);
-      this.propertyComponent = this.propertyContainer.createComponent(componentFactory)._component;
+      const componentFactory = this._resolver.resolveComponentFactory(renderer);
+      const componentRef = this.propertyContainer.createComponent(componentFactory);
+      this.propertyComponent = componentRef.instance as PropertyComponent<any>;
       this.propertyComponent.setProperty(this.selectedProperty);
     }
   }

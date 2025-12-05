@@ -1,11 +1,12 @@
-import {EventEmitter, Injectable, Input, OnDestroy, OnInit, Output} from "@angular/core";
+import {Directive, EventEmitter, Input, OnDestroy, OnInit, Output} from "@angular/core";
 import {FormContent} from "@app/components/document-form/form-model/FormContent";
 import {DraftService} from "@app/components/document-form/draft.service";
 import {IdDto} from "@app/dto/IdDto";
 import {Observable, timer} from "rxjs";
 import {takeWhile} from "rxjs/operators";
 import {deepClone} from "@app/support/utils";
-@Injectable()
+
+@Directive()
 export class DocumentForm<Form extends FormContent> implements OnInit, OnDestroy {
 
   _form: Form = this.createNewForm();

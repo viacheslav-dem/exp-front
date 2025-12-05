@@ -1,5 +1,7 @@
 import {Component, ViewChild} from '@angular/core';
 import {PropertyComponent} from "@app/components/settings/property.component";
+import {DataService} from "@app/services/data.service";
+import {ToastyService} from "ng2-toasty";
 import {PropertyDto} from "@app/dto/PropertyDto";
 import * as _ from "lodash";
 import {Role} from "@app/pipes/role.pipe";
@@ -11,6 +13,11 @@ import {SearchPersonByRolesComponent} from "@app/components/search/search-person
   templateUrl: './gknt-deputy-chairman-procurations.component.html'
 })
 export class GkntDeputyChairmanProcurationsComponent extends PropertyComponent<Procurations> {
+
+  constructor(protected _dataService: DataService,
+              protected _toasty: ToastyService) {
+    super(_dataService, _toasty);
+  }
 
   Role = Role;
 

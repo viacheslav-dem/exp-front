@@ -13,7 +13,7 @@ export class ChooseFilesComponent implements OnInit {
     DocType.DOCX.extension, DocType.DOC.extension,
     DocType.PDF.extension, DocType.TIFF.extension
   ].join(',');
-  @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
+  @ViewChild('fileInput') fileInput: ElementRef;
 
   constructor() {
   }

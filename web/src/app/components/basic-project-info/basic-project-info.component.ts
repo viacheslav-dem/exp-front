@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {ActionButtonMetadata} from "@app/components/project-info/project-info.component";
+import {ActionButtonMetadata} from "@app/components/project-info/action-button-metadata";
 import {ProjectState, ProjectStateBadge} from "@app/pipes/project-state.pipe";
 import {Role} from "@app/pipes/role.pipe";
 import {PersonService} from "@app/services/person.service";
@@ -36,16 +36,18 @@ export class BasicProjectInfoComponent implements OnInit {
 
   project: ProjectDto = new ProjectDto();
   transitionHistory: ProjectTransitionHistoryDto;
+  // Precomputed directions for display to avoid mutating project.directions during change detection
+  displayedDirections: DirectionDto[] = [];
   @Input() buttons: ActionButtonMetadata[] = [];
   @Input() role: string;
   @Input() lifecycleGroup: LifecycleGroupDto;
   @Input() visibleDocsForExpert: boolean;
   @Output() onChanged: EventEmitter<any> = new EventEmitter();
 
-  @ViewChild('decisionFormModal', { static: false }) decisionFormModal: ModalComponent;
-  @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
-  @ViewChild('projectDocumentsComponent', { static: false }) projectDocumentsComponent: DocumentListComponent;
-  @ViewChild('projectDocumentsComponent', { static: false }) projectDocumentsComponent1: DocumentListComponent;
+  @ViewChild('decisionFormModal') decisionFormModal: ModalComponent;
+  @ViewChild('transitionHistoryModal') transitionHistoryModal: ModalComponent;
+  @ViewChild('projectDocumentsComponent') projectDocumentsComponent: DocumentListComponent;
+  @ViewChild('projectDocumentsComponent') projectDocumentsComponent1: DocumentListComponent;
 
   constructor(private _personService: PersonService,
               private _projectService: ProjectService,
@@ -65,6 +67,7 @@ export class BasicProjectInfoComponent implements OnInit {
     }
     this._projectService.prepareProject(project);
     this.project = project;
+    this.updateDisplayedDirections();
   }
 
   changed() {
@@ -211,31 +214,38 @@ export class BasicProjectInfoComponent implements OnInit {
     return newDirections;
   }
 
-    displayDirectionOrSubDirection() {
-    let directionsToDisplay: DirectionDto[] = [];
-    let projectDirections = this.project.directions;
+  updateDisplayedDirections() {
+    if (!this.project || !this.project.directions) {
+      this.displayedDirections = [];
+      return;
+    }
+
+    const directionsToDisplay: DirectionDto[] = [];
+    const projectDirections = this.project.directions;
+
     for (let i = 0; i < projectDirections.length; i++) {
-      let proDir = projectDirections[i] as DirectionDto;
+      // clone object to avoid mutating original project.directions
+      const proDir = { ...projectDirections[i] } as DirectionDto;
       proDir.subDirectionDtos = [];
       directionsToDisplay.push(proDir);
     }
-    if (this.project.subDirections === null){
-      return directionsToDisplay;
-    } else {
-      let projectSubDirections = this.project.subDirections;
+
+    if (this.project.subDirections != null) {
+      const projectSubDirections = this.project.subDirections;
       for (let i = 0; i < projectSubDirections.length; i++) {
-        let proSubDir = projectSubDirections[i];
+        const proSubDir = projectSubDirections[i];
         for (let j = 0; j < directionsToDisplay.length; j++) {
-          let dirToDis = directionsToDisplay[j];
-          let proDirId = proSubDir.direction.id;
-          let dirToDisId = dirToDis.id;
-          if(proDirId == dirToDisId){
+          const dirToDis = directionsToDisplay[j];
+          const proDirId = proSubDir.direction.id;
+          const dirToDisId = dirToDis.id;
+          if (proDirId == dirToDisId) {
             dirToDis.subDirectionDtos.push(proSubDir);
           }
         }
       }
     }
-    return directionsToDisplay;
+
+    this.displayedDirections = directionsToDisplay;
   }
 
 }

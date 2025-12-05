@@ -2,12 +2,7 @@ import {Component, EventEmitter, forwardRef, Input, Output} from '@angular/core'
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
 import * as moment from "moment";
-import {defineLocale} from 'ngx-bootstrap/chronos';
-import {ruLocale} from 'ngx-bootstrap/locale';
-import {BsLocaleService} from "ngx-bootstrap";
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
-
-defineLocale('ru', ruLocale);
 export const PERIOD_FILTER_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
   useExisting: forwardRef(() => DatePeriodComponent),
@@ -38,10 +33,9 @@ export class DatePeriodComponent extends ControlComponent<DateRange> {
   label: string;
   @Output() onSelect: EventEmitter<DateRange> = new EventEmitter<DateRange>();
 
-  constructor(private _localeService: BsLocaleService) {
+  constructor() {
     super();
     // this.debug = true;
-    this._localeService.use('ru');
   }
 
 

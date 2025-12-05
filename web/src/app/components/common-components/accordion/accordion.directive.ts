@@ -1,11 +1,11 @@
-import {Directive, ElementRef, Renderer, Input} from '@angular/core';
+import {Directive, ElementRef, Input} from '@angular/core';
 
 @Directive({
   selector: '[accordianShow]'
 })
 export class AccordionDirective {
 
-  constructor(private el: ElementRef,private renderer: Renderer) {
+  constructor(private el: ElementRef) {
     console.log('elements', el);
   }
 

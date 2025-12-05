@@ -1,29 +1,26 @@
-import {Directive, ElementRef, Renderer, Input} from "@angular/core";
+import {Directive, ElementRef, Input} from "@angular/core";
 @Directive({ selector: '[loadingData]' })
 export class LoadingDataDirective {
   private spinnerLocal:any;
   private spinnerBg: any;
 
-  constructor(private el: ElementRef,private renderer: Renderer) {
+  constructor(private el: ElementRef) {
   }
 
   @Input('loadingData') set isLoading(isLoading: boolean){
     if(isLoading) {
-      this.renderer.setElementStyle(this.el.nativeElement, 'position', 'relative');
-      // this.spinnerLocal = this.renderer.createElement(this.el.nativeElement, 'div');
-      // this.renderer.setElementClass(this.spinnerLocal, 'spinner-local', true);
-      this.spinnerBg = this.renderer.createElement(this.el.nativeElement, 'div');
-      this.renderer.setElementClass(this.spinnerBg, 'spinner-bg', true);
-      // let spinner = this.renderer.createElement(this.spinnerLocal, 'div');
-      // this.renderer.setElementClass(spinner, 'spinner', true);
-      // let bounce1 = this.renderer.createElement(spinner, 'div');
-      // let bounce2 = this.renderer.createElement(spinner, 'div');
-      // this.renderer.setElementClass(bounce1, 'double-bounce1', true);
-      // this.renderer.setElementClass(bounce2, 'double-bounce2', true);
+      const host: HTMLElement = this.el.nativeElement;
+      host.style.position = 'relative';
+
+      this.spinnerBg = document.createElement('div');
+      this.spinnerBg.classList.add('spinner-bg');
+      host.appendChild(this.spinnerBg);
     } else {
       if(this.spinnerBg){
-        // this.spinnerLocal.remove();
-        this.el.nativeElement.removeChild(this.spinnerBg);
+        const host: HTMLElement = this.el.nativeElement;
+        if (this.spinnerBg.parentNode === host) {
+          host.removeChild(this.spinnerBg);
+        }
       }
     }
   }

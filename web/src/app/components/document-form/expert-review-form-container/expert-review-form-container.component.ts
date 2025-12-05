@@ -4,6 +4,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
 import {ExpertReviewFormContent} from "@app/components/document-form/form-model/ExpertReviewFormContent";
 import {ExpertReviewForm} from "@app/components/document-form/expert-review-form-container/expert-review-form";
 import {TemplateType} from "@app/components/document-form/form-model/TemplateType";
+import {DraftService} from "@app/components/document-form/draft.service";
+import {IdDto} from "@app/dto/IdDto";
 
 @Component({
   selector: 'app-expert-review-form',
@@ -27,6 +29,10 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
 export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormContent> extends DocumentFormContainerComponent<Form> {
 
   _project: ProjectDto;
+
+  // Override parent @Input to expose as component input (parent field is used directly)
+  @Input() draftService: DraftService<Form>;
+  @Input() draftOwner: IdDto;
 
   @Input()
   set project(project) {

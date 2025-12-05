@@ -30,8 +30,9 @@ export class DocumentFormContainerComponent<Form extends FormContent> extends Do
       while (this.formContainer.length > 0) {
         this.formContainer.get(0).destroy();
       }
-      let componentFactory = this.resolver.resolveComponentFactory(formRenderer);
-      this.formComponent = this.formContainer.createComponent(componentFactory)._component;
+      const componentFactory = this.resolver.resolveComponentFactory(formRenderer);
+      const componentRef = this.formContainer.createComponent(componentFactory);
+      this.formComponent = componentRef.instance as DocumentForm<Form>;
       if (this._formRenderer && this._formRenderer != formRenderer) {
         console.warn('change of document form container is bad practice!');
       }

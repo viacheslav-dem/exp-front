@@ -35,6 +35,7 @@ import {ProjectLifecycleDto} from "@app/dto/ProjectLifecycleDto";
 import {ReturnFromCouncilWithoutExpertiseFormContent} from "@app/components/document-form/form-model/ReturnFromCouncilWithoutExpertiseFormContent";
 import {DocumentDto} from "@app/dto/DocumentDto";
 import {DocumentService} from "@app/services/document.service";
+import {ActionButtonMetadata} from "./action-button-metadata";
 
 @Component({
   selector: 'app-project-info',
@@ -938,16 +939,5 @@ export class ProjectInfoComponent implements OnInit {
   }
 }
 
-export class ActionButtonMetadata {
-  title: string;
-  styleClass: string = 'btn btn-sm';
-  onclick: any;
-
-  constructor(title: string, onclick: any, style: string) {
-    this.title = title;
-    this.onclick = onclick;
-    if (style) {
-      this.styleClass += ' ' + style;
-    }
-  }
-}
+// Re-export for backward compatibility
+export {ActionButtonMetadata} from './action-button-metadata';

@@ -1,7 +1,7 @@
 <div class="list-group-item">
 
-  <!--SHOW-->
-  <div *ngIf="!isEdit">
+    <!--SHOW-->
+    <div *ngIf="!isEdit && value">
     <div class="form-group">
       <label class="form-group-label">Общие параметры</label>
       <a class="btn btn-icon float-right" (click)="edit()">

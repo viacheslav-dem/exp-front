@@ -1,7 +1,7 @@
 <div class="list-group-item">
 
-  <!--SHOW-->
-  <div *ngIf="!isEdit">
+    <!--SHOW-->
+    <div *ngIf="!isEdit && value">
     <a class="btn btn-icon float-right" (click)="edit()">
       <fa-icon icon="cog" size="lg"></fa-icon>
     </a>

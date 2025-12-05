@@ -21,7 +21,8 @@
     "target": "es5",
     "typeRoots": [
       "../node_modules/@types"
-    ]
+    ],
+    "skipLibCheck": true
   },
   "angularCompilerOptions": {
     "strictInjectionParameters":true,
@@ -30,7 +31,5 @@
   "exclude": [
     "../node_modules"
   ],
-  "types": [
-    "node"
-  ]
+  "types": []
 }

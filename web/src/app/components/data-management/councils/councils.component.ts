@@ -40,7 +40,7 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   newDirection: CatalogDto;
   belisa: IdNameDto;
 
-  @ViewChild(SearchPersonComponent, { static: false }) public searchPersonModal: SearchPersonComponent;
+  @ViewChild(SearchPersonComponent) public searchPersonModal: SearchPersonComponent;
 
   constructor(private _toasty: GlobalToastyService,
               private _dataService: DataService,

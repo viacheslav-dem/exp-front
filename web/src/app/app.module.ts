@@ -90,7 +90,12 @@ import { NotificationComponent } from './components/notification/notification.co
 import {SystemNotificationComponent} from "@app/components/system-notification/system-notification.component";
 import {SystemNotificationService} from "@app/services/system-notification.service";
 import {ErrorInterceptor} from "@app/http-interceptors/error-interceptor";
-import {BsDatepickerModule} from "ngx-bootstrap";
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { defineLocale } from 'ngx-bootstrap/chronos';
+import { ruLocale } from 'ngx-bootstrap/locale';
+defineLocale('ru', ruLocale);
+import { TimepickerModule } from 'ngx-bootstrap/timepicker';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 @NgModule({
     imports: [
@@ -106,8 +111,10 @@ import {BsDatepickerModule} from "ngx-bootstrap";
         SearchModule,
         DataManagementModule,
         SettingsModule,
-        FontAwesomeModule,
-        BsDatepickerModule,
+       FontAwesomeModule,
+         BsDatepickerModule.forRoot(),
+         TimepickerModule.forRoot(),
+         BsDropdownModule.forRoot(),
     ],
     declarations: [
         AppComponent,
@@ -198,4 +205,5 @@ import {BsDatepickerModule} from "ngx-bootstrap";
     ]
 })
 export class AppModule {
+
 }

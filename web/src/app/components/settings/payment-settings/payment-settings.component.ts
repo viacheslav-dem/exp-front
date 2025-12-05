@@ -1,11 +1,17 @@
 import {Component} from '@angular/core';
 import {PropertyComponent} from "@app/components/settings/property.component";
+import {DataService} from "@app/services/data.service";
+import {ToastyService} from "ng2-toasty";
 
 @Component({
   selector: 'app-payment-settings',
   templateUrl: './payment-settings.component.html'
 })
 export class PaymentSettingsComponent extends PropertyComponent<PaymentSettings> {
+  constructor(protected _dataService: DataService,
+              protected _toasty: ToastyService) {
+    super(_dataService, _toasty);
+  }
 }
 
 export class PaymentSettings {

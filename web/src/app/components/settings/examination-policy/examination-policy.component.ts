@@ -1,11 +1,17 @@
 import {Component} from '@angular/core';
 import {PropertyComponent} from "@app/components/settings/property.component";
+import {DataService} from "@app/services/data.service";
+import {ToastyService} from "ng2-toasty";
 
 @Component({
   selector: 'app-examination-policy',
   templateUrl: './examination-policy.component.html'
 })
 export class ExaminationPolicyComponent extends PropertyComponent<ExaminationPolicy> {
+  constructor(protected _dataService: DataService,
+              protected _toasty: ToastyService) {
+    super(_dataService, _toasty);
+  }
 }
 
 export class ExaminationPolicy {
