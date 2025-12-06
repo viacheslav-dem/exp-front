@@ -15,13 +15,14 @@ export const DATE_INPUT_VALUE_ACCESSOR: any = {
            class="form-control"
            [minDate]="minDate"
            [maxDate]="maxDate"
-           [bsConfig]="{ dateInputFormat: dateFormat, containerClass: 'theme-default', showWeekNumbers:false}"
-           bsDatepicker 
-           [(ngModel)]="dateValue" 
+           [bsConfig]="{ dateInputFormat: dateFormat, containerClass: 'theme-default', showWeekNumbers:false }"
+           bsDatepicker
+           [(ngModel)]="dateValue"
            (bsValueChange)="onChange($event)"
            [placeholder]="placeholder"
-           [placement]="placement"
-           [title]="title">
+           placement="bottom"
+           [title]="title"
+           container="body">
   `,
   styles: [],
   providers: [DATE_INPUT_VALUE_ACCESSOR]

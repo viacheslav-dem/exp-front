@@ -8,7 +8,6 @@ import {SearchField} from "@app/components/common-components/page-and-filter/mod
 import {Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
 import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 import {isEmptyOrNull} from "@app/support/utils";
-import {esLocale} from "ngx-bootstrap";
 
 @Component({
   selector: 'app-directions',

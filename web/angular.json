@@ -49,7 +49,7 @@
             "production": {
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
+              "sourceMap": true,
               "extractCss": true,
               "namedChunks": false,
               "aot": true,
@@ -112,5 +112,8 @@
       "inlineStyle": true,
       "prefix": "app"
     }
+  },
+  "cli": {
+    "analytics": "fb38048d-e815-4937-8740-c840a35ecc4a"
   }
 }

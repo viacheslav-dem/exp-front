@@ -1,8 +1,10 @@
-import {Component, EventEmitter, forwardRef, Input, Output} from '@angular/core';
+import {Component, EventEmitter, forwardRef, Input, Output, ViewChild} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
 import * as moment from "moment";
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
+import {BsDaterangepickerDirective} from 'ngx-bootstrap/datepicker';
+
 export const PERIOD_FILTER_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
   useExisting: forwardRef(() => DatePeriodComponent),
@@ -12,19 +14,22 @@ export const PERIOD_FILTER_CONTROL_VALUE_ACCESSOR: any = {
 @Component({
   selector: 'app-date-period',
   template: `
-    <ng-container>
-      <input style="padding: 0; margin: 0; border:0; width: 100%"
-             bsDaterangepicker
-             [(ngModel)]="bsRangeValue"
-             (bsValueChange)="onChange($event)"
-             [bsConfig]="{ dateInputFormat: dateFormat, containerClass: 'theme-default', showWeekNumbers:false }"
-             [placeholder]="placeholder"
-             [title]="title">
-    </ng-container>
+    <input style="padding: 0; margin: 0; border:0; width: 100%"
+           bsDaterangepicker
+           [(ngModel)]="bsRangeValue"
+           (bsValueChange)="onChange($event)"
+           [bsConfig]="bsConfig"
+           [placeholder]="placeholder"
+           [title]="title"
+           [outsideClick]="true"
+           placement="bottom"
+           container="body">
   `,
   providers: [PERIOD_FILTER_CONTROL_VALUE_ACCESSOR]
 })
 export class DatePeriodComponent extends ControlComponent<DateRange> {
+
+  @ViewChild(BsDaterangepickerDirective, { static: false }) datepicker: BsDaterangepickerDirective;
 
   @Input()
   dateFormat: string = 'DD.MM.YYYY';
@@ -33,9 +38,29 @@ export class DatePeriodComponent extends ControlComponent<DateRange> {
   label: string;
   @Output() onSelect: EventEmitter<DateRange> = new EventEmitter<DateRange>();
 
+  bsConfig = {
+    rangeInputFormat: 'DD.MM.YYYY',
+    dateInputFormat: 'DD.MM.YYYY',
+    containerClass: 'theme-default',
+    showWeekNumbers: false
+  };
+
   constructor() {
     super();
     // this.debug = true;
+  }
+
+  // Workaround for positioning bug on re-open
+  ngAfterViewInit() {
+    if (this.datepicker) {
+      const originalShow = this.datepicker.show.bind(this.datepicker);
+      this.datepicker.show = () => {
+        // Force hide first to reset state
+        this.datepicker.hide();
+        // Then show with small delay to allow positioning recalculation
+        setTimeout(() => originalShow(), 10);
+      };
+    }
   }
 
 

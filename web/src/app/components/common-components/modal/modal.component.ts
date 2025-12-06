@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild, Input, Output, EventEmitter, OnDestroy} from '@angular/core';
-import {ModalDirective, ModalOptions} from "ngx-bootstrap";
+import {ModalDirective, ModalOptions} from "ngx-bootstrap/modal";
 
 @Component({
   selector: 'app-modal',

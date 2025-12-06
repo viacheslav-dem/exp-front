@@ -4,6 +4,9 @@ import {GlobalToastyService} from "./services/global-toasty.service";
 import * as moment from 'moment';
 import {CRYPTO} from "@app/config";
 import {library} from '@fortawesome/fontawesome-svg-core';
+import {BsLocaleService} from 'ngx-bootstrap/datepicker';
+import {defineLocale} from 'ngx-bootstrap/chronos';
+import {ruLocale} from 'ngx-bootstrap/locale';
 import {
   faAngleDown,
   faAngleUp,
@@ -37,7 +40,7 @@ import {
   faPlayCircle
 } from '@fortawesome/free-solid-svg-icons';
 
-
+defineLocale('ru', ruLocale);
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html'
@@ -48,8 +51,10 @@ export class AppComponent {
       private _toastyService: ToastyService,
       private _toastyConfig: ToastyConfig,
       private _toasty: GlobalToastyService,
+      private _localeService: BsLocaleService,
   ) {
     moment.locale('ru');
+    this._localeService.use('ru');
     library.add(faInfo, faTrashAlt, faPencilAlt, faArrowDown, faEye, faEyeSlash, faCog, faTimes,
       faCheck, faPlus, faMinus, faCalendar, faCircle, faUser, faKey, faList, faInfoCircle, faPowerOff,
       faSortAlphaDown, faSortAlphaUp, faSortAmountDown, faSortAmountUp, faSort, faChevronUp, faChevronDown,

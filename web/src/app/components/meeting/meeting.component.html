@@ -61,7 +61,7 @@
                           title="Количество замечаний: {{agenda.project.expertRemarksCount}}">
             <fa-icon class="fa" icon="exclamation-triangle" style="color: darkorange"></fa-icon></span>
                     <span
-                            [routerLink]="['/projects',agenda.project.id, 'agendas', agenda.project.id, {hash:agenda.project.hash, agendaHash: agenda.project.hash}]"
+                            [routerLink]="['/projects', agenda.project.id, 'agendas', agenda.id]"
                             class="ml-2 link">{{agenda.project.title}} </span>
                     <span class="text-primary selectable" (click)="loadAgendaData(agenda)">
             <fa-icon class="m-auto fa" [icon]="agenda.isCollapsed?'chevron-up':'chevron-down'"></fa-icon>

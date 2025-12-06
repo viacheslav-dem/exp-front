@@ -240,6 +240,9 @@ export class Agenda_8_1_2_3_4_5_7_8_12NIOKTR_14_2025_FormComponent extends Agend
     }
 
     showTarget8_1() {
+        if (!this.project || !this.project.code || !this.project.code.code) {
+            return false;
+        }
         let is8_1 = false;
         // Использовал регулярные выражения, т.к. проверка возвращала true для 8.1 и 8.11, 8.12 и т.д.
         const regExp = /8.1(.*)/;
@@ -257,34 +260,37 @@ export class Agenda_8_1_2_3_4_5_7_8_12NIOKTR_14_2025_FormComponent extends Agend
     }
 
     showTarget8_3() {
-        return this.project.code.code.startsWith('8.3');
+        return !!(this.project && this.project.code && this.project.code.code && this.project.code.code.startsWith('8.3'));
     }
 
     showTarget8_4() {
-        return this.project.code.code.startsWith('8.4');
+        return !!(this.project && this.project.code && this.project.code.code && this.project.code.code.startsWith('8.4'));
     }
 
     showTargetNot8_4() {
+        if (!this.project || !this.project.code || !this.project.code.code) {
+            return false;
+        }
         return !this.project.code.code.startsWith('8.4');
     }
 
     showTarget8_5() {
-        return this.project.code.code.startsWith('8.5');
+        return !!(this.project && this.project.code && this.project.code.code && this.project.code.code.startsWith('8.5'));
     }
 
     showTarget8_7() {
-        return this.project.code.code.startsWith('8.7');
+        return !!(this.project && this.project.code && this.project.code.code && this.project.code.code.startsWith('8.7'));
     }
 
     showTarget8_8() {
-        return this.project.code.code.startsWith('8.8');
+        return !!(this.project && this.project.code && this.project.code.code && this.project.code.code.startsWith('8.8'));
     }
 
     showTarget8_12() {
-        return this.project.code.code.startsWith('8.12');
+        return !!(this.project && this.project.code && this.project.code.code && this.project.code.code.startsWith('8.12'));
     }
 
     showTarget8_14() {
-        return this.project.code.code.startsWith('8.14');
+        return !!(this.project && this.project.code && this.project.code.code && this.project.code.code.startsWith('8.14'));
     }
 }

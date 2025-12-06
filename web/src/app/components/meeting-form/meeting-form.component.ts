@@ -1,5 +1,5 @@
 import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
-import {ModalDirective} from "ngx-bootstrap";
+import {ModalDirective} from "ngx-bootstrap/modal";
 import * as moment from "moment";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {PeriodDto} from "@app/dto/PeriodDto";

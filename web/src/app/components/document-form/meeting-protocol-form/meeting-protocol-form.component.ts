@@ -83,8 +83,8 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
       let formRenderer: Type<AgendaNewForm> = this._agendaFormResolver.getFormRenderer(agenda.project.code.code);
       if (formRenderer) {
         let componentFactory = this.resolver.resolveComponentFactory(formRenderer);
-        let component: AgendaNewForm = this.agendaComponents[agenda.project.id] =
-          this.formContainer.createComponent(componentFactory)._component;
+        const componentRef = this.formContainer.createComponent(componentFactory);
+        let component: AgendaNewForm = this.agendaComponents[agenda.project.id] = componentRef.instance;
         component.ind = i;
         component.project = agenda.project;
         component.parent = this;
