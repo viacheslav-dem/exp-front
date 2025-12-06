@@ -1,11 +1,12 @@
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {CatalogDto} from "@app/dto/CatalogDto";
-import {Input} from "@angular/core";
+import { Input, Directive } from "@angular/core";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {Catalog, DataService} from "@app/services/data.service";
 import * as _ from "lodash";
 import {DirectionDto} from "@app/dto/DirectionDto";
 
+@Directive()
 export abstract class CatalogTemplate<T extends CatalogDto> extends FilterAndPages<T> {
 
   items: T[];

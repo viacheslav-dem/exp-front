@@ -18,11 +18,7 @@ export class PaginationComponent implements OnInit {
   @Input() maxSize: number = 10;
   @Output() onPageChanged = new EventEmitter<PageRequest>();
 
-  constructor() {
-  }
-
   ngOnInit() {
-    console.log('PaginationComponent ngOnInit, pagination.page =', this.pagination && this.pagination.page);
     if (this.pagination) {
       this.pageChanged(this.pagination);
     }
@@ -67,7 +63,6 @@ export class PaginationComponent implements OnInit {
   }
 
   pageChanged(event: Pagination): void {
-    console.log('PaginationComponent.pageChanged event.page =', event && event.page);
     this.onPageChanged.emit(new PageRequest(event));
   }
 }

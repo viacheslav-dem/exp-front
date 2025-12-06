@@ -2,7 +2,6 @@ import {ErrorHandler, NgModule} from "@angular/core";
 import {routing} from "./app.routing";
 import {AppComponent} from "./app.component";
 import {HttpClientSecure} from "./services/http.client";
-import {ToastyConfig, ToastyModule, ToastyService} from "ng2-toasty";
 import {GlobalToastyService} from "./services/global-toasty.service";
 import {AuthGuardService} from "./services/auth-guard.service";
 import {AuthService} from "./services/auth.service";
@@ -100,7 +99,6 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
     imports: [
         BrowserModule,
         routing,
-        ToastyModule.forRoot(),
         DialogModule.forRoot(),
         CommonComponentsModule,
         HttpClientModule,
@@ -179,8 +177,6 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
         StorageService,
         HttpClientSecure,
         AuthService,
-        ToastyService,
-        ToastyConfig,
         GlobalToastyService,
         AuthGuardService,
         DefineRole,

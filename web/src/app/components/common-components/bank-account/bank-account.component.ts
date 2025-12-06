@@ -16,7 +16,7 @@ export const BANK_CONTROL_VALUE_ACCESSOR: any = {
     <ng-container *ngIf="_value!=null">
       <label class="form-group-label">Банковские реквизиты в ОПЕРУ ОАО «АСБ Беларусбанк»</label>
       <div class="form-sub-group">
-        <div class="input-group btn-group separated">
+        <div class="input-group separated">
           <app-date-input
               class="width-auto" [(ngModel)]="_value.accountTerms" [title]="'Срок действия счёта'"
               [placement]="'top'" [placeholder]="'Срок действия счёта'"

@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from "@angular/core";
 import {RemarkDto} from "@app/dto/RemarkDto";
-import {ToastyService} from "ng2-toasty";
+import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {DialogService} from "@app/components/dialogs/dialog.service";
 import {RemarksContainerDto} from "@app/dto/RemarksContainerDto";
 import {Role} from "@app/pipes/role.pipe";
@@ -12,7 +12,7 @@ import {Role} from "@app/pipes/role.pipe";
 
 export class MeetingRemarkComponent {
 
-  constructor(private _toasty: ToastyService,
+  constructor(private _toasty: GlobalToastyService,
               private _dialogService: DialogService) {
   }
 

@@ -22,7 +22,6 @@ import {ModalComponent} from "@app/components/common-components/modal/modal.comp
 import {LastSignEnumPipe} from "@app/pipes/last-sign.pipe";
 import {HttpClientSecure} from "@app/services/http.client";
 import {SERVER_URL} from "@app/config";
-import {ToastyService} from "ng2-toasty";
 import {ProgressService} from "@app/components/common-components/progress/progress.service";
 
 @Component({
@@ -54,19 +53,18 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
   isSending: boolean;
   disabled: boolean;
 
-  constructor(private toasty: GlobalToastyService,
-              private _personService: PersonService,
-              private _dataService: DataService,
-              private _dialogService: DialogService,
-              private _academicTitleTypePipe: AcademicTitleTypePipe,
-              private _rolePipe: RolePipe,
-              private _lastSignPipe: LastSignEnumPipe,
-              private _http: HttpClientSecure,
-              private _toastyService: ToastyService,
-              private _progress: ProgressService,
-              private _degreeTypePipe: DegreeTypePipe) {
-    super(10);
-  }
+    constructor(private toasty: GlobalToastyService,
+                private _personService: PersonService,
+                private _dataService: DataService,
+                private _dialogService: DialogService,
+                private _academicTitleTypePipe: AcademicTitleTypePipe,
+                private _rolePipe: RolePipe,
+                private _lastSignPipe: LastSignEnumPipe,
+                private _http: HttpClientSecure,
+                private _progress: ProgressService,
+                private _degreeTypePipe: DegreeTypePipe) {
+      super(10);
+    }
 
   ngOnInit() {
     this._searchFields = [
@@ -187,7 +185,7 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
           this._progress.hide();
           return this._http.post(`${this.url}/persons/notification/send`, messageRequest).subscribe();
         } else {
-          this._toastyService.error("Идёт формирование писем")
+          this.toasty.error("Идёт формирование писем")
           return this._progress.hide();
         }
       });

@@ -45,6 +45,7 @@ import {BankAccountInputDirective} from "@app/components/common-components/bank-
 import {BooleanButtonV2Component} from "@app/components/common-components/boolean-button/boolean-button-v2.component";
 import {MethRecPdfComponent} from "@app/components/dialogs/meth-rec/meth-rec-pdf.component";
 import {HighchartComponent} from "@app/components/highchart/highchart.component";
+import {GlobalToastsComponent} from "@app/components/common-components/global-toasts/global-toasts.component";
 
 @NgModule({
   imports: [
@@ -106,7 +107,8 @@ import {HighchartComponent} from "@app/components/highchart/highchart.component"
     BankAccountInputDirective,
     BooleanButtonV2Component,
     MethRecPdfComponent,
-    HighchartComponent
+    HighchartComponent,
+    GlobalToastsComponent
   ],
   declarations: [
     DocumentListComponent,
@@ -142,7 +144,8 @@ import {HighchartComponent} from "@app/components/highchart/highchart.component"
     NumberInputDirective,
     BankAccountInputDirective,
     MethRecPdfComponent,
-    HighchartComponent
+    HighchartComponent,
+    GlobalToastsComponent
   ]
 })
 export class CommonComponentsModule {

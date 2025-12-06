@@ -1,7 +1,8 @@
-import {OnInit} from "@angular/core";
+import { OnInit, Directive } from "@angular/core";
 import {FileUploader} from "ng2-file-upload";
 import {AuthService} from "@app/services/auth.service";
 
+@Directive()
 export abstract class UploadHelper implements OnInit {
 
   fileUploader: FileUploader;

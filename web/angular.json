@@ -20,7 +20,6 @@
               "src/WEB-INF"
             ],
             "styles": [
-              "node_modules/ng2-toasty/style-bootstrap.css",
               "node_modules/ion-rangeslider/css/normalize.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
               "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
@@ -100,14 +99,14 @@
   "defaultProject": "examination-web",
   "schematics": {
     "@schematics/angular:component": {
-      "spec": false,
+      "skipTests": true,
       "inlineTemplate": true,
       "inlineStyle": true,
       "prefix": "app",
-      "styleext": "scss"
+      "style": "scss"
     },
     "@schematics/angular:directive": {
-      "spec": false,
+      "skipTests": true,
       "inlineTemplate": true,
       "inlineStyle": true,
       "prefix": "app"

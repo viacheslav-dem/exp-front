@@ -1,4 +1,4 @@
-import {OnInit} from "@angular/core";
+import { OnInit, Directive } from "@angular/core";
 import {SearchField} from "app/components/common-components/page-and-filter/model/SearchField";
 import {Page} from "app/components/common-components/page-and-filter/model/Page";
 import {Filter} from "app/components/common-components/page-and-filter/model/Filter";
@@ -8,6 +8,7 @@ import {SortOrder} from "app/components/common-components/page-and-filter/model/
 import {FilterBuilder} from "app/components/common-components/page-and-filter/model/FilterBuilder";
 import {PageRequest} from "@app/components/common-components/page-and-filter/model/PageRequest";
 
+@Directive()
 export abstract class FilterAndPages<T> implements OnInit {
 
   _page: Page<T> = new Page();

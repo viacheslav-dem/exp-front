@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {PropertyComponent} from "@app/components/settings/property.component";
 import {getAllAuditTypes} from "@app/pipes/audit-type.pipe";
 import {DataService} from "@app/services/data.service";
-import {ToastyService} from "ng2-toasty";
+import {GlobalToastyService} from "@app/services/global-toasty.service";
 
 @Component({
   selector: 'app-audit-policy',
@@ -49,7 +49,7 @@ export class AuditPolicyComponent extends PropertyComponent<AuditPolicy> {
   types: string[] = getAllAuditTypes();
 
   constructor(protected _dataService: DataService,
-              protected _toasty: ToastyService) {
+              protected _toasty: GlobalToastyService) {
     super(_dataService, _toasty);
   }
 }

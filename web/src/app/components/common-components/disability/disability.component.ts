@@ -14,7 +14,7 @@ export const DISABILITY_CONTROL_VALUE_ACCESSOR: any = {
   template: `
     <ng-container *ngIf="_value != null">
       <div class="btn-group" style="margin-top: 0.5rem">
-        <label class="btn btn-sm btn-primary" [class.active]="_value.isPensioner"
+        <label class="btn btn-sm btn-primary mr-2" [class.active]="_value.isPensioner"
                (click)="_value.isPensioner = !_value.isPensioner">
           <fa-icon *ngIf="_value.isPensioner" icon="check"></fa-icon>
           Пенсионер

@@ -1,6 +1,7 @@
 import {ControlValueAccessor} from "@angular/forms";
-import {Input, OnInit} from "@angular/core";
+import { Input, OnInit, Directive } from "@angular/core";
 
+@Directive()
 export class ControlComponent<T> implements OnInit, ControlValueAccessor {
 
   _value: T;

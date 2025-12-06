@@ -1,5 +1,4 @@
 import {Injectable, Output, EventEmitter} from '@angular/core';
-import {ToastOptions} from "ng2-toasty";
 import {isString} from "util";
 
 @Injectable()
@@ -52,11 +51,12 @@ export class GlobalToastyService {
     if (this.active["err" + status]) {
       return;
     }
-    let toastOptions: ToastOptions = new ToastOptions();
-    toastOptions.title = "Ошибка #" + status;
-    toastOptions.msg = message;
-    toastOptions.onAdd = () => this.active["err" + status] = true;
-    toastOptions.onRemove = () => this.active["err" + status] = false;
+    const toastOptions: any = {
+      title: "Ошибка #" + status,
+      msg: message,
+      onAdd: () => this.active["err" + status] = true,
+      onRemove: () => this.active["err" + status] = false
+    };
     this.error(toastOptions);
   }
 

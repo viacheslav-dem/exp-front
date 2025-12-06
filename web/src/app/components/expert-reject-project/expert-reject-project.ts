@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from "@angular/core";
 import {ProjectDto} from "@app/dto/ProjectDto";
-import {ToastyService} from "ng2-toasty";
 import {DatePipe} from "@angular/common";
+import {GlobalToastyService} from "@app/services/global-toasty.service";
 
 @Component({
   selector: 'app-expert-reject-project',
@@ -20,7 +20,7 @@ export class ExpertRejectProject {
   otherReason: string;
   date: Date;
 
-  constructor(private _toasty: ToastyService,
+  constructor(private _toasty: GlobalToastyService,
               private _datePipe: DatePipe) {
   }
 
@@ -30,7 +30,7 @@ export class ExpertRejectProject {
 
   onSave() {
     if (this.selectReason == null) {
-      this._toasty.warning('Пожалуйста, укажите причину отказа от проведения государственной экспертизы.');
+      this._toasty.warn('Пожалуйста, укажите причину отказа от проведения государственной экспертизы.');
       return;
     }
     let finalReason;
@@ -51,7 +51,7 @@ export class ExpertRejectProject {
 
   createTimeReason(): string {
     if (this.date == null) {
-      this._toasty.warning('Пожалуйста, укажите возможные сроки начала проведения государственной экспертизы.');
+      this._toasty.warn('Пожалуйста, укажите возможные сроки начала проведения государственной экспертизы.');
       return null;
     }
     return this.selectReason + '. Возможный срок начала проведения экспертизы: ' +
@@ -60,7 +60,7 @@ export class ExpertRejectProject {
 
   createOtherReason(): string {
     if (this.otherReason == null) {
-      this._toasty.warning('Пожалуйста, укажите причину отказа от проведения государственной экспертизы.');
+      this._toasty.warn('Пожалуйста, укажите причину отказа от проведения государственной экспертизы.');
       return null;
     }
     return this.selectReason + ': ' + this.otherReason;

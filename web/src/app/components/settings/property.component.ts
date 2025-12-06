@@ -1,6 +1,6 @@
 import {PropertyDto} from "@app/dto/PropertyDto";
 import {DataService} from "@app/services/data.service";
-import {ToastyService} from "ng2-toasty";
+import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {Injectable} from "@angular/core";
 import * as _ from "lodash";
 
@@ -8,7 +8,7 @@ import * as _ from "lodash";
 export class PropertyComponent<T> {
 
   constructor(protected _dataService: DataService,
-              protected _toasty: ToastyService) {
+              protected _toasty: GlobalToastyService) {
   }
 
   property: PropertyDto;

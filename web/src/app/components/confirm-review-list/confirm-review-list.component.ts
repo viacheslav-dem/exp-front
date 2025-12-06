@@ -86,7 +86,7 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
       'Пожалуйста, проверьте данные об эксперте, поскольку отменить действие будет невозможно.').subscribe(() => {
       this._reviewService.acceptExpert(review).subscribe(res => {
         review.state = res.state;
-        this._toasty.success("Потвержден.");
+        this._toasty.success("Подтвержден.");
       });
     });
   }

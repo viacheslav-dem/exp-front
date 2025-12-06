@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {PropertyComponent} from "@app/components/settings/property.component";
 import {DataService} from "@app/services/data.service";
-import {ToastyService} from "ng2-toasty";
+import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {IdNameDto} from "@app/dto/IdNameDto";
 
 @Component({
@@ -13,7 +13,7 @@ export class OrgsComponent extends PropertyComponent<Orgs> implements OnInit {
   allOrgs: IdNameDto[] = [];
 
   constructor(protected _dataService: DataService,
-              protected _toasty: ToastyService) {
+              protected _toasty: GlobalToastyService) {
     super(_dataService, _toasty);
   }
   ngOnInit() {
