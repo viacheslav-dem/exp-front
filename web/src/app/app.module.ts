@@ -56,7 +56,6 @@ import {GroupTransitionHistoryComponent} from "@app/components/transition-histor
 import {LifecycleTransitionHistoryComponent} from "@app/components/transition-history/lifecycle-transition-history/lifecycle-transition-history.component";
 import {ExpertTransitionHistoryComponent} from "@app/components/transition-history/expert-transition-history/expert-transition-history.component";
 import {StatsService} from "@app/services/stats.service";
-import {StatsModule} from "@app/components/stats/stats.module";
 import {ExpertListComponent} from "@app/components/expert-list/expert-list.component";
 import {FinishedReviewsSparklineChart} from "@app/components/expert-list/finished-reviews.sparkline.chart";
 import {ReviewResultsSparklineChart} from "@app/components/expert-list/review-results.sparkline.chart";
@@ -107,7 +106,6 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
         HttpClientModule,
         CryptoModule,
         DocumentFormModule,
-        StatsModule,
         SearchModule,
         DataManagementModule,
         SettingsModule,

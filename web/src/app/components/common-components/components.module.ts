@@ -8,7 +8,6 @@ import {CollapseModule} from "ngx-bootstrap/collapse";
 import {ModalModule} from "ngx-bootstrap/modal";
 import {PaginationModule} from "ngx-bootstrap/pagination";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {BrowserModule} from "@angular/platform-browser";
 import {CryptoModule} from "app/crypto/crypto.module";
 import {PasswordInputComponent} from "app/components/common-components/password_input/password-input.component";
 import {PasswordInputValidatorDirective} from "app/components/common-components/password_input/PasswordInputValidator";
@@ -45,11 +44,11 @@ import {NumberInputDirective} from "@app/components/common-components/number-inp
 import {BankAccountInputDirective} from "@app/components/common-components/bank-account/bank-account-input.directive";
 import {BooleanButtonV2Component} from "@app/components/common-components/boolean-button/boolean-button-v2.component";
 import {MethRecPdfComponent} from "@app/components/dialogs/meth-rec/meth-rec-pdf.component";
+import {HighchartComponent} from "@app/components/highchart/highchart.component";
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     FormsModule,
     ReactiveFormsModule,
     CustomPipesModule,
@@ -106,7 +105,8 @@ import {MethRecPdfComponent} from "@app/components/dialogs/meth-rec/meth-rec-pdf
     NumberInputDirective,
     BankAccountInputDirective,
     BooleanButtonV2Component,
-    MethRecPdfComponent
+    MethRecPdfComponent,
+    HighchartComponent
   ],
   declarations: [
     DocumentListComponent,
@@ -141,7 +141,8 @@ import {MethRecPdfComponent} from "@app/components/dialogs/meth-rec/meth-rec-pdf
     TimeInputComponent,
     NumberInputDirective,
     BankAccountInputDirective,
-    MethRecPdfComponent
+    MethRecPdfComponent,
+    HighchartComponent
   ]
 })
 export class CommonComponentsModule {

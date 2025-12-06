@@ -57,6 +57,7 @@
     "ts-node": "4.1.0",
     "typescript": "3.8.3",
     "webpack": "^4.20.2",
+    "webpack-bundle-analyzer": "^3.9.0",
     "webpack-dev-server": "3.1.9"
   },
   "description": "123",
