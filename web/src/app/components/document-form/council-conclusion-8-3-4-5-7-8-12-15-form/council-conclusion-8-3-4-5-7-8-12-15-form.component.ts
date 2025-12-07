@@ -31,11 +31,14 @@ export class CouncilConclusion_8_3_4_5_7_8_12_15_FormComponent extends CouncilCo
     }
 
     showTarget8_1() {
+        const code = this.project && this.project.code && this.project.code.code ? this.project.code.code : null;
+        if (!code) {
+            return false;
+        }
         let is8_1 = false;
         // Использовал регулярные выражения, т.к. проверка возвращала true для 8.1 и 8.11, 8.12 и т.д.
         const regExp = /8.1(.*)/;
         const isDigit = /\d/;
-        let code = this.project.code.code;
         if (code.startsWith('8.1')) {
             let regExpMatchArray = code.match(regExp);
             if (regExpMatchArray && regExpMatchArray[1]) {
@@ -48,24 +51,29 @@ export class CouncilConclusion_8_3_4_5_7_8_12_15_FormComponent extends CouncilCo
     }
 
     showTarget8_3() {
-        return this.project.code.code.startsWith('8.3');
+        const code = this.project && this.project.code && this.project.code.code ? this.project.code.code : null;
+        return !!code && code.startsWith('8.3');
     }
 
     showTarget8_4() {
-        return this.project.code.code.startsWith('8.4');
+        const code = this.project && this.project.code && this.project.code.code ? this.project.code.code : null;
+        return !!code && code.startsWith('8.4');
     }
 
 
     showTarget8_8() {
-        return this.project.code.code.startsWith('8.8');
+        const code = this.project && this.project.code && this.project.code.code ? this.project.code.code : null;
+        return !!code && code.startsWith('8.8');
     }
 
     showTarget8_2() {
-        return this.project.code.code.startsWith('8.2');
+        const code = this.project && this.project.code && this.project.code.code ? this.project.code.code : null;
+        return !!code && code.startsWith('8.2');
     }
 
     showTarget8_15() {
-        return this.project.code.code.startsWith('8.15');
+        const code = this.project && this.project.code && this.project.code.code ? this.project.code.code : null;
+        return !!code && code.startsWith('8.15');
     }
 
 

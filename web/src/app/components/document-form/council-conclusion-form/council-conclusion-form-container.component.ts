@@ -92,8 +92,8 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
       this.formContainer.get(0).destroy();
     }
     let componentFactory = this.resolver.resolveComponentFactory(_formRenderer);
-    this.formComponent = this.formContainer.createComponent(componentFactory)._component;
-    this.formComponent.setForm(this._form.projectProtocol);
+    const componentRef = this.formContainer.createComponent(componentFactory);
+    this.formComponent = componentRef.instance as CouncilConclusionForm;
     this.formComponent.parent = this;
     this.formComponent.project = this.project;
     this.formComponent.group = this.group;

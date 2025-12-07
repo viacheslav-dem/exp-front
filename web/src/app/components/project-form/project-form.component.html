@@ -207,7 +207,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="row  m-1" *ngIf="newDirection">
+                <div class="row subdirections m-1" *ngIf="newDirection">
                     <app-dropdown [(ngModel)]="subDirection" [notSelected]="'Ничего не выбрано'"
                                   [options]="getSubDirectionName()"
                                   [resetEnabled]="true" [optionToString]="optionToString"></app-dropdown>

@@ -183,7 +183,7 @@ a:hover {
   padding: 10px 15px;
 }
 
-.form-sub-group:not(last-child) {
+.form-sub-group:not(:last-child) {
   margin-bottom: 0.5rem;
 }
 
@@ -454,4 +454,10 @@ body {
   width: 98%;
   text-align: right;
 }
+.subdirections app-dropdown .btn.dropdown-toggle {
+  min-width: 500px;   // ширина самой кнопки
+}
 
+.subdirections app-dropdown .dropdown-menu {
+  min-width: 500px;   // ширина выпадающего списка
+}

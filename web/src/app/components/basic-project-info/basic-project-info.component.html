@@ -10,8 +10,8 @@
   </div>
 </ng-container>
 <!--ACTIONS-->
-<div class="mb-1">
-  <button *ngFor="let meta of buttons" [ngClass]="meta.styleClass" class="mr-1" (click)="meta.onclick()">
+<div class="mb-3">
+  <button *ngFor="let meta of buttons" [ngClass]="meta.styleClass" class="mr-2" (click)="meta.onclick()">
     {{meta.title}}
   </button>
 </div>
