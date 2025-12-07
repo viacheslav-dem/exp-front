@@ -87,6 +87,25 @@
             "tsConfig": [],
             "exclude": []
           }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "tsConfig": "src/tsconfig.spec.json",
+            "karmaConfig": "src/karma.conf.js",
+            "styles": [
+              "src/resources/css/style.scss"
+            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ],
+            "assets": [
+              "src/assets",
+              "src/WEB-INF"
+            ]
+          }
         }
       }
     },
