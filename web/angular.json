@@ -25,9 +25,10 @@
               "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
               "node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.standalone.css",
               "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
-              "node_modules/angular2-multiselect-dropdown/themes/default.theme.css",
+              "node_modules/@ng-select/ng-select/themes/default.theme.css",
               "src/resources/css/style.scss"
             ],
+
             "scripts": [
               "node_modules/highcharts/highcharts.js",
               "node_modules/highcharts/modules/exporting.js",

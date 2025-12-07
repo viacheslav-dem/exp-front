@@ -5,6 +5,7 @@ import {ModalComponent} from "app/components/common-components/modal/modal.compo
 import {UploadHelper} from "app/components/common-components/file-uploader/upload-helper";
 import {removeFileSuffix} from "app/support/utils";
 import {IdDto} from "@app/dto/IdDto";
+import {HttpBackend} from "@angular/common/http";
 
 @Component({
   selector: 'app-document-uploader',
@@ -14,6 +15,7 @@ export class DocumentUploaderComponent extends UploadHelper {
 
   fileName: string;
   fileDescription: string;
+  isDragOver: boolean = false;
 
   @Input() url: string;
   @Input() idDto: IdDto;
@@ -23,8 +25,31 @@ export class DocumentUploaderComponent extends UploadHelper {
   @ViewChild('fileLoaderModal') fileLoaderModal: ModalComponent;
 
   constructor(private _toasty: GlobalToastyService,
-              protected _authService: AuthService) {
-    super(_authService);
+              protected _authService: AuthService,
+              httpBackend: HttpBackend) {
+    super(_authService, httpBackend);
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+    const files = event.dataTransfer && event.dataTransfer.files;
+    if (files && files.length) {
+      this.onFilesChosen(Array.from(files) as File[]);
+    }
   }
 
   ngOnInit() {

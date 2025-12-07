@@ -28,11 +28,9 @@ import {LoadingDataDirective} from "@app/components/common-components/loading-da
 import {CheckboxComponent} from "@app/components/common-components/checkbox/checkbox.component";
 import {ProgressComponent} from "@app/components/common-components/progress/progress.component";
 import {SliderComponent} from "@app/components/common-components/slider/slider.component";
-import {Ng2CompleterModule} from "ng2-completer";
 import {BooleanButtonComponent} from './boolean-button/boolean-button.component';
 import {FilterComponent} from "@app/components/common-components/page-and-filter/filter/filter.component";
 import {PaginationComponent} from "@app/components/common-components/page-and-filter/pagination/pagination.component";
-import {AngularMultiSelectModule} from "angular2-multiselect-dropdown";
 import {ChooseFilesComponent} from "@app/components/common-components/file-uploader/choose-files/choose-files.component";
 import {SilentFileUploaderComponent} from "@app/components/common-components/file-uploader/silent-file-uploader/silent-file-uploader.component";
 import {MonthYearComponent} from "@app/components/common-components/month-year/month-year.component";
@@ -40,6 +38,7 @@ import {SelectCatalogComponent} from './select-catalog/select-catalog.component'
 import {DateInputComponent} from './date-input/date-input.component';
 import {TimeInputComponent} from "@app/components/common-components/time-input/time-input.component";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
+import {NgSelectModule} from "@ng-select/ng-select";
 import {NumberInputDirective} from "@app/components/common-components/number-input/number-input.directive";
 import {BankAccountInputDirective} from "@app/components/common-components/bank-account/bank-account-input.directive";
 import {BooleanButtonV2Component} from "@app/components/common-components/boolean-button/boolean-button-v2.component";
@@ -59,8 +58,8 @@ import {GlobalToastsComponent} from "@app/components/common-components/global-to
     CustomFormsModule,
     CollapseModule,
     CryptoModule,
-    AngularMultiSelectModule,
     FontAwesomeModule,
+    NgSelectModule,
   ],
   exports: [
     CommonModule,
@@ -71,9 +70,8 @@ import {GlobalToastsComponent} from "@app/components/common-components/global-to
     ModalModule,
     CustomFormsModule,
     CollapseModule,
-    Ng2CompleterModule,
-    AngularMultiSelectModule,
     FontAwesomeModule,
+    NgSelectModule,
     DocumentListComponent,
     FileEditorComponent,
     PasswordInputComponent,

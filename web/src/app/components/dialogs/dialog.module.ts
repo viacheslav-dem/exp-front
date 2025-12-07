@@ -7,12 +7,14 @@ import {LoginCreateComponent} from './user-form/login-create.component';
 import {ChangePasswordComponent} from './change-password/change-password.component';
 import {ConfirmDialogComponent} from "@app/components/dialogs/confirm-dialog/confirm-dialog.component";
 import {CustomPipesModule} from "@app/pipes/custom-pipes.module";
+import {NgSelectModule} from "@ng-select/ng-select";
 
 
 @NgModule({
   imports: [
     CommonComponentsModule,
-    CustomPipesModule
+    CustomPipesModule,
+    NgSelectModule
   ],
   exports: [
     DialogComponent,

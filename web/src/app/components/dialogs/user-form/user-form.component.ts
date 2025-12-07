@@ -36,7 +36,7 @@ export class UserFormComponent {
   role: string;
   _user: PersonDto;
   _originalUser: PersonDto;
-  _userSelectedOrg: SelectItem[] = [];
+  _userSelectedOrg: SelectItem = null;
   photo: string = 'assets/abstract_profile.jpg';
   current: boolean = false;
   Catalog = Catalog;
@@ -109,7 +109,9 @@ export class UserFormComponent {
       this.current = this._user.current;
     }
     if (this._user.org) {
-      this._userSelectedOrg = [new SelectItem(this._user.org, this._user.org.name, this._user.org.id)];
+      this._userSelectedOrg = new SelectItem(this._user.org, this._user.org.name, this._user.org.id);
+    } else {
+      this._userSelectedOrg = null;
     }
   };
 

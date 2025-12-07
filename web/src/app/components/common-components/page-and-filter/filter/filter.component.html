@@ -57,12 +57,17 @@
       </app-checkbox>
 
       <!--MULTISELECT-->
-      <angular2-multiselect
+      <ng-select
         *ngIf="field.type == SearchFieldType.MULTI_SELECT"
-        [data]="field.allItems" [(ngModel)]="field.selectedItems" [settings]="field.settings"
-        (onSelect)="changeMultiSelect(field)" (onDeSelect)="changeMultiSelect(field)"
-        (onSelectAll)="changeMultiSelect(field)" (onDeSelectAll)="changeMultiSelect(field)">>
-      </angular2-multiselect>
+        [items]="field.allItems"
+        bindLabel="itemName"
+        [multiple]="true"
+        [(ngModel)]="field.selectedItems"
+        [searchable]="true"
+        [clearable]="true"
+        [placeholder]="field.settings.text || 'Выбрать'"
+        (ngModelChange)="changeMultiSelect(field)">
+      </ng-select>
 
       <div *ngIf="field.resetEnabled && !field.isEmpty()" class="input-group-append selectable">
         <button class="btn btn-primary" (click)="filterChanged()">Поиск</button>

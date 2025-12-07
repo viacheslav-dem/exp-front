@@ -187,18 +187,15 @@
 
         <div class="form-sub-group user-org-dropdown">
             <label>Наименование организации</label>
-            <angular2-multiselect
-                    [data]="allOrgs"
-                    [ngModel]="_userSelectedOrg"
-                    [settings]="{
-                      singleSelection: true,
-                      enableSearchFilter: true,
-                      enableFilterSelectAll: false,
-                      text: 'Организация не выбрана',
-                      searchPlaceholderText: 'Поиск...'
-                    }"
-                    (onSelect)="selectOrg($event)">
-            </angular2-multiselect>
+            <ng-select
+                    [items]="allOrgs"
+                    bindLabel="itemName"
+                    [(ngModel)]="_userSelectedOrg"
+                    [searchable]="true"
+                    [clearable]="true"
+                    placeholder="Организация не выбрана"
+                    (ngModelChange)="selectOrg($event)">
+            </ng-select>
         </div>
     </div>
 

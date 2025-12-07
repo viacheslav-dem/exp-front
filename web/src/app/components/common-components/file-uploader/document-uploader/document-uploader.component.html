@@ -1,4 +1,11 @@
-<app-choose-files (onFilesChosen)="onFilesChosen($event)" [typesAccept]="typesAccept" ></app-choose-files>
+<div class="file-drop-zone"
+     (dragover)="onDragOver($event)"
+     (dragleave)="onDragLeave($event)"
+     (drop)="onDrop($event)"
+     [class.drag-over]="isDragOver">
+  <app-choose-files (onFilesChosen)="onFilesChosen($event)" [typesAccept]="typesAccept"></app-choose-files>
+  <div class="small text-muted mt-1">Перетащите файл сюда или выберите через диалог</div>
+</div>
 
 <app-modal #fileLoaderModal [title]="'Загрузка файла'" >
   <div class="form-group">

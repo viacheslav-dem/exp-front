@@ -1,48 +1,69 @@
 import {map} from 'rxjs/operators';
 import {Component, EventEmitter, OnInit, Output} from "@angular/core";
 import {PersonService} from "app/services/person.service";
-import {CompleterData, CompleterItem} from "ng2-completer";
-import {AutoCompleteDataSource} from "app/components/search/search-person/search-person-autocomplete/AutoCompleteDataSource";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import {sortByName} from "@app/components/common-components/page-and-filter/model/SortOrder";
 import {Pagination} from "@app/components/common-components/page-and-filter/model/Pagination";
 import {SearchPageRequest} from "@app/components/common-components/page-and-filter/model/SearchPageRequest";
+import {Subject, of} from "rxjs";
+import {debounceTime, distinctUntilChanged, switchMap} from "rxjs/operators";
 
 @Component({
   selector: 'app-search-person-autocomplete',
   template: `
-    <ng2-completer [minSearchLength]="2" [(ngModel)]="person" [datasource]="autoCompleteSource"
-                   placeholder="Фамилия" [clearUnselected]="true"
-                   (selected)="onPersonSelect($event)"
-                   textSearching="Поиск..." textNoResults="Ничего не найдено"></ng2-completer>
+    <ng-select
+      [items]="items"
+      bindLabel="title"
+      [typeahead]="searchInput$"
+      [(ngModel)]="person"
+      placeholder="Фамилия"
+      [clearable]="true"
+      [searchable]="true"
+      [loading]="loading"
+      [typeToSearchText]="'Поиск...'"
+      [notFoundText]="'Ничего не найдено'"
+      (change)="onPersonSelect($event)">
+    </ng-select>
 
   `
 })
 export class SearchPersonAutocompleteComponent implements OnInit {
 
   public person;
-  autoCompleteSource: CompleterData;
+  items: any[] = [];
+  loading: boolean = false;
+  searchInput$ = new Subject<string>();
 
   @Output() public selected = new EventEmitter();
 
   constructor(private _service: PersonService) {
-    this.autoCompleteSource = new AutoCompleteDataSource((login: string) => {
-        let filter = FilterBuilder.startsWith('personName.lastName', login);
-        let pagination = new Pagination(30);
-        let request = new SearchPageRequest(pagination, filter, sortByName('personName.'));
-        return this._service.searchPersons(request).pipe(map((response) => {
-          // console.log("response", response);
-          let searchResults = response.content;
-          let data: CompleterItem[] = [];
-          searchResults.forEach(person => data.push({
-              title: `${person.personName.lastName} ${person.personName.firstName} ${person.personName.middleName}`,
-              originalObject: person
+    this.searchInput$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((login: string) => {
+          if (!login || login.length < 2) {
+            return of([]);
+          }
+          this.loading = true;
+          const filter = FilterBuilder.startsWith('personName.lastName', login);
+          const pagination = new Pagination(30);
+          const request = new SearchPageRequest(pagination, filter, sortByName('personName.'));
+          return this._service.searchPersons(request).pipe(
+            map((response) => {
+              const searchResults = response.content;
+              return searchResults.map(person => ({
+                title: `${person.personName.lastName} ${person.personName.firstName} ${person.personName.middleName}`,
+                originalObject: person
+              }));
             })
           );
-          return data;
-        }));
-      }
-    );
+        })
+      )
+      .subscribe((items) => {
+        this.items = items;
+        this.loading = false;
+      });
   }
 
   ngOnInit() {

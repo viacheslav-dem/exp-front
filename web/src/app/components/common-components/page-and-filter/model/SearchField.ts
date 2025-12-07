@@ -2,8 +2,6 @@ import {Filter} from "app/components/common-components/page-and-filter/model/Fil
 import {Operation} from "app/components/common-components/page-and-filter/model/FilterBuilder";
 import {DateRange, DoubleRange, Range} from "@app/components/common-components/page-and-filter/model/Range";
 import {SortOrder} from "@app/components/common-components/page-and-filter/model/SortOrder";
-// import {ListItem} from "angular2-multiselect-dropdown/multiselect.model";
-// import {DropdownSettings} from "angular2-multiselect-dropdown/multiselect.interface";
 import {Catalog} from "@app/services/data.service";
 import {isArray} from "util";
 

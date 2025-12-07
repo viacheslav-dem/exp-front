@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
 import {AuthService} from "app/services/auth.service";
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {UploadHelper} from "app/components/common-components/file-uploader/upload-helper";
+import {HttpBackend} from "@angular/common/http";
 
 @Component({
   selector: 'app-silent-file-uploader',
@@ -13,10 +14,12 @@ export class SilentFileUploaderComponent extends UploadHelper {
   @Input() typesAccept: string;
   @Input() controlClass: any;
   @Output() saved = new EventEmitter();
+  isDragOver: boolean = false;
 
   constructor(private _toasty: GlobalToastyService,
-              protected _authService: AuthService) {
-    super(_authService);
+              protected _authService: AuthService,
+              protected _http: HttpBackend) {
+    super(_authService, _http);
   }
 
   ngOnInit() {
@@ -41,5 +44,27 @@ export class SilentFileUploaderComponent extends UploadHelper {
     this.file = files[0];
     this._toasty.info("Загрузка файла началась.");
     this.saveFile();
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+    const files = event.dataTransfer && event.dataTransfer.files;
+    if (files && files.length) {
+      this.onFilesChosen(Array.from(files) as File[]);
+    }
   }
 }

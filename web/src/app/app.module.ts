@@ -94,10 +94,12 @@ import { ruLocale } from 'ngx-bootstrap/locale';
 defineLocale('ru', ruLocale);
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
     imports: [
         BrowserModule,
+        NgSelectModule,
         routing,
         DialogModule.forRoot(),
         CommonComponentsModule,
