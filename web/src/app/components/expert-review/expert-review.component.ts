@@ -24,7 +24,7 @@ import {
     ExpertReviewFormContainerComponent
 } from "@app/components/document-form/expert-review-form-container/expert-review-form-container.component";
 import {DataService} from "@app/services/data.service";
-import "rxjs-compat/add/operator/takeWhile";
+//import { takeWhile } from 'rxjs/operators';
 import {PeriodDto} from "@app/dto/PeriodDto";
 import * as moment from "moment";
 import {AccountingPlainDto} from "@app/dto/AccountingPlainDto";

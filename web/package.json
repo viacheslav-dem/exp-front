@@ -34,7 +34,6 @@
     "ngx-bootstrap": "^5.6.1",
     "popper.js": "^1.16.1",
     "rxjs": "^6.5.5",
-    "rxjs-compat": "^6.5.5",
     "sass": "^1.86.0",
     "ts-helpers": "1.1.2",
     "tslib": "^2.0.0",

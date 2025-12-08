@@ -461,3 +461,8 @@ body {
 .subdirections app-dropdown .dropdown-menu {
   min-width: 500px;   // ширина выпадающего списка
 }
+// Отступ под drag&drop-зоной в списке шаблонов документов,
+// чтобы подсказка и область загрузки не прилипали к следующему блоку
+.list-group .form-sub-group .file-drop-zone {
+  margin-bottom: 0.5rem;
+}
