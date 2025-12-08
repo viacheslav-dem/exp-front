@@ -14,39 +14,28 @@ import {OrgsComponent} from "@app/components/settings/orgs/orgs.component";
 import { AuditPolicyComponent } from './audit-policy/audit-policy.component';
 
 @NgModule({
-  imports: [
-    CommonComponentsModule,
-    SearchModule,
-  ],
-  declarations: [
-    SettingsComponent,
-    AuthPolicyComponent,
-    PasswordPolicyComponent,
-    ExaminationPolicyComponent,
-    StatesTermsComponent,
-    PaymentSettingsComponent,
-    GkntDeputyChairmanProcurationsComponent,
-    HighTechCriteriaComponent,
-    OrgsComponent,
-    AuditPolicyComponent,
-  ],
-  entryComponents: [
-    AuthPolicyComponent,
-    PasswordPolicyComponent,
-    ExaminationPolicyComponent,
-    StatesTermsComponent,
-    PaymentSettingsComponent,
-    GkntDeputyChairmanProcurationsComponent,
-    HighTechCriteriaComponent,
-    OrgsComponent,
-    AuditPolicyComponent,
-  ],
-  providers: [
-    PropertyComponentResolver,
-  ],
-  exports: [
-    SettingsComponent,
-  ]
+    imports: [
+        CommonComponentsModule,
+        SearchModule,
+    ],
+    declarations: [
+        SettingsComponent,
+        AuthPolicyComponent,
+        PasswordPolicyComponent,
+        ExaminationPolicyComponent,
+        StatesTermsComponent,
+        PaymentSettingsComponent,
+        GkntDeputyChairmanProcurationsComponent,
+        HighTechCriteriaComponent,
+        OrgsComponent,
+        AuditPolicyComponent,
+    ],
+    providers: [
+        PropertyComponentResolver,
+    ],
+    exports: [
+        SettingsComponent,
+    ]
 })
 export class SettingsModule {
 }

@@ -158,61 +158,72 @@
                 <div class="text-sm italic">{{expert.phones | phones}}</div>
             </div>
             <div class="col-lg-3 text-sm px-0">
-                <div *ngIf="expert.areas.length > 0">
-                    Области компетенции:&nbsp;<span class="italic">{{expert | areas}}</span>
+                <div *ngIf="expert?.areas?.length > 0">
+                    Области компетенции:&nbsp;
+                    <span class="italic">{{ expert | areas }}</span>
                 </div>
-                <div *ngIf="expert.personInfo.specializations">
+
+                <div *ngIf="expert?.personInfo?.specializations?.length">
                     Специализация:&nbsp;
                     <div *ngFor="let spec of expert.personInfo.specializations"
-                         class="italic">{{spec.name}}
+                         class="italic">
+                        {{ spec.name }}
                     </div>
                 </div>
-                <div *ngIf="expert.personInfo.specialities">
+
+                <div *ngIf="expert?.personInfo?.specialities?.length">
                     Специальность:&nbsp;
                     <div *ngFor="let special of expert.personInfo.specialities"
-                         class="italic">{{special.name}}
+                         class="italic">
+                        {{ special.name }}
                     </div>
                 </div>
             </div>
             <div class="col-lg-3 text-sm pr-0">
                 <div *ngIf="expert.org?.name">
-                    Организация:&nbsp;<span class="italic">{{expert.org?.name}}</span>
+                    Организация:&nbsp;<span class="italic">{{ expert.org?.name }}</span>
                 </div>
                 <div *ngIf="expert.post">
-                    Должность:&nbsp;<span class="italic">{{expert.post}}</span>
+                    Должность:&nbsp;<span class="italic">{{ expert.post }}</span>
                 </div>
             </div>
             <div class="col-lg-3 text-sm">
                 <div>
-                    Объектов на&nbsp;экспертизе:&nbsp;<span
-                        class="bold">{{expert.realTimeStats.projectsOnExamination}}</span>
+                    Объектов на&nbsp;экспертизе:&nbsp;
+                    <span class="bold">
+      {{ expert?.realTimeStats?.projectsOnExamination }}
+    </span>
                 </div>
                 <div>
-                    Ожидают подтверждения:&nbsp;<span
-                        class="bold">{{expert.realTimeStats.reviewsOnConfirmation}}</span>
+                    Ожидают подтверждения:&nbsp;
+                    <span class="bold">
+      {{ expert?.realTimeStats?.reviewsOnConfirmation }}
+    </span>
                 </div>
                 <div>
-                    Нарушены сроки:&nbsp;<span
-                        class="bold">{{expert.realTimeStats.reviewsTermsViolation.red}}</span>
+                    Нарушены сроки:&nbsp;
+                    <span class="bold">
+      {{ expert?.realTimeStats?.reviewsTermsViolation?.red }}
+    </span>
                 </div>
                 <div>
                     Завершено заключений:&nbsp;
                     <span class="bold">
-                                {{expert.realTimeStats.acceptedProjects + expert.realTimeStats.rejectedProjects}}
-                            </span>
+      {{ (expert?.realTimeStats?.acceptedProjects || 0) + (expert?.realTimeStats?.rejectedProjects || 0) }}
+    </span>
                 </div>
                 <div class="">
                     <div class="d-inline-block text-nowrap mr-2">
                         Отказы эксперта:&nbsp;
                         <span class="bold">
-                                    {{expert.realTimeStats.rejectedReviewsByExpert}}
-                                </span>
+        {{ expert?.realTimeStats?.rejectedReviewsByExpert }}
+      </span>
                     </div>
                     <div class="d-inline-block text-nowrap">
                         Отказы ГКНТ:&nbsp;
                         <span class="bold">
-                                    {{expert.realTimeStats.rejectedReviewsByGknt}}
-                                </span>
+        {{ expert?.realTimeStats?.rejectedReviewsByGknt }}
+      </span>
                     </div>
                 </div>
             </div>

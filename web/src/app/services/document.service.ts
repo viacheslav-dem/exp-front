@@ -54,9 +54,6 @@ export class DocumentService {
         let contentDisposition: string = response.headers.get('content-disposition');
         let filename = contentDisposition.substr(contentDisposition.indexOf('=') + 1);
         filename = decodeURIComponent(filename);
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-          window.navigator.msSaveOrOpenBlob(response.body, filename);
-        } else {
           let a:HTMLAnchorElement = <HTMLAnchorElement>document.createElement('a');
           a.href = window.URL.createObjectURL(response.body);
           a.target = '_parent';
@@ -70,7 +67,7 @@ export class DocumentService {
           (document.body || document.documentElement).appendChild(a);
           a.click();
           a.parentNode.removeChild(a);
-        }
+
 
     }));
   }
