@@ -1,6 +1,5 @@
 import {Component, Input} from '@angular/core';
 import {SearchPersonComponent} from "app/components/search/search-person/search-person.component";
-import {isString} from "util";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 
 @Component({
@@ -17,7 +16,7 @@ export class SearchPersonByRolesComponent extends SearchPersonComponent {
   }
 
   @Input() set roles(roles: string[] | string) {
-    if (isString(roles)) {
+    if (typeof roles === 'string') {
       roles = [roles];
     }
     this._roles = roles;

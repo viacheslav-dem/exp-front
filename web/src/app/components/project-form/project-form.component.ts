@@ -221,16 +221,17 @@ export class ProjectFormComponent implements OnInit {
     }
 
     validate() {
-        if (this._project.code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025') {
-            if (isEmptyOrNull(this._project.program)) {
-                throw 'Наименование программы (подпрограммы) не может быть пустым.';
-            }
-        }
         if (isEmptyOrNull(this._project.title)) {
             throw 'Наименование объекта экспертизы не может быть пустым.';
         }
         if (!this._project.code) {
             throw 'Пожалуйста, выберите код объекта экспертизы.';
+        }
+
+        if (this._project.code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025') {
+            if (isEmptyOrNull(this._project.program)) {
+                throw 'Наименование программы (подпрограммы) не может быть пустым.';
+            }
         }
         if (isEmptyOrNull(this._project.executor)) {
             throw 'Пожалуйста, укажите исполнителей и соисполнителей объекта экспертизы.';

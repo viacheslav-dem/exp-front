@@ -53,13 +53,12 @@
                     <executable>ng</executable>
                     <arguments>
                         <argument>build</argument>
-                        <!--analyze the project; switched of because of unfixed error;-->
+                        <argument>--configuration</argument>
+                        <argument>production</argument>
                         <argument>--aot</argument>
-                        <argument>--prod</argument>
-                        <!--<argument>&#45;&#45;bh</argument>-->
-                        <!--<argument>/exam/</argument>-->
                     </arguments>
                 </configuration>
+
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

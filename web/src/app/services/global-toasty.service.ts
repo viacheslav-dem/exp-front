@@ -1,5 +1,4 @@
 import {Injectable, Output, EventEmitter} from '@angular/core';
-import {isString} from "util";
 
 @Injectable()
 export class GlobalToastyService {
@@ -10,7 +9,7 @@ export class GlobalToastyService {
   constructor() { }
 
   static buildOptions(options, title) {
-    if (!options || isString(options)) {
+    if (!options || typeof options === 'string') {
       return {
         title: title,
         msg: options,

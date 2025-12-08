@@ -1,8 +1,6 @@
 /**
  * Created by belous.dmitri on 02.02.2017.
  */
-
-import {isArray, isBoolean, isString} from "util";
 import {NumberPipe} from "@app/pipes/number.pipe";
 
 // noinspection JSUnusedGlobalSymbols
@@ -130,7 +128,7 @@ export class ChartBuilder {
    * @param title
    */
   title(title?: string | TitleBuilder | any) {
-    if (isString(title)) {
+    if (typeof title === 'string') {
       title = {text: title};
     } else if (title instanceof TitleBuilder) {
       title = title.options;
@@ -275,7 +273,7 @@ export class ChartBuilder {
    * @param defaultAxis
    */
   xAxis(xAxis: string | AxisBuilder | AxisBuilder[] | any | any[], defaultAxis: boolean = false) {
-    if (isString(xAxis)) {
+    if (typeof xAxis === 'string') {
       xAxis = Chart.axis(xAxis);
     }
     if (!this.options.xAxis) {
@@ -300,7 +298,7 @@ export class ChartBuilder {
    * @param defaultAxis
    */
   yAxis(yAxis: string | AxisBuilder | AxisBuilder[] | any | any[], defaultAxis: boolean = false) {
-    if (isString(yAxis)) {
+    if (typeof yAxis === 'string') {
       yAxis = Chart.axis(yAxis);
     }
     if (!this.options.yAxis) {
@@ -316,7 +314,7 @@ export class ChartBuilder {
   }
 
   private prepareAxis(axis: AxisBuilder | AxisBuilder[] | any | any[]): any[] {
-    if (!isArray(axis)) {
+    if (!Array.isArray(axis)) {
       axis = [axis];
     }
     axis.forEach((anAxis, index) => {
@@ -353,7 +351,7 @@ export class ChartBuilder {
     if (exporting == null) {
       exporting = true;
     }
-    if (isBoolean(exporting)) {
+    if (typeof exporting === 'boolean') {
       exporting = {enabled: exporting};
     } else if (exporting instanceof ExportingBuilder) {
       exporting = exporting.options;
@@ -366,7 +364,7 @@ export class ChartBuilder {
     if (legend == null) {
       legend = true;
     }
-    if (isBoolean(legend)) {
+    if (typeof legend === 'boolean') {
       legend = {enabled: legend};
     } else if (legend instanceof LegendBuilder) {
       legend = legend.options;
@@ -406,7 +404,7 @@ export class ChartBuilder {
   }
 
   series(series: SeriesBuilder | SeriesBuilder[] | any | any[]) {
-    if (!isArray(series)) {
+    if (!Array.isArray(series)) {
       series = [series];
     }
     series.forEach((aSeries) => {
@@ -419,7 +417,7 @@ export class ChartBuilder {
   }
 
   loading(loading: boolean | LoadingBuilder | any = true) {
-    if (isBoolean(loading)) {
+    if (typeof loading === 'boolean') {
       loading = Chart.loading().enabled(loading);
     }
     if (loading instanceof LoadingBuilder) {
@@ -435,7 +433,7 @@ export class ChartBuilder {
   }
 
   colors(colors: string | string[]) {
-    if (isString(colors)) {
+    if (typeof colors === 'string') {
       colors = [colors];
     }
     this.options.colors = colors;
@@ -450,7 +448,7 @@ export class ChartBuilder {
    * @returns {ChartBuilder}
    */
   responsive(responsiveRule: ResponsiveRuleBuilder | ResponsiveRuleBuilder[] | any | any[]) {
-    if (!isArray(responsiveRule)) {
+    if (!Array.isArray(responsiveRule)) {
       responsiveRule = [responsiveRule];
     }
     responsiveRule.forEach(rule => {
@@ -498,7 +496,7 @@ export class ChartBuilder {
    * @returns {ChartBuilder}
    */
   credits(credits: boolean | any = true) {
-    if (isBoolean(credits)) {
+    if (typeof credits === 'boolean') {
       credits = {
         enabled: credits,
       };
@@ -799,7 +797,7 @@ export class AxisBuilder {
    * @param title
    */
   title(title?: string | TitleBuilder | any) {
-    if (isString(title)) {
+    if (typeof title === 'string') {
       title = {text: title};
     } else if (title instanceof TitleBuilder) {
       title = title.options;
@@ -814,7 +812,7 @@ export class AxisBuilder {
    * @param labels
    */
   labels(labels: boolean | LabelsBuilder | any) {
-    if (isBoolean(labels)) {
+    if (typeof labels === 'boolean') {
       labels = {enabled: labels};
     }
     if (labels instanceof LabelsBuilder) {
@@ -1203,7 +1201,7 @@ export class PlotOptionsBuilder {
     if (dataLabels == null) {
       dataLabels = true;
     }
-    if (isBoolean(dataLabels)) {
+    if (typeof dataLabels === 'boolean') {
       dataLabels = {enabled: dataLabels};
     } else if (dataLabels instanceof DataLabelsBuilder) {
       dataLabels = dataLabels.options;

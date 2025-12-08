@@ -1,5 +1,4 @@
 import {Pipe, PipeTransform} from "@angular/core";
-import {isString} from "util";
 import {TemplateDocumentDto} from "@app/dto/TemplateDocumentDto";
 import {isEmptyOrNull} from "@app/support/utils";
 

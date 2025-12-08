@@ -348,6 +348,16 @@ body {
   border-radius: 0.25rem;
   min-height: 600px;
 }
+.file-drop-zone {
+  border: 1px dashed #ccc;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.file-drop-zone.drag-over {
+  border-color: #007bff;
+  background-color: rgba(0, 123, 255, 0.05);
+}
 
 .main-menu {
   padding: 0;
@@ -464,5 +474,48 @@ body {
 // Отступ под drag&drop-зоной в списке шаблонов документов,
 // чтобы подсказка и область загрузки не прилипали к следующему блоку
 .list-group .form-sub-group .file-drop-zone {
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+.ng-select .ng-value-label {
+  white-space: normal;
+  word-wrap: break-word;
+}
+/* строка фильтра: сортировка + поле (в т.ч. ng-select) */
+.filter .input-group,
+app-filter .input-group {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;     // все по одной высоте
+  width: 100%;
+}
+
+/* блок с иконкой сортировки слева */
+.filter .input-group-prepend,
+app-filter .input-group-prepend {
+  flex: 0 0 auto;           // фиксированная ширина по контенту
+  margin-right: 0;
+}
+
+/* сам ng-select справа от иконки */
+.filter ng-select,
+app-filter ng-select {
+  flex: 1 1 auto;           // занимает всё оставшееся место
+  min-width: 0;             // чтобы не выталкивал иконку
+}
+
+/* контейнер внутри ng-select тоже на всю ширину */
+.filter ng-select .ng-select-container,
+app-filter ng-select .ng-select-container {
+  width: 100%;
+}
+
+.ng-select .ng-value-icon.left {
+  font-size: 16px;      // сделать символ больше
+  line-height: 1;       // чтобы не было лишних отступов по вертикали
+  //width: 16px;          // опционально — увеличить "кликабельную" область
+  //height: 16px;
+}
+
+.ng-select .ng-value-icon.left:hover {
+  font-size: 20px;      // если хочешь эффект увеличения при наведении
 }

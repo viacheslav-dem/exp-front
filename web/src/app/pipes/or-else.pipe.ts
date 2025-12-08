@@ -1,5 +1,4 @@
 import {Pipe, PipeTransform} from "@angular/core";
-import {isString} from "util";
 
 @Pipe({name: 'orElse'})
 export class OrElsePipe implements PipeTransform {
@@ -8,7 +7,7 @@ export class OrElsePipe implements PipeTransform {
     if (!value) {
       return defultValue;
     }
-    if (isString(value) && value.trim().length == 0) {
+    if ( typeof value === 'string' && value.trim().length == 0) {
       return defultValue;
     }
     return value;
