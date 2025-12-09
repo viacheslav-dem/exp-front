@@ -39,6 +39,7 @@ import {DateInputComponent} from './date-input/date-input.component';
 import {TimeInputComponent} from "@app/components/common-components/time-input/time-input.component";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {NgSelectModule} from "@ng-select/ng-select";
+import {NgxSliderModule} from "@angular-slider/ngx-slider";
 import {NumberInputDirective} from "@app/components/common-components/number-input/number-input.directive";
 import {BankAccountInputDirective} from "@app/components/common-components/bank-account/bank-account-input.directive";
 import {BooleanButtonV2Component} from "@app/components/common-components/boolean-button/boolean-button-v2.component";
@@ -52,14 +53,15 @@ import {GlobalToastsComponent} from "@app/components/common-components/global-to
     FormsModule,
     ReactiveFormsModule,
     CustomPipesModule,
-    PaginationModule.forRoot(),
-    BsDatepickerModule.forRoot(),
-    ModalModule.forRoot(),
+    PaginationModule,
+    BsDatepickerModule,
+    ModalModule,
     CustomFormsModule,
     CollapseModule,
     CryptoModule,
     FontAwesomeModule,
     NgSelectModule,
+    NgxSliderModule,
   ],
   exports: [
     CommonModule,
@@ -67,11 +69,13 @@ import {GlobalToastsComponent} from "@app/components/common-components/global-to
     ReactiveFormsModule,
     CustomPipesModule,
     PaginationModule,
+    BsDatepickerModule,
     ModalModule,
     CustomFormsModule,
     CollapseModule,
     FontAwesomeModule,
     NgSelectModule,
+    NgxSliderModule,
     DocumentListComponent,
     FileEditorComponent,
     PasswordInputComponent,

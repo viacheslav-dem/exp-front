@@ -12,7 +12,7 @@ import {Catalog} from "@app/services/data.service";
 @Component({
   selector: 'app-return-from-council-without-expertise-form',
   templateUrl: './return-from-council-without-expertise-form.component.html',
-  styles: [``]
+  //styles: [``]
 })
 export class ReturnFromCouncilWithoutExpertiseFormComponent extends DocumentForm<ReturnFromCouncilWithoutExpertiseFormContent> {
 

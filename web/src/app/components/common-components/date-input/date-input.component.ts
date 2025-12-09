@@ -41,8 +41,10 @@ export class DateInputComponent extends ControlComponent<number> {
   @Output() onSelect: EventEmitter<number> = new EventEmitter<number>();
 
   prepareValue(): void {
-    if (this._value) {
+    if (this._value != null) {
       this.dateValue = this.getDate(this._value);
+    } else {
+      this.dateValue = null;
     }
   }
 
@@ -53,6 +55,9 @@ export class DateInputComponent extends ControlComponent<number> {
       let date: Date = new Date(this.value);
       date.setHours(0, 0, 0, 0);
       this.onSelect.emit(date.getTime());
+    } else {
+      // Если дата была очищена, устанавливаем null
+      this.value = null;
     }
   }
 

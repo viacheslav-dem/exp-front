@@ -1,5 +1,4 @@
-import {RouterModule, Routes} from "@angular/router";
-import {ModuleWithProviders} from "@angular/core";
+import {Routes} from "@angular/router";
 import {LoginComponent} from "./base/login/login.component";
 import {AuthGuardService} from "./services/auth-guard.service";
 import {DefineRole} from "./services/define-role";
@@ -26,7 +25,7 @@ import {SubOrgListComponent} from "@app/components/sub-org-list/sub-org-list.com
 import {NotificationComponent} from "@app/components/notification/notification.component";
 import {SystemNotificationComponent} from "@app/components/system-notification/system-notification.component";
 
-const appRoutes: Routes = [
+export const appRoutes: Routes = [
   {
     path: '',
     component: HelloComponent,
@@ -67,4 +66,3 @@ const appRoutes: Routes = [
     ]
   }
 ];
-export const routing: ModuleWithProviders<RouterModule> = RouterModule.forRoot(appRoutes, {});

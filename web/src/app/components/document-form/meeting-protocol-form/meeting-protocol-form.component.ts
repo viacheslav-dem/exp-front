@@ -8,7 +8,7 @@ import {MeetingService} from "@app/services/meeting.service";
 import {AgendaFormResolver} from "@app/components/document-form/meeting-protocol-form/agenda-form-resolver.service";
 import {compareByField, isEmptyOrNull, sortPersonsByName} from "@app/support/utils";
 import {PersonService} from "@app/services/person.service";
-import * as moment from "moment";
+import {setHours, setMinutes, getHours, getMinutes, getTime, isAfter} from 'date-fns';
 import {RemarksContainerDto} from "@app/dto/RemarksContainerDto";
 import {MeetingProtocolNewFormContent} from "@app/components/document-form/meeting-protocol-form/MeetingProtocolNewFormContent";
 import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form/agenda-new-form.service";
@@ -121,8 +121,9 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
 
   validate() {
     super.validate();
-    let endDate = moment(this._form.endDate);
-    if (moment(this._meeting.period.end).hour(endDate.hour()).minute(endDate.minute()).valueOf() <= this._meeting.period.start) {
+    let endDate = new Date(this._form.endDate);
+    let meetingEndWithTime = setMinutes(setHours(new Date(this._meeting.period.end), getHours(endDate)), getMinutes(endDate));
+    if (getTime(meetingEndWithTime) <= this._meeting.period.start) {
       throw 'Время окончания должно следовать за временем начала заседания.';
     }
     if (this._form.prepareTimeBySecretary<0){
@@ -140,8 +141,8 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
     form.projectsById = {};
     this._meeting.agendas.map(agenda => agenda.project.id).forEach(projectId =>
       form.projectsById[projectId] = this.agendaComponents[projectId].getForm());
-    let endDate = moment(form.endDate);
-    form.endDate = moment(this._meeting.period.end).hour(endDate.hour()).minute(endDate.minute()).valueOf();
+    let endDate = new Date(form.endDate);
+    form.endDate = getTime(setMinutes(setHours(new Date(this._meeting.period.end), getHours(endDate)), getMinutes(endDate)));
     return form;
   }
 

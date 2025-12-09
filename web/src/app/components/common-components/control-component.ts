@@ -36,6 +36,8 @@ export class ControlComponent<T> implements OnInit, ControlValueAccessor {
     if (value !== this._value) {
       this.log(value, 'call write');
       this._value = value;
+      // Вызываем prepareValue только если значение не null/undefined
+      // или если компонент может обработать null
       this.prepareValue();
     }
   }

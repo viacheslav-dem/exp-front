@@ -22,7 +22,7 @@ import {
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {Operation} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
-import * as moment from "moment";
+import {subDays, getTime, parse} from 'date-fns';
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
 import {Router} from "@angular/router";
 import {DialogService} from "@app/components/dialogs/dialog.service";
@@ -48,8 +48,8 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
   AccountingState = AccountingState;
   SortClass = SortClass;
 
-  dateFrom: number =  moment().add(-1, "day").valueOf();
-  dateTo: number = moment().add(-1, "day").valueOf();
+  dateFrom: number = getTime(subDays(new Date(), 1));
+  dateTo: number = getTime(subDays(new Date(), 1));
 
 
   sortOrder: SortOrder = new SortOrder('id', Direction.DESC);
@@ -62,8 +62,6 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
   @ViewChild('fileViewerModal', { static: false }) fileViewer: ModalComponent;
   @ViewChild('confirmFinishAccountingModal', { static: false }) confirmFinishAccountingModal: ModalComponent;
   @ViewChild('paySumInput', { static: false }) paySumInput;
-  @ViewChild("dateFromInput", { static: true }) dateFromInput: ElementRef;
-  @ViewChild("dateToInput", { static: true }) dateToInput: ElementRef;
 
 
   constructor(private _accountingService: AccountingService,
@@ -94,13 +92,11 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
           .setSingleSelection(true).setSelectText('Выбрать тип расчёта'),
         SearchField.multiSelect('state', getAllAccountingStates(), value => this._accountingStatePipe.transform(value))
           .setSelectText('Выбрать состояние').setCheckAllEnabled(true),
-        SearchField.checkbox('stateEndDate', 'С подходящим или нарушенным сроком', new DateRange(null, moment().valueOf()), null)
+        SearchField.checkbox('stateEndDate', 'С подходящим или нарушенным сроком', new DateRange(null, getTime(new Date())), null)
           .setOperation(Operation.RANGE),
       ];
       this.enableFilterCache("accounting");
     }
-    this.dateFromInput.nativeElement.onchange = (e) => this.changeDateFrom(e.target.value);
-    this.dateToInput.nativeElement.onchange = (e) => this.changeDateTo(e.target.value);
   }
 
   loadPage() {
@@ -203,15 +199,13 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
     return Math.round(num*100)/100
   }
 
-  changeDateTo(dateTo) {
-
-    this.dateTo = moment(dateTo, 'DD.MM.YYYY').valueOf();
+  changeDateToValue(dateTo: number) {
+    this.dateTo = dateTo;
     this.update();
   }
 
-  changeDateFrom(dateFrom) {
-
-    this.dateFrom = moment(dateFrom, 'DD.MM.YYYY').valueOf();
+  changeDateFromValue(dateFrom: number) {
+    this.dateFrom = dateFrom;
     this.update();
   }
 

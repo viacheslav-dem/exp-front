@@ -6,13 +6,12 @@
     <div>
       <div class="row">
         <div class="col">
-          <div class="input-group input-group-sm date input-daterange"
-               data-date-autoclose="true" data-date-language="ru" data-provide="datepicker" data-date-format="dd.mm.yyyy">
-            <input #dateFromInput class="form-control" title="Начальная дата" [value]="dateFrom | mdate">
+          <div class="input-group input-group-sm">
+            <app-date-input [(ngModel)]="dateFrom" (onSelect)="changeDateFromValue($event)" title="Начальная дата"></app-date-input>
             <div class="input-group-append input-group-prepend">
               <div class="input-group-text">-</div>
             </div>
-            <input #dateToInput class="form-control" title="Конечная дата" [value]="dateTo | mdate">
+            <app-date-input [(ngModel)]="dateTo" (onSelect)="changeDateToValue($event)" title="Конечная дата"></app-date-input>
             <div class="input-group-append">
               <div class="input-group-text">
                 <fa-icon icon="calendar"></fa-icon>

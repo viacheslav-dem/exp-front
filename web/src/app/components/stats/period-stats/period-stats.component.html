@@ -2,13 +2,20 @@
   <h5 class="card-title">
     История проведения экспертиз
   </h5>
-  <div class="input-group input-group-sm date input-daterange"
-       data-date-autoclose="true" data-date-language="ru" data-provide="datepicker" data-date-format="MM yyyy">
-    <input #dateFromInput class="form-control" title="Начальная дата" [value]="dateFrom | monthYear">
+  <div class="input-group input-group-sm">
+    <input type="text" class="form-control" title="Начальная дата"
+           [(ngModel)]="dateFromValue"
+           [bsConfig]="datePickerConfig"
+           bsDatepicker
+           (bsValueChange)="changeDateFrom($event)">
     <div class="input-group-append input-group-prepend">
       <div class="input-group-text">-</div>
     </div>
-    <input #dateToInput class="form-control" title="Конечная дата" [value]="dateTo | monthYear">
+    <input type="text" class="form-control" title="Конечная дата"
+           [(ngModel)]="dateToValue"
+           [bsConfig]="datePickerConfig"
+           bsDatepicker
+           (bsValueChange)="changeDateTo($event)">
     <div class="input-group-append">
       <div class="input-group-text">
         <fa-icon icon="calendar"></fa-icon>

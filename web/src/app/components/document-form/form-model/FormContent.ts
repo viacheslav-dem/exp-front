@@ -1,6 +1,6 @@
-import * as moment from "moment";
+import {getTime} from 'date-fns';
 
 export class FormContent {
-  date: number = moment().valueOf();
+  date: number = getTime(new Date());
   isDefault: boolean = true;
 }

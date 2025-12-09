@@ -1,7 +1,7 @@
 import {Component, forwardRef} from '@angular/core';
-import * as moment from "moment";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
+import {setHours, setMinutes, getHours, getMinutes, getTime} from 'date-fns';
 
 export const TIME_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -42,9 +42,9 @@ export class TimeInputComponent extends ControlComponent<number> {
 
   prepareValue() {
     if (this.value != null) {
-      let date = moment(this.value);
-      this._hour = date.hour();
-      this._minute = date.minute();
+      let date = new Date(this.value);
+      this._hour = getHours(date);
+      this._minute = getMinutes(date);
     }
   }
 
@@ -53,10 +53,24 @@ export class TimeInputComponent extends ControlComponent<number> {
   }
 
   onMinuteSelect() {
-    this.value = moment(this.value).minute(this._minute).valueOf();
+    if (this.value != null) {
+      this.value = getTime(setMinutes(new Date(this.value), this._minute));
+    } else {
+      // Если значение null, создаем новую дату с текущим временем
+      let date = new Date();
+      date.setHours(this._hour, this._minute, 0, 0);
+      this.value = getTime(date);
+    }
   }
 
   onHourSelect() {
-    this.value = moment(this.value).hour(this._hour).valueOf();
+    if (this.value != null) {
+      this.value = getTime(setHours(new Date(this.value), this._hour));
+    } else {
+      // Если значение null, создаем новую дату с текущим временем
+      let date = new Date();
+      date.setHours(this._hour, this._minute, 0, 0);
+      this.value = getTime(date);
+    }
   }
 }

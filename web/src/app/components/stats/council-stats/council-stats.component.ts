@@ -1,6 +1,8 @@
-import {Component, ElementRef, Injectable, Input, OnInit, ViewChild} from "@angular/core";
+import {Component, Injectable, Input, OnInit, ViewChild} from "@angular/core";
 import {StatsService} from "@app/services/stats.service";
-import * as moment from "moment";
+import {subYears, getTime, addMonths, startOfMonth, endOfMonth, format, parse} from 'date-fns';
+import {ru} from 'date-fns/locale';
+import {BsDatepickerConfig} from 'ngx-bootstrap/datepicker';
 import {CouncilStatsDto} from "@app/dto/CouncilStatsDto";
 import {CouncilPlainDto} from "@app/dto/CouncilPlainDto";
 import {DataService} from "@app/services/data.service";
@@ -25,16 +27,23 @@ export class CouncilStatsComponent implements OnInit {
   Role = Role;
   role: Role;
 
-  dateFrom: number = moment().add(-1, 'year').valueOf();
-  dateTo: number = moment().valueOf();
+  dateFrom: number = getTime(subYears(new Date(), 1));
+  dateTo: number = getTime(new Date());
+
+  dateFromValue: Date = new Date(this.dateFrom);
+  dateToValue: Date = new Date(this.dateTo);
+  
+  datePickerConfig: Partial<BsDatepickerConfig> = {
+    minMode: 'month',
+    dateInputFormat: 'MM.yyyy',
+    containerClass: 'theme-default',
+    showWeekNumbers: false
+  };
 
   _council: CouncilPlainDto;
   allCouncils: CouncilPlainDto[];
   stats: CouncilStatsDto[];
   statsV2: CouncilStatsResponseDTO[];
-
-  @ViewChild("dateFromInput", { static: true }) dateFromInput: ElementRef;
-  @ViewChild("dateToInput", { static: true }) dateToInput: ElementRef;
 
   @ViewChild(ProjectListFromStatsComponent, { static: false }) public listProjectsFromStats: ProjectListFromStatsComponent;
 
@@ -58,12 +67,10 @@ export class CouncilStatsComponent implements OnInit {
         this.council = this.allCouncils[0];
       }
     });
-    this.dateFromInput.nativeElement.onchange = (e) => this.changeDateFrom(e.target.value);
-    this.dateToInput.nativeElement.onchange = (e) => this.changeDateTo(e.target.value);
   }
 
   update() {
-    let dateToExclusive = moment(this.dateTo).add(1, 'month').valueOf();
+    let dateToExclusive = getTime(addMonths(new Date(this.dateTo), 1));
     if (this.role == Role.BUREAU_CHAIRMAN) {
       this.statsService.getCouncilStatsForBureauChairman(this.dateFrom, dateToExclusive).subscribe(res => this.stats = res);
     } else if (this._council) {
@@ -75,16 +82,18 @@ export class CouncilStatsComponent implements OnInit {
     }
   }
 
-  changeDateTo(dateTo) {
-
-    this.dateTo = moment(dateTo, 'MMMM YYYY').valueOf();
-    this.update();
+  changeDateTo(date: Date) {
+    if (date) {
+      this.dateTo = getTime(startOfMonth(date));
+      this.update();
+    }
   }
 
-  changeDateFrom(dateFrom) {
-
-    this.dateFrom = moment(dateFrom, 'MMMM YYYY').valueOf();
-    this.update();
+  changeDateFrom(date: Date) {
+    if (date) {
+      this.dateFrom = getTime(startOfMonth(date));
+      this.update();
+    }
   }
 
   @Input() set council(council: CouncilPlainDto) {
@@ -93,12 +102,14 @@ export class CouncilStatsComponent implements OnInit {
   }
 
   showListProjectsFromStats(type, month) {
-    let monthValue = moment(month, 'MMMM YYYY').valueOf();
-    let startOfMonth = moment(monthValue).startOf('month').format('DD-MMMM-YYYY hh:mm');
-    let endOfMonth   = moment(monthValue).endOf('month').format('DD-MMMM-YYYY hh:mm');
+    let monthValue = getTime(new Date(month));
+    let startOfMonthDate = startOfMonth(new Date(monthValue));
+    let endOfMonthDate = endOfMonth(new Date(monthValue));
+    let startOfMonthStr = format(startOfMonthDate, 'dd-MMMM-yyyy HH:mm', {locale: ru});
+    let endOfMonthStr = format(endOfMonthDate, 'dd-MMMM-yyyy HH:mm', {locale: ru});
 
-    let startOfMonthValue = moment(startOfMonth, 'DD-MMMM-YYYY hh:mm').valueOf();
-    let endOfMonthValue = moment(endOfMonth, 'DD-MMMM-YYYY hh:mm').valueOf();
+    let startOfMonthValue = getTime(parse(startOfMonthStr, 'dd-MMMM-yyyy HH:mm', new Date(), {locale: ru}));
+    let endOfMonthValue = getTime(parse(endOfMonthStr, 'dd-MMMM-yyyy HH:mm', new Date(), {locale: ru}));
 
     this.listProjectsFromStats.show(type, this._council.id, startOfMonthValue, endOfMonthValue);
   }

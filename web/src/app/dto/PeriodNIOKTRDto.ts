@@ -1,4 +1,4 @@
-import * as moment from "moment";
+import {parse, getTime} from 'date-fns';
 
 export class PeriodNIOKTRDto {
 
@@ -11,8 +11,11 @@ export class PeriodNIOKTRDto {
     }
 
     parse(date: number | string): number {
+        if (date == null || date === undefined) {
+            return null;
+        }
         if (typeof date === 'string') {
-            return moment(date, 'YYYY-MM-DD HH:mm:ss').toDate().getTime();
+            return getTime(parse(date, 'yyyy-MM-dd HH:mm:ss', new Date()));
         }
         return date;
     }

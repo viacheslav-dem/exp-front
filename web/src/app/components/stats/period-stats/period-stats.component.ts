@@ -1,7 +1,8 @@
-import {Component, ElementRef, OnInit, ViewChild} from "@angular/core";
+import {Component, OnInit} from "@angular/core";
 import {StatsService} from "@app/services/stats.service";
 import {StatsDto} from "@app/dto/StatsDto";
-import * as moment from "moment";
+import {subYears, getTime, addMonths, startOfMonth} from 'date-fns';
+import {BsDatepickerConfig} from 'ngx-bootstrap/datepicker';
 
 @Component({
   selector: 'app-period-stats',
@@ -9,33 +10,43 @@ import * as moment from "moment";
 })
 export class PeriodStatsComponent implements OnInit {
 
-  dateFrom: number = moment().add(-1, 'year').valueOf();
-  dateTo: number = moment().valueOf();
+  dateFrom: number = getTime(subYears(new Date(), 1));
+  dateTo: number = getTime(new Date());
   stats: StatsDto[];
-  @ViewChild("dateFromInput", { static: true }) dateFromInput: ElementRef;
-  @ViewChild("dateToInput", { static: true }) dateToInput: ElementRef;
+  
+  dateFromValue: Date = new Date(this.dateFrom);
+  dateToValue: Date = new Date(this.dateTo);
+  
+  datePickerConfig: Partial<BsDatepickerConfig> = {
+    minMode: 'month',
+    dateInputFormat: 'MM.yyyy',
+    containerClass: 'theme-default',
+    showWeekNumbers: false
+  };
 
   constructor(private _statsService: StatsService) {
   }
 
   ngOnInit(): void {
-    this.dateFromInput.nativeElement.onchange = (e) => this.changeDateFrom(e.target.value);
-    this.dateToInput.nativeElement.onchange = (e) => this.changeDateTo(e.target.value);
     this.update();
   }
 
   update() {
-    let dateToExclusive = moment(this.dateTo).add(1, 'month').valueOf();
+    let dateToExclusive = getTime(addMonths(new Date(this.dateTo), 1));
     this._statsService.getStatsByMonths(this.dateFrom, dateToExclusive).subscribe(res => this.stats = res);
   }
 
-  changeDateTo(dateTo) {
-    this.dateTo = moment(dateTo, 'MMMM YYYY').valueOf();
-    this.update();
+  changeDateTo(date: Date) {
+    if (date) {
+      this.dateTo = getTime(startOfMonth(date));
+      this.update();
+    }
   }
 
-  changeDateFrom(dateFrom) {
-    this.dateFrom = moment(dateFrom, 'MMMM YYYY').valueOf();
-    this.update();
+  changeDateFrom(date: Date) {
+    if (date) {
+      this.dateFrom = getTime(startOfMonth(date));
+      this.update();
+    }
   }
 }

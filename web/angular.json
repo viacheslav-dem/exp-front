@@ -20,10 +20,6 @@
               "src/WEB-INF"
             ],
             "styles": [
-              "node_modules/ion-rangeslider/css/normalize.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.css",
-              "node_modules/ion-rangeslider/css/ion.rangeSlider.skinNice.css",
-              "node_modules/bootstrap-datepicker/dist/css/bootstrap-datepicker.standalone.css",
               "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
               "src/resources/css/style.scss"
@@ -35,14 +31,9 @@
               "node_modules/highcharts/modules/no-data-to-display.js",
               "node_modules/highcharts/highcharts-more.js",
               "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/moment/min/moment.min.js",
-              "node_modules/moment/locale/ru.js",
-              "node_modules/ion-rangeslider/js/ion.rangeSlider.min.js",
               "node_modules/popper.js/dist/umd/popper.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.min.js",
-              "src/resources/avest/avcmxwebp-1.1.5.js",
-              "node_modules/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js",
-              "node_modules/bootstrap-datepicker/dist/locales/bootstrap-datepicker.ru.min.js"
+              "src/resources/avest/avcmxwebp-1.1.5.js"
             ],
             "aot": false,
             "vendorChunk": true,
@@ -99,6 +90,7 @@
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/popper.js/dist/umd/popper.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
             "assets": [

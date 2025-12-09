@@ -44,7 +44,7 @@ export class MethRecPdfComponent {
     }
 
     cancel() {
-        this.canceled.next();
+        this.canceled.next(null);
     }
 
     documentUrl: SafeResourceUrl;

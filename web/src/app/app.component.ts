@@ -1,6 +1,5 @@
 import {Component} from "@angular/core";
 import {GlobalToastyService} from "./services/global-toasty.service";
-import * as moment from 'moment';
 import {CRYPTO} from "@app/config";
 import {FaIconLibrary} from '@fortawesome/angular-fontawesome';
 import {BsLocaleService} from 'ngx-bootstrap/datepicker';
@@ -50,7 +49,6 @@ export class AppComponent {
       private _localeService: BsLocaleService,
       private faIconLibrary: FaIconLibrary,
   ) {
-    moment.locale('ru');
     this._localeService.use('ru');
     this.faIconLibrary.addIcons(
       faInfo, faTrashAlt, faPencilAlt, faArrowDown, faEye, faEyeSlash, faCog, faTimes,

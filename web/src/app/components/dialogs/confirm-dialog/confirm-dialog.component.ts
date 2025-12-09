@@ -37,6 +37,6 @@ export class ConfirmDialogComponent {
   }
 
   cancel() {
-    this.canceled.next();
+    this.canceled.next(null);
   }
 }

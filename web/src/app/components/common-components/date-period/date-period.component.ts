@@ -1,7 +1,7 @@
 import {Component, EventEmitter, forwardRef, Input, Output, ViewChild} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
-import * as moment from "moment";
+import {addDays, getTime} from 'date-fns';
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
 import {BsDaterangepickerDirective} from 'ngx-bootstrap/datepicker';
 
@@ -65,9 +65,11 @@ export class DatePeriodComponent extends ControlComponent<DateRange> {
 
 
   prepareValue(): void {
-    if (this._value) {
+    if (this._value != null && this._value.start != null && this._value.end != null) {
       console.log("prepareValue");
       this.bsRangeValue = [this.getDate(this._value.start), this.getDate(this._value.end)];
+    } else {
+      this.bsRangeValue = [];
     }
   }
 
@@ -75,14 +77,16 @@ export class DatePeriodComponent extends ControlComponent<DateRange> {
   onChange(d: Date[]) {
     if (d != null && d.length > 1 && d[0] != null && d[1] != null) {
       this.value = new DateRange(d[0].getTime(), d[1].getTime());
-      let date: Date = new Date(this.value.start);
-      date.setHours(0, 0, 0, 0);
-      let result = new DateRange();
-      result.start = date.getTime();
-      date = new Date(this.value.end);
-      date.setHours(0, 0, 0, 0);
-      result.end = moment(date).add(1, 'days').valueOf();
-      this.onSelect.emit(result);
+      if (this.value.start != null && this.value.end != null) {
+        let date: Date = new Date(this.value.start);
+        date.setHours(0, 0, 0, 0);
+        let result = new DateRange();
+        result.start = date.getTime();
+        date = new Date(this.value.end);
+        date.setHours(0, 0, 0, 0);
+        result.end = getTime(addDays(date, 1));
+        this.onSelect.emit(result);
+      }
     }
   }
 

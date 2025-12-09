@@ -26,7 +26,7 @@ import {
 import {DataService} from "@app/services/data.service";
 //import { takeWhile } from 'rxjs/operators';
 import {PeriodDto} from "@app/dto/PeriodDto";
-import * as moment from "moment";
+import {getTime} from 'date-fns';
 import {AccountingPlainDto} from "@app/dto/AccountingPlainDto";
 import {TemplateType} from "@app/components/document-form/form-model/TemplateType";
 
@@ -40,7 +40,7 @@ export class ExpertReviewComponent implements OnInit {
     ExpertReviewState = ExpertReviewState;
     SERVER_URL = SERVER_URL;
     DocType = DocType;
-    period = new PeriodDto(moment().valueOf(), moment().valueOf());
+    period = new PeriodDto(getTime(new Date()), getTime(new Date()));
 
     expertReview: ExpertReviewDto = new ExpertReviewDto();
     transitionHistory: ExpertTransitionHistoryDto;

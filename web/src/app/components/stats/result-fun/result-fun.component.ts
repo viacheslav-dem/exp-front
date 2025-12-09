@@ -1,5 +1,5 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
-import * as moment from "moment";
+import {getTime, addYears} from 'date-fns';
 import {StatsService} from "@app/services/stats.service";
 import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO";
 import {EMPTY, Subscription, throwError} from "rxjs";
@@ -129,7 +129,7 @@ export class ResultFunComponent implements OnInit, OnDestroy {
 
   private getResFunMonth() {
     let date = new Date(this.year, this.months.indexOf(this.mouth), 1);
-    let dateToExclusive = moment(date).valueOf();
+    let dateToExclusive = getTime(date);
     this.subscription = this.statsService.getResFunMonth(dateToExclusive).subscribe(
         res => {
           this.councilStatsResponseDTOs = res;
@@ -153,8 +153,8 @@ export class ResultFunComponent implements OnInit, OnDestroy {
   private getResFunYear() {
     let date = new Date(this.year, 0, 1);
 
-    let dateFrom = moment(date).valueOf();
-    let dateTo = moment(date).add(1, 'year').valueOf();
+    let dateFrom = getTime(new Date(date));
+    let dateTo = getTime(addYears(new Date(date), 1));
     this.subscription = this.statsService.getResFunYear(dateFrom, dateTo).subscribe(
         res => {
           this.councilStatsResponseDTOs = res;

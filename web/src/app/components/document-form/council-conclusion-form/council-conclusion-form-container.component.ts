@@ -3,7 +3,7 @@ import {DocumentForm} from "@app/components/document-form/document-form";
 import {SearchPersonByRolesComponent} from "@app/components/search/search-person/search-person-by-role.component";
 import {Role} from "@app/pipes/role.pipe";
 import {PersonPlainDto} from "@app/dto/PersonPlainDto";
-import * as moment from "moment";
+import {getTime} from 'date-fns';
 import {PersonService} from "@app/services/person.service";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {LifecycleGroupDto} from "@app/dto/LifecycleGroupDto";
@@ -118,7 +118,7 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     this._form.chairman = this._form.chairman || this._group.bureauChairman;
     this._form.documents = this._form.documents || [];
     this.documents = this._form.documents.map(d => new Text(d));
-    this._form.innerExpertiseDate = this._form.innerExpertiseDate || moment().valueOf();
+    this._form.innerExpertiseDate = this._form.innerExpertiseDate || getTime(new Date());
     if (this.formComponent) {
       this.formComponent.setForm(this._form.projectProtocol);
     }

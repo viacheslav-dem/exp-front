@@ -4,7 +4,6 @@
     <content url="file://$MODULE_DIR$" dumb="true">
       <excludeFolder url="file://$MODULE_DIR$/bin/dist" />
       <excludeFolder url="file://$MODULE_DIR$/bin/tmp" />
-      <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
   </component>
   <component name="FacetManager">

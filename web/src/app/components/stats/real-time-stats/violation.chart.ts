@@ -8,7 +8,7 @@ import {Chart} from "app/components/highchart/highchart.builder";
 import {MonthYearPipe} from "app/pipes/mdate.pipe";
 import {blueClr, noViolationClr, redClr, yellowClr} from "@app/components/stats/colors";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
-import * as moment from "moment";
+import {subDays, getTime} from 'date-fns';
 
 @Component({
   selector: 'app-violation-chart',
@@ -60,7 +60,7 @@ export class ViolationChart implements OnInit {
           this.onClick.emit({
             filterName: 'нарушены сроки',
             filter: FilterBuilder.dateRange(this.filterKeyPrefix + 'stateEndDate',
-              null, moment().add(-1, 'days').valueOf())
+              null, getTime(subDays(new Date(), 1)))
           });
           return false;
         },
@@ -74,7 +74,7 @@ export class ViolationChart implements OnInit {
           this.onClick.emit({
             filterName: 'последний день срока',
             filter: FilterBuilder.dateRange(this.filterKeyPrefix + 'stateEndDate',
-              moment().add(-1, 'days').valueOf(), moment().valueOf())
+              getTime(subDays(new Date(), 1)), getTime(new Date()))
           });
           return false;
         },
@@ -88,8 +88,8 @@ export class ViolationChart implements OnInit {
           this.onClick.emit({
             filterName: 'прошла половина срока',
             filter: FilterBuilder.and('', [
-              FilterBuilder.dateRange(this.filterKeyPrefix + 'stateEndDate', moment().valueOf(), null),
-              FilterBuilder.dateRange(this.filterKeyPrefix + 'stateMiddleDate', null, moment().valueOf()),
+              FilterBuilder.dateRange(this.filterKeyPrefix + 'stateEndDate', getTime(new Date()), null),
+              FilterBuilder.dateRange(this.filterKeyPrefix + 'stateMiddleDate', null, getTime(new Date())),
             ])
           });
           return false;
@@ -103,7 +103,7 @@ export class ViolationChart implements OnInit {
         click: () => {
           this.onClick.emit({
             filterName: 'прошло менее половины срока',
-            filter: FilterBuilder.dateRange(this.filterKeyPrefix + 'stateMiddleDate', moment().valueOf(), null)
+            filter: FilterBuilder.dateRange(this.filterKeyPrefix + 'stateMiddleDate', getTime(new Date()), null)
           });
           return false;
         },

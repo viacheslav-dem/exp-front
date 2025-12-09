@@ -13,7 +13,7 @@ import {ExpertReviewState} from "@app/pipes/review-state.pipe";
 import {ProjectService} from "@app/services/project.service";
 import {Router} from "@angular/router";
 import {PersonFullNamePipe} from "@app/pipes/person-full-name.pipe";
-import * as moment from "moment";
+import {subDays, getTime} from 'date-fns';
 import {AcademicTitleTypePipe, getAllAcademicTitleTypes} from "@app/pipes/academic-title.pipe";
 import {Role} from "@app/pipes/role.pipe";
 import {AuthService} from "@app/services/auth.service";
@@ -116,7 +116,7 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> {
     this._projectService.filter = FilterBuilder.and('', [
       FilterBuilder.equals('expertReviews.expert', expert.id),
       FilterBuilder.equals('expertReviews.state', ExpertReviewState.ON_EXAMINATION),
-      FilterBuilder.dateRange('expertReviews.stateEndDate', null, moment().add(-1, 'days').valueOf())
+      FilterBuilder.dateRange('expertReviews.stateEndDate', null, getTime(subDays(new Date(), 1)))
     ]);
     this._router.navigateByUrl('projects-filtered').then();
   }

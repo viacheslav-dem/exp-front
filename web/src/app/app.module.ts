@@ -1,5 +1,6 @@
-import {ErrorHandler, NgModule} from "@angular/core";
-import {routing} from "./app.routing";
+import {ErrorHandler, NgModule, NO_ERRORS_SCHEMA} from "@angular/core";
+import {RouterModule} from "@angular/router";
+import {appRoutes} from "./app.routing";
 import {AppComponent} from "./app.component";
 import {HttpClientSecure} from "./services/http.client";
 import {GlobalToastyService} from "./services/global-toasty.service";
@@ -62,6 +63,7 @@ import {ReviewsViolationSparklineChart} from "@app/components/expert-list/review
 import {DataManagementModule} from "@app/components/data-management/data-management.module";
 import {SearchModule} from "@app/components/search/search.module";
 import {BrowserModule} from "@angular/platform-browser";
+import {CommonModule} from "@angular/common";
 import {SelectRoleComponent} from "@app/base/select-role/select-role.component";
 import {SettingsModule} from "@app/components/settings/settings.module";
 import {MeetingFormComponent} from "@app/components/meeting-form/meeting-form.component";
@@ -100,8 +102,8 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 @NgModule({
     imports: [
         BrowserModule,
+        RouterModule.forRoot(appRoutes),
         NgSelectModule,
-        routing,
         DialogModule.forRoot(),
         CommonComponentsModule,
         HttpClientModule,
@@ -115,6 +117,11 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
          BsDatepickerModule.forRoot(),
          TimepickerModule.forRoot(),
          BsDropdownModule.forRoot(),
+    ],
+    exports: [
+        RouterModule,
+        CommonComponentsModule,
+        DialogModule,
     ],
     declarations: [
         AppComponent,
@@ -172,6 +179,7 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
     bootstrap: [
         AppComponent
     ],
+    schemas: [NO_ERRORS_SCHEMA],
     providers: [
         {provide: LocationStrategy, useClass: HashLocationStrategy},
         {provide: ErrorHandler, useClass: CustomErrorHandler},

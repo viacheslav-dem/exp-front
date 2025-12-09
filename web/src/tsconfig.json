@@ -25,8 +25,9 @@
     "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
-    "strictInjectionParameters":true,
-    "trace":true
+    "enableIvy": true,
+    "strictInjectionParameters": true,
+    "trace": true
   },
   "exclude": [
     "../node_modules",
