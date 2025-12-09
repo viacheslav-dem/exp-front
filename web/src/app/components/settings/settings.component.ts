@@ -56,7 +56,6 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> {
     }
     this.selectedProperty = property;
     // show tooltips
-    setTimeout(() => $('.propertyType[data-toggle="tooltip"]')['tooltip'](), 500);
     this.updatePropertyComponent();
   }
 

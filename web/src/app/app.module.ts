@@ -95,6 +95,7 @@ defineLocale('ru', ruLocale);
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
 @NgModule({
     imports: [
@@ -110,6 +111,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
         DataManagementModule,
         SettingsModule,
        FontAwesomeModule,
+        TooltipModule.forRoot(),
          BsDatepickerModule.forRoot(),
          TimepickerModule.forRoot(),
          BsDropdownModule.forRoot(),

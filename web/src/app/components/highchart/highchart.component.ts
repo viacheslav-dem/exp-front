@@ -107,12 +107,18 @@ export class HighchartComponent {
   }
 
   showExportButton() {
-    $(this.el.nativeElement).find('.highcharts-contextbutton').removeAttr('hidden');
+    const button: HTMLElement | null = this.el.nativeElement.querySelector('.highcharts-contextbutton');
+    if (button) {
+      button.removeAttribute('hidden');
+    }
   }
 
   hideExportButton() {
     if (!this.hover) {
-      $(this.el.nativeElement).find('.highcharts-contextbutton').attr('hidden', "true");
+      const button: HTMLElement | null = this.el.nativeElement.querySelector('.highcharts-contextbutton');
+      if (button) {
+        button.setAttribute('hidden', 'true');
+      }
     }
   }
 

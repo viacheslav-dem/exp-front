@@ -3,19 +3,48 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <modelVersion>4.0.0</modelVersion>
+
     <groupId>by.i4t.examination</groupId>
     <artifactId>examination-web</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <modelVersion>4.0.0</modelVersion>
     <packaging>war</packaging>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- формат даты для имени файла -->
+        <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
     </properties>
 
     <build>
-        <finalName>exam</finalName>
+        <!-- имя выходного файла: front-2025-12-09.war -->
+        <finalName>front-${maven.build.timestamp}</finalName>
+
         <outputDirectory>${basedir}/target</outputDirectory>
+
         <plugins>
+            <!-- Генерация свойства maven.build.timestamp по текущей дате -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>maven.build.timestamp</name>
+                            <!-- формат берётся из maven.build.timestamp.format -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- очистка dist перед сборкой Angular -->
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>3.0.0</version>
@@ -37,6 +66,7 @@
                     </filesets>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -58,17 +88,19 @@
                         <argument>--aot</argument>
                     </arguments>
                 </configuration>
-
             </plugin>
+
+            <!-- упаковываем dist в WAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
+                <version>3.0.0</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <webappDirectory>dist</webappDirectory>
                 </configuration>
-                <version>3.0.0</version>
             </plugin>
+
         </plugins>
     </build>
 </project>

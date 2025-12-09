@@ -35,8 +35,6 @@ export class FilterComponent implements OnInit {
       return;
     }
     this._fields = fields;
-    // show tooltips
-    setTimeout(() => $('.filter [data-toggle="tooltip"]')['tooltip'](), 500);
     this._fields.forEach(field => {
       if ((field.type == SearchFieldType.MULTI_SELECT) && field.catalog != null)
         this.dataService.getCatalog(field.catalog).subscribe(items => (<MultiSelectField>field).setItems(items));

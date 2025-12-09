@@ -14,7 +14,7 @@
           шаблон
           <span *ngIf="template.disabled">(неактивный)</span>
           <span class="italic text-sm text-muted float-right templateType"
-                data-toggle="tooltip" data-placement="bottom" title="Строковый идентификатор">
+                tooltip="Строковый идентификатор" placement="bottom">
             {{template.templateType | orElse: 'не указан'}}
           </span>
         </div>
