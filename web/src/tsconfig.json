@@ -17,18 +17,24 @@
     "moduleResolution": "node",
     "outDir": "../dist/out-tsc",
     "sourceMap": true,
-    "target": "ES2020",
+    "target": "ES2022",
     "typeRoots": [
       "../node_modules/@types"
     ],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
     "strictInjectionParameters":true,
     "trace":true
   },
   "exclude": [
-    "../node_modules"
+    "../node_modules",
+    "test.ts",
+    "**/*.spec.ts",
+    "app/components/search/search-person/search-person-autocomplete/AutoCompleteDataSource.ts",
+    "app/dto/UserPostDto.ts",
+    "app/color/colors.ts"
   ],
   "types": []
 }
