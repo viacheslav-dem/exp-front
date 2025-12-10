@@ -31,7 +31,7 @@ import {MenuComponent} from "./components/menu/menu.component";
 import {CommonComponentsModule} from "./components/common-components/components.module";
 import {AuditComponent} from "./components/audit/audit.component";
 import {AuditService} from "./services/audit.service";
-import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import {CryptoModule} from "@app/crypto/crypto.module";
 import {DocumentFormModule} from "@app/components/document-form/document-form.module";
 import {BasicProjectInfoComponent} from "@app/components/basic-project-info/basic-project-info.component";
@@ -105,26 +105,7 @@ import { LOCALE_ID } from '@angular/core';
 // Регистрация русской локали для Angular
 registerLocaleData(localeRu, 'ru', localeRuExtra);
 
-@NgModule({
-    imports: [
-        BrowserModule,
-        RouterModule.forRoot(appRoutes),
-        NgSelectModule,
-        DialogModule.forRoot(),
-        CommonComponentsModule,
-        HttpClientModule,
-        CryptoModule,
-        DocumentFormModule,
-        SearchModule,
-        DataManagementModule,
-        SettingsModule,
-       FontAwesomeModule,
-        TooltipModule.forRoot(),
-         BsDatepickerModule.forRoot(),
-         TimepickerModule.forRoot(),
-         BsDropdownModule.forRoot(),
-    ],
-    exports: [
+@NgModule({ exports: [
         RouterModule,
         CommonComponentsModule,
         DialogModule,
@@ -185,14 +166,27 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
     bootstrap: [
         AppComponent
     ],
-    schemas: [NO_ERRORS_SCHEMA],
-    providers: [
-        {provide: LocationStrategy, useClass: HashLocationStrategy},
-        {provide: ErrorHandler, useClass: CustomErrorHandler},
-        {provide: LOCALE_ID, useValue: 'ru'},
-        {provide: HTTP_INTERCEPTORS, useClass: AuthErrorInterceptor, multi: true},
-        {provide: HTTP_INTERCEPTORS, useClass: LoggingInterceptor, multi: true},
-        {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
+    schemas: [NO_ERRORS_SCHEMA], imports: [BrowserModule,
+        RouterModule.forRoot(appRoutes),
+        NgSelectModule,
+        DialogModule.forRoot(),
+        CommonComponentsModule,
+        CryptoModule,
+        DocumentFormModule,
+        SearchModule,
+        DataManagementModule,
+        SettingsModule,
+        FontAwesomeModule,
+        TooltipModule.forRoot(),
+        BsDatepickerModule.forRoot(),
+        TimepickerModule.forRoot(),
+        BsDropdownModule.forRoot()], providers: [
+        { provide: LocationStrategy, useClass: HashLocationStrategy },
+        { provide: ErrorHandler, useClass: CustomErrorHandler },
+        { provide: LOCALE_ID, useValue: 'ru' },
+        { provide: HTTP_INTERCEPTORS, useClass: AuthErrorInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: LoggingInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
         StorageService,
         HttpClientSecure,
         AuthService,
@@ -214,9 +208,9 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         MeetingService,
         AgendaService,
         ChartService,
-        SystemNotificationService
-    ]
-})
+        SystemNotificationService,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule {
 
 }

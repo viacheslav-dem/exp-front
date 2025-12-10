@@ -1,6 +1,6 @@
 import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {ModalDirective} from "ngx-bootstrap/modal";
-import {getTime, setHours, setMinutes, getHours, getMinutes} from 'date-fns';
+import * as dayjs from 'dayjs';
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {PeriodDto} from "@app/dto/PeriodDto";
 import {MeetingPostDto} from "@app/dto/MeetingPostDto";
@@ -16,7 +16,7 @@ import {isEmptyOrNull} from "@app/support/utils";
 })
 export class MeetingFormComponent {
 
-  period = new PeriodDto(getTime(new Date()), getTime(new Date()));
+  period = new PeriodDto(dayjs().valueOf(), dayjs().valueOf());
   projects: ProjectPlainDto[] = [];
   id: number;
   place: string;
@@ -34,8 +34,8 @@ export class MeetingFormComponent {
   }
 
   save() {
-    let endDate = new Date(this.period.end);
-    this.period.end = getTime(setMinutes(setHours(new Date(this.period.start), getHours(endDate)), getMinutes(endDate)));
+    let endDate = dayjs(this.period.end);
+    this.period.end = dayjs(this.period.start).hour(endDate.hour()).minute(endDate.minute()).valueOf();
     this.validateProject();
     this.validateData();
     let meeting = new MeetingPostDto(this.period, this.place, this.projects.filter(project => project.isChecked));
@@ -48,8 +48,8 @@ export class MeetingFormComponent {
   }
 
   edit() {
-    let endDate = new Date(this.period.end);
-    this.period.end = getTime(setMinutes(setHours(new Date(this.period.start), getHours(endDate)), getMinutes(endDate)));
+    let endDate = dayjs(this.period.end);
+    this.period.end = dayjs(this.period.start).hour(endDate.hour()).minute(endDate.minute()).valueOf();
     this.validateProject();
     this.validateData();
     let meeting = new MeetingPostDto(this.period, this.place, this.projects.filter(project => project.isChecked), this.id);
@@ -97,7 +97,7 @@ export class MeetingFormComponent {
 
     }
     else {
-      this.period = new PeriodDto(getTime(new Date()), getTime(new Date()));
+      this.period = new PeriodDto(dayjs().valueOf(), dayjs().valueOf());
       this.place = null;
       this.isEdit = false;
       this.loadProjectsForMeeting();

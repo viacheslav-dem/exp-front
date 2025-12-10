@@ -1,7 +1,8 @@
-import {Component, Injectable, Input, OnInit, ViewChild} from "@angular/core";
+import {Component, Injectable, Input, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/core";
 import {StatsService} from "@app/services/stats.service";
-import {subYears, getTime, addMonths, startOfMonth, endOfMonth, format, parse} from 'date-fns';
-import {ru} from 'date-fns/locale';
+import * as dayjs from 'dayjs';
+import 'dayjs/locale/ru';
+const customParseFormat = require('dayjs/plugin/customParseFormat');
 import {BsDatepickerConfig} from 'ngx-bootstrap/datepicker';
 import {CouncilStatsDto} from "@app/dto/CouncilStatsDto";
 import {CouncilPlainDto} from "@app/dto/CouncilPlainDto";
@@ -22,20 +23,23 @@ import {FormControl} from "@angular/forms";
   templateUrl: './council-stats.component.html',
 })
 @Injectable({ providedIn: 'root' })
-export class CouncilStatsComponent implements OnInit {
+export class CouncilStatsComponent implements OnInit, AfterViewInit {
 
   Role = Role;
   role: Role;
 
-  dateFrom: number = getTime(subYears(new Date(), 1));
-  dateTo: number = getTime(new Date());
+  dateFrom: number = dayjs().subtract(1, 'year').valueOf();
+  dateTo: number = dayjs().valueOf();
 
   dateFromValue: Date = new Date(this.dateFrom);
   dateToValue: Date = new Date(this.dateTo);
   
+  @ViewChild('dateFromInput', { static: false }) dateFromInput: ElementRef<HTMLInputElement>;
+  @ViewChild('dateToInput', { static: false }) dateToInput: ElementRef<HTMLInputElement>;
+  
   datePickerConfig: Partial<BsDatepickerConfig> = {
     minMode: 'month',
-    dateInputFormat: 'MM.yyyy',
+    dateInputFormat: 'MM.yyyy', // для ngx-bootstrap (date-fns формат)
     containerClass: 'theme-default',
     showWeekNumbers: false
   };
@@ -55,6 +59,7 @@ export class CouncilStatsComponent implements OnInit {
               private dialogService: DialogService,
               private toasty: GlobalToastyService,
               private councilPipe: CouncilPipe) {
+    dayjs.extend(customParseFormat);
     this.councilToString = council => councilPipe.transform(council);
   }
 
@@ -69,8 +74,30 @@ export class CouncilStatsComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit(): void {
+    // Обновляем отображение после инициализации
+    requestAnimationFrame(() => {
+      this.updateInputDisplay();
+    });
+  }
+
+  private updateInputDisplay(): void {
+    if (this.dateFromInput?.nativeElement && this.dateFromValue) {
+      const formatted = dayjs(this.dateFromValue).locale('ru').format('MM.YYYY');
+      if (this.dateFromInput.nativeElement.value !== formatted) {
+        this.dateFromInput.nativeElement.value = formatted;
+      }
+    }
+    if (this.dateToInput?.nativeElement && this.dateToValue) {
+      const formatted = dayjs(this.dateToValue).locale('ru').format('MM.YYYY');
+      if (this.dateToInput.nativeElement.value !== formatted) {
+        this.dateToInput.nativeElement.value = formatted;
+      }
+    }
+  }
+
   update() {
-    let dateToExclusive = getTime(addMonths(new Date(this.dateTo), 1));
+    let dateToExclusive = dayjs(this.dateTo).add(1, 'month').valueOf();
     if (this.role == Role.BUREAU_CHAIRMAN) {
       this.statsService.getCouncilStatsForBureauChairman(this.dateFrom, dateToExclusive).subscribe(res => this.stats = res);
     } else if (this._council) {
@@ -84,15 +111,31 @@ export class CouncilStatsComponent implements OnInit {
 
   changeDateTo(date: Date) {
     if (date) {
-      this.dateTo = getTime(startOfMonth(date));
+      this.dateTo = dayjs(date).startOf('month').valueOf();
+      this.dateToValue = new Date(this.dateTo);
       this.update();
+      // Обновляем отображение после изменения даты
+      requestAnimationFrame(() => {
+        if (this.dateToInput?.nativeElement) {
+          const formatted = dayjs(date).locale('ru').format('MM.YYYY');
+          this.dateToInput.nativeElement.value = formatted;
+        }
+      });
     }
   }
 
   changeDateFrom(date: Date) {
     if (date) {
-      this.dateFrom = getTime(startOfMonth(date));
+      this.dateFrom = dayjs(date).startOf('month').valueOf();
+      this.dateFromValue = new Date(this.dateFrom);
       this.update();
+      // Обновляем отображение после изменения даты
+      requestAnimationFrame(() => {
+        if (this.dateFromInput?.nativeElement) {
+          const formatted = dayjs(date).locale('ru').format('MM.YYYY');
+          this.dateFromInput.nativeElement.value = formatted;
+        }
+      });
     }
   }
 
@@ -102,14 +145,14 @@ export class CouncilStatsComponent implements OnInit {
   }
 
   showListProjectsFromStats(type, month) {
-    let monthValue = getTime(new Date(month));
-    let startOfMonthDate = startOfMonth(new Date(monthValue));
-    let endOfMonthDate = endOfMonth(new Date(monthValue));
-    let startOfMonthStr = format(startOfMonthDate, 'dd-MMMM-yyyy HH:mm', {locale: ru});
-    let endOfMonthStr = format(endOfMonthDate, 'dd-MMMM-yyyy HH:mm', {locale: ru});
+    let monthValue = dayjs(month).valueOf();
+    let startOfMonthDate = dayjs(monthValue).startOf('month');
+    let endOfMonthDate = dayjs(monthValue).endOf('month');
+    let startOfMonthStr = startOfMonthDate.locale('ru').format('DD-MMMM-YYYY HH:mm');
+    let endOfMonthStr = endOfMonthDate.locale('ru').format('DD-MMMM-YYYY HH:mm');
 
-    let startOfMonthValue = getTime(parse(startOfMonthStr, 'dd-MMMM-yyyy HH:mm', new Date(), {locale: ru}));
-    let endOfMonthValue = getTime(parse(endOfMonthStr, 'dd-MMMM-yyyy HH:mm', new Date(), {locale: ru}));
+    let startOfMonthValue = dayjs(startOfMonthStr, 'DD-MMMM-YYYY HH:mm', 'ru').valueOf();
+    let endOfMonthValue = dayjs(endOfMonthStr, 'DD-MMMM-YYYY HH:mm', 'ru').valueOf();
 
     this.listProjectsFromStats.show(type, this._council.id, startOfMonthValue, endOfMonthValue);
   }

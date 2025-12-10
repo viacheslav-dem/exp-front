@@ -1,6 +1,6 @@
-import {getTime} from 'date-fns';
+import * as dayjs from 'dayjs';
 
 export class FormContent {
-  date: number = getTime(new Date());
+  date: number = dayjs().valueOf();
   isDefault: boolean = true;
 }

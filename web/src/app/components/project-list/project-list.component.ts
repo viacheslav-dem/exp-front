@@ -7,7 +7,7 @@ import {Catalog, DataService} from "@app/services/data.service";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
 import {ProjectState} from "@app/pipes/project-state.pipe";
-import {getTime} from 'date-fns';
+import * as dayjs from 'dayjs';
 import {Operation} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import {ProjectLiDto} from "@app/dto/ProjectLiDto";
 import {ProjectService} from "@app/services/project.service";
@@ -88,7 +88,7 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
             SearchField.datePeriod('registerDate').setTitle('Дата регистрации в ГКНТ')
                 .setPlaceholder('Выбрать период...')
                 .setSortable(true).setSortDirection(Direction.DESC),
-            SearchField.checkbox(this.getStateField(), 'С подходящим или нарушенным сроком', new DateRange(null, getTime(new Date())), null)
+            SearchField.checkbox(this.getStateField(), 'С подходящим или нарушенным сроком', new DateRange(null, dayjs().valueOf()), null)
                 .setOperation(Operation.RANGE),
             SearchField.multiSelect('code', Catalog.PROJECT_CODE, (code) => code.code)
                 .setSearchFilterEnabled(true).setSelectText('Выбрать код')

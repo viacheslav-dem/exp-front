@@ -10,8 +10,8 @@ import {SearchField} from "@app/components/common-components/page-and-filter/mod
 import {ProjectService} from "@app/services/project.service";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {Router} from "@angular/router";
-import {startOfMonth, format} from 'date-fns';
-import {ru} from 'date-fns/locale';
+import * as dayjs from 'dayjs';
+import 'dayjs/locale/ru';
 
 
 @Component({
@@ -62,7 +62,7 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
 
                 this.setLoading(false);
             }, () => this.setLoading(false));
-            this.period = format(startOfMonth(new Date(this.startOfMonth)), 'MMMM yyyy', {locale: ru});
+            this.period = dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY');
             this.searchProjectModal.show();
         }
     }
@@ -78,7 +78,7 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
 
                 this.setLoading(false);
             }, () => this.setLoading(false));
-            this.period = format(startOfMonth(new Date(this.startOfMonth)), 'MMMM yyyy', {locale: ru});
+            this.period = dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY');
             this.searchProjectModal.show();
         }
     }

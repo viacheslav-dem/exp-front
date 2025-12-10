@@ -1,13 +1,6 @@
 import {OnInit, Directive} from "@angular/core";
 import {AuthService} from "@app/services/auth.service";
-import {
-  HttpClient,
-  HttpEvent,
-  HttpEventType,
-  HttpHeaders,
-  HttpRequest,
-  HttpBackend
-} from "@angular/common/http";
+import { HttpClient, HttpEvent, HttpEventType, HttpHeaders, HttpRequest, HttpBackend } from "@angular/common/http";
 
 @Directive()
 export abstract class UploadHelper implements OnInit {

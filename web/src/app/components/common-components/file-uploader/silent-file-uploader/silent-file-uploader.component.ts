@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
 import {AuthService} from "app/services/auth.service";
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {UploadHelper} from "app/components/common-components/file-uploader/upload-helper";
-import {HttpBackend} from "@angular/common/http";
+import { HttpBackend } from "@angular/common/http";
 
 @Component({
   selector: 'app-silent-file-uploader',

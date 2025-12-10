@@ -1,4 +1,7 @@
-import {parse, getTime} from 'date-fns';
+import * as dayjs from 'dayjs';
+const customParseFormat = require('dayjs/plugin/customParseFormat');
+
+dayjs.extend(customParseFormat);
 
 export class PeriodDto {
 
@@ -15,7 +18,7 @@ export class PeriodDto {
             return null;
         }
         if (typeof date === 'string') {
-            return getTime(parse(date, 'yyyy-MM-dd HH:mm:ss', new Date()));
+            return dayjs(date, 'YYYY-MM-DD HH:mm:ss').valueOf();
         }
         return date;
     }

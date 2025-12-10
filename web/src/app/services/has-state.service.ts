@@ -1,5 +1,5 @@
-import {isAfter, addDays, format, getTime} from 'date-fns';
-import {ru} from 'date-fns/locale';
+import * as dayjs from 'dayjs';
+import 'dayjs/locale/ru';
 import {HasState, ViewState} from "@app/dto/HasState";
 import {Role} from "@app/pipes/role.pipe";
 import {AuthService} from "@app/services/auth.service";
@@ -18,15 +18,15 @@ export class HasStateService {
     if (viewState == null) {
       viewState = new ViewState(entity);
     }
-    if (viewState.stateEndDate && isAfter(current, addDays(new Date(viewState.stateEndDate), 1))) {
+    if (viewState.stateEndDate && dayjs(current).isAfter(dayjs(viewState.stateEndDate).add(1, 'day'))) {
       entity.red = true;
-    } else if (viewState.stateEndDate && isAfter(current, new Date(viewState.stateEndDate))) {
+    } else if (viewState.stateEndDate && dayjs(current).isAfter(dayjs(viewState.stateEndDate))) {
       entity.yellow = true;
-    } else if (viewState.stateMiddleDate && isAfter(current, new Date(viewState.stateMiddleDate))) {
+    } else if (viewState.stateMiddleDate && dayjs(current).isAfter(dayjs(viewState.stateMiddleDate))) {
       entity.blue = true;
     }
     if (viewState.stateEndDate && termsMessages[viewState.state]) {
-      entity.termsMessage = termsMessages[viewState.state] + ' по ' + format(new Date(viewState.stateEndDate), "dd.MM.yyyy", {locale: ru});
+      entity.termsMessage = termsMessages[viewState.state] + ' по ' + dayjs(viewState.stateEndDate).locale('ru').format("DD.MM.YYYY");
     }
   }
 }

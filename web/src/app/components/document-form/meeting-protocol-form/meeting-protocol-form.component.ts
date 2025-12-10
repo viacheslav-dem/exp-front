@@ -8,7 +8,7 @@ import {MeetingService} from "@app/services/meeting.service";
 import {AgendaFormResolver} from "@app/components/document-form/meeting-protocol-form/agenda-form-resolver.service";
 import {compareByField, isEmptyOrNull, sortPersonsByName} from "@app/support/utils";
 import {PersonService} from "@app/services/person.service";
-import {setHours, setMinutes, getHours, getMinutes, getTime, isAfter} from 'date-fns';
+import * as dayjs from 'dayjs';
 import {RemarksContainerDto} from "@app/dto/RemarksContainerDto";
 import {MeetingProtocolNewFormContent} from "@app/components/document-form/meeting-protocol-form/MeetingProtocolNewFormContent";
 import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form/agenda-new-form.service";
@@ -121,9 +121,9 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
 
   validate() {
     super.validate();
-    let endDate = new Date(this._form.endDate);
-    let meetingEndWithTime = setMinutes(setHours(new Date(this._meeting.period.end), getHours(endDate)), getMinutes(endDate));
-    if (getTime(meetingEndWithTime) <= this._meeting.period.start) {
+    let endDate = dayjs(this._form.endDate);
+    let meetingEndWithTime = dayjs(this._meeting.period.end).hour(endDate.hour()).minute(endDate.minute());
+    if (meetingEndWithTime.valueOf() <= this._meeting.period.start) {
       throw 'Время окончания должно следовать за временем начала заседания.';
     }
     if (this._form.prepareTimeBySecretary<0){
@@ -141,8 +141,8 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
     form.projectsById = {};
     this._meeting.agendas.map(agenda => agenda.project.id).forEach(projectId =>
       form.projectsById[projectId] = this.agendaComponents[projectId].getForm());
-    let endDate = new Date(form.endDate);
-    form.endDate = getTime(setMinutes(setHours(new Date(this._meeting.period.end), getHours(endDate)), getMinutes(endDate)));
+    let endDate = dayjs(form.endDate);
+    form.endDate = dayjs(this._meeting.period.end).hour(endDate.hour()).minute(endDate.minute()).valueOf();
     return form;
   }
 

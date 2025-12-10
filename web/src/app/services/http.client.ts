@@ -4,7 +4,7 @@ import {catchError, tap} from 'rxjs/operators';
 import {Injectable} from "@angular/core";
 import {StorageService} from "./storage.service";
 import {ProgressService} from "../components/common-components/progress/progress.service";
-import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from "@angular/common/http";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 
 type HttpRequestOptions = {

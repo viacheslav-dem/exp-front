@@ -22,7 +22,10 @@ import {
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {Operation} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
-import {subDays, getTime, parse} from 'date-fns';
+import * as dayjs from 'dayjs';
+const customParseFormat = require('dayjs/plugin/customParseFormat');
+
+dayjs.extend(customParseFormat);
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
 import {Router} from "@angular/router";
 import {DialogService} from "@app/components/dialogs/dialog.service";
@@ -48,8 +51,8 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
   AccountingState = AccountingState;
   SortClass = SortClass;
 
-  dateFrom: number = getTime(subDays(new Date(), 1));
-  dateTo: number = getTime(subDays(new Date(), 1));
+  dateFrom: number = dayjs().subtract(1, 'day').valueOf();
+  dateTo: number = dayjs().subtract(1, 'day').valueOf();
 
 
   sortOrder: SortOrder = new SortOrder('id', Direction.DESC);
@@ -92,7 +95,7 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
           .setSingleSelection(true).setSelectText('Выбрать тип расчёта'),
         SearchField.multiSelect('state', getAllAccountingStates(), value => this._accountingStatePipe.transform(value))
           .setSelectText('Выбрать состояние').setCheckAllEnabled(true),
-        SearchField.checkbox('stateEndDate', 'С подходящим или нарушенным сроком', new DateRange(null, getTime(new Date())), null)
+        SearchField.checkbox('stateEndDate', 'С подходящим или нарушенным сроком', new DateRange(null, dayjs().valueOf()), null)
           .setOperation(Operation.RANGE),
       ];
       this.enableFilterCache("accounting");

@@ -12,7 +12,7 @@
     ></app-dropdown>
   </div>
   <div class="input-group input-group-sm">
-    <input type="text" class="form-control" title="Начальная дата"
+    <input #dateFromInput type="text" class="form-control" title="Начальная дата"
            [(ngModel)]="dateFromValue"
            [bsConfig]="datePickerConfig"
            bsDatepicker
@@ -20,7 +20,7 @@
     <div class="input-group-append input-group-prepend">
       <div class="input-group-text">-</div>
     </div>
-    <input type="text" class="form-control" title="Конечная дата"
+    <input #dateToInput type="text" class="form-control" title="Конечная дата"
            [(ngModel)]="dateToValue"
            [bsConfig]="datePickerConfig"
            bsDatepicker

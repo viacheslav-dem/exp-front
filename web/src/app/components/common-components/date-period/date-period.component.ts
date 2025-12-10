@@ -1,7 +1,8 @@
-import {Component, EventEmitter, forwardRef, Input, OnChanges, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, forwardRef, Input, OnChanges, Output, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
-import {addDays, getTime} from 'date-fns';
+import * as dayjs from 'dayjs';
+import 'dayjs/locale/ru';
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
 import {BsDaterangepickerDirective} from 'ngx-bootstrap/datepicker';
 
@@ -14,9 +15,11 @@ export const PERIOD_FILTER_CONTROL_VALUE_ACCESSOR: any = {
 @Component({
   selector: 'app-date-period',
   template: `
-    <input style="padding: 0; margin: 0; border:0; width: 100%"
+    <input #dateInput
+           style="padding: 0; margin: 0; border:0; width: 100%"
            bsDaterangepicker
            [(ngModel)]="bsRangeValue"
+           (ngModelChange)="onModelChange($event)"
            (bsValueChange)="onChange($event)"
            [bsConfig]="bsConfig"
            [placeholder]="placeholder"
@@ -27,12 +30,13 @@ export const PERIOD_FILTER_CONTROL_VALUE_ACCESSOR: any = {
   `,
   providers: [PERIOD_FILTER_CONTROL_VALUE_ACCESSOR]
 })
-export class DatePeriodComponent extends ControlComponent<DateRange> implements OnChanges {
+export class DatePeriodComponent extends ControlComponent<DateRange> implements OnChanges, AfterViewInit {
 
   @ViewChild(BsDaterangepickerDirective, { static: false }) datepicker: BsDaterangepickerDirective;
+  @ViewChild('dateInput', { static: false }) dateInput: ElementRef<HTMLInputElement>;
 
   @Input()
-  dateFormat: string = 'dd.MM.yyyy';
+  dateFormat: string = 'DD.MM.YYYY';
   bsRangeValue: any[] = [];
   @Input()
   label: string;
@@ -43,56 +47,59 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
   constructor() {
     super();
     this.updateBsConfig();
-    // this.debug = true;
   }
 
   ngOnChanges() {
     this.updateBsConfig();
   }
 
+  ngAfterViewInit() {
+    // Метод для будущих расширений
+  }
+
   private updateBsConfig() {
-    const format = this.dateFormat || 'dd.MM.yyyy';
+    // ngx-bootstrap использует date-fns внутри, поэтому конвертируем формат dayjs (Moment.js) в date-fns
+    const dateFnsFormat = this.convertMomentFormatToDateFns(this.dateFormat || 'DD.MM.YYYY');
     this.bsConfig = {
-      rangeInputFormat: format,
-      dateInputFormat: format,
+      rangeInputFormat: dateFnsFormat,
+      dateInputFormat: dateFnsFormat,
       containerClass: 'theme-default',
       showWeekNumbers: false
     };
   }
 
-  // Workaround for positioning bug on re-open
-  ngAfterViewInit() {
-    if (this.datepicker) {
-      const originalShow = this.datepicker.show.bind(this.datepicker);
-      this.datepicker.show = () => {
-        // Force hide first to reset state
-        this.datepicker.hide();
-        // Then show with small delay to allow positioning recalculation
-        setTimeout(() => originalShow(), 10);
-      };
-      
-      // Принудительно обновляем конфигурацию после инициализации
-      // Это может помочь исправить проблему с форматом в ngx-bootstrap 12.0.0
-      setTimeout(() => {
-        if (this.datepicker && this.datepicker._config) {
-          this.datepicker._config.rangeInputFormat = this.dateFormat || 'dd.MM.yyyy';
-          this.datepicker._config.dateInputFormat = this.dateFormat || 'dd.MM.yyyy';
-        }
-      }, 0);
-    }
+  /**
+   * Конвертирует формат dayjs/Moment.js (DD.MM.YYYY) в формат date-fns (dd.MM.yyyy)
+   * для совместимости с ngx-bootstrap (который использует date-fns внутри)
+   */
+  private convertMomentFormatToDateFns(momentFormat: string): string {
+    return momentFormat
+      .replace(/DD/g, 'dd')
+      .replace(/YYYY/g, 'yyyy')
+      .replace(/MM/g, 'MM')
+      .replace(/D/g, 'd')
+      .replace(/Y/g, 'y');
   }
-
 
   prepareValue(): void {
     if (this._value != null && this._value.start != null && this._value.end != null) {
-      console.log("prepareValue");
       this.bsRangeValue = [this.getDate(this._value.start), this.getDate(this._value.end)];
     } else {
       this.bsRangeValue = [];
     }
   }
 
-  //we need to normalize dates before emit
+  onModelChange(value: any[]) {
+    // Workaround: ngx-bootstrap имеет баг с форматированием года в daterangepicker
+    // Обновляем отображение после того, как ngx-bootstrap обновит значение
+    if (value && value.length === 2 && value[0] && value[1] && this.dateInput?.nativeElement) {
+      // Используем requestAnimationFrame для обновления в следующем кадре рендеринга
+      requestAnimationFrame(() => {
+        this.updateDisplayValue(value[0], value[1]);
+      });
+    }
+  }
+
   onChange(d: Date[]) {
     if (d != null && d.length > 1 && d[0] != null && d[1] != null) {
       this.value = new DateRange(d[0].getTime(), d[1].getTime());
@@ -103,8 +110,33 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
         result.start = date.getTime();
         date = new Date(this.value.end);
         date.setHours(0, 0, 0, 0);
-        result.end = getTime(addDays(date, 1));
+        result.end = dayjs(date).add(1, 'day').valueOf();
         this.onSelect.emit(result);
+        
+        // Workaround: обновляем отображение после выбора даты
+        // Двойной requestAnimationFrame гарантирует обновление после ngx-bootstrap
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            this.updateDisplayValue(d[0], d[1]);
+          });
+        });
+      }
+    }
+  }
+
+  /**
+   * Обновляет отображаемое значение в input поле
+   * Использует dayjs для форматирования с поддержкой формата Moment.js (DD.MM.YYYY)
+   */
+  private updateDisplayValue(fromDate: Date, toDate: Date): void {
+    if (this.dateInput?.nativeElement) {
+      const fromFormatted = dayjs(fromDate).locale('ru').format(this.dateFormat);
+      const toFormatted = dayjs(toDate).locale('ru').format(this.dateFormat);
+      const formattedValue = `${fromFormatted} - ${toFormatted}`;
+      
+      // Обновляем только если значение отличается (избегаем лишних обновлений)
+      if (this.dateInput.nativeElement.value !== formattedValue) {
+        this.dateInput.nativeElement.value = formattedValue;
       }
     }
   }

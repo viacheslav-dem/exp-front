@@ -5,7 +5,7 @@ import {ModalComponent} from "app/components/common-components/modal/modal.compo
 import {UploadHelper} from "app/components/common-components/file-uploader/upload-helper";
 import {removeFileSuffix} from "app/support/utils";
 import {IdDto} from "@app/dto/IdDto";
-import {HttpBackend} from "@angular/common/http";
+import { HttpBackend } from "@angular/common/http";
 
 @Component({
   selector: 'app-document-uploader',

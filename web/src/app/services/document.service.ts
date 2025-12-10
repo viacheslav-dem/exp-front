@@ -2,7 +2,7 @@ import {map} from 'rxjs/operators';
 import {Injectable} from "@angular/core";
 import {SERVER_URL} from "@app/config";
 import {HttpClientSecure} from "@app/services/http.client";
-import {HttpResponse} from "@angular/common/http";
+import { HttpResponse } from "@angular/common/http";
 import {TemplateDocumentDto} from "@app/dto/TemplateDocumentDto";
 import {Observable} from "rxjs";
 import {SearchPageRequest} from "@app/components/common-components/page-and-filter/model/SearchPageRequest";
