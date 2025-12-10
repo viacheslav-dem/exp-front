@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-target-analysis-block',
-  template: `
+    selector: 'app-target-analysis-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Анализ целевых показателей:
@@ -25,7 +25,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class TargetAnalysisBlockComponent {
 

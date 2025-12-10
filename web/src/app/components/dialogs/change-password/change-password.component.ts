@@ -5,8 +5,8 @@ import {StorageService} from "@app/services/storage.service";
 import {AuthService} from "@app/services/auth.service";
 
 @Component({
-  selector: 'app-change-password',
-  template: `
+    selector: 'app-change-password',
+    template: `
     <div ngForm appNestableForm>
       <app-password-input passwordInputValidator #passwordInputComponentNgModel="ngModel"
                           [changeValueAfterBlur]="passwordInputComponentNgModel.control.valid"
@@ -18,7 +18,8 @@ import {AuthService} from "@app/services/auth.service";
       </div>
     </div>
   `,
-  styles: []
+    styles: [],
+    standalone: false
 })
 export class ChangePasswordComponent implements OnInit {
 

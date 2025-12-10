@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-analog-params-block',
-  template: `
+    selector: 'app-analog-params-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Основные технико-экономические и социально-экономические параметры планируемых новшеств 
@@ -22,7 +22,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AnalogParamsBlockComponent {
 

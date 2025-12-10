@@ -2,8 +2,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Text} from "@app/components/document-form/form-model/Text";
 
 @Component({
-  selector: 'app-scientific-level-items-block',
-  template: `
+    selector: 'app-scientific-level-items-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Выберите пункты, наличие которых подтверждает научно-технический уровень внедряемых технологий:
@@ -14,7 +14,8 @@ import {Text} from "@app/components/document-form/form-model/Text";
       <textarea *ngIf="full" [(ngModel)]="_form.scientificLevelItemsText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ScientificLevelItemsBlockComponent {
 

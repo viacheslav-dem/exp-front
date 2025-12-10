@@ -2,8 +2,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/ConfirmDialogField";
 
 @Component({
-  selector: 'app-confirm-dialog',
-  template: `
+    selector: 'app-confirm-dialog',
+    template: `
     <div>
       <div class="mb-2">{{message}}</div>
       <div class="form-sub-group" *ngFor="let field of fields">
@@ -16,7 +16,8 @@ import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/Confirm
         <button class="btn btn-dark" (click)="cancel()">{{cancelBtnMessage}}</button>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ConfirmDialogComponent {
 

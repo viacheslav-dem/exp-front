@@ -8,12 +8,13 @@ import {AuthService} from "@app/services/auth.service";
 import {environment} from "../../../environments/environment";
 
 @Component({
-  selector: 'app-project-li',
-  templateUrl: './project-li.component.html',
-  styles: ['span{margin-right: 0.3rem;}',
-    'a:hover{cursor: default; text-decoration: none}',
-    '.border-red{border: 2px solid #dc3545 !important;}'
-  ]
+    selector: 'app-project-li',
+    templateUrl: './project-li.component.html',
+    styles: ['span{margin-right: 0.3rem;}',
+        'a:hover{cursor: default; text-decoration: none}',
+        '.border-red{border: 2px solid #dc3545 !important;}'
+    ],
+    standalone: false
 })
 export class ProjectLiComponent implements OnInit {
 

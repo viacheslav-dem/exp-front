@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-added-value-block',
-  template: `
+    selector: 'app-added-value-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Уровень добавленной стоимости на одного работающего по инновационному проекту,
@@ -27,7 +27,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AddedValueBlockComponent {
 

@@ -4,7 +4,8 @@ import {anyMatch, isEmptyOrNull} from "@app/support/utils";
 
 @Component({
     selector: 'app-agenda-8-16-new-form',
-    templateUrl: './agenda-8-16-new-form.component.html'
+    templateUrl: './agenda-8-16-new-form.component.html',
+    standalone: false
 })
 export class Agenda_8_16_NewFormComponent extends AgendaNewForm {
 

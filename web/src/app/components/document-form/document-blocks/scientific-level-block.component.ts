@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-scientific-level-block',
-  template: `
+    selector: 'app-scientific-level-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Оценка научно-технического уровня внедряемых технологий по сравнению с передовыми технологиями, 
@@ -23,7 +23,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ScientificLevelBlockComponent {
 

@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-sufficiency-block',
-  template: `
+    selector: 'app-sufficiency-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Достаточность запланированных этапов работ (услуг), 
@@ -27,7 +27,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.sufficiencyText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class SufficiencyBlockComponent {
 

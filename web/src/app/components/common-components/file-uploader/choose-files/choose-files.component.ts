@@ -2,8 +2,9 @@ import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} f
 import {DocType} from "@app/components/common-components/file-uploader/doc-type";
 
 @Component({
-  selector: 'app-choose-files',
-  templateUrl: 'choose-files.component.html'
+    selector: 'app-choose-files',
+    templateUrl: 'choose-files.component.html',
+    standalone: false
 })
 export class ChooseFilesComponent implements OnInit {
 

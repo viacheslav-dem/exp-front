@@ -9,9 +9,9 @@ import {ReferralFormContent} from "@app/components/document-form/form-model/Refe
 import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
 
 @Component({
-  selector: 'app-referral-form',
-  templateUrl: './referral-form.component.html',
-  styles: [`
+    selector: 'app-referral-form',
+    templateUrl: './referral-form.component.html',
+    styles: [`
       ::ng-deep .hint {
           margin-top: 0.5rem;
           font-style: italic;
@@ -25,7 +25,8 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
       ::ng-deep .hint ul {
           margin-bottom: 0.5rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class ReferralFormComponent extends DocumentForm<ReferralFormContent> {
 

@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-prognosis-block',
-  template: `
+    selector: 'app-prognosis-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Оценка анализа текущего состояния и прогноза 
@@ -25,7 +25,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class PrognosisBlockComponent {
 

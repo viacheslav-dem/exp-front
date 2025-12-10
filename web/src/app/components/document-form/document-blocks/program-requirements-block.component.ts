@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-program-requirements-block',
-  template: `
+    selector: 'app-program-requirements-block',
+    template: `
       <div class="form-sub-group">
           <label>
               {{ num }}. Соответствие требованиям, указанным в Положении о порядке реализации государственных программ:
@@ -36,7 +36,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
               </ul>
           </div>
       </div>
-  `
+  `,
+    standalone: false
 })
 export class ProgramRequirementsBlockComponent {
 

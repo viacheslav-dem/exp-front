@@ -16,7 +16,8 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
                                 [falseLabel]="'нет'"
                                 (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
         </div>
-  `
+  `,
+    standalone: false
 })
 export class DocumentAccordanceBlock {
 

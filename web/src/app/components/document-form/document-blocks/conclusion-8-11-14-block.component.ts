@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-conclusion-8-11-14-block',
-  template: `
+    selector: 'app-conclusion-8-11-14-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Целесообразность реализации объекта государственной экспертизы и его финансирования за счет средств
@@ -25,7 +25,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class Conclusion_8_11_14_BlockComponent {
 

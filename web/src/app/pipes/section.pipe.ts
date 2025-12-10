@@ -3,7 +3,10 @@ import {SectionPlainDto} from "@app/dto/SectionPlainDto";
 import {SectionTypePipe} from "@app/pipes/section-type.pipe";
 import {firstCharToUpperCase} from "@app/support/utils";
 
-@Pipe({name: 'sectionFullName'})
+@Pipe({
+    name: 'sectionFullName',
+    standalone: false
+})
 export class SectionPipe implements PipeTransform {
 
   constructor(private _typePipe: SectionTypePipe) {

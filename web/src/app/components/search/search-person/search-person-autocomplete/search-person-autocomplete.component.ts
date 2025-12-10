@@ -9,8 +9,8 @@ import {Subject, of} from "rxjs";
 import {debounceTime, distinctUntilChanged, switchMap} from "rxjs/operators";
 
 @Component({
-  selector: 'app-search-person-autocomplete',
-  template: `
+    selector: 'app-search-person-autocomplete',
+    template: `
     <ng-select
       [items]="items"
       bindLabel="title"
@@ -25,7 +25,8 @@ import {debounceTime, distinctUntilChanged, switchMap} from "rxjs/operators";
       (change)="onPersonSelect($event)">
     </ng-select>
 
-  `
+  `,
+    standalone: false
 })
 export class SearchPersonAutocompleteComponent implements OnInit {
 

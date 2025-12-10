@@ -5,8 +5,9 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {IdNameDto} from "@app/dto/IdNameDto";
 
 @Component({
-  selector: 'app-orgs',
-  templateUrl: './orgs.component.html'
+    selector: 'app-orgs',
+    templateUrl: './orgs.component.html',
+    standalone: false
 })
 export class OrgsComponent extends PropertyComponent<Orgs> implements OnInit {
 

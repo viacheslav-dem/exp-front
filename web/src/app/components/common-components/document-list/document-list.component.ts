@@ -7,8 +7,9 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {DialogService} from "@app/components/dialogs/dialog.service";
 
 @Component({
-  selector: 'app-document-list',
-  templateUrl: './document-list.component.html'
+    selector: 'app-document-list',
+    templateUrl: './document-list.component.html',
+    standalone: false
 })
 export class DocumentListComponent implements OnInit {
 

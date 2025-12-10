@@ -4,8 +4,9 @@ import {DataService} from "@app/services/data.service";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 
 @Component({
-  selector: 'app-examination-policy',
-  templateUrl: './examination-policy.component.html'
+    selector: 'app-examination-policy',
+    templateUrl: './examination-policy.component.html',
+    standalone: false
 })
 export class ExaminationPolicyComponent extends PropertyComponent<ExaminationPolicy> {
   constructor(protected _dataService: DataService,

@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-innovative-block',
-  template: `
+    selector: 'app-innovative-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Возможность отнесения товаров (работ, услуг) к категории инновационных:
@@ -15,7 +15,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.innovativeText" rows="3" class="form-control"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class InnovativeBlockComponent {
 

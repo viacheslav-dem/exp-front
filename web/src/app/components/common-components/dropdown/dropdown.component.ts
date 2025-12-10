@@ -10,9 +10,9 @@ export const DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-dropdown',
-  styleUrls: ['dropdown.component.scss'],
-  template: `
+    selector: 'app-dropdown',
+    styleUrls: ['dropdown.component.scss'],
+    template: `
     <div class="dropdown btn-group">
       <button [disabled]="disabled" type="button" class="btn btn-outline-primary dropdown-toggle"
               [class.reset-available]="resetAvailable()" data-toggle="dropdown">
@@ -31,7 +31,8 @@ export const DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
       </button>
     </div>
   `,
-  providers: [DROPDOWN_CONTROL_VALUE_ACCESSOR]
+    providers: [DROPDOWN_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class DropdownComponent<T> extends ControlComponent<T> {
 

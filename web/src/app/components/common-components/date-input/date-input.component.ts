@@ -1,7 +1,7 @@
 import {Component, EventEmitter, forwardRef, Input, OnChanges, Output, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 
 export const DATE_INPUT_VALUE_ACCESSOR: any = {
@@ -11,8 +11,8 @@ export const DATE_INPUT_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-date-input',
-  template: `
+    selector: 'app-date-input',
+    template: `
     <input #dateInput
            type="text"
            class="form-control"
@@ -28,8 +28,9 @@ export const DATE_INPUT_VALUE_ACCESSOR: any = {
            [title]="title"
            container="body">
   `,
-  styles: [],
-  providers: [DATE_INPUT_VALUE_ACCESSOR]
+    styles: [],
+    providers: [DATE_INPUT_VALUE_ACCESSOR],
+    standalone: false
 })
 export class DateInputComponent extends ControlComponent<number> implements OnChanges, AfterViewInit {
 

@@ -1,6 +1,6 @@
 import {Component, Injectable, Input, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/core";
 import {StatsService} from "@app/services/stats.service";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 const customParseFormat = require('dayjs/plugin/customParseFormat');
 import {BsDatepickerConfig} from 'ngx-bootstrap/datepicker';
@@ -19,8 +19,9 @@ import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO
 import {FormControl} from "@angular/forms";
 
 @Component({
-  selector: 'app-council-stats',
-  templateUrl: './council-stats.component.html',
+    selector: 'app-council-stats',
+    templateUrl: './council-stats.component.html',
+    standalone: false
 })
 @Injectable({ providedIn: 'root' })
 export class CouncilStatsComponent implements OnInit, AfterViewInit {

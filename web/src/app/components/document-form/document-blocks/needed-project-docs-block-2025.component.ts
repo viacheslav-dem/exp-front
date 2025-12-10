@@ -35,7 +35,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
             </p>
         </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class NeededProjectDocsBlock2025Component {
 

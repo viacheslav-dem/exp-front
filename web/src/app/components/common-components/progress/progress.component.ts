@@ -3,8 +3,9 @@ import {Component, OnInit} from '@angular/core';
 import {ProgressService} from "./progress.service";
 
 @Component({
-  selector: 'app-progress',
-  templateUrl: './progress.component.html'
+    selector: 'app-progress',
+    templateUrl: './progress.component.html',
+    standalone: false
 })
 export class ProgressComponent implements OnInit {
 

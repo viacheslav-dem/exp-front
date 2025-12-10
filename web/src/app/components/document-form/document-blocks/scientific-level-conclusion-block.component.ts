@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-scientific-level-conclusion-block',
-  template: `
+    selector: 'app-scientific-level-conclusion-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Соответствие научно-технического уровня внедряемых технологий 
@@ -48,7 +48,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ScientificLevelConclusionBlockComponent {
 

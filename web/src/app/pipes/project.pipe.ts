@@ -1,6 +1,9 @@
 import {Pipe, PipeTransform} from "@angular/core";
 
-@Pipe({name: 'titleAndCode'})
+@Pipe({
+    name: 'titleAndCode',
+    standalone: false
+})
 export class ProjectPipe implements PipeTransform {
 
   transform(value: any): any {

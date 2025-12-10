@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-product-name-block',
-  template: `
+    selector: 'app-product-name-block',
+    template: `
     <div class="form-sub-group">
       <label>
         Наименование товаров (работ, услуг):
@@ -11,7 +11,8 @@ import {Component, Input} from '@angular/core';
                 title="Наименование товаров"
                 placeholder="наименование"></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ProductNameBlockComponent {
 

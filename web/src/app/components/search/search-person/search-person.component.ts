@@ -8,8 +8,9 @@ import {Filter} from "@app/components/common-components/page-and-filter/model/Fi
 import {PersonPlainDto} from "@app/dto/PersonPlainDto";
 
 @Component({
-  selector: 'app-search-person',
-  templateUrl: './search-person.component.html'
+    selector: 'app-search-person',
+    templateUrl: './search-person.component.html',
+    standalone: false
 })
 export class SearchPersonComponent extends FilterAndPages<PersonPlainDto> {
 

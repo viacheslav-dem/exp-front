@@ -8,8 +8,9 @@ import {IdDto} from "@app/dto/IdDto";
 import { HttpBackend } from "@angular/common/http";
 
 @Component({
-  selector: 'app-document-uploader',
-  templateUrl: 'document-uploader.component.html'
+    selector: 'app-document-uploader',
+    templateUrl: 'document-uploader.component.html',
+    standalone: false
 })
 export class DocumentUploaderComponent extends UploadHelper {
 

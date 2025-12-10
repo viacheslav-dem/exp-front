@@ -26,7 +26,8 @@ import {IndustryDto} from "@app/dto/IndustryDto";
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AddedValueInBoundBlock2025Component {
 

@@ -1,7 +1,10 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {AbstractEnumPipe} from "@app/pipes/abstract-enum.pipe";
 
-@Pipe({name: 'projectState'})
+@Pipe({
+    name: 'projectState',
+    standalone: false
+})
 export class ProjectStatePipe extends AbstractEnumPipe<ProjectState> {
 
   init() {

@@ -23,8 +23,9 @@ import {Catalog, DataService} from "@app/services/data.service";
 import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 
 @Component({
-  selector: 'app-basic-project-info',
-  templateUrl: './basic-project-info.component.html'
+    selector: 'app-basic-project-info',
+    templateUrl: './basic-project-info.component.html',
+    standalone: false
 })
 export class BasicProjectInfoComponent implements OnInit {
 

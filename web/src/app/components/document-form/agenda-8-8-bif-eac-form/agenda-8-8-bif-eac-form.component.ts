@@ -4,7 +4,8 @@ import {Agenda_8_1_2_NewFormComponent} from "@app/components/document-form/agend
 
 @Component({
     selector: 'app-agenda-8-8-bif-eac-form',
-    templateUrl: './agenda-8-8-bif-eac-form.component.html'
+    templateUrl: './agenda-8-8-bif-eac-form.component.html',
+    standalone: false
 })
 export class Agenda_8_8_Bif_Eac_FormComponent extends Agenda_8_1_2_NewFormComponent {
 

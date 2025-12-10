@@ -4,8 +4,9 @@ import {IdDto} from "@app/dto/IdDto";
 import {CommentDto} from "@app/dto/CommentDto";
 
 @Component({
-  selector: 'app-agenda-chat',
-  templateUrl: 'agenda-chat.component.html'
+    selector: 'app-agenda-chat',
+    templateUrl: 'agenda-chat.component.html',
+    standalone: false
 })
 export class AgendaChatComponent implements OnInit {
 

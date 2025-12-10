@@ -7,7 +7,8 @@ import {DataService} from "@app/services/data.service";
 
 @Component({
     selector: 'app-council-conclusion-8-3-4-5-7-8-12-15-form',
-    templateUrl: './council-conclusion-8-3-4-5-7-8-12-15-form.component.html'
+    templateUrl: './council-conclusion-8-3-4-5-7-8-12-15-form.component.html',
+    standalone: false
 })
 export class CouncilConclusion_8_3_4_5_7_8_12_15_FormComponent extends CouncilConclusion_8_1_2_FormComponent {
 

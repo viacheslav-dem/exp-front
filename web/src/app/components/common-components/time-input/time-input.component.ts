@@ -1,7 +1,7 @@
 import {Component, forwardRef} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 
 export const TIME_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -10,8 +10,8 @@ export const TIME_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-time-input',
-  template: `
+    selector: 'app-time-input',
+    template: `
     <div>
       <app-dropdown class="btn-group" (onSelected)="onHourSelect()" [options]="allHours" [resetEnabled]="false"
                     [(ngModel)]="_hour" [optionToString]="formatTime"></app-dropdown>
@@ -20,7 +20,8 @@ export const TIME_CONTROL_VALUE_ACCESSOR: any = {
                     [(ngModel)]="_minute" [optionToString]="formatTime"></app-dropdown>
     </div>
   `,
-  providers: [TIME_CONTROL_VALUE_ACCESSOR]
+    providers: [TIME_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class TimeInputComponent extends ControlComponent<number> {
 

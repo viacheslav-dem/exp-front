@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-program-level-block',
-  template: `
+    selector: 'app-program-level-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы 
@@ -30,7 +30,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ProgramLevelBlockComponent {
 

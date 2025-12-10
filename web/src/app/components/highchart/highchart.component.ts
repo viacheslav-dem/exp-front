@@ -81,8 +81,9 @@ Highcharts.wrap(Highcharts.Chart.prototype, 'getContainer', function (proceed) {
 });
 
 @Component({
-  selector: "highchart",
-  template: '<div (mouseleave)="onMouseLeave()" (mouseenter)="onMouseEnter()"></div>'
+    selector: "highchart",
+    template: '<div (mouseleave)="onMouseLeave()" (mouseenter)="onMouseEnter()"></div>',
+    standalone: false
 })
 export class HighchartComponent {
 

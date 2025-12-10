@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-significance-block',
-  template: `
+    selector: 'app-significance-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Значение работы для реализации приоритетов социально-экономического развития, разработки новых 
@@ -18,7 +18,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class SignificanceBlockComponent {
 

@@ -6,13 +6,14 @@ import {NestableFormDirective} from "app/components/common-components/custom-for
 
 
 @Component({
-  selector: 'app-control-error-messages',
-  template: `
+    selector: 'app-control-error-messages',
+    template: `
     <div *ngIf="messagesAvailable&&messages?.length" [class.alert]="alertClass" [class.alert-danger]="alertClass">
       <span *ngFor="let msg of messages" style="color:#dc3545"><small>{{msg}}</small></span>
     </div>
     <!--<app-show-json [objectToShow]="control.errors"></app-show-json>-->
   `,
+    standalone: false
 })
 export class ControlErrorMessagesComponent implements OnInit, OnChanges {
 

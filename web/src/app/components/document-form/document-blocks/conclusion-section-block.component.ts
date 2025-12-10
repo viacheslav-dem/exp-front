@@ -4,8 +4,8 @@ import {NewVoteResults} from "@app/components/document-form/meeting-protocol-for
 import {DecisionStateBadge} from "@app/pipes/decision.pipe";
 
 @Component({
-  selector: 'app-section-conclusion-block',
-  template: `
+    selector: 'app-section-conclusion-block',
+    template: `
     <div class="form-sub-group">
       <label>
         <span>{{num}}.</span>
@@ -29,7 +29,8 @@ import {DecisionStateBadge} from "@app/pipes/decision.pipe";
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ConclusionSectionBlockComponent {
 

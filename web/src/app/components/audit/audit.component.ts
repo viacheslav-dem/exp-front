@@ -13,15 +13,16 @@ import {AuditRecordDto} from "@app/dto/AuditRecordDto";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 
 @Component({
-  selector: 'app-audit',
-  templateUrl: './audit.component.html',
-  styles: [`
+    selector: 'app-audit',
+    templateUrl: './audit.component.html',
+    styles: [`
       table {
           font-size: 0.875rem;
           background-color: white;
           margin-bottom: 0;
       }
-  `]
+  `],
+    standalone: false
 })
 export class AuditComponent extends FilterAndPages<AuditRecordDto> {
 

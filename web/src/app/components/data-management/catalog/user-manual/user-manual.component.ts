@@ -11,8 +11,8 @@ import {DocType} from "@app/components/common-components/file-uploader/doc-type"
 import {DocumentService} from "@app/services/document.service";
 
 @Component({
-  selector: 'app-user-manual',
-  template: `
+    selector: 'app-user-manual',
+    template: `
     <h5 class="mb-3">Руководства пользователя</h5>
     <div class="list-group">
 
@@ -53,7 +53,8 @@ import {DocumentService} from "@app/services/document.service";
       </div>
     </div>
   `,
-  styles: []
+    styles: [],
+    standalone: false
 })
 export class UserManualComponent extends CatalogTemplate<ManualDto> {
   DocType = DocType;

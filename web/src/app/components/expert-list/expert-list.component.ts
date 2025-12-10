@@ -13,7 +13,7 @@ import {ExpertReviewState} from "@app/pipes/review-state.pipe";
 import {ProjectService} from "@app/services/project.service";
 import {Router} from "@angular/router";
 import {PersonFullNamePipe} from "@app/pipes/person-full-name.pipe";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import {AcademicTitleTypePipe, getAllAcademicTitleTypes} from "@app/pipes/academic-title.pipe";
 import {Role} from "@app/pipes/role.pipe";
 import {AuthService} from "@app/services/auth.service";
@@ -21,9 +21,10 @@ import {ExpertReviewService} from "@app/services/expert-review.service";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 
 @Component({
-  selector: 'app-expert-list',
-  templateUrl: './expert-list.component.html',
-  styleUrls: ['./expert-list.component.scss']
+    selector: 'app-expert-list',
+    templateUrl: './expert-list.component.html',
+    styleUrls: ['./expert-list.component.scss'],
+    standalone: false
 })
 export class ExpertListComponent extends FilterAndPages<PersonExpertDto> {
 

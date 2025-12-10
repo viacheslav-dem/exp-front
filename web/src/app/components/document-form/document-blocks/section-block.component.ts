@@ -3,8 +3,8 @@ import {IndustryDto} from "@app/dto/IndustryDto";
 import {Catalog} from "@app/services/data.service";
 
 @Component({
-  selector: 'app-section-block',
-  template: `
+    selector: 'app-section-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Секция и подсекция основного вида экономической деятельности, которому соответствует
@@ -31,7 +31,8 @@ import {Catalog} from "@app/services/data.service";
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class SectionBlockComponent {
 

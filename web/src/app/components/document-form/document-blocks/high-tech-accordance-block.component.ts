@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-high-tech-accordance-block',
-  template: `
+    selector: 'app-high-tech-accordance-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Соответствие (высокотехнологичность производства) по пункту 1 таблицы «Критерии отнесения товаров
@@ -17,7 +17,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.highTechAccordanceText" rows="3" class="form-control"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class HighTechAccordanceBlockComponent {
 

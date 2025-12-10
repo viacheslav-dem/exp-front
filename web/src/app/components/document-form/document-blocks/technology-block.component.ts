@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-technology-block',
-  template: `
+    selector: 'app-technology-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Оптимальность выбранной технологии и ее инновационность для Республики Беларусь:
@@ -24,7 +24,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class TechnologyBlockComponent {
 

@@ -9,8 +9,9 @@ import {PersonPlainDto} from "@app/dto/PersonPlainDto";
 import {SearchPersonByRolesComponent} from "@app/components/search/search-person/search-person-by-role.component";
 
 @Component({
-  selector: 'app-gknt-deputy-chairman-procurations',
-  templateUrl: './gknt-deputy-chairman-procurations.component.html'
+    selector: 'app-gknt-deputy-chairman-procurations',
+    templateUrl: './gknt-deputy-chairman-procurations.component.html',
+    standalone: false
 })
 export class GkntDeputyChairmanProcurationsComponent extends PropertyComponent<Procurations> {
 

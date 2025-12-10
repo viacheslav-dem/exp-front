@@ -8,15 +8,15 @@ import {MeetingService} from "@app/services/meeting.service";
 import {AgendaFormResolver} from "@app/components/document-form/meeting-protocol-form/agenda-form-resolver.service";
 import {compareByField, isEmptyOrNull, sortPersonsByName} from "@app/support/utils";
 import {PersonService} from "@app/services/person.service";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import {RemarksContainerDto} from "@app/dto/RemarksContainerDto";
 import {MeetingProtocolNewFormContent} from "@app/components/document-form/meeting-protocol-form/MeetingProtocolNewFormContent";
 import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form/agenda-new-form.service";
 
 @Component({
-  selector: 'app-meeting-protocol-form',
-  templateUrl: 'meeting-protocol-form.component.html',
-  styles: [`
+    selector: 'app-meeting-protocol-form',
+    templateUrl: 'meeting-protocol-form.component.html',
+    styles: [`
       ::ng-deep .hint {
           margin-top: 0.5rem;
           font-style: italic;
@@ -30,7 +30,8 @@ import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form
       ::ng-deep .hint ul {
           margin-bottom: 0.5rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNewFormContent> {
 

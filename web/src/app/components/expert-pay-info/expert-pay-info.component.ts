@@ -8,6 +8,7 @@ import {PageRequest} from "@app/components/common-components/page-and-filter/mod
 @Component({
     selector: 'app-expert-pay-info',
     templateUrl: './expert-pay-info.component.html',
+    standalone: false
 })
 
 export class ExpertPayInfoComponent extends FilterAndPages<ExpertPayInfoDto> {

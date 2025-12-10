@@ -10,6 +10,7 @@ import {Catalog} from "app/services/data.service";
         noItemsLabel="Способы коммерциализации отсутствуют"
         [type]="Catalog.COMMERCIALIZATION_METHODS"
     ></app-simple-catalog>`,
+    standalone: false
 })
 export class CommercializationMethodsComponent {
     Catalog = Catalog;

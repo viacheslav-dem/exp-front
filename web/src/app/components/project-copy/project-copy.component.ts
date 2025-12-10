@@ -4,8 +4,9 @@ import {ListItem} from "@app/components/common-components/checkbox-list/checkbox
 import {isEmptyOrNull} from "@app/support/utils";
 
 @Component({
-  selector: 'app-project-copy',
-  templateUrl: 'project-copy.component.html'
+    selector: 'app-project-copy',
+    templateUrl: 'project-copy.component.html',
+    standalone: false
 })
 
 

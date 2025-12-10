@@ -4,8 +4,8 @@ import {DecisionState, DecisionStateBadge} from "@app/pipes/decision.pipe";
 import {ProjectDto} from "@app/dto/ProjectDto";
 
 @Component({
-  selector: 'app-conclusion-council-block',
-  template: `
+    selector: 'app-conclusion-council-block',
+    template: `
     <div class="form-sub-group">
       <label class="font-weight-bold">
         Заключение государственного экспертного совета по объекту государственной экспертизы <i>{{project?.title}}</i>:
@@ -22,7 +22,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ConclusionCouncilBlockComponent {
 

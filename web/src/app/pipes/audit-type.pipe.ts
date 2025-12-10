@@ -1,7 +1,10 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {AbstractEnumPipe} from "@app/pipes/abstract-enum.pipe";
 
-@Pipe({name: 'auditType'})
+@Pipe({
+    name: 'auditType',
+    standalone: false
+})
 export class AuditTypePipe extends AbstractEnumPipe<AuditTypes>{
   init() {
       this.map[AuditTypes.AUTH] = 'Успешная аутентификация';

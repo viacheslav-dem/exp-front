@@ -4,8 +4,9 @@ import {CouncilPlainDto} from "@app/dto/CouncilPlainDto";
 import {isEmptyOrNull} from "@app/support/utils";
 
 @Component({
-  selector: 'app-decision-document-form',
-  templateUrl: './decision-document-form.component.html'
+    selector: 'app-decision-document-form',
+    templateUrl: './decision-document-form.component.html',
+    standalone: false
 })
 export class DecisionDocumentFormComponent extends DocumentForm<any> {
 

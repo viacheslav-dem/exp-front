@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-conclusion-block',
-  template: `
+    selector: 'app-conclusion-block',
+    template: `
     <div class="form-group">
 
       <label class="font-weight-bold">
@@ -26,7 +26,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ConclusionBlockComponent {
 

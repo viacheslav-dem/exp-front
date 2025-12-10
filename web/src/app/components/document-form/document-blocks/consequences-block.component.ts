@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-consequences-block',
-  template: `
+    selector: 'app-consequences-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
@@ -40,7 +40,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ConsequencesBlockComponent {
 

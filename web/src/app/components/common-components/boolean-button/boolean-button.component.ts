@@ -8,8 +8,8 @@ export const BB_CONTROL_VALUE_ACCESSOR: any = {
   multi: true
 };
 @Component({
-  selector: 'app-boolean-button',
-  template: `
+    selector: 'app-boolean-button',
+    template: `
     <div [class.disabled]="disabled" (click)="toggle()" style="display: inline-block; height:30px;" class="mr-2">
       <label  (click)="toggleTrue()" [class]="'btn btn-sm ' + trueStyle" [class.active]="_value" [class.disabled]="disabled">
         <fa-icon *ngIf="_value && (!disabled || showDisabledSelection)" icon="check"></fa-icon>
@@ -21,7 +21,7 @@ export const BB_CONTROL_VALUE_ACCESSOR: any = {
       </label>
     </div>
   `,
-  styles: [`
+    styles: [`
     .disabled {
         pointer-events: none;
     }
@@ -36,7 +36,8 @@ export const BB_CONTROL_VALUE_ACCESSOR: any = {
         border-top-left-radius: 0;
     }
   `],
-  providers: [BB_CONTROL_VALUE_ACCESSOR]
+    providers: [BB_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class BooleanButtonComponent extends ControlComponent<boolean> {
 

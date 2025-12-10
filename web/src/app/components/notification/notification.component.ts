@@ -25,9 +25,9 @@ import {SERVER_URL} from "@app/config";
 import {ProgressService} from "@app/components/common-components/progress/progress.service";
 
 @Component({
-  selector: 'app-notification',
-  templateUrl: './notification.component.html',
-  styles: [`
+    selector: 'app-notification',
+    templateUrl: './notification.component.html',
+    styles: [`
       table {
           font-size: 0.875rem;
           background-color: white;
@@ -37,7 +37,8 @@ import {ProgressService} from "@app/components/common-components/progress/progre
       td, th {
           padding: 0.75rem 0.5rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class NotificationComponent extends FilterAndPages<PersonDto> implements OnDestroy {
 

@@ -8,8 +8,9 @@ import {isEmptyOrNull} from "@app/support/utils";
 
 
 @Component({
-  selector: 'app-review-8-16-form',
-  templateUrl: './expert-review-8-16-form.component.html'
+    selector: 'app-review-8-16-form',
+    templateUrl: './expert-review-8-16-form.component.html',
+    standalone: false
 })
 export class ExpertReview_8_16_FormComponent extends ExpertReviewForm<ExpertReview_8_16_FormContent> {
   @Input() url: string = '/examination-api/document/protocol';

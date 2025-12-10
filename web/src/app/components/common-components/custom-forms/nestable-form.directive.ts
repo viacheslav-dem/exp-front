@@ -22,8 +22,9 @@ function isPrimitive(test) {
 };
 
 @Directive({
-  selector: '[appNestableForm]',
-  exportAs: "appNestableForm"
+    selector: '[appNestableForm]',
+    exportAs: "appNestableForm",
+    standalone: false
 })
 //https://www.toptal.com/angular-js/angular-4-forms-validation
 export class NestableFormDirective implements OnInit, OnDestroy {

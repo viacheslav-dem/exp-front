@@ -10,13 +10,14 @@ import {SearchField} from "@app/components/common-components/page-and-filter/mod
 import {ProjectService} from "@app/services/project.service";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {Router} from "@angular/router";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 
 
 @Component({
     selector: 'project-list-from-stats',
-    templateUrl: 'project-list-from-stats.component.html'
+    templateUrl: 'project-list-from-stats.component.html',
+    standalone: false
 })
 export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
 

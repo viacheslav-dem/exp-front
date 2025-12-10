@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-priority-accordance-conclusion-block',
-  template: `
+    selector: 'app-priority-accordance-conclusion-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Соответствие приоритетности направления инвестиций в технологии:
@@ -37,7 +37,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class PriorityAccordanceConclusionBlockComponent {
 

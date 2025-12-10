@@ -7,7 +7,8 @@ import {DegreeTypePipe} from "@app/pipes/degree.pipe";
     selector: 'app-best-expert',
     templateUrl: './best-expert.component.html',
     styleUrls: ['./best-expert.component.css'],
-    styles: []
+    styles: [],
+    standalone: false
 })
 export class BestExpertComponent implements OnInit {
 

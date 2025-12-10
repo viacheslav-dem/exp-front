@@ -4,8 +4,9 @@ import {DataService} from "app/services/data.service";
 import {SectionPlainDto} from "@app/dto/SectionPlainDto";
 
 @Component({
-  selector: 'app-search-section',
-  templateUrl: './search-section.component.html'
+    selector: 'app-search-section',
+    templateUrl: './search-section.component.html',
+    standalone: false
 })
 export class SearchSectionComponent implements OnInit {
 

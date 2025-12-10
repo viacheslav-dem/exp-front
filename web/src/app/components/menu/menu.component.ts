@@ -1,14 +1,15 @@
 import {Component, OnInit, Input, Output, EventEmitter, AfterViewInit} from '@angular/core';
 
 @Component({
-  selector: 'app-menu',
-  templateUrl: './menu.component.html',
-  styles: [`
+    selector: 'app-menu',
+    templateUrl: './menu.component.html',
+    styles: [`
     .nav-link {
         white-space: nowrap;
         padding: 0.5rem;
     }
-  `]
+  `],
+    standalone: false
 })
 export class MenuComponent implements OnInit {
 

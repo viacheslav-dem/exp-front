@@ -2,7 +2,10 @@ import {Pipe, PipeTransform} from "@angular/core";
 import {isEmptyOrNull} from "@app/support/utils";
 import {CouncilPlainDto} from "@app/dto/CouncilPlainDto";
 
-@Pipe({name: 'councilCodeAndName'})
+@Pipe({
+    name: 'councilCodeAndName',
+    standalone: false
+})
 export class CouncilPipe implements PipeTransform {
 
   transform(value: CouncilPlainDto): any {

@@ -5,9 +5,9 @@ import {SystemNotificationDto} from "@app/dto/SystemNotificationDto";
 import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
 
 @Component({
-  selector: 'app-login',
-  templateUrl: 'login.component.html',
-  styles: [`
+    selector: 'app-login',
+    templateUrl: 'login.component.html',
+    styles: [`
     .title {
       text-transform: uppercase;
       text-align: center;
@@ -26,7 +26,8 @@ import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
     #password-icon-crossed{
       display: none;
     }
-  `]
+  `],
+    standalone: false
 })
 export class LoginComponent implements OnInit {
 

@@ -4,8 +4,9 @@ import {CouncilConclusionForm} from "@app/components/document-form/council-concl
 import {DecisionState} from "@app/pipes/decision.pipe";
 
 @Component({
-  selector: 'app-council-conclusion-8-10PVT-form',
-  templateUrl: './council-conclusion-8-10PVT-form.component.html'
+    selector: 'app-council-conclusion-8-10PVT-form',
+    templateUrl: './council-conclusion-8-10PVT-form.component.html',
+    standalone: false
 })
 export class CouncilConclusion_8_10PVT_FormComponent extends CouncilConclusionForm {
 

@@ -41,7 +41,8 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
                 научных исследований, научные исследования по которым носят прикладной характер).
             </p>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class SoftwareToolBlock2025Component {
 

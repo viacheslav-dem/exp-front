@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-assessment-conclusion-block-2025',
-  template: `
+    selector: 'app-assessment-conclusion-block-2025',
+    template: `
     <div class="form-sub-group">
       <label>
         {{ num }}. Оценка соответствия предложений поставщиков (подрядчиков, исполнителей), претендующих на участие в
@@ -30,7 +30,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AssessmentConclusionBlock2025Component {
 

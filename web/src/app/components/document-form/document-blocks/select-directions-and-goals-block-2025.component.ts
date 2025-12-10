@@ -4,8 +4,8 @@ import {IdNameDto} from "@app/dto/IdNameDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 
 @Component({
-  selector: 'app-select-directions-and-goals-block-2025',
-  template: `
+    selector: 'app-select-directions-and-goals-block-2025',
+    template: `
     <ng-container *ngIf="_project">
       <div *ngIf="_allDirections.length > 0" class="form-group">
         <label>
@@ -46,7 +46,8 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
         </p>
       </div>
     </ng-container>
-  `
+  `,
+    standalone: false
 })
 export class SelectDirectionsAndGoalsBlock2025Component {
 

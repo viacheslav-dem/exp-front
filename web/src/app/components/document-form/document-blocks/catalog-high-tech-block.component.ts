@@ -13,7 +13,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
                             [disabled]="disabled"
                             (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class CatalogHighTechBlockComponent {
 

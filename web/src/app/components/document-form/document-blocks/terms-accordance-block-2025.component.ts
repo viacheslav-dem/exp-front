@@ -27,7 +27,8 @@ import {PeriodDto} from "@app/dto/PeriodDto";
       <textarea *ngIf="full" [(ngModel)]="_form.termsAccordanceText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст"></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class TermsAccordanceBlock2025Component {
 

@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-results-block',
-  template: `
+    selector: 'app-results-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Сопоставительный анализ запланированных результатов и их соответствия достигнутым результатам.
@@ -17,7 +17,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ResultsBlockComponent {
 

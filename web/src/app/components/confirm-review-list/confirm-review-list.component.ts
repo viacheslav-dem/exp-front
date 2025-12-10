@@ -18,13 +18,14 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {PageRequest} from '@app/components/common-components/page-and-filter/model/PageRequest';
 
 @Component({
-  selector: 'app-confirm-review-list',
-  templateUrl: './confirm-review-list.component.html',
-  styles: [`
+    selector: 'app-confirm-review-list',
+    templateUrl: './confirm-review-list.component.html',
+    styles: [`
     .chart {
       margin: 0;
     }
-  `]
+  `],
+    standalone: false
 })
 export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExpertsDto> {
 

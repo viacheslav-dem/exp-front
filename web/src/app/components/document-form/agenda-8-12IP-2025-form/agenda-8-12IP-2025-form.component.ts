@@ -4,7 +4,8 @@ import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form
 
 @Component({
     selector: 'app-agenda-8-12IP-2025-form',
-    templateUrl: './agenda-8-12IP-2025-form.component.html'
+    templateUrl: './agenda-8-12IP-2025-form.component.html',
+    standalone: false
 })
 export class Agenda_8_12IP_2025FormComponent extends AgendaNewForm {
 

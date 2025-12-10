@@ -10,8 +10,8 @@ export const LC_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-login-create',
-  template: `
+    selector: 'app-login-create',
+    template: `
     <ng-container *ngIf="_value == null">
       <button class="btn btn-primary" (click)="create()">Предоставить доступ</button>
     </ng-container>
@@ -27,7 +27,8 @@ export const LC_CONTROL_VALUE_ACCESSOR: any = {
       </ng-container>
     </ng-container>
   `,
-  providers: [LC_CONTROL_VALUE_ACCESSOR]
+    providers: [LC_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class LoginCreateComponent extends ControlComponent<UserDto> {
 

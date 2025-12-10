@@ -1,9 +1,12 @@
 import {Pipe, PipeTransform} from "@angular/core";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 import {firstCharToUpperCase} from "../support/utils";
 
-@Pipe({name: 'mdate'})
+@Pipe({
+    name: 'mdate',
+    standalone: false
+})
 export class MdatePipe implements PipeTransform {
 
   transform(value: number): any {
@@ -11,7 +14,10 @@ export class MdatePipe implements PipeTransform {
   }
 }
 
-@Pipe({name: 'mtime'})
+@Pipe({
+    name: 'mtime',
+    standalone: false
+})
 export class MTimePipe implements PipeTransform {
 
   transform(value: number): any {
@@ -19,7 +25,10 @@ export class MTimePipe implements PipeTransform {
   }
 }
 
-@Pipe({name: 'formatDate'})
+@Pipe({
+    name: 'formatDate',
+    standalone: false
+})
 export class FormatDatePipe implements PipeTransform {
 
   transform(value: number, formatStr: string = 'DD.MM.YYYY HH:mm:ss'): any {
@@ -29,7 +38,10 @@ export class FormatDatePipe implements PipeTransform {
   }
 }
 
-@Pipe({name: 'monthYear'})
+@Pipe({
+    name: 'monthYear',
+    standalone: false
+})
 export class MonthYearPipe implements PipeTransform {
 
   transform(value:any): any {

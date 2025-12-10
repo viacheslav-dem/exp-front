@@ -10,15 +10,16 @@ interface ToastItem {
 }
 
 @Component({
-  selector: 'app-global-toasts',
-  template: `
+    selector: 'app-global-toasts',
+    template: `
     <div class="global-toasts position-fixed" style="bottom: 10px; right: 10px; z-index: 1060;">
       <div *ngFor="let t of toasts" class="alert" [ngClass]="cssClass(t)" role="alert">
         <strong *ngIf="t.title">{{ t.title }}</strong>
         <span *ngIf="t.msg"> {{ t.msg }}</span>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class GlobalToastsComponent implements OnInit, OnDestroy {
   toasts: ToastItem[] = [];

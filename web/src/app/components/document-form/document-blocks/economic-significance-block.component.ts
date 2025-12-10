@@ -4,8 +4,8 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
 
 @Component({
-  selector: 'app-economic-significance-block',
-  template: `
+    selector: 'app-economic-significance-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Значимость (экономическая и (или) социальная), которая должна быть достигнута по итогам выполнения работ,
@@ -101,7 +101,8 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class EconomicSignificanceBlockComponent {
 

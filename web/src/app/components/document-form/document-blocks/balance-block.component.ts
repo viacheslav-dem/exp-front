@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-balance-block',
-  template: `
+    selector: 'app-balance-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Сальдо потока денежных средств в свободно-конвертируемой валюте
@@ -26,7 +26,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class BalanceBlockComponent {
 

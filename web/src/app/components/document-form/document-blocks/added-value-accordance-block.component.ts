@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-added-value-accordance-block',
-  template: `
+    selector: 'app-added-value-accordance-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Соответствие (удельная добавленная стоимость (без учета НДС; включает фонд заработной платы с
@@ -18,7 +18,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.addedValueText" rows="3" class="form-control"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AddedValueAccordanceBlockComponent {
 

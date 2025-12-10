@@ -3,8 +3,9 @@ import {ModalDirective} from "ngx-bootstrap/modal";
 import {DataService} from "app/services/data.service";
 
 @Component({
-  selector: 'app-search-council',
-  templateUrl: './search-council.component.html'
+    selector: 'app-search-council',
+    templateUrl: './search-council.component.html',
+    standalone: false
 })
 export class SearchCouncilComponent implements OnInit {
 

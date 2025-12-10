@@ -11,7 +11,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       </div>
       <textarea *ngIf="full" [(ngModel)]="_form.industrialExpertiseText" rows="3" class="form-control mt-05"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
-  `
+  `,
+    standalone: false
 })
 export class CreationIndustrialExpertiseBlock {
 

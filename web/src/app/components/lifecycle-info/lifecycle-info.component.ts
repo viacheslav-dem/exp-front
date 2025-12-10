@@ -11,8 +11,9 @@ import {LifecycleGroupState} from "@app/pipes/lifecycle-group-state.pipe";
 import {ProjectDto} from "@app/dto/ProjectDto";
 
 @Component({
-  selector: 'app-lifecycle-info',
-  templateUrl: './lifecycle-info.component.html',
+    selector: 'app-lifecycle-info',
+    templateUrl: './lifecycle-info.component.html',
+    standalone: false
 })
 export class LifecycleInfoComponent implements OnInit {
 

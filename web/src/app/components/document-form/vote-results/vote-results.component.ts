@@ -10,8 +10,8 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-vote-results',
-  template: `
+    selector: 'app-vote-results',
+    template: `
       <div *ngIf="_value" [class.d-none]="!display">
         <label><i>Результаты голосования</i></label>
         <div class="row">
@@ -61,13 +61,14 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
         </div>
       </div>
   `,
-  styles: [`
+    styles: [`
       span.disabled {
           color: #bbbbbb;
       }
     
   `],
-  providers: [VOTE_RESULTS_CONTROL_VALUE_ACCESSOR]
+    providers: [VOTE_RESULTS_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class VoteResultsComponent extends ControlComponent<VoteResults> {
 

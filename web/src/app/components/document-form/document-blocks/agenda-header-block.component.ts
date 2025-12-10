@@ -4,8 +4,8 @@ import {DecisionStateBadge} from "@app/pipes/decision.pipe";
 import {AgendaNewFormContent} from "@app/components/document-form/meeting-protocol-form/AgendaNewFormContent";
 
 @Component({
-  selector: 'app-agenda-header-block',
-  template: `
+    selector: 'app-agenda-header-block',
+    template: `
     <label class="form-group-label mb-0 selectable">
       <span>{{ind + 1}}. {{project | titleAndCode}}</span>
       <span> | Решение:</span>
@@ -17,7 +17,8 @@ import {AgendaNewFormContent} from "@app/components/document-form/meeting-protoc
               [attr.data-target]="'#meeting-project-' + project?.id">
       </button>
     </label>
-  `
+  `,
+    standalone: false
 })
 export class AgendaHeaderBlockComponent {
 

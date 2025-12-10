@@ -5,8 +5,8 @@ import {DataService} from "@app/services/data.service";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 
 @Component({
-  selector: 'app-audit-policy',
-  template: `
+    selector: 'app-audit-policy',
+    template: `
     <div class="list-group-item">
 
       <!--SHOW-->
@@ -43,7 +43,8 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
       </ng-container>
     </div>
   `,
-  styles: []
+    styles: [],
+    standalone: false
 })
 export class AuditPolicyComponent extends PropertyComponent<AuditPolicy> {
   types: string[] = getAllAuditTypes();

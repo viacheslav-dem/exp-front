@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-assessment-conclusion-block',
-  template: `
+    selector: 'app-assessment-conclusion-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Оценка достаточности и соответствия предложений поставщиков
@@ -28,7 +28,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AssessmentConclusionBlockComponent {
 

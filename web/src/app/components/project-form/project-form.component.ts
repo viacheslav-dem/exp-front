@@ -14,7 +14,8 @@ import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
 
 @Component({
     selector: 'app-project-form',
-    templateUrl: 'project-form.component.html'
+    templateUrl: 'project-form.component.html',
+    standalone: false
 })
 export class ProjectFormComponent implements OnInit {
 

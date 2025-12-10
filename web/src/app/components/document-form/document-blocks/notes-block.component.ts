@@ -2,8 +2,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Text} from "@app/components/document-form/form-model/Text";
 
 @Component({
-  selector: 'app-notes-block',
-  template: `
+    selector: 'app-notes-block',
+    template: `
     <div class="form-group">
       <label class="form-group-label">Замечания эксперта</label>
 
@@ -26,7 +26,8 @@ import {Text} from "@app/components/document-form/form-model/Text";
         </button>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class NotesBlockComponent {
 

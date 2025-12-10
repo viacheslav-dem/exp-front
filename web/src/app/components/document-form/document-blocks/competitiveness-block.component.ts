@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-competitiveness-block',
-  template: `
+    selector: 'app-competitiveness-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Обоснование конкурентоспособности разработки:
@@ -19,7 +19,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class CompetitivenessBlockComponent {
 

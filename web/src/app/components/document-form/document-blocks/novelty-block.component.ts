@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-novelty-block',
-  template: `
+    selector: 'app-novelty-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Новизна (инновационность) объекта государственной экспертизы.
@@ -27,7 +27,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class NoveltyBlockComponent {
 

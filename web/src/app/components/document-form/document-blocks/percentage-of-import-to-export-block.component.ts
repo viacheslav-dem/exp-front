@@ -10,7 +10,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea [(ngModel)]="_form.percentageOfImportToExport" rows="3" class="form-control mt-05"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class PercentageOfImportToExportBlockComponent {
 

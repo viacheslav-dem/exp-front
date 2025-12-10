@@ -102,7 +102,7 @@
                 <version>3.0.0</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <webappDirectory>dist</webappDirectory>
+                    <webappDirectory>dist/browser</webappDirectory>
                 </configuration>
             </plugin>
 

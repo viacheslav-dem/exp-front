@@ -10,8 +10,9 @@ import {
 } from "@app/components/document-form/form-model/ExpertReview_8_5_7_8_12IP_2025FormContent";
 
 @Component({
-  selector: 'app-expert-review-8-5-7-8-12IP-2025-form',
-  templateUrl: './expert-review_8_5_7_8_12-i-p_2025-form.component.html'
+    selector: 'app-expert-review-8-5-7-8-12IP-2025-form',
+    templateUrl: './expert-review_8_5_7_8_12-i-p_2025-form.component.html',
+    standalone: false
 })
 export class ExpertReview_8_5_7_8_12IP_2025FormComponent extends ExpertReviewForm<ExpertReview_8_5_7_8_12IP_2025FormContent> {
 

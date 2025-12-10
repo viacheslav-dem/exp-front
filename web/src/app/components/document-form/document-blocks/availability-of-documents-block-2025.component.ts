@@ -47,7 +47,8 @@ import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
             </div>
         </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AvailabilityOfDocumentsBlock2025Component implements OnInit{
 

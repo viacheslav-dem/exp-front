@@ -7,8 +7,9 @@ import {Direction} from "app/components/common-components/page-and-filter/model/
 import {CatalogTemplate} from "app/components/data-management/catalog/CatalogTemplate";
 
 @Component({
-  selector: 'app-industries',
-  templateUrl: './industries.component.html'
+    selector: 'app-industries',
+    templateUrl: './industries.component.html',
+    standalone: false
 })
 export class IndustriesComponent extends CatalogTemplate<IndustryDto> {
 

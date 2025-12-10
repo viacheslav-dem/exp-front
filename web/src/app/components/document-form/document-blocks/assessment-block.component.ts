@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-assessment-block',
-  template: `
+    selector: 'app-assessment-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Оценка научно-технического уровня, эффективности, достаточности и соответствия предложений
@@ -23,7 +23,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AssessmentBlockComponent {
 

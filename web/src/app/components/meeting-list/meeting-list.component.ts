@@ -12,8 +12,9 @@ import {SearchField} from "@app/components/common-components/page-and-filter/mod
 import {Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
 
 @Component({
-  selector: 'app-meeting-list',
-  templateUrl: 'meeting-list.component.html'
+    selector: 'app-meeting-list',
+    templateUrl: 'meeting-list.component.html',
+    standalone: false
 })
 export class MeetingListComponent extends FilterAndPages<MeetingDto> {
 

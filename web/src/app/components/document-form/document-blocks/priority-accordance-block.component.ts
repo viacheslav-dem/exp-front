@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-priority-accordance-block',
-  template: `
+    selector: 'app-priority-accordance-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Приоритетность направления инвестиций в технологию, обоснованность расходов.
@@ -32,7 +32,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class PriorityAccordanceBlockComponent {
 

@@ -58,7 +58,8 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
             
         </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class EconomicSignificance88BIFBlockComponent {
 

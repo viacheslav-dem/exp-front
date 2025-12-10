@@ -18,7 +18,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <div *ngIf="full" class="hint">
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ExportOrientedBlockComponent {
 

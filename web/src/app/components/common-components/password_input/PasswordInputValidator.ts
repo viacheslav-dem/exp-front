@@ -18,10 +18,11 @@ function passwordValidatorFactory() {
 }
 
 @Directive({
-  selector: '[passwordInputValidator][ngModel]',
-  providers: [
-    {provide: NG_VALIDATORS, useExisting: forwardRef(() => PasswordInputValidatorDirective), multi: true}
-  ]
+    selector: '[passwordInputValidator][ngModel]',
+    providers: [
+        { provide: NG_VALIDATORS, useExisting: forwardRef(() => PasswordInputValidatorDirective), multi: true }
+    ],
+    standalone: false
 })
 export class PasswordInputValidatorDirective {
 

@@ -7,7 +7,6 @@ import {BsDatepickerModule} from "ngx-bootstrap/datepicker";
 import {CollapseModule} from "ngx-bootstrap/collapse";
 import {ModalModule} from "ngx-bootstrap/modal";
 import {PaginationModule} from "ngx-bootstrap/pagination";
-import {NgbDatepickerModule, NgbDateAdapter, NgbDateNativeAdapter} from '@ng-bootstrap/ng-bootstrap';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {CryptoModule} from "app/crypto/crypto.module";
 import {PasswordInputComponent} from "app/components/common-components/password_input/password-input.component";
@@ -56,7 +55,6 @@ import {GlobalToastsComponent} from "@app/components/common-components/global-to
     CustomPipesModule,
     PaginationModule,
     BsDatepickerModule,
-    NgbDatepickerModule,
     ModalModule,
     CustomFormsModule,
     CollapseModule,
@@ -78,7 +76,6 @@ import {GlobalToastsComponent} from "@app/components/common-components/global-to
     FontAwesomeModule,
     NgSelectModule,
     NgxSliderModule,
-    NgbDatepickerModule,
     DocumentListComponent,
     FileEditorComponent,
     PasswordInputComponent,

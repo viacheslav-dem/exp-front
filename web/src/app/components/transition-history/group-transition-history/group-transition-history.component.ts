@@ -4,13 +4,14 @@ import {LifecycleGroupTransitionHistoryDto} from "@app/dto/LifecycleGroupTransit
 import {TransitionDto} from "@app/dto/TransitionDto";
 
 @Component({
-  selector: 'app-group-transition-history',
-  templateUrl: './group-transition-history.component.html',
-  styles: [`
+    selector: 'app-group-transition-history',
+    templateUrl: './group-transition-history.component.html',
+    styles: [`
       table {
           font-size: 0.875rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class GroupTransitionHistoryComponent implements OnInit {
 

@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-science-block',
-  template: `
+    selector: 'app-science-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Соответствие (наукоемкость) по пункту 5 таблицы «Критерии отнесения товаров к высокотехнологичным»
@@ -17,7 +17,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.scienceText" rows="3" class="form-control"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ScienceBlockComponent {
 

@@ -4,7 +4,8 @@ import {CouncilConclusionForm} from "@app/components/document-form/council-concl
 
 @Component({
     selector: 'app-council-conclusion-8-1-2-form',
-    templateUrl: './council-conclusion-8-1-2-form.component.html'
+    templateUrl: './council-conclusion-8-1-2-form.component.html',
+    standalone: false
 })
 export class CouncilConclusion_8_1_2_FormComponent extends CouncilConclusionForm {
 

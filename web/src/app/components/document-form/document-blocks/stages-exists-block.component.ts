@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-stages-exists-block',
-  template: `
+    selector: 'app-stages-exists-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Льготирование реализации объекта государственной экспертизы.
@@ -21,7 +21,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class StagesExistsBlockComponent {
 

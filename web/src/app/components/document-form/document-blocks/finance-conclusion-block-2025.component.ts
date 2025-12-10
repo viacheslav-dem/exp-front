@@ -42,7 +42,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         </ul>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class FinanceConclusionBlock2025Component {
 

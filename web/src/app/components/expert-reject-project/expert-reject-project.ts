@@ -4,8 +4,9 @@ import {DatePipe} from "@angular/common";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 
 @Component({
-  selector: 'app-expert-reject-project',
-  templateUrl: 'expert-reject-project.html'
+    selector: 'app-expert-reject-project',
+    templateUrl: 'expert-reject-project.html',
+    standalone: false
 })
 
 

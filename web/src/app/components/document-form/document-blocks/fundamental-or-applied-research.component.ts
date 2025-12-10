@@ -32,7 +32,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
             </div>
         </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class FundamentalOrAppliedResearchComponent implements OnInit{
 

@@ -9,13 +9,14 @@ import {ProjectService} from "@app/services/project.service";
 import {ProjectDto} from "@app/dto/ProjectDto";
 
 @Component({
-  selector: 'app-lifecycle-group-list',
-  templateUrl: './lifecycle-group-list.component.html',
-  styles: [`
+    selector: 'app-lifecycle-group-list',
+    templateUrl: './lifecycle-group-list.component.html',
+    styles: [`
       .lifecycle-group-item:not(:last-child) {
           margin-bottom: 1rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class LifecycleGroupListComponent implements OnInit {
 

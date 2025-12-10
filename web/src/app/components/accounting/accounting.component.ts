@@ -22,7 +22,7 @@ import {
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {Operation} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 const customParseFormat = require('dayjs/plugin/customParseFormat');
 
 dayjs.extend(customParseFormat);
@@ -32,9 +32,9 @@ import {DialogService} from "@app/components/dialogs/dialog.service";
 import {PeriodDto} from "@app/dto/PeriodDto";
 
 @Component({
-  selector: 'app-accounting',
-  templateUrl: './accounting.component.html',
-  styles: [`
+    selector: 'app-accounting',
+    templateUrl: './accounting.component.html',
+    styles: [`
       table {
           font-size: 0.875rem;
           background-color: white;
@@ -44,7 +44,8 @@ import {PeriodDto} from "@app/dto/PeriodDto";
       td, th {
           padding: 0.75rem 0.5rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class AccountingComponent extends FilterAndPages<AccountingDto> {
 

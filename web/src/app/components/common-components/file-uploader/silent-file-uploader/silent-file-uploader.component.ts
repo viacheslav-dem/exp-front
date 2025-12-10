@@ -5,8 +5,9 @@ import {UploadHelper} from "app/components/common-components/file-uploader/uploa
 import { HttpBackend } from "@angular/common/http";
 
 @Component({
-  selector: 'app-silent-file-uploader',
-  templateUrl: 'silent-file-uploader.component.html'
+    selector: 'app-silent-file-uploader',
+    templateUrl: 'silent-file-uploader.component.html',
+    standalone: false
 })
 export class SilentFileUploaderComponent extends UploadHelper {
 

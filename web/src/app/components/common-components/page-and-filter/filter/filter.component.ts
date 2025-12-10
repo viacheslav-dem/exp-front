@@ -12,8 +12,9 @@ import {Filter} from "app/components/common-components/page-and-filter/model/Fil
 import {DataService} from "@app/services/data.service";
 
 @Component({
-  selector: 'app-filter',
-  templateUrl: './filter.component.html'
+    selector: 'app-filter',
+    templateUrl: './filter.component.html',
+    standalone: false
 })
 export class FilterComponent implements OnInit {
 

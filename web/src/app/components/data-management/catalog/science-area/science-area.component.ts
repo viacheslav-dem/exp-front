@@ -5,8 +5,8 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {ScienceAreaDto} from "@app/dto/ScienceAreaDto";
 
 @Component({
-  selector: 'app-science-area',
-  template: `
+    selector: 'app-science-area',
+    template: `
     <h5 class="mb-3">{{header}}</h5>
     <div class="list-group">
 
@@ -82,7 +82,8 @@ import {ScienceAreaDto} from "@app/dto/ScienceAreaDto";
       </div>
     </div>
   `,
-  styles: []
+    styles: [],
+    standalone: false
 })
 export class ScienceAreaComponent extends SimpleCatalogComponent<ScienceAreaDto> {
 

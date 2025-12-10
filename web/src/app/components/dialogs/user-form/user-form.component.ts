@@ -24,9 +24,10 @@ import {SectionPipe} from "@app/pipes/section.pipe";
 import {SelectItem} from "@app/components/common-components/page-and-filter/model/SearchField";
 
 @Component({
-  selector: 'app-user-form',
-  templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.scss']
+    selector: 'app-user-form',
+    templateUrl: './user-form.component.html',
+    styleUrls: ['./user-form.component.scss'],
+    standalone: false
 })
 export class UserFormComponent {
 

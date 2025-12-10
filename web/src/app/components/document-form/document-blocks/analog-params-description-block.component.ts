@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-analog-params-description-block',
-  template: `
+    selector: 'app-analog-params-description-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Признаки, которыми технологии и (или) продукция отличаются от аналогов на
@@ -23,7 +23,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AnalogParamsDescriptionBlockComponent {
 

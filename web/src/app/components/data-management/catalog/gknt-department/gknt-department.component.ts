@@ -13,8 +13,9 @@ import {FilterBuilder} from "@app/components/common-components/page-and-filter/m
 import {PersonDto} from "@app/dto/PersonDto";
 
 @Component({
-  selector: 'app-gknt-department',
-  templateUrl: './gknt-department.component.html'
+    selector: 'app-gknt-department',
+    templateUrl: './gknt-department.component.html',
+    standalone: false
 })
 export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> {
 

@@ -1,14 +1,15 @@
 import {Component, Input, OnInit} from "@angular/core";
 
 @Component({
-  selector: 'app-checkbox-list',
-  template: `
+    selector: 'app-checkbox-list',
+    template: `
     <div>
       <div *ngFor="let opt of options">
         <app-checkbox [(ngModel)]="opt.selected" (onChecked)="select(opt)"> {{opt.label}}</app-checkbox>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class CheckBoxListComponent implements OnInit {
 

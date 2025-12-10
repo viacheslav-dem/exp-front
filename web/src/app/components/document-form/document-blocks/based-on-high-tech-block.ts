@@ -15,7 +15,8 @@ import {EconomicActivityBlockComponent} from "@app/components/document-form/docu
                 [(ngModel)]="_form.basedOnHighTechText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class BasedOnHighTechBlockComponent {
 

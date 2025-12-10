@@ -7,7 +7,7 @@ import {Catalog, DataService} from "@app/services/data.service";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
 import {ProjectState} from "@app/pipes/project-state.pipe";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import {Operation} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import {ProjectLiDto} from "@app/dto/ProjectLiDto";
 import {ProjectService} from "@app/services/project.service";
@@ -22,7 +22,8 @@ import {PageRequest} from "@app/components/common-components/page-and-filter/mod
 
 @Component({
     selector: 'app-project-list',
-    templateUrl: './project-list.component.html'
+    templateUrl: './project-list.component.html',
+    standalone: false
 })
 export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
 

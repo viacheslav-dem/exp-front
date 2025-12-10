@@ -22,9 +22,9 @@ import {ModalComponent} from "@app/components/common-components/modal/modal.comp
 import {LastSignEnumPipe} from "@app/pipes/last-sign.pipe";
 
 @Component({
-  selector: 'app-user-list',
-  templateUrl: './user-list.component.html',
-  styles: [`
+    selector: 'app-user-list',
+    templateUrl: './user-list.component.html',
+    styles: [`
       table {
           font-size: 0.875rem;
           background-color: white;
@@ -34,7 +34,8 @@ import {LastSignEnumPipe} from "@app/pipes/last-sign.pipe";
       td, th {
           padding: 0.75rem 0.5rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class UserListComponent extends FilterAndPages<PersonDto> implements OnDestroy {
 

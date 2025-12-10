@@ -23,7 +23,8 @@ import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/Confirm
                 <button class="btn btn-dark" (click)="cancel()">{{cancelBtnMessage}}</button>
             </div>
         </div>
-  `
+  `,
+    standalone: false
 })
 export class MethRecPdfComponent {
 

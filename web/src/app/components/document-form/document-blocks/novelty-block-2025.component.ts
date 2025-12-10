@@ -29,7 +29,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
           </div>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class NoveltyBlock2025Component {
 

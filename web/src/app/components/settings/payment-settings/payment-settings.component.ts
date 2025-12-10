@@ -4,8 +4,9 @@ import {DataService} from "@app/services/data.service";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 
 @Component({
-  selector: 'app-payment-settings',
-  templateUrl: './payment-settings.component.html'
+    selector: 'app-payment-settings',
+    templateUrl: './payment-settings.component.html',
+    standalone: false
 })
 export class PaymentSettingsComponent extends PropertyComponent<PaymentSettings> {
   constructor(protected _dataService: DataService,

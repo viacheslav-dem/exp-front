@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-intellectual-labor-block',
-  template: `
+    selector: 'app-intellectual-labor-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Соответствие (использование высококвалифицированного интеллектуального труда) по пункту 8 таблицы
@@ -17,7 +17,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.intellectualLaborText" rows="3" class="form-control"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class IntellectualLaborBlockComponent {
 

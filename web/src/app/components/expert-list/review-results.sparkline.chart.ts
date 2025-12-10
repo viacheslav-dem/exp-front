@@ -9,8 +9,9 @@ import {ExpertStatsDto} from "@app/dto/ExpertStatsDto";
 import {ChartService} from "@app/services/chart.service";
 
 @Component({
-  selector: 'app-review-results-sparkline-chart',
-  template: '<highchart [options]="chart"></highchart>'
+    selector: 'app-review-results-sparkline-chart',
+    template: '<highchart [options]="chart"></highchart>',
+    standalone: false
 })
 export class ReviewResultsSparklineChart implements OnInit {
 

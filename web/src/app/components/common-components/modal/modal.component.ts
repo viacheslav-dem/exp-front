@@ -2,8 +2,9 @@ import {Component, OnInit, ViewChild, Input, Output, EventEmitter, OnDestroy} fr
 import {ModalDirective, ModalOptions} from "ngx-bootstrap/modal";
 
 @Component({
-  selector: 'app-modal',
-  templateUrl: './modal.component.html'
+    selector: 'app-modal',
+    templateUrl: './modal.component.html',
+    standalone: false
 })
 export class ModalComponent implements OnInit, OnDestroy {
 

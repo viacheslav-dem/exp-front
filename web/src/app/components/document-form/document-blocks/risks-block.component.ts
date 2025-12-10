@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-risks-block',
-  template: `
+    selector: 'app-risks-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Риски реализации проекта:
@@ -36,7 +36,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class RisksBlockComponent {
 

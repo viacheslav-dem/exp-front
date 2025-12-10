@@ -15,7 +15,8 @@ import {Component, Input} from '@angular/core';
                 title="Наименование товаров"
                 placeholder="наименование"></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class PvtProductNamingBlockComponent {
 

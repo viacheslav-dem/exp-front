@@ -9,8 +9,9 @@ import {CouncilStatsDto} from "@app/dto/CouncilStatsDto";
 import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO";
 
 @Component({
-  selector: 'app-council-results-chart',
-  template: '<highchart [options]="chart"></highchart>'
+    selector: 'app-council-results-chart',
+    template: '<highchart [options]="chart"></highchart>',
+    standalone: false
 })
 export class CouncilResultsChart implements OnInit {
 

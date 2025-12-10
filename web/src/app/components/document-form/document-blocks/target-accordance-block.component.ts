@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-target-accordance-block',
-  template: `
+    selector: 'app-target-accordance-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Соответствие объекта государственной экспертизы заявленным целям:
@@ -19,7 +19,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.targetAccordanceText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст"></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class TargetAccordanceBlockComponent {
 

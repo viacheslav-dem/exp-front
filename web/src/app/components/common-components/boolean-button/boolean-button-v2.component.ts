@@ -38,7 +38,8 @@ export const BB_CONTROL_VALUE_ACCESSOR: any = {
         border-top-left-radius: 0;
     }
   `],
-    providers: [BB_CONTROL_VALUE_ACCESSOR]
+    providers: [BB_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class BooleanButtonV2Component extends ControlComponent<boolean> {
 

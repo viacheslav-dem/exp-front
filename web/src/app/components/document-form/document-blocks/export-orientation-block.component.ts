@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-export-orientation-block',
-  template: `
+    selector: 'app-export-orientation-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Соответствие (экспортоориентированность) по пункту 3 таблицы «Критерии отнесения товаров к
@@ -17,7 +17,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.exportOrientationText" rows="3" class="form-control"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ExportOrientationBlockComponent {
 

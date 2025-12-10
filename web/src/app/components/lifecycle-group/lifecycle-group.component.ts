@@ -22,8 +22,9 @@ import {CouncilConclusionFormContainerComponent} from "@app/components/document-
 import {ProjectDto} from "@app/dto/ProjectDto";
 
 @Component({
-  selector: 'app-lifecycle-group',
-  templateUrl: './lifecycle-group.component.html'
+    selector: 'app-lifecycle-group',
+    templateUrl: './lifecycle-group.component.html',
+    standalone: false
 })
 export class LifecycleGroupComponent implements OnInit {
 

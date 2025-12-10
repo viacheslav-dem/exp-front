@@ -3,8 +3,9 @@ import {SearchPersonComponent} from "app/components/search/search-person/search-
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 
 @Component({
-  selector: 'app-search-person-by-roles',
-  templateUrl: './search-person.component.html'
+    selector: 'app-search-person-by-roles',
+    templateUrl: './search-person.component.html',
+    standalone: false
 })
 export class SearchPersonByRolesComponent extends SearchPersonComponent {
 

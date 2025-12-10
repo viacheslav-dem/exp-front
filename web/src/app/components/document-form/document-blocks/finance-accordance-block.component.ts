@@ -3,8 +3,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 
 @Component({
-  selector: 'app-finance-accordance-block',
-  template: `
+    selector: 'app-finance-accordance-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Соответствие заявленного финансирования планируемому объему выполняемых работ:
@@ -38,7 +38,8 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class FinanceAccordanceBlockComponent {
 

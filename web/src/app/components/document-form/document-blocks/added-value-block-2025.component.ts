@@ -25,7 +25,8 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AddedValueBlock2025Component {
 

@@ -7,8 +7,9 @@ import {MonthYearPipe} from "@app/pipes/mdate.pipe";
 import {blueClr} from "@app/components/stats/colors";
 
 @Component({
-  selector: 'app-finished-projects-chart',
-  template: '<highchart [options]="chart"></highchart>'
+    selector: 'app-finished-projects-chart',
+    template: '<highchart [options]="chart"></highchart>',
+    standalone: false
 })
 export class FinishedProjectsChart implements OnInit {
 

@@ -19,8 +19,9 @@ import {FilterBuilder} from "@app/components/common-components/page-and-filter/m
 import {SearchPersonComponent} from "@app/components/search/search-person/search-person.component";
 
 @Component({
-  selector: 'app-councils',
-  templateUrl: './councils.component.html'
+    selector: 'app-councils',
+    templateUrl: './councils.component.html',
+    standalone: false
 })
 export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   Catalog = Catalog;

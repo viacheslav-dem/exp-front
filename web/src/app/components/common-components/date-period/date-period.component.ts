@@ -1,7 +1,7 @@
 import {Component, EventEmitter, forwardRef, Input, OnChanges, Output, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
 import {BsDaterangepickerDirective} from 'ngx-bootstrap/datepicker';
@@ -13,8 +13,8 @@ export const PERIOD_FILTER_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-date-period',
-  template: `
+    selector: 'app-date-period',
+    template: `
     <input #dateInput
            style="padding: 0; margin: 0; border:0; width: 100%"
            bsDaterangepicker
@@ -28,7 +28,8 @@ export const PERIOD_FILTER_CONTROL_VALUE_ACCESSOR: any = {
            placement="bottom"
            container="body">
   `,
-  providers: [PERIOD_FILTER_CONTROL_VALUE_ACCESSOR]
+    providers: [PERIOD_FILTER_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class DatePeriodComponent extends ControlComponent<DateRange> implements OnChanges, AfterViewInit {
 

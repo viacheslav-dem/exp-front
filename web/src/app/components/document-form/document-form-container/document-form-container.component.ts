@@ -3,8 +3,9 @@ import {DocumentForm} from "@app/components/document-form/document-form";
 import {FormContent} from "@app/components/document-form/form-model/FormContent";
 
 @Component({
-  selector: 'app-document-form',
-  templateUrl: 'document-form-container.component.html',
+    selector: 'app-document-form',
+    templateUrl: 'document-form-container.component.html',
+    standalone: false
 })
 export class DocumentFormContainerComponent<Form extends FormContent> extends DocumentForm<Form> {
 

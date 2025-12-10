@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-export-block',
-  template: `
+    selector: 'app-export-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Экспортная ориентированность инновационного проекта (превышение экспорта над импортом):
@@ -20,7 +20,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ExportBlockComponent {
 

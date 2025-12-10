@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-high-tech-block',
-  template: `
+    selector: 'app-high-tech-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Возможность отнесения товаров (работ, услуг) к категории высокотехнологичных: <br>
@@ -17,7 +17,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.highTechText" rows="3" class="form-control"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class HighTechBlockComponent {
 

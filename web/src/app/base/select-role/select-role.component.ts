@@ -6,14 +6,15 @@ import {ActivatedRoute} from "@angular/router";
 import {ProjectListComponent} from "@app/components/project-list/project-list.component";
 
 @Component({
-  selector: 'app-select-role',
-  templateUrl: 'select-role.component.html',
-  styles: [`
+    selector: 'app-select-role',
+    templateUrl: 'select-role.component.html',
+    styles: [`
       .col-2.badge.badge-info.badge-pill {
           margin-right: 0px;
           max-height: 20px;
       }
-  `]
+  `],
+    standalone: false
 })
 export class SelectRoleComponent implements OnInit {
 

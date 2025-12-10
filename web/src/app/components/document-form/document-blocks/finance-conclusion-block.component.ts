@@ -3,8 +3,8 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectDto} from "@app/dto/ProjectDto";
 
 @Component({
-  selector: 'app-finance-conclusion-block',
-  template: `
+    selector: 'app-finance-conclusion-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Целесообразность реализации объекта государственной экспертизы и его финансирования за счет средств
@@ -42,7 +42,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         </ul>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class FinanceConclusionBlockComponent {
 

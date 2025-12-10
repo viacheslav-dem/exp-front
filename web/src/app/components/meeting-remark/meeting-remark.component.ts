@@ -6,8 +6,9 @@ import {RemarksContainerDto} from "@app/dto/RemarksContainerDto";
 import {Role} from "@app/pipes/role.pipe";
 
 @Component({
-  selector: 'app-meeting-remark',
-  templateUrl: './meeting-remark.component.html'
+    selector: 'app-meeting-remark',
+    templateUrl: './meeting-remark.component.html',
+    standalone: false
 })
 
 export class MeetingRemarkComponent {

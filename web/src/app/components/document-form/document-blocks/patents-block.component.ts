@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-patents-block',
-  template: `
+    selector: 'app-patents-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Создание товара с использованием способных к правовой охране результатов интеллектуальной деятельности
@@ -21,7 +21,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class PatentsBlockComponent {
 

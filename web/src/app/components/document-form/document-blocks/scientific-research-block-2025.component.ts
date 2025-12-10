@@ -36,7 +36,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
           </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ScientificResearchBlock2025Component {
 

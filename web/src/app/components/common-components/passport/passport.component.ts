@@ -9,8 +9,8 @@ export const PASSPORT_CONTROL_VALUE_ACCESSOR: any = {
   multi: true
 };
 @Component({
-  selector: 'app-passport',
-  template: `
+    selector: 'app-passport',
+    template: `
     <ng-container *ngIf="_value!=null">
       <label class="form-group-label">Паспорт</label>
     <div class="form-sub-group">
@@ -38,7 +38,8 @@ export const PASSPORT_CONTROL_VALUE_ACCESSOR: any = {
     </div>
     </ng-container>
   `,
-  providers: [PASSPORT_CONTROL_VALUE_ACCESSOR]
+    providers: [PASSPORT_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class PassportComponent extends ControlComponent<PassportDto> {
 

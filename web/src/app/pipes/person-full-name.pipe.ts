@@ -1,7 +1,10 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {PersonNameDto} from "@app/dto/PersonNameDto";
 
-@Pipe({name: 'fullName'})
+@Pipe({
+    name: 'fullName',
+    standalone: false
+})
 export class PersonFullNamePipe implements PipeTransform {
 
   transform(value:any): any {

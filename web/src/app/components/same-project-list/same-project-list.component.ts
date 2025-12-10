@@ -4,7 +4,8 @@ import {ProjectService} from "@app/services/project.service";
 
 @Component({
     selector: 'app-same-project-list',
-    templateUrl: './same-project-list.component.html'
+    templateUrl: './same-project-list.component.html',
+    standalone: false
 })
 
 export class SameProjectListComponent {

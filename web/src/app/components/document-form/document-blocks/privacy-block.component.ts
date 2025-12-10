@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-privacy-block',
-  template: `
+    selector: 'app-privacy-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Создание объекта права промышленной собственности
@@ -25,7 +25,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class PrivacyBlockComponent {
 

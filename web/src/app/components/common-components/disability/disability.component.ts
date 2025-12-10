@@ -10,8 +10,8 @@ export const DISABILITY_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-disability',
-  template: `
+    selector: 'app-disability',
+    template: `
     <ng-container *ngIf="_value != null">
       <div class="btn-group" style="margin-top: 0.5rem">
         <label class="btn btn-sm btn-primary mr-2" [class.active]="_value.isPensioner"
@@ -46,7 +46,8 @@ export const DISABILITY_CONTROL_VALUE_ACCESSOR: any = {
       <div *ngIf="!_value.isDisabled && !_value.isPensioner" class="italic">Данные отсутствуют</div>
     </ng-container>
   `,
-  providers: [DISABILITY_CONTROL_VALUE_ACCESSOR]
+    providers: [DISABILITY_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class DisabilityComponent extends ControlComponent<DisabilityDto> {
 }

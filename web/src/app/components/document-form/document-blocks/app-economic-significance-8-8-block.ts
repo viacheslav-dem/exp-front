@@ -128,7 +128,8 @@ import {
                 </ul>
              </div>
         </div>
-    `
+    `,
+    standalone: false
 })
 export class EconomicSignificance_8_8_BlockComponent {
 

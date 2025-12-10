@@ -11,8 +11,9 @@ import {NumberPipe} from "@app/pipes/number.pipe";
 import {ChartService} from "@app/services/chart.service";
 
 @Component({
-  selector: 'app-reviews-violation-sparkline-chart',
-  template: '<highchart [options]="chart"></highchart>'
+    selector: 'app-reviews-violation-sparkline-chart',
+    template: '<highchart [options]="chart"></highchart>',
+    standalone: false
 })
 export class ReviewsViolationSparklineChart implements OnInit {
 

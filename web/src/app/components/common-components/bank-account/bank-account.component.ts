@@ -11,8 +11,8 @@ export const BANK_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-bank-account',
-  template: `
+    selector: 'app-bank-account',
+    template: `
     <ng-container *ngIf="_value!=null">
       <label class="form-group-label">Банковские реквизиты в ОПЕРУ ОАО «АСБ Беларусбанк»</label>
       <div class="form-sub-group">
@@ -40,7 +40,8 @@ export const BANK_CONTROL_VALUE_ACCESSOR: any = {
       </div>
     </ng-container>
   `,
-  providers: [BANK_CONTROL_VALUE_ACCESSOR]
+    providers: [BANK_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class BankAccountComponent extends ControlComponent<BankAccountDto> {
 

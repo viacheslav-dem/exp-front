@@ -6,8 +6,9 @@ import {ProjectService} from "@app/services/project.service";
 import {Router} from "@angular/router";
 
 @Component({
-  selector: 'app-project-list-filtered',
-  templateUrl: './project-list-filtered.component.html'
+    selector: 'app-project-list-filtered',
+    templateUrl: './project-list-filtered.component.html',
+    standalone: false
 })
 export class ProjectListFilteredComponent extends FilterAndPages<ProjectLiDto> {
 

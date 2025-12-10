@@ -2,8 +2,8 @@ import {Component, Input} from '@angular/core';
 import {IndustryDto} from "@app/dto/IndustryDto";
 
 @Component({
-  selector: 'app-added-value-in-bound-block',
-  template: `
+    selector: 'app-added-value-in-bound-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Организация технологического процесса, обеспечивающего средний уровень добавленной стоимости на одного
@@ -23,7 +23,8 @@ import {IndustryDto} from "@app/dto/IndustryDto";
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AddedValueInBoundBlockComponent {
 

@@ -1,5 +1,8 @@
 import {Directive, ElementRef, Input} from "@angular/core";
-@Directive({ selector: '[loadingData]' })
+@Directive({
+    selector: '[loadingData]',
+    standalone: false
+})
 export class LoadingDataDirective {
   private spinnerLocal:any;
   private spinnerBg: any;

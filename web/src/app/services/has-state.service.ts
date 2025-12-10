@@ -1,4 +1,4 @@
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 import {HasState, ViewState} from "@app/dto/HasState";
 import {Role} from "@app/pipes/role.pipe";

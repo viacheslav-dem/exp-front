@@ -10,8 +10,8 @@ export const NUMBER_RANGE_FILTER_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-number-range-filter',
-  template: `
+    selector: 'app-number-range-filter',
+    template: `
     <ng-container *ngIf="value!=null">
       <input numberInput type="text" [attr.name]="name+'_start'" [(ngModel)]="value.start"
              class="form-control" style="width:75px; display: inline-block;"/>
@@ -20,7 +20,8 @@ export const NUMBER_RANGE_FILTER_CONTROL_VALUE_ACCESSOR: any = {
              class="form-control" style="width:75px; display:inline-block"/>
     </ng-container>
   `,
-  providers: [NUMBER_RANGE_FILTER_CONTROL_VALUE_ACCESSOR]
+    providers: [NUMBER_RANGE_FILTER_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class NumberRangeComponent extends ControlComponent<DoubleRange> {
 

@@ -7,9 +7,10 @@ import {UserFormComponent} from "@app/components/dialogs/user-form/user-form.com
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 
 @Component({
-  selector: 'app-dialogs',
-  templateUrl: './dialog.component.html',
-  styles: []
+    selector: 'app-dialogs',
+    templateUrl: './dialog.component.html',
+    styles: [],
+    standalone: false
 })
 export class DialogComponent implements OnInit {
 

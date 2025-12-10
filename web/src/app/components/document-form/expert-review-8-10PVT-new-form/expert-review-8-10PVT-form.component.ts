@@ -10,13 +10,14 @@ import {ExpertReview_8_10PVT_NewFormContent} from "@app/components/document-form
 import {isEmptyOrNull} from "@app/support/utils";
 
 @Component({
-  selector: 'app-review-8-10PVT-form',
-  templateUrl: './expert-review-8-10PVT-form.component.html',
-  styles: [`
+    selector: 'app-review-8-10PVT-form',
+    templateUrl: './expert-review-8-10PVT-form.component.html',
+    styles: [`
       .alert.alert-primary:hover {
           opacity: 1;
       }
-  `]
+  `],
+    standalone: false
 })
 export class ExpertReview_8_10PVT_NewFormComponent extends ExpertReviewForm<ExpertReview_8_10PVT_NewFormContent> {
 

@@ -3,7 +3,8 @@ import {CouncilConclusionForm} from "@app/components/document-form/council-concl
 
 @Component({
     selector: 'app-council-conclusion-8-8BIF-form',
-    templateUrl: './council-conclusion-8-8BIF-form.component.html'
+    templateUrl: './council-conclusion-8-8BIF-form.component.html',
+    standalone: false
 })
 export class CouncilConclusion_8_8BIF_FormComponent extends CouncilConclusionForm {
 

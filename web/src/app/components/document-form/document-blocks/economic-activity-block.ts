@@ -14,7 +14,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
                 [(ngModel)]="_form.economicActivityText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class EconomicActivityBlockComponent {
 

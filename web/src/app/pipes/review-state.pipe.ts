@@ -1,7 +1,10 @@
 import {Pipe} from "@angular/core";
 import {AbstractEnumPipe} from "@app/pipes/abstract-enum.pipe";
 
-@Pipe({name: 'reviewState'})
+@Pipe({
+    name: 'reviewState',
+    standalone: false
+})
 export class ReviewStatePipe extends AbstractEnumPipe<ExpertReviewState> {
 
   init() {

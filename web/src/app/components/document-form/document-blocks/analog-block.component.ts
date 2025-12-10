@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-analog-block',
-  template: `
+    selector: 'app-analog-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Укажите, на что направлен объект государственной экспертизы:
@@ -19,7 +19,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AnalogBlockComponent {
 

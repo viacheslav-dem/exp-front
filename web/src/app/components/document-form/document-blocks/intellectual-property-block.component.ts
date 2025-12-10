@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-intellectual-property-block',
-  template: `
+    selector: 'app-intellectual-property-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Соответствие (использование интеллектуальной собственности) по пункту 7 таблицы «Критерии
@@ -17,7 +17,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.intellectualPropertyText" rows="3" class="form-control"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class IntellectualPropertyBlockComponent {
 

@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-effect-block',
-  template: `
+    selector: 'app-effect-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Возможный экономический и (или) социальный и (или) экологический эффект от реализации мероприятия.
@@ -20,7 +20,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class EffectBlockComponent {
 

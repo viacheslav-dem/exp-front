@@ -44,7 +44,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 
             </div>
         </div>
-    `
+    `,
+    standalone: false
 })
 export class CompetenceSufficiencyBlock2025Component {
 

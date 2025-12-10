@@ -22,7 +22,8 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
     </textarea>
         </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class FinanceAccordanceConclusionBlockComponent {
 

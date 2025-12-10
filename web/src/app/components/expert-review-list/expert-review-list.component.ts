@@ -9,13 +9,14 @@ import {PersonFullNamePipe} from "@app/pipes/person-full-name.pipe";
 import {ProjectService} from "@app/services/project.service";
 
 @Component({
-  selector: 'app-expert-review-list',
-  templateUrl: './expert-review-list.component.html',
-  styles: [`
+    selector: 'app-expert-review-list',
+    templateUrl: './expert-review-list.component.html',
+    styles: [`
       .review:not(:last-child) {
           margin-bottom: 1rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class ExpertReviewListComponent implements OnInit {
 

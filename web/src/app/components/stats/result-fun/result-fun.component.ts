@@ -1,5 +1,5 @@
 import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import {StatsService} from "@app/services/stats.service";
 import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO";
 import {EMPTY, Subscription, throwError} from "rxjs";
@@ -7,9 +7,10 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {CouncilStatsV2ResponseDTO} from "@app/dto/response/CouncilStatsV2ResponseDTO";
 
 @Component({
-  selector: 'app-result-fun',
-  templateUrl: './result-fun.component.html',
-  styles: []
+    selector: 'app-result-fun',
+    templateUrl: './result-fun.component.html',
+    styles: [],
+    standalone: false
 })
 export class ResultFunComponent implements OnInit, OnDestroy {
 

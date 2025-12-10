@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-marketing-research-results-block',
-  template: `
+    selector: 'app-marketing-research-results-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Сведения о проведении маркетинговых и патентных исследований и их результаты.
@@ -21,7 +21,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class MarketingResearchResultsBlockComponent {
 

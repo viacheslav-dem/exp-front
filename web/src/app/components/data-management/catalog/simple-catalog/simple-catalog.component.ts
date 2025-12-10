@@ -7,8 +7,8 @@ import {DataService} from "@app/services/data.service";
 import {Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
 
 @Component({
-  selector: 'app-simple-catalog',
-  template: `<h5 class="mb-3">{{header}}</h5>
+    selector: 'app-simple-catalog',
+    template: `<h5 class="mb-3">{{header}}</h5>
   <div class="list-group">
 
     <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
@@ -78,7 +78,8 @@ import {Direction} from "@app/components/common-components/page-and-filter/model
     </div>
   </div>
   `,
-  styles: []
+    styles: [],
+    standalone: false
 })
 export class SimpleCatalogComponent<T extends CatalogDto> extends CatalogTemplate<T> {
 

@@ -13,8 +13,9 @@ import {
 import {PropertyComponent} from "@app/components/settings/property.component";
 
 @Component({
-  selector: 'app-settings',
-  templateUrl: './settings.component.html'
+    selector: 'app-settings',
+    templateUrl: './settings.component.html',
+    standalone: false
 })
 export class SettingsComponent extends FilterAndPages<PropertyDto> {
 

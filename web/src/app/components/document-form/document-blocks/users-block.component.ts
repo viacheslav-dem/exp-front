@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-users-block',
-  template: `
+    selector: 'app-users-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Сведения о предполагаемом владельце, операторе, пользователях программно-технических средств, 
@@ -21,7 +21,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class UsersBlockComponent {
 

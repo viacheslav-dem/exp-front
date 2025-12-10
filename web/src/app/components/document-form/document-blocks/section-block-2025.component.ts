@@ -36,7 +36,8 @@ import {Catalog} from "@app/services/data.service";
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class SectionBlock2025Component {
 

@@ -1,7 +1,8 @@
 import {Directive, ElementRef, Input} from '@angular/core';
 
 @Directive({
-  selector: '[accordianShow]'
+    selector: '[accordianShow]',
+    standalone: false
 })
 export class AccordionDirective {
 

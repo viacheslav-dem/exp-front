@@ -10,8 +10,8 @@ import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 import {isEmptyOrNull} from "@app/support/utils";
 
 @Component({
-  selector: 'app-directions',
-  template: `<h5 class="mb-3">"Справочник приоритетных направлений научных исследований и (или) научно-технической деятельности"</h5>
+    selector: 'app-directions',
+    template: `<h5 class="mb-3">"Справочник приоритетных направлений научных исследований и (или) научно-технической деятельности"</h5>
   <div class="list-group">
 
     <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
@@ -90,7 +90,8 @@ import {isEmptyOrNull} from "@app/support/utils";
     </div>
   </div>
   `,
-  styles: []
+    styles: [],
+    standalone: false
 })
 export class DirectionsComponent <T extends DirectionDto> extends CatalogTemplate<T> {
 

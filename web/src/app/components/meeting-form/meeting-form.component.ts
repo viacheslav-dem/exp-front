@@ -1,6 +1,6 @@
 import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {ModalDirective} from "ngx-bootstrap/modal";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {PeriodDto} from "@app/dto/PeriodDto";
 import {MeetingPostDto} from "@app/dto/MeetingPostDto";
@@ -11,8 +11,9 @@ import {MeetingService} from "@app/services/meeting.service";
 import {isEmptyOrNull} from "@app/support/utils";
 
 @Component({
-  selector: 'app-meeting-form',
-  templateUrl: './meeting-form.component.html'
+    selector: 'app-meeting-form',
+    templateUrl: './meeting-form.component.html',
+    standalone: false
 })
 export class MeetingFormComponent {
 

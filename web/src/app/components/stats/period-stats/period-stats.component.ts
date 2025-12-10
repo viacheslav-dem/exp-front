@@ -1,13 +1,14 @@
 import {Component, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/core";
 import {StatsService} from "@app/services/stats.service";
 import {StatsDto} from "@app/dto/StatsDto";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 import {BsDatepickerConfig} from 'ngx-bootstrap/datepicker';
 
 @Component({
-  selector: 'app-period-stats',
-  templateUrl: './period-stats.component.html',
+    selector: 'app-period-stats',
+    templateUrl: './period-stats.component.html',
+    standalone: false
 })
 export class PeriodStatsComponent implements OnInit, AfterViewInit {
 

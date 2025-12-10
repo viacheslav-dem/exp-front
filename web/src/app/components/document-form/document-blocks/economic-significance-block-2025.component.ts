@@ -687,7 +687,8 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
                 </div>
             </div>
         </div>
-    `
+    `,
+    standalone: false
 })
 export class EconomicSignificanceBlock2025Component {
 

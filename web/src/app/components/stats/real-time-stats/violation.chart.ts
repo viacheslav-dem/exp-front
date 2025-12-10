@@ -8,11 +8,12 @@ import {Chart} from "app/components/highchart/highchart.builder";
 import {MonthYearPipe} from "app/pipes/mdate.pipe";
 import {blueClr, noViolationClr, redClr, yellowClr} from "@app/components/stats/colors";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 
 @Component({
-  selector: 'app-violation-chart',
-  template: '<highchart [options]="chart"></highchart>',
+    selector: 'app-violation-chart',
+    template: '<highchart [options]="chart"></highchart>',
+    standalone: false
 })
 export class ViolationChart implements OnInit {
 

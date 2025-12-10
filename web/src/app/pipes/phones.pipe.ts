@@ -1,7 +1,10 @@
 import {Pipe, PipeTransform} from "@angular/core";
 import {PhoneDto} from "@app/dto/PhoneDto";
 
-@Pipe({name: 'phones'})
+@Pipe({
+    name: 'phones',
+    standalone: false
+})
 export class PhonesPipe implements PipeTransform {
 
   static phoneTypes: { [key: string]: PhoneType } = {

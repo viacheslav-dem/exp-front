@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-result-accordance-block',
-  template: `
+    selector: 'app-result-accordance-block',
+    template: `
     <div class="form-sub-group">
       <label>
         <span *ngIf="num">{{num}}.</span>
@@ -20,7 +20,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ResultAccordanceBlockComponent {
 

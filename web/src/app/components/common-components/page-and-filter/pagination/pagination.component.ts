@@ -4,8 +4,9 @@ import {Pagination} from "app/components/common-components/page-and-filter/model
 import {PageRequest} from "@app/components/common-components/page-and-filter/model/PageRequest";
 
 @Component({
-  selector: 'app-pagination',
-  templateUrl: './pagination.component.html'
+    selector: 'app-pagination',
+    templateUrl: './pagination.component.html',
+    standalone: false
 })
 export class PaginationComponent implements OnInit {
 

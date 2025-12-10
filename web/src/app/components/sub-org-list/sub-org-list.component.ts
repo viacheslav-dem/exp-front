@@ -5,8 +5,9 @@ import {PersonDto} from "@app/dto/PersonDto";
 import {DataService} from "@app/services/data.service";
 
 @Component({
-  selector: 'app-sub-org-list',
-  templateUrl: 'sub-org-list.component.html'
+    selector: 'app-sub-org-list',
+    templateUrl: 'sub-org-list.component.html',
+    standalone: false
 })
 
 export class SubOrgListComponent implements OnInit {

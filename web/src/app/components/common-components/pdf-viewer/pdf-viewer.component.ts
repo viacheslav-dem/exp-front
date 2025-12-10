@@ -5,13 +5,13 @@ import {SERVER_URL} from "app/config";
 import {DocumentDto} from "@app/dto/DocumentDto";
 
 @Component({
-  selector: 'app-pdf-viewer',
+    selector: 'app-pdf-viewer',
     template: `
         <iframe *ngIf="documentUrl" [src]="documentUrl" class="viewer" align="left" allowfullscreen>
             Ваш браузер не поддерживает плавающие фреймы!
         </iframe>
-  `
-
+  `,
+    standalone: false
 })
 export class PdfViewerComponent {
 

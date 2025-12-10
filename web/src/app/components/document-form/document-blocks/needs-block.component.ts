@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-needs-block',
-  template: `
+    selector: 'app-needs-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Обоснование прогнозируемой потребности в разрабатываемой продукции (товарах, услугах) 
@@ -21,7 +21,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class NeedsBlockComponent {
 

@@ -2,8 +2,9 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
 import {RemarkDto} from "@app/dto/RemarkDto";
 
 @Component({
-  selector: 'app-remark-response',
-  templateUrl: './remark-response.component.html'
+    selector: 'app-remark-response',
+    templateUrl: './remark-response.component.html',
+    standalone: false
 })
 
 export class RemarkResponseComponent {

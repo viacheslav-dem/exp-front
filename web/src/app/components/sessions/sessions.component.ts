@@ -3,8 +3,8 @@ import {AuditService} from "@app/services/audit.service";
 import {PersonPlainDto} from "@app/dto/PersonPlainDto";
 
 @Component({
-  selector: 'app-sessions',
-  template: `
+    selector: 'app-sessions',
+    template: `
       <div class="row">
           <div class="col-12">
               <div class="card pt-3">
@@ -21,7 +21,8 @@ import {PersonPlainDto} from "@app/dto/PersonPlainDto";
           </div>
       </div>
   `,
-  styles: []
+    styles: [],
+    standalone: false
 })
 export class SessionsComponent implements OnInit {
 

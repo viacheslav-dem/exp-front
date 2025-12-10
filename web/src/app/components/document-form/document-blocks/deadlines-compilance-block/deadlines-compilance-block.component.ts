@@ -2,8 +2,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
 
 @Component({
-  selector: 'app-deadlines-compliance-block',
-  template: `
+    selector: 'app-deadlines-compliance-block',
+    template: `
       <div class="form-sub-group">
           <label>
               {{num}}. Создание объекта права промышленной собственности
@@ -27,7 +27,8 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
           </div>
       </div>
   `,
-  styles: []
+    styles: [],
+    standalone: false
 })
 export class DeadlinesComplianceBlockComponent {
 

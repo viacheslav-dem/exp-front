@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-stages-block-2025',
-  template: `
+    selector: 'app-stages-block-2025',
+    template: `
     <div class="form-sub-group">
       <label>
         {{ num }}. Наличие в календарном плане этапов реализации объекта государственной экспертизы, подлежащих
@@ -28,7 +28,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class StagesBlock2025Component {
 

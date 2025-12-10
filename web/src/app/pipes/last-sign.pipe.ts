@@ -2,7 +2,10 @@ import {Pipe} from "@angular/core";
 import {AbstractEnumPipe} from "@app/pipes/abstract-enum.pipe";
 import {AuditTypes} from "@app/pipes/audit-type.pipe";
 
-@Pipe({name: 'lastSign'})
+@Pipe({
+    name: 'lastSign',
+    standalone: false
+})
 export class LastSignEnumPipe extends AbstractEnumPipe<LastSignEnum> {
 
     init() {

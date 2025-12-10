@@ -9,8 +9,8 @@ export const CHECKBOX_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-checkbox',
-  template: `
+    selector: 'app-checkbox',
+    template: `
     <div class="custom-control custom-checkbox" (click)="check()">
       <input type="checkbox" class="custom-control-input" [(ngModel)]="value">
       <label class="custom-control-label">
@@ -18,7 +18,8 @@ export const CHECKBOX_VALUE_ACCESSOR: any = {
       </label>
     </div>
   `,
-  providers: [CHECKBOX_VALUE_ACCESSOR]
+    providers: [CHECKBOX_VALUE_ACCESSOR],
+    standalone: false
 })
 export class CheckboxComponent extends ControlComponent<boolean> {
 

@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-work-significance-block',
-  template: `
+    selector: 'app-work-significance-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Значение работы для реализации приоритетов социально-экономического развития, разработки новых 
@@ -17,7 +17,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.workSignificanceText" rows="3" class="form-control"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class WorkSignificanceBlockComponent {
 

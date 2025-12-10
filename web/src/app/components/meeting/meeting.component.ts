@@ -21,8 +21,9 @@ import {RemarksContainerDto} from "@app/dto/RemarksContainerDto";
 import {MeetingProtocolFormComponent} from "@app/components/document-form/meeting-protocol-form/meeting-protocol-form.component";
 
 @Component({
-  selector: 'app-meeting',
-  templateUrl: 'meeting.component.html'
+    selector: 'app-meeting',
+    templateUrl: 'meeting.component.html',
+    standalone: false
 })
 export class MeetingComponent implements OnInit {
 

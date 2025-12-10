@@ -11,8 +11,8 @@ export const NEW_VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-new-vote-results',
-  template: `
+    selector: 'app-new-vote-results',
+    template: `
     <div *ngIf="_value">
       <label><i><b>Результаты голосования</b></i></label>
       <div class="row">
@@ -76,13 +76,14 @@ export const NEW_VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
       span.disabled {
           color: #bbbbbb;
       }
 
   `],
-  providers: [NEW_VOTE_RESULTS_CONTROL_VALUE_ACCESSOR]
+    providers: [NEW_VOTE_RESULTS_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class NewVoteResultsComponent extends ControlComponent<NewVoteResults> {
 

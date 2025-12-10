@@ -26,7 +26,8 @@ import {Component, Input} from "@angular/core";
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class MarketingResearchResultsBlock2025Component {
 

@@ -5,9 +5,10 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {HighTechCriteria} from "@app/components/document-form/form-model/high-tech-criteria";
 
 @Component({
-  selector: 'app-high-tech-criteria',
-  templateUrl: './high-tech-criteria.component.html',
-  styleUrls: ['./high-tech-criteria.component.scss']
+    selector: 'app-high-tech-criteria',
+    templateUrl: './high-tech-criteria.component.html',
+    styleUrls: ['./high-tech-criteria.component.scss'],
+    standalone: false
 })
 export class HighTechCriteriaComponent extends PropertyComponent<HighTechCriteria> {
   constructor(protected _dataService: DataService,

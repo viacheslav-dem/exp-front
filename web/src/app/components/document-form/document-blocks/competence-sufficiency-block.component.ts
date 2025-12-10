@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-competence-sufficiency-block',
-  template: `
+    selector: 'app-competence-sufficiency-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Достаточность компетенции кадрового состава потенциального исполнителя работ:
@@ -25,7 +25,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class CompetenceSufficiencyBlockComponent {
 

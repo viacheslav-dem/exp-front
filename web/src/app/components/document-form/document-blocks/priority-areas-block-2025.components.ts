@@ -36,7 +36,8 @@ import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
             </div>
         </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class PriorityAreasBlock2025Components implements OnInit{
 

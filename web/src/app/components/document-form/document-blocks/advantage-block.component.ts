@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-advantage-block',
-  template: `
+    selector: 'app-advantage-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Обладание товаром более высокими технико-экономическими показателями по сравнению с другими товарами, 
@@ -20,7 +20,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class AdvantageBlockComponent {
 

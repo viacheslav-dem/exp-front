@@ -5,7 +5,8 @@ import {DataService} from "@app/services/data.service";
 
 @Component({
     selector: 'app-agenda-8-1-2-3-4-5-7-8-12NIOKTR-14-2025-form',
-    templateUrl: './agenda-8-1-2-3-4-5-7-8-12NIOKTR-14-2025-form.html'
+    templateUrl: './agenda-8-1-2-3-4-5-7-8-12NIOKTR-14-2025-form.html',
+    standalone: false
 })
 export class Agenda_8_1_2_3_4_5_7_8_12NIOKTR_14_2025_FormComponent extends AgendaNewForm {
 

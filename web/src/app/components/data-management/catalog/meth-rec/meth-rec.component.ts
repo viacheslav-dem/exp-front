@@ -11,7 +11,8 @@ import {SERVER_URL} from "@app/config";
 
 @Component({
     selector: 'app-meth-rec',
-    templateUrl: './meth-rec.component.html'
+    templateUrl: './meth-rec.component.html',
+    standalone: false
 })
 export class MethRecComponent extends FilterAndPages<TemplateDocumentDto> {
 

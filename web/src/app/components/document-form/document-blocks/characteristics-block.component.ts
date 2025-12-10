@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-characteristics-block',
-  template: `
+    selector: 'app-characteristics-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Функциональные, технические, технологические и другие характеристики создаваемых и приобретаемых 
@@ -22,7 +22,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class CharacteristicsBlockComponent {
 

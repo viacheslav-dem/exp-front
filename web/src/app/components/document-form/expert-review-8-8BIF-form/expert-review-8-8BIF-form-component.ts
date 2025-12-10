@@ -12,7 +12,8 @@ import {anyMatch, isEmptyOrNull} from "@app/support/utils";
 
 @Component({
     selector: 'app-review-8-8BIF-form',
-    templateUrl: './expert-review-8-8BIF-form.component.html'
+    templateUrl: './expert-review-8-8BIF-form.component.html',
+    standalone: false
 })
 export class ExpertReview_8_8BIF_FormComponent extends ExpertReviewForm<ExpertReview_8_8BIF_FormContent> {
     constructor(

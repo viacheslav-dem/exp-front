@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-novelty-accordance-block',
-  template: `
+    selector: 'app-novelty-accordance-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Соответствие (новизна товара (работ, услуг)) по пункту 2 таблицы «Критерии отнесения товаров к
@@ -17,7 +17,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.noveltyAccordanceText" rows="3" class="form-control"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class NoveltyAccordanceBlockComponent {
 

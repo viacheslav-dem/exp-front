@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-marketing-research-8-8-plain-block',
-  template: `
+    selector: 'app-marketing-research-8-8-plain-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Проведение маркетинговых и патентных исследований, их результаты:
@@ -10,7 +10,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <app-dropdown [options]="marketingResearchOptions" [(ngModel)]="_form.marketingResearch"
                     (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class MarketingResearchPlainBifBlockComponent {
 

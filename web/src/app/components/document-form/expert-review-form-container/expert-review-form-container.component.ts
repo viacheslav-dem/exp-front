@@ -8,9 +8,9 @@ import {DraftService} from "@app/components/document-form/draft.service";
 import {IdDto} from "@app/dto/IdDto";
 
 @Component({
-  selector: 'app-expert-review-form',
-  templateUrl: 'expert-review-form-container.component.html',
-  styles: [`
+    selector: 'app-expert-review-form',
+    templateUrl: 'expert-review-form-container.component.html',
+    styles: [`
       ::ng-deep .hint {
           margin-top: 0.5rem;
           font-style: italic;
@@ -24,7 +24,8 @@ import {IdDto} from "@app/dto/IdDto";
       ::ng-deep .hint ul {
           margin-bottom: 0.5rem;
       }
-  `]
+  `],
+    standalone: false
 })
 export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormContent> extends DocumentFormContainerComponent<Form> {
 

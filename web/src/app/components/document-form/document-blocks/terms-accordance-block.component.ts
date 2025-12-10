@@ -3,8 +3,8 @@ import {PeriodDto} from "@app/dto/PeriodDto";
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
 
 @Component({
-  selector: 'app-terms-accordance-block',
-  template: `
+    selector: 'app-terms-accordance-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Соответствие сроков выполнения объекта государственной экспертизы необходимым:
@@ -27,7 +27,8 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
       <textarea *ngIf="full" [(ngModel)]="_form.termsAccordanceText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст"></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class TermsAccordanceBlockComponent {
 

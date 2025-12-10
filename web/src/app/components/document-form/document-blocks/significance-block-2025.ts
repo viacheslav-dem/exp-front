@@ -18,7 +18,8 @@ import {Component, Input} from "@angular/core";
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class SignificanceBlock2025Component {
 

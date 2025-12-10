@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-conclusion-8-6-block',
-  template: `
+    selector: 'app-conclusion-8-6-block',
+    template: `
     <div class="form-sub-group">
       <label>
         Заключение эксперта по объекту государственной экспертизы:
@@ -20,7 +20,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class Conclusion_8_6_BlockComponent {
 

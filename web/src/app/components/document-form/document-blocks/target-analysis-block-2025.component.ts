@@ -35,7 +35,8 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
           </ul>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class TargetAnalysisBlock2025Component {
 

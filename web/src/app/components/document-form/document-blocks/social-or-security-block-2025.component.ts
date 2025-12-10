@@ -52,7 +52,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
           </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class SocialOrSecurityBlock2025Component {
 

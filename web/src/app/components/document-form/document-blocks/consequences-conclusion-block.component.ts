@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-consequences-conclusion-block',
-  template: `
+    selector: 'app-consequences-conclusion-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
@@ -42,7 +42,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class ConsequencesConclusionBlockComponent {
 

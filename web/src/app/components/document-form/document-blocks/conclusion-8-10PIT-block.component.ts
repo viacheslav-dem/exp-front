@@ -1,8 +1,8 @@
 import {Component, Input} from '@angular/core';
 
 @Component({
-  selector: 'app-conclusion-8-10PIT-block',
-  template: `
+    selector: 'app-conclusion-8-10PIT-block',
+    template: `
     <div class="form-group">
 
       <label class="font-weight-bold">
@@ -23,7 +23,8 @@ import {Component, Input} from '@angular/core';
         </p>
       </div>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class Conclusion810PITBlockComponent {
 

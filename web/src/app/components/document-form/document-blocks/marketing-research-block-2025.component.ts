@@ -63,7 +63,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
                 </div>
             </div>
         </div>
-    `
+    `,
+    standalone: false
 })
 export class MarketingResearchBlock2025Component {
 

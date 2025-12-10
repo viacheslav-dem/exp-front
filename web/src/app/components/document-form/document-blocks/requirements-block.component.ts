@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
-  selector: 'app-requirements-block',
-  template: `
+    selector: 'app-requirements-block',
+    template: `
     <div class="form-sub-group">
       <label>
         {{num}}. Достаточность требований, предъявляемых к квалификации и опыту (компетенции) лиц, 
@@ -15,7 +15,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <textarea *ngIf="full" [(ngModel)]="_form.requirementsText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст."></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class RequirementsBlockComponent {
 

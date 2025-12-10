@@ -11,14 +11,15 @@ export const CATALOG_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-select-catalog',
-  template: `
+    selector: 'app-select-catalog',
+    template: `
     <app-dropdown 
       [(ngModel)]="value" [notSelected]="notSelected" [options]="options"
       [resetEnabled]="resetEnabled" [optionToString]="optionToString"
     ></app-dropdown>
   `,
-  providers: [CATALOG_CONTROL_VALUE_ACCESSOR]
+    providers: [CATALOG_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class SelectCatalogComponent extends ControlComponent<CatalogDto> {
 

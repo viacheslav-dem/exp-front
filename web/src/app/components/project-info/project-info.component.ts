@@ -38,8 +38,9 @@ import {DocumentService} from "@app/services/document.service";
 import {ActionButtonMetadata} from "./action-button-metadata";
 
 @Component({
-  selector: 'app-project-info',
-  templateUrl: 'project-info.component.html'
+    selector: 'app-project-info',
+    templateUrl: 'project-info.component.html',
+    standalone: false
 })
 export class ProjectInfoComponent implements OnInit {
 

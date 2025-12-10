@@ -4,8 +4,9 @@ import {isEmptyOrNull} from "@app/support/utils";
 import {ExpertReview_8_11_14_NewFormContent} from "@app/components/document-form/form-model/ExpertReview_8_11_14_NewFormContent";
 
 @Component({
-  selector: 'app-review-8-11-14-new-form',
-  templateUrl: './expert-review-8-11-14-new-form.component.html'
+    selector: 'app-review-8-11-14-new-form',
+    templateUrl: './expert-review-8-11-14-new-form.component.html',
+    standalone: false
 })
 export class ExpertReview_8_11_14_NewFormComponent extends ExpertReviewForm<ExpertReview_8_11_14_NewFormContent> {
 

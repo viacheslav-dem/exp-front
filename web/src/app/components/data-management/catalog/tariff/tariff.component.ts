@@ -5,8 +5,8 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {TariffRateDto} from "@app/dto/TariffRateDto";
 
 @Component({
-  selector: 'app-tariff',
-  template: `
+    selector: 'app-tariff',
+    template: `
     <h5 class="mb-3">{{header}}</h5>
     <div class="list-group">
 
@@ -101,7 +101,8 @@ import {TariffRateDto} from "@app/dto/TariffRateDto";
       </div>
     </div>
   `,
-  styles: []
+    styles: [],
+    standalone: false
 })
 export class TariffComponent extends SimpleCatalogComponent<TariffRateDto> {
 

@@ -8,7 +8,8 @@ import {PeriodDto} from "@app/dto/PeriodDto";
 
 @Component({
     selector: 'app-review-8-1-2-15-new-form',
-    templateUrl: './expert-review-8-1-2-15-new-form.component.html'
+    templateUrl: './expert-review-8-1-2-15-new-form.component.html',
+    standalone: false
 })
 export class ExpertReview_8_1_2_15_NewFormComponent extends ExpertReviewForm<ExpertReview_8_1_2_15_NewFormContent> {
 

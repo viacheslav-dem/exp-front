@@ -8,8 +8,9 @@ import {StatsDto} from "@app/dto/StatsDto";
 import {blueClr} from "@app/components/stats/colors";
 
 @Component({
-  selector: 'app-finished-reviews-chart',
-  template: '<highchart [options]="chart"></highchart>'
+    selector: 'app-finished-reviews-chart',
+    template: '<highchart [options]="chart"></highchart>',
+    standalone: false
 })
 export class FinishedReviewsChart implements OnInit {
 

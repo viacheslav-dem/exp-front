@@ -2,8 +2,9 @@ import {Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges
 import {Options} from '@angular-slider/ngx-slider';
 
 @Component({
-  selector: 'app-slider',
-  templateUrl: './slider.component.html'
+    selector: 'app-slider',
+    templateUrl: './slider.component.html',
+    standalone: false
 })
 export class SliderComponent implements OnInit, OnChanges {
 

@@ -10,8 +10,8 @@ export const PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-  selector: 'app-password-input',
-  template: `
+    selector: 'app-password-input',
+    template: `
     <ng-container *ngIf="value" ngForm appNestableForm>
       <label>Текущий пароль</label>
       <input [(ngModel)]="value.currentPassword" name="currentPassword" class="form-control" type="password" required
@@ -71,7 +71,8 @@ export const PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR: any = {
              required [pattern]="pattern" (change)="onChange()" (input)="onInput()"/>
     </ng-container>
   `,
-  providers: [PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR]
+    providers: [PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR],
+    standalone: false
 })
 export class PasswordInputComponent extends ControlComponent<PasswordDto> {
 

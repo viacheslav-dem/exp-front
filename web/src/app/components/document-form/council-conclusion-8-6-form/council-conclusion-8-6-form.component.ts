@@ -3,8 +3,9 @@ import {CouncilConclusionForm} from "@app/components/document-form/council-concl
 import {DecisionState} from "@app/pipes/decision.pipe";
 
 @Component({
-  selector: 'app-council-conclusion-8-6-form',
-  templateUrl: './council-conclusion-8-6-form.component.html'
+    selector: 'app-council-conclusion-8-6-form',
+    templateUrl: './council-conclusion-8-6-form.component.html',
+    standalone: false
 })
 export class CouncilConclusion_8_6_FormComponent extends CouncilConclusionForm {
 

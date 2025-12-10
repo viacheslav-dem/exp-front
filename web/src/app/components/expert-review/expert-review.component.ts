@@ -26,13 +26,14 @@ import {
 import {DataService} from "@app/services/data.service";
 //import { takeWhile } from 'rxjs/operators';
 import {PeriodDto} from "@app/dto/PeriodDto";
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import {AccountingPlainDto} from "@app/dto/AccountingPlainDto";
 import {TemplateType} from "@app/components/document-form/form-model/TemplateType";
 
 @Component({
     selector: 'app-expert-review',
-    templateUrl: './expert-review.component.html'
+    templateUrl: './expert-review.component.html',
+    standalone: false
 })
 export class ExpertReviewComponent implements OnInit {
 

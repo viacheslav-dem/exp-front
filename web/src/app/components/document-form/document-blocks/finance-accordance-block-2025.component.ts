@@ -28,7 +28,8 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
       <textarea *ngIf="full" [(ngModel)]="_form.financeAccordanceText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст"></textarea>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class FinanceAccordanceBlock2025Component {
 
