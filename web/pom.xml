@@ -15,6 +15,10 @@
 
         <!-- формат даты для имени файла -->
         <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+        
+        <!-- Установка локали для Maven, чтобы избежать предупреждения о платформенной зависимости -->
+        <user.language>ru</user.language>
+        <user.country>RU</user.country>
     </properties>
 
     <build>
@@ -39,6 +43,7 @@
                         <configuration>
                             <name>maven.build.timestamp</name>
                             <!-- формат берётся из maven.build.timestamp.format -->
+                            <locale>ru_RU</locale>
                         </configuration>
                     </execution>
                 </executions>

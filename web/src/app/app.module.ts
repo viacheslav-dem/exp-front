@@ -9,7 +9,9 @@ import {AuthService} from "./services/auth.service";
 import {DefineRole} from "./services/define-role";
 import {LoginComponent} from "./base/login/login.component";
 import {StorageService} from "./services/storage.service";
-import {HashLocationStrategy, LocationStrategy} from "@angular/common";
+import {HashLocationStrategy, LocationStrategy, registerLocaleData} from "@angular/common";
+import localeRu from '@angular/common/locales/ru';
+import localeRuExtra from '@angular/common/locales/extra/ru';
 import {ProgressService} from "./components/common-components/progress/progress.service";
 import {HelloComponent} from "./base/hello/hello.component";
 import {ErrorPageComponent} from "./base/error-page/error-page.component";
@@ -98,6 +100,10 @@ import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { LOCALE_ID } from '@angular/core';
+
+// Регистрация русской локали для Angular
+registerLocaleData(localeRu, 'ru', localeRuExtra);
 
 @NgModule({
     imports: [
@@ -183,6 +189,7 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
     providers: [
         {provide: LocationStrategy, useClass: HashLocationStrategy},
         {provide: ErrorHandler, useClass: CustomErrorHandler},
+        {provide: LOCALE_ID, useValue: 'ru'},
         {provide: HTTP_INTERCEPTORS, useClass: AuthErrorInterceptor, multi: true},
         {provide: HTTP_INTERCEPTORS, useClass: LoggingInterceptor, multi: true},
         {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},

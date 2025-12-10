@@ -65,18 +65,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "examination-web:build"
+            "buildTarget": "examination-web:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "examination-web:build:production"
+              "buildTarget": "examination-web:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "examination-web:build"
+            "buildTarget": "examination-web:build"
           }
         },
         "test": {

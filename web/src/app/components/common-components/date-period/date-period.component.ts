@@ -1,4 +1,4 @@
-import {Component, EventEmitter, forwardRef, Input, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, forwardRef, Input, OnChanges, Output, ViewChild} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {addDays, getTime} from 'date-fns';
@@ -27,27 +27,37 @@ export const PERIOD_FILTER_CONTROL_VALUE_ACCESSOR: any = {
   `,
   providers: [PERIOD_FILTER_CONTROL_VALUE_ACCESSOR]
 })
-export class DatePeriodComponent extends ControlComponent<DateRange> {
+export class DatePeriodComponent extends ControlComponent<DateRange> implements OnChanges {
 
   @ViewChild(BsDaterangepickerDirective, { static: false }) datepicker: BsDaterangepickerDirective;
 
   @Input()
-  dateFormat: string = 'DD.MM.YYYY';
+  dateFormat: string = 'dd.MM.yyyy';
   bsRangeValue: any[] = [];
   @Input()
   label: string;
   @Output() onSelect: EventEmitter<DateRange> = new EventEmitter<DateRange>();
 
-  bsConfig = {
-    rangeInputFormat: 'DD.MM.YYYY',
-    dateInputFormat: 'DD.MM.YYYY',
-    containerClass: 'theme-default',
-    showWeekNumbers: false
-  };
+  bsConfig: any;
 
   constructor() {
     super();
+    this.updateBsConfig();
     // this.debug = true;
+  }
+
+  ngOnChanges() {
+    this.updateBsConfig();
+  }
+
+  private updateBsConfig() {
+    const format = this.dateFormat || 'dd.MM.yyyy';
+    this.bsConfig = {
+      rangeInputFormat: format,
+      dateInputFormat: format,
+      containerClass: 'theme-default',
+      showWeekNumbers: false
+    };
   }
 
   // Workaround for positioning bug on re-open
@@ -60,6 +70,15 @@ export class DatePeriodComponent extends ControlComponent<DateRange> {
         // Then show with small delay to allow positioning recalculation
         setTimeout(() => originalShow(), 10);
       };
+      
+      // Принудительно обновляем конфигурацию после инициализации
+      // Это может помочь исправить проблему с форматом в ngx-bootstrap 12.0.0
+      setTimeout(() => {
+        if (this.datepicker && this.datepicker._config) {
+          this.datepicker._config.rangeInputFormat = this.dateFormat || 'dd.MM.yyyy';
+          this.datepicker._config.dateInputFormat = this.dateFormat || 'dd.MM.yyyy';
+        }
+      }, 0);
     }
   }
 

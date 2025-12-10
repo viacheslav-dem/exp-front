@@ -1,4 +1,4 @@
-import {Component, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, ViewChild} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 
@@ -15,7 +15,7 @@ export const DATE_INPUT_VALUE_ACCESSOR: any = {
            class="form-control"
            [minDate]="minDate"
            [maxDate]="maxDate"
-           [bsConfig]="{ dateInputFormat: dateFormat, containerClass: 'theme-default', showWeekNumbers:false }"
+           [bsConfig]="bsConfig"
            bsDatepicker
            [(ngModel)]="dateValue"
            (bsValueChange)="onChange($event)"
@@ -27,18 +27,38 @@ export const DATE_INPUT_VALUE_ACCESSOR: any = {
   styles: [],
   providers: [DATE_INPUT_VALUE_ACCESSOR]
 })
-export class DateInputComponent extends ControlComponent<number> {
+export class DateInputComponent extends ControlComponent<number> implements OnChanges {
 
   @Input()
   minDate: Date;
   @Input()
   maxDate: Date;
   @Input()
-  dateFormat: string = 'DD.MM.YYYY';
+  dateFormat: string = 'dd.MM.yyyy';
   @Input() placement: string = "bottom";
 
   dateValue: Date;
   @Output() onSelect: EventEmitter<number> = new EventEmitter<number>();
+
+  bsConfig: any;
+
+  constructor() {
+    super();
+    this.updateBsConfig();
+  }
+
+  ngOnChanges() {
+    // Обновляем формат при изменении dateFormat
+    this.updateBsConfig();
+  }
+
+  private updateBsConfig() {
+    this.bsConfig = {
+      dateInputFormat: this.dateFormat || 'dd.MM.yyyy',
+      containerClass: 'theme-default',
+      showWeekNumbers: false
+    };
+  }
 
   prepareValue(): void {
     if (this._value != null) {
