@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output, input} from '@angular/core';
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {IdNameDto} from "@app/dto/IdNameDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
@@ -10,8 +10,8 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
       @if (_allDirections.length > 0) {
         <div class="form-group">
           <label>
-            @if (num) {
-              <span>{{ num }}.</span>
+            @if (num()) {
+              <span>{{ num() }}.</span>
             }
             Выберите приоритетные направления научной,
             научно-технической и инновационной деятельности в Республике Беларусь,
@@ -73,11 +73,9 @@ export class SelectDirectionsAndGoalsBlock2025Component {
     directionsAndGoalsText: string
   };
 
-  @Input()
-  num: string;
+  readonly num = input<string>(undefined);
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, ViewChild, input} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {Role} from "app/pipes/role.pipe";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
@@ -22,11 +22,11 @@ export class ExpertReviewListComponent implements OnInit {
 
   Role = Role;
 
-  @Input() expertReviews: ExpertReviewDto[] = [];
-  @Input() role: string;
-  @Input() project: any;
+  readonly expertReviews = input<ExpertReviewDto[]>([]);
+  readonly role = input<string>(undefined);
+  readonly project = input<any>(undefined);
   @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
-  @Input() canChooseExperts: boolean;
+  readonly canChooseExperts = input<boolean>(undefined);
 
   @ViewChild(SearchExpertComponent, { static: false }) public searchExpertComponent: SearchExpertComponent;
 
@@ -41,20 +41,19 @@ export class ExpertReviewListComponent implements OnInit {
   }
 
   changed() {
-    this.onChanged.emit(this.expertReviews);
+    this.onChanged.emit(this.expertReviews());
   }
 
   onSelectedExpert(expert) {
-    console.log("review-list")
     this.searchExpertComponent.hide();
     this._dialogService.showConfirmDialog(
       'Выбор эксперта',
-      `Назначить эксперта "${this._personPipe.transform(expert)}" на объект экспертизы "${this.project.title}"?`,
+      `Назначить эксперта "${this._personPipe.transform(expert)}" на объект экспертизы "${this.project().title}"?`,
       'Эксперт получит приглашение поучаствовать в экспертизе.'
     ).subscribe(() => {
-      this._projectService.attachExpert(this.project, expert.id).subscribe(res => {
+      this._projectService.attachExpert(this.project(), expert.id).subscribe(res => {
         this._toasty.success("Эксперт прикреплен.");
-        this.expertReviews.push(res);
+        this.expertReviews().push(res);
         this.changed();
       })
     });

@@ -1,21 +1,21 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-advantage-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Обладание товаром более высокими технико-экономическими показателями по сравнению с другими товарами,
+        {{num()}}. Обладание товаром более высокими технико-экономическими показателями по сравнению с другими товарами,
         представленными на определенном сегменте рынка:
       </label>
-      <app-boolean-button [(ngModel)]="_form.advantage" [trueLabel]="'да'"
+      <app-boolean-button [(ngModel)]="_form().advantage" [trueLabel]="'да'"
         [falseLabel]="'нет'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full) {
-        <textarea [(ngModel)]="_form.advantageText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().advantageText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст."></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -29,14 +29,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class AdvantageBlockComponent {
 
-  @Input()
-  num: string = "2";
+  readonly num = input<string>("2");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { advantage: boolean, advantageText: string };
+  readonly _form = input<{
+    advantage: boolean;
+    advantageText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

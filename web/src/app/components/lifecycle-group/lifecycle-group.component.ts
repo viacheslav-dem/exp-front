@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild, input} from '@angular/core';
 import {ProjectLifecycleState, ProjectLifecycleStateBadge} from "@app/pipes/lifecycle-state.pipe";
 import {Router} from "@angular/router";
 import {SearchSectionComponent} from "@app/components/search/search-section/search-section.component";
@@ -40,8 +40,13 @@ export class LifecycleGroupComponent implements OnInit {
   lifecycleRemark: ProjectLifecycleDto = new ProjectLifecycleDto;
   groupRemark: LifecycleGroupDto = new LifecycleGroupDto;
 
-  @Input() role;
-  @Input() project: ProjectDto = new ProjectDto();
+  readonly role = input(undefined);
+  readonly projectInput = input<ProjectDto>(new ProjectDto());
+  _project: ProjectDto;
+
+  get project(): ProjectDto {
+    return this._project ?? this.projectInput();
+  }
 
   @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
@@ -67,6 +72,7 @@ export class LifecycleGroupComponent implements OnInit {
   }
 
   ngOnInit() {
+    this._project = this.projectInput();
   }
 
   @Input() set group(group) {
@@ -96,20 +102,21 @@ export class LifecycleGroupComponent implements OnInit {
   }
 
   canEditSections() {
-    return this._group && this._group.state == LifecycleGroupState.ON_CHECKING && this.role == Role.BUREAU_CHAIRMAN;
+    return this._group && this._group.state == LifecycleGroupState.ON_CHECKING && this.role() == Role.BUREAU_CHAIRMAN;
   }
 
   canChangeSections(lifecycle?: ProjectLifecycleDto) {
-    return this._group.state == LifecycleGroupState.IN_PROCESSING && this.role == Role.BUREAU_CHAIRMAN &&
+    return this._group.state == LifecycleGroupState.IN_PROCESSING && this.role() == Role.BUREAU_CHAIRMAN &&
       (lifecycle.state == ProjectLifecycleState.ON_CHOOSING_MEETING || lifecycle.state == ProjectLifecycleState.READY_FOR_MEETING ||
         lifecycle.state == ProjectLifecycleState.ON_EXPERT_EXAMINATION);
   }
 
   canAnswerForSectionQuestion(lifecycle?: ProjectLifecycleDto) {
-      return this.role == Role.CUSTOMER
-      && this.project.isRescheduleSection
+      const project = this.project;
+      return this.role() == Role.CUSTOMER
+      && project.isRescheduleSection
       && lifecycle.remarks.length > 0
-      && this.project.canAddDocumentsForCustomerForSection;
+      && project.canAddDocumentsForCustomerForSection;
 
   }
 
@@ -119,10 +126,11 @@ export class LifecycleGroupComponent implements OnInit {
   }
 
   canAnswerForBureauQuestion(group?: LifecycleGroupDto) {
-    return this.role == Role.CUSTOMER
-      && this.project.isRescheduleBureau
+    const project = this.project;
+    return this.role() == Role.CUSTOMER
+      && project.isRescheduleBureau
       && group.remarks.length > 0
-      && this.project.canAddDocumentsForCustomerForBureau;
+      && project.canAddDocumentsForCustomerForBureau;
   }
 
   answerForBureauRemark(group: LifecycleGroupDto) {
@@ -163,7 +171,7 @@ export class LifecycleGroupComponent implements OnInit {
       .subscribe(() => {
           this._lifecycleService.replyForSectionRemark(this.lifecycleRemark).subscribe(
             value => {
-              this.project = value;
+              this._project = value;
               this._lifecycle = this.lifecycleRemark;
               this.onReplyChanged.emit(this.project);
             }
@@ -187,7 +195,7 @@ export class LifecycleGroupComponent implements OnInit {
       .subscribe(() => {
           this._lifecycleGroupService.replyForBureauRemark(this.groupRemark).subscribe(
             value => {
-              this.project = value;
+              this._project = value;
               this._group = this.groupRemark;
               this.onReplyChanged.emit(this.project);
             }
@@ -223,8 +231,10 @@ export class LifecycleGroupComponent implements OnInit {
   }
 
   canEditGroups() {
-    return this.project.state == 'ON_CHECKING' && this.role == Role.GKNT_WORKER ||
-      this.project.state == 'ON_DEPARTMENT_SIGNING' && this.role == Role.GKNT_DEPARTMENT_CHAIRMAN;
+    const role = this.role();
+    const project = this.project;
+    return project.state == 'ON_CHECKING' && role == Role.GKNT_WORKER ||
+      project.state == 'ON_DEPARTMENT_SIGNING' && role == Role.GKNT_DEPARTMENT_CHAIRMAN;
   }
 
   deleteLifecycleGroup(group: LifecycleGroupDto) {
@@ -244,7 +254,7 @@ export class LifecycleGroupComponent implements OnInit {
   }
 
   canEditConclusion() {
-    return this._group.state == LifecycleGroupState.ON_CONCLUSION && this.role == Role.BUREAU_CHAIRMAN;
+    return this._group.state == LifecycleGroupState.ON_CONCLUSION && this.role() == Role.BUREAU_CHAIRMAN;
   }
 
   generateConclusion(form) {
@@ -263,8 +273,10 @@ export class LifecycleGroupComponent implements OnInit {
   }
 
   canEditReferral() {
-    return this.project.state == 'ON_CHECKING' && this.role == Role.GKNT_WORKER ||
-      this.project.state == 'ON_DEPARTMENT_SIGNING' && this.role == Role.GKNT_DEPARTMENT_CHAIRMAN;
+    const role = this.role();
+    const project = this.project;
+    return project.state == 'ON_CHECKING' && role == Role.GKNT_WORKER ||
+      project.state == 'ON_DEPARTMENT_SIGNING' && role == Role.GKNT_DEPARTMENT_CHAIRMAN;
   }
 
   generateReferral(form: any) {
@@ -284,7 +296,7 @@ export class LifecycleGroupComponent implements OnInit {
 
   canEditLifecycleGroupDecision() {
     return this.project.state == ProjectState.ON_DEPARTMENT_FINAL_SIGNING &&
-      anyMatch(this.role, Role.GKNT_WORKER, Role.GKNT_DEPARTMENT_CHAIRMAN);
+      anyMatch(this.role(), Role.GKNT_WORKER, Role.GKNT_DEPARTMENT_CHAIRMAN);
   }
 
   canReadLifecycleGroupDecision() {

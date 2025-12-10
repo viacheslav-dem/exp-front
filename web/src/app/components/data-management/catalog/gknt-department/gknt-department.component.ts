@@ -28,7 +28,7 @@ export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> 
   constructor(public _toasty: GlobalToastyService,
               public _dataService: DataService) {
     super(_toasty, _dataService);
-    this.type = Catalog.GKNT_DEPARTMENT;
+    this._type = Catalog.GKNT_DEPARTMENT;
   }
 
   ngOnInit() {

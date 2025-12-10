@@ -20,7 +20,7 @@ export class IndustriesComponent extends CatalogTemplate<IndustryDto> {
   constructor(public _toasty: GlobalToastyService,
               public _dataService: DataService) {
     super(_toasty, _dataService);
-    this.type = Catalog.INDUSTRY;
+    this._type = Catalog.INDUSTRY;
   }
 
   ngOnInit() {

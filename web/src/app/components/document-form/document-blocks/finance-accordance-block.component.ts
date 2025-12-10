@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 
@@ -7,24 +7,24 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Соответствие заявленного финансирования планируемому объему выполняемых работ:
+        {{num()}}. Соответствие заявленного финансирования планируемому объему выполняемых работ:
       </label>
-      <app-boolean-button [(ngModel)]="_form.financeAccordance" [trueLabel]="'соответствует'"
+      <app-boolean-button [(ngModel)]="_form().financeAccordance" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (!_form.financeAccordance) {
-        <label>Рекомендуемый объем финансирования, {{project?.currency?.name || 'руб.'}}:</label>
+      @if (!_form().financeAccordance) {
+        <label>Рекомендуемый объем финансирования, {{project()?.currency?.name || 'руб.'}}:</label>
         <div class="input-group">
-          <input [(ngModel)]="_form.financeSuggestion" min="0" numberInput type="text" class="form-control"
-            [title]="'Рекомендуемый объем финансирования, ' + (project?.currency?.name || 'руб.')"
-            [placeholder]="'сумма, ' + (project?.currency?.name || 'руб.')">
+          <input [(ngModel)]="_form().financeSuggestion" min="0" numberInput type="text" class="form-control"
+            [title]="'Рекомендуемый объем финансирования, ' + (project()?.currency?.name || 'руб.')"
+            [placeholder]="'сумма, ' + (project()?.currency?.name || 'руб.')">
           </div>
         }
-        @if (full) {
-          <textarea [(ngModel)]="_form.financeAccordanceText" rows="3" class="form-control mt-05"
-          [attr.placeholder]="isTextRequired ? 'Обязательный текст.' : 'Пояснительный текст (при необходимости).'"></textarea>
+        @if (full()) {
+          <textarea [(ngModel)]="_form().financeAccordanceText" rows="3" class="form-control mt-05"
+          [attr.placeholder]="isTextRequired() ? 'Обязательный текст.' : 'Пояснительный текст (при необходимости).'"></textarea>
         }
-        @if (full) {
+        @if (full()) {
           <div class="hint">
             <p>
               <b>Подсказка.</b>
@@ -47,20 +47,19 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 })
 export class FinanceAccordanceBlockComponent {
 
-  @Input()
-  num: string = "9.3";
+  readonly num = input<string>("9.3");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  isTextRequired: boolean = false;
+  readonly isTextRequired = input<boolean>(false);
 
-  @Input()
-  _form: { financeAccordance: boolean, financeSuggestion: number, financeAccordanceText: string };
+  readonly _form = input<{
+    financeAccordance: boolean;
+    financeSuggestion: number;
+    financeAccordanceText: string;
+}>(undefined);
 
-  @Input()
-  project: ProjectPlainDto | ProjectDto;
+  readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

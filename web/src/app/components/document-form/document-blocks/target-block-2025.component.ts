@@ -1,19 +1,19 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 
 @Component({
     selector: 'app-target-block-2025',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Оценка целевых показателей проекта:
+        {{num()}}. Оценка целевых показателей проекта:
       </label>
-      <app-dropdown [options]="targetOptions" [(ngModel)]="_form.target"
+      <app-dropdown [options]="targetOptions" [(ngModel)]="_form().target"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      @if (full) {
-        <textarea [(ngModel)]="_form.targetText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().targetText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -35,14 +35,14 @@ export class TargetBlock2025Component {
         'недостаточна',
     ];
 
-    @Input()
-    num: string = "3.1";
+    readonly num = input<string>("3.1");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { target: string, targetText: string };
+    readonly _form = input<{
+    target: string;
+    targetText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

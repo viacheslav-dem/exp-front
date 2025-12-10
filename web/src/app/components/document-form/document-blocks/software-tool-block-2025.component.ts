@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 
@@ -7,31 +7,31 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Соответствие заявленному программному инструменту реализации:
+        {{num()}}. Соответствие заявленному программному инструменту реализации:
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.softwareTool === 1}" (click)="stateButton(1)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().softwareTool === 1}" (click)="stateButton(1)">
           Соответсвует
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.softwareTool === 2}" (click)="stateButton(2)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().softwareTool === 2}" (click)="stateButton(2)">
           Не соотвествует
         </button>
-        <button type="button" class="btn btn-outline-warning" [ngClass]="{'active': _form.softwareTool === 3}" (click)="stateButton(3)">
+        <button type="button" class="btn btn-outline-warning" [ngClass]="{'active': _form().softwareTool === 3}" (click)="stateButton(3)">
           Целесообразна реализация вне рамок программ
         </button>
       </div>
-      @if (_form.softwareTool == 2) {
+      @if (_form().softwareTool == 2) {
         <label class="mt-2">Рекомендуемые программный инструмент:</label>
-        <textarea [(ngModel)]="_form.softwareToolSuggestion" rows="2" class="form-control"
+        <textarea [(ngModel)]="_form().softwareToolSuggestion" rows="2" class="form-control"
           title="Рекомендуемый программный инструмент"
         placeholder="Рекомендуемый программный инструмент"></textarea>
       }
-      @if (full) {
-        <textarea [(ngModel)]="_form.softwareToolText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().softwareToolText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
     </div>
-    @if (full) {
+    @if (full()) {
       <div class="hint">
         <p>
           <b>Подсказка.</b>
@@ -50,17 +50,17 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 })
 export class SoftwareToolBlock2025Component {
 
-    @Input()
-    num: string = "10.6";
+    readonly num = input<string>("10.6");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    isTextRequired: boolean = false;
+    readonly isTextRequired = input<boolean>(false);
 
-    @Input()
-    _form: { softwareTool: number, softwareToolSuggestion: string, softwareToolText: string };
+    readonly _form = input<{
+    softwareTool: number;
+    softwareToolSuggestion: string;
+    softwareToolText: string;
+}>(undefined);
 
 
     @Output()
@@ -68,11 +68,11 @@ export class SoftwareToolBlock2025Component {
 
     stateButton(number: number) {
         if(number == 1){
-            this._form.softwareTool = 1;
+            this._form().softwareTool = 1;
         } else if (number == 2){
-            this._form.softwareTool = 2;
+            this._form().softwareTool = 2;
         } else if (number == 3){
-            this._form.softwareTool = 3;
+            this._form().softwareTool = 3;
         }
     }
 

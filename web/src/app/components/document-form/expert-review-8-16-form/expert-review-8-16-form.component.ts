@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {ExpertReviewForm} from "@app/components/document-form/expert-review-form-container/expert-review-form";
 import {Catalog} from "@app/services/data.service";
 import {ExpertReview_8_16_FormContent} from "@app/components/document-form/form-model/ExpertReview_8_16_FormContent";
@@ -13,7 +13,7 @@ import {isEmptyOrNull} from "@app/support/utils";
     standalone: false
 })
 export class ExpertReview_8_16_FormComponent extends ExpertReviewForm<ExpertReview_8_16_FormContent> {
-  @Input() url: string = '/examination-api/document/protocol';
+  readonly url = input<string>('/examination-api/document/protocol');
   constructor(
       private _documentService: DocumentService,
       private _http: HttpClientSecure
@@ -40,7 +40,7 @@ export class ExpertReview_8_16_FormComponent extends ExpertReviewForm<ExpertRevi
     }
   }
   downloadDocxDocument() {
-        return this._documentService.downloadFile(`${this.url}?${this._http.getTokenParamsString()}`).subscribe();
+        return this._documentService.downloadFile(`${this.url()}?${this._http.getTokenParamsString()}`).subscribe();
     }
   onConditionsChanged() {}
 

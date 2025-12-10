@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectDto} from "@app/dto/ProjectDto";
 
@@ -7,21 +7,21 @@ import {ProjectDto} from "@app/dto/ProjectDto";
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Объект государственной экспертизы является социально значимым или направленным на обеспечение национальной безопасности:
+        {{num()}}. Объект государственной экспертизы является социально значимым или направленным на обеспечение национальной безопасности:
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.socialOrSecurity === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().socialOrSecurity === true}" (click)="stateButton(true)">
           Да (социально значимый / направлен на обеспечение национальной безопасности)
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.socialOrSecurity === false && _form.socialOrSecurity !== undefined}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().socialOrSecurity === false && _form().socialOrSecurity !== undefined}" (click)="stateButton(false)">
           Нет
         </button>
       </div>
-      @if (full) {
-        <textarea [(ngModel)]="_form.socialOrSecurityText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().socialOrSecurityText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -65,29 +65,27 @@ export class SocialOrSecurityBlock2025Component {
         'нет',
     ];
 
-    @Input()
-    num: string = "10.3";
+    readonly num = input<string>("10.3");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    isTextRequired: boolean = false;
+    readonly isTextRequired = input<boolean>(false);
 
-    @Input()
-    _form: { socialOrSecurity: boolean, socialOrSecurityText: string };
+    readonly _form = input<{
+    socialOrSecurity: boolean;
+    socialOrSecurityText: string;
+}>(undefined);
 
-    @Input()
-    project: ProjectPlainDto | ProjectDto;
+    readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     stateButton(flag: boolean) {
         if(flag){
-            this._form.socialOrSecurity = true;
+            this._form().socialOrSecurity = true;
         } else {
-            this._form.socialOrSecurity = false;
+            this._form().socialOrSecurity = false;
         }
     }
 

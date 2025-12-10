@@ -238,7 +238,7 @@
                       <div class="row subdirections m-1">
                         <app-dropdown [(ngModel)]="subDirection" [notSelected]="'Ничего не выбрано'"
                           [options]="getSubDirectionName()"
-                        [resetEnabled]="true" [optionToString]="optionToString"></app-dropdown>
+                        [resetEnabled]="true" [optionToString]="optionToString()"></app-dropdown>
                         <!--          <div class="dropdown" >-->
                         <!--              <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown">-->
                         <!--                {{subDirection.directionName}}-->

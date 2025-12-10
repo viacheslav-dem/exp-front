@@ -1,22 +1,22 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 
 @Component({
     selector: 'app-socio-economic-dev-2025',
     template: `
         <div class="form-sub-group">
           <label>
-            {{num}}. Соответствие объекта государственной экспертизы заявленным целям:
+            {{num()}}. Соответствие объекта государственной экспертизы заявленным целям:
           </label>
           <div class="btn-group" role="group" aria-label="Basic example">
-            <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.socioEconomic === true}" (click)="stateButton(true)">
+            <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().socioEconomic === true}" (click)="stateButton(true)">
               Соответсвует
             </button>
-            <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.socioEconomic === false}" (click)="stateButton(false)">
+            <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().socioEconomic === false}" (click)="stateButton(false)">
               Не соотвествует
             </button>
           </div>
-          @if (full) {
-            <textarea [(ngModel)]="_form.socioEconomicText" rows="3" class="form-control mt-05"
+          @if (full()) {
+            <textarea [(ngModel)]="_form().socioEconomicText" rows="3" class="form-control mt-05"
             placeholder="Обязательный текст"></textarea>
           }
         </div>
@@ -25,23 +25,23 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
 })
 export class SocioEconomivDev2025Component {
 
-    @Input()
-    num: string = "10.6";
+    readonly num = input<string>("10.6");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { socioEconomic: boolean, socioEconomicText: string };
+    readonly _form = input<{
+    socioEconomic: boolean;
+    socioEconomicText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     stateButton(flag: boolean) {
         if(flag){
-            this._form.socioEconomic = true;
+            this._form().socioEconomic = true;
         } else {
-            this._form.socioEconomic = false;
+            this._form().socioEconomic = false;
         }
     }
 }

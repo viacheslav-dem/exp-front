@@ -7,7 +7,7 @@ import {TariffRateDto} from "@app/dto/TariffRateDto";
 @Component({
     selector: 'app-tariff',
     template: `
-    <h5 class="mb-3">{{header}}</h5>
+    <h5 class="mb-3">{{headerValue}}</h5>
     <div class="list-group">
     
       <!--      <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>-->
@@ -17,7 +17,7 @@ import {TariffRateDto} from "@app/dto/TariffRateDto";
         <!--ADD ITEM-->
         <div (click)="addItem()">
           <div class="list-group-item selectable link background-dark-sea-green">
-            {{addLabel}}
+            {{addLabelValue}}
           </div>
         </div>
     
@@ -27,7 +27,7 @@ import {TariffRateDto} from "@app/dto/TariffRateDto";
             <!--ITEM HEADER-->
             <div class="list-group-item" [class.disabled]="item.disabled">
               <div class="text-mini font-weight-bold">
-                {{itemLabel}}
+                {{itemLabelValue}}
                 @if (item.id == 0) {
                   <span>(не сохранено)</span>
                 }
@@ -102,7 +102,7 @@ import {TariffRateDto} from "@app/dto/TariffRateDto";
                     @if (!items || items.length == 0) {
                       <div>
                         <div class="italic list-group-item background-light-blue">
-                          {{noItemsLabel}}
+                          {{noItemsLabelValue}}
                         </div>
                       </div>
                     }
@@ -121,10 +121,10 @@ export class TariffComponent extends SimpleCatalogComponent<TariffRateDto> {
 
   constructor(toasty: GlobalToastyService, dataService: DataService) {
     super(toasty, dataService);
-    this.header = "Справочник тарифов";
-    this.addLabel = "Добавить тариф";
-    this.itemLabel = "тариф";
-    this.noItemsLabel = "Тарифы отсутствуют";
-    this.type = Catalog.TARIFF;
+    this._header = "Справочник тарифов";
+    this._addLabel = "Добавить тариф";
+    this._itemLabel = "тариф";
+    this._noItemsLabel = "Тарифы отсутствуют";
+    this._type = Catalog.TARIFF;
   }
 }

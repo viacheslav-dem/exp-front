@@ -1,25 +1,25 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 
 @Component({
     selector: 'app-prognosis-block-2025',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Оценка анализа текущего состояния и прогноза научно-технического развития соответствующей сферы планирования:
+        {{num()}}. Оценка анализа текущего состояния и прогноза научно-технического развития соответствующей сферы планирования:
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.prognosis === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().prognosis === true}" (click)="stateButton(true)">
           Достаточна
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.prognosis === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().prognosis === false}" (click)="stateButton(false)">
           Недостаточна
         </button>
       </div>
-      @if (full) {
-        <textarea [(ngModel)]="_form.prognosisText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().prognosisText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -39,26 +39,23 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
 })
 export class PrognosisBlock2025Component {
 
-    @Input()
-    num: string = "2";
+    readonly num = input<string>("2");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: {
-        prognosis: boolean;
-        prognosisText: string;
-    };
+    readonly _form = input<{
+    prognosis: boolean;
+    prognosisText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     stateButton(flag: boolean) {
         if(flag){
-            this._form.prognosis = true;
+            this._form().prognosis = true;
         } else {
-            this._form.prognosis = false;
+            this._form().prognosis = false;
         }
     }
 }

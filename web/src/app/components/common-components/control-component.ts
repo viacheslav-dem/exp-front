@@ -1,13 +1,13 @@
 import {ControlValueAccessor} from "@angular/forms";
-import { Input, OnInit, Directive } from "@angular/core";
+import { OnInit, Directive, input } from "@angular/core";
 
 @Directive()
 export class ControlComponent<T> implements OnInit, ControlValueAccessor {
 
   _value: T;
-  @Input() name: string = 'unnamed_control_' + Math.random();
-  @Input() placeholder: string = '';
-  @Input() title: string = '';
+  readonly name = input<string>('unnamed_control_' + Math.random());
+  readonly placeholder = input<string>('');
+  readonly title = input<string>('');
   protected onTouchedCallbacks = [];
   protected onChangeCallbacks = [];
   protected debug: boolean;
@@ -23,7 +23,6 @@ export class ControlComponent<T> implements OnInit, ControlValueAccessor {
   };
 
   set value(v: T) {
-    console.log(v);
     if (v !== this._value) {
       this.log(v, 'call setter');
       this._value = v;

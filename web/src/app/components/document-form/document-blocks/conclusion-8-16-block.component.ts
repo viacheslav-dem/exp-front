@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-conclusion-8-16-block',
@@ -9,8 +9,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         Заключение эксперта по объекту государственной экспертизы
       </label>
       <app-boolean-button
-        [(ngModel)]="_form.conclusion"
-        [disabled]="disabled"
+        [(ngModel)]="_form().conclusion"
+        [disabled]="disabled()"
         [showDisabledSelection]="true"
         [trueLabel]="'целесообразно'"
         [falseLabel]="'нецелесообразно'"
@@ -21,11 +21,11 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class Conclusion_8_16_BlockComponent {
 
-    @Input()
-    disabled: boolean = false;
+    readonly disabled = input<boolean>(false);
 
-    @Input()
-    _form: { conclusion: boolean };
+    readonly _form = input<{
+    conclusion: boolean;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

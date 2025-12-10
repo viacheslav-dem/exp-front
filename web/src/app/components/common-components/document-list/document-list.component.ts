@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild, input} from '@angular/core';
 import {FileEditorComponent} from "../file-editor/file-editor.component";
 import {DocumentService} from "@app/services/document.service";
 import {DocumentDto} from "@app/dto/DocumentDto";
@@ -15,9 +15,9 @@ export class DocumentListComponent implements OnInit {
 
   _documents: any[];
   public selectedDocument: any;
-  @Input() canDelete = false;
-  @Input() canUpdate = false;
-  @Input() url: string = 'document';
+  readonly canDelete = input(false);
+  readonly canUpdate = input(false);
+  readonly url = input<string>('document');
   @Output() onUpdate: EventEmitter<DocumentDto> = new EventEmitter();
   @Output() onDelete: EventEmitter<any> = new EventEmitter();
   @ViewChild(FileEditorComponent) fileEditor: FileEditorComponent;
@@ -71,7 +71,7 @@ export class DocumentListComponent implements OnInit {
   }
 
   downloadDocument(doc: DocumentDto) {
-    this._documentService.downloadDocument(doc, this.url).subscribe();
+    this._documentService.downloadDocument(doc, this.url()).subscribe();
   }
 
   deleteDocument(doc) {
@@ -79,6 +79,6 @@ export class DocumentListComponent implements OnInit {
   }
 
   downloadDocxDocument(doc: DocumentDto) {
-    this._documentService.downloadDocument(doc, this.url + '/docx').subscribe();
+    this._documentService.downloadDocument(doc, this.url() + '/docx').subscribe();
   }
 }

@@ -88,12 +88,4 @@ export class LoginoffComponent implements OnInit, OnDestroy {
   getUserManual() {
     this._authService.getManual().subscribe(doc => this.dialogService.showPDFViewer("document", doc).subscribe());
   }
-
-  closeDropdown(menu: HTMLElement) {
-    const dropdown = menu.closest('.dropdown');
-    if (dropdown) {
-      dropdown.classList.remove('show');
-      menu.classList.remove('show');
-    }
-  }
 }

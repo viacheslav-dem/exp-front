@@ -1,4 +1,4 @@
-import {Component, Input, ViewChild} from '@angular/core';
+import {Component, ViewChild, input} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {Role} from "@app/pipes/role.pipe";
@@ -34,15 +34,15 @@ export class ReferralFormComponent extends DocumentForm<ReferralFormContent> {
 
   searchPersonFilter;
 
-  @Input() project: ProjectDto;
-  @Input() council: any;
+  readonly project = input<ProjectDto>(undefined);
+  readonly council = input<any>(undefined);
 
   @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
 
   ngOnInit() {
     super.ngOnInit();
-    this.searchPersonFilter = FilterBuilder.equals('gkntDepartment', this.project.gkntDepartment);
-    this._form.gkntDepartmentChairman = this.project.gkntDepartmentChairman;
+    this.searchPersonFilter = FilterBuilder.equals('gkntDepartment', this.project().gkntDepartment);
+    this._form.gkntDepartmentChairman = this.project().gkntDepartmentChairman;
   }
 
   createNewForm(): ReferralFormContent {
@@ -59,6 +59,6 @@ export class ReferralFormComponent extends DocumentForm<ReferralFormContent> {
   }
 
   is8_6() {
-    return ProjectCodePlainDto.isCode(this.project.code.code, 6);
+    return ProjectCodePlainDto.isCode(this.project().code.code, 6);
   }
 }

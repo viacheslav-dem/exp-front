@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, OnInit, Output, input} from "@angular/core";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectDto} from "@app/dto/ProjectDto";
 
@@ -7,27 +7,27 @@ import {ProjectDto} from "@app/dto/ProjectDto";
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Соответствие научного исследования по объекту государственной экспертизы:
+        {{num()}}. Соответствие научного исследования по объекту государственной экспертизы:
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.fundamentalOrAppliedResearch === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().fundamentalOrAppliedResearch === true}" (click)="stateButton(true)">
           Соответсвует
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.fundamentalOrAppliedResearch === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().fundamentalOrAppliedResearch === false}" (click)="stateButton(false)">
           Не соотвествует
         </button>
       </div>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <b>Подсказка.</b>
           Перечисляются соответствующие приоритетные направления, в том числе сквозные, к которым относится объект государственной экспертизы:
         </div>
       }
-      @if (full) {
-        <textarea [(ngModel)]="_form.fundamentalOrAppliedResearchText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().fundamentalOrAppliedResearchText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <div>
             <b>Подсказка.</b>
@@ -43,17 +43,16 @@ import {ProjectDto} from "@app/dto/ProjectDto";
 })
 export class FundamentalOrAppliedResearchComponent implements OnInit{
 
-    @Input()
-    num: string = "10.1";
+    readonly num = input<string>("10.1");
 
-    @Input()
-    project: ProjectPlainDto | ProjectDto;
+    readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { fundamentalOrAppliedResearch: boolean, fundamentalOrAppliedResearchText: string };
+    readonly _form = input<{
+    fundamentalOrAppliedResearch: boolean;
+    fundamentalOrAppliedResearchText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -61,9 +60,9 @@ export class FundamentalOrAppliedResearchComponent implements OnInit{
 
     stateButton(flag: boolean) {
         if(flag){
-            this._form.fundamentalOrAppliedResearch = true;
+            this._form().fundamentalOrAppliedResearch = true;
         } else{
-            this._form.fundamentalOrAppliedResearch = false;
+            this._form().fundamentalOrAppliedResearch = false;
         }
     }
 

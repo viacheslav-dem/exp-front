@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {CouncilPlainDto} from "@app/dto/CouncilPlainDto";
 import {isEmptyOrNull} from "@app/support/utils";
@@ -10,9 +10,9 @@ import {isEmptyOrNull} from "@app/support/utils";
 })
 export class DecisionDocumentFormComponent extends DocumentForm<any> {
 
-  @Input() needCauses: boolean = true;
-  @Input() project: any = {};
-  @Input() council: CouncilPlainDto;
+  readonly needCauses = input<boolean>(true);
+  readonly project = input<any>({});
+  readonly council = input<CouncilPlainDto>(undefined);
   causes: {name: string}[] = [];
 
   getForm() {
@@ -23,7 +23,7 @@ export class DecisionDocumentFormComponent extends DocumentForm<any> {
 
   validate() {
     super.validate();
-    if (this.needCauses && this.causes.filter(cause => !isEmptyOrNull(cause.name)).length == 0) {
+    if (this.needCauses() && this.causes.filter(cause => !isEmptyOrNull(cause.name)).length == 0) {
       throw 'Не указаны причины возврата объекта экспертизы.';
     }
   }

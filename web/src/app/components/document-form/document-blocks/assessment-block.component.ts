@@ -1,17 +1,17 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
     selector: 'app-assessment-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Оценка научно-технического уровня, эффективности, достаточности и соответствия предложений
+        {{num()}}. Оценка научно-технического уровня, эффективности, достаточности и соответствия предложений
         поставщиков (подрядчиков, исполнителей), претендующих на участие в реализации мероприятия,
         целям рассматриваемого мероприятия.
       </label>
-      <textarea [(ngModel)]="_form.assessment" rows="3" class="form-control"
+      <textarea [(ngModel)]="_form().assessment" rows="3" class="form-control"
       placeholder="Обязательный текст."></textarea>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -30,12 +30,11 @@ import {Component, Input} from '@angular/core';
 })
 export class AssessmentBlockComponent {
 
-  @Input()
-  num: string = "9";
+  readonly num = input<string>("9");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { assessment: string };
+  readonly _form = input<{
+    assessment: string;
+}>(undefined);
 }

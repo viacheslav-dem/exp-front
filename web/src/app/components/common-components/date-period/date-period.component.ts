@@ -1,4 +1,4 @@
-import {Component, EventEmitter, forwardRef, Input, OnChanges, Output, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
+import {Component, EventEmitter, forwardRef, OnChanges, Output, ViewChild, ElementRef, AfterViewInit, input} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
 import dayjs from 'dayjs';
@@ -22,8 +22,8 @@ export const PERIOD_FILTER_CONTROL_VALUE_ACCESSOR: any = {
            (ngModelChange)="onModelChange($event)"
            (bsValueChange)="onChange($event)"
            [bsConfig]="bsConfig"
-           [placeholder]="placeholder"
-           [title]="title"
+           [placeholder]="placeholder()"
+           [title]="title()"
            [outsideClick]="true"
            placement="bottom"
            container="body">
@@ -36,11 +36,9 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
   @ViewChild(BsDaterangepickerDirective, { static: false }) datepicker: BsDaterangepickerDirective;
   @ViewChild('dateInput', { static: false }) dateInput: ElementRef<HTMLInputElement>;
 
-  @Input()
-  dateFormat: string = 'DD.MM.YYYY';
+  readonly dateFormat = input<string>('DD.MM.YYYY');
   bsRangeValue: any[] = [];
-  @Input()
-  label: string;
+  readonly label = input<string>(undefined);
   @Output() onSelect: EventEmitter<DateRange> = new EventEmitter<DateRange>();
 
   bsConfig: any;
@@ -60,7 +58,7 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
 
   private updateBsConfig() {
     // ngx-bootstrap использует date-fns внутри, поэтому конвертируем формат dayjs (Moment.js) в date-fns
-    const dateFnsFormat = this.convertMomentFormatToDateFns(this.dateFormat || 'DD.MM.YYYY');
+    const dateFnsFormat = this.convertMomentFormatToDateFns(this.dateFormat() || 'DD.MM.YYYY');
     this.bsConfig = {
       rangeInputFormat: dateFnsFormat,
       dateInputFormat: dateFnsFormat,

@@ -1,15 +1,15 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
     selector: 'app-results-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Сопоставительный анализ запланированных результатов и их соответствия достигнутым результатам.
+        {{num()}}. Сопоставительный анализ запланированных результатов и их соответствия достигнутым результатам.
       </label>
-      <textarea [(ngModel)]="_form.results" rows="3" class="form-control"
+      <textarea [(ngModel)]="_form().results" rows="3" class="form-control"
       placeholder="Обязательный текст."></textarea>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -24,12 +24,11 @@ import {Component, Input} from '@angular/core';
 })
 export class ResultsBlockComponent {
 
-  @Input()
-  num: string = "1";
+  readonly num = input<string>("1");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { results: string };
+  readonly _form = input<{
+    results: string;
+}>(undefined);
 }

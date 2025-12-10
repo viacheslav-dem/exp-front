@@ -1,24 +1,24 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-assessment-conclusion-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Оценка достаточности и соответствия предложений поставщиков
+        {{num()}}. Оценка достаточности и соответствия предложений поставщиков
         (подрядчиков, исполнителей), претендующих на участие в реализации
         мероприятия, целям рассматриваемого мероприятия:
       </label>
       <app-boolean-button
-        [(ngModel)]="_form.assessment"
+        [(ngModel)]="_form().assessment"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full) {
-        <textarea [(ngModel)]="_form.assessmentText" rows="3" class="form-control"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().assessmentText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -37,14 +37,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class AssessmentConclusionBlockComponent {
 
-  @Input()
-  num: string = "12.3";
+  readonly num = input<string>("12.3");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { assessment: boolean, assessmentText: string };
+  readonly _form = input<{
+    assessment: boolean;
+    assessmentText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

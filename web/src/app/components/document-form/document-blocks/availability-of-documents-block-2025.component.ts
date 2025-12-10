@@ -1,11 +1,11 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, OnInit, Output, input} from "@angular/core";
 
 @Component({
     selector: 'app-availability-of-documents-block-2025',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Для объектов государственной экспертизы, указанных в подпункте 8.4 пункта 8 Положения,
+        {{num()}}. Для объектов государственной экспертизы, указанных в подпункте 8.4 пункта 8 Положения,
         устанавливается наличие документов, являющихся обязательными при проведении государственной экспертизы:
       </label>
       <ul>
@@ -30,18 +30,18 @@ import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
         </li>
       </ul>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.availabilityDoc === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().availabilityDoc === true}" (click)="stateButton(true)">
           Имеются
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.availabilityDoc === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().availabilityDoc === false}" (click)="stateButton(false)">
           Не имеются
         </button>
       </div>
-      @if (full) {
-        <textarea [(ngModel)]="_form.availabilityDocText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().availabilityDocText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <div>
             <b>Подсказка.</b>
@@ -56,14 +56,15 @@ import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 })
 export class AvailabilityOfDocumentsBlock2025Component implements OnInit{
 
-    @Input()
-    num: string = "10.1";
+    readonly num = input<string>("10.1");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { availabilityDoc: boolean, availabilityDocSuggestion: string, availabilityDocText: string };
+    readonly _form = input<{
+    availabilityDoc: boolean;
+    availabilityDocSuggestion: string;
+    availabilityDocText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -71,9 +72,9 @@ export class AvailabilityOfDocumentsBlock2025Component implements OnInit{
 
     stateButton(flag: boolean) {
         if(flag){
-            this._form.availabilityDoc = true;
+            this._form().availabilityDoc = true;
         } else{
-            this._form.availabilityDoc = false;
+            this._form().availabilityDoc = false;
         }
     }
 

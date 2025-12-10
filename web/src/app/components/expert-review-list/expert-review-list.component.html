@@ -1,7 +1,7 @@
 <!--HEADER-->
 <div class="mb-2">
   <div class="d-inline-block text-muted">Экспертные оценки:</div>
-  @if (canChooseExperts) {
+  @if (canChooseExperts()) {
     <button class="btn btn-sm btn-primary btn-right"
       (click)="searchExpertComponent.show()">
       Добавить эксперта
@@ -10,20 +10,20 @@
 </div>
 
 <!--BODY-->
-@if (expertReviews.length == 0) {
+@if (expertReviews().length == 0) {
   <div>
     <div class="list-group-item text-muted text-sm italic">
       Экспертные оценки отсутствуют
     </div>
   </div>
 }
-@for (expertReview of expertReviews; track expertReview) {
+@for (expertReview of expertReviews(); track expertReview) {
   <div class="review">
-    <app-expert-review [role]="role" [project]="project" [review]="expertReview"></app-expert-review>
+    <app-expert-review [role]="role()" [project]="project()" [review]="expertReview"></app-expert-review>
   </div>
 }
 
 <!--SEARCH EXPERT MODAL-->
-@if (canChooseExperts) {
+@if (canChooseExperts()) {
   <app-search-expert (selected)="onSelectedExpert($event)"></app-search-expert>
 }

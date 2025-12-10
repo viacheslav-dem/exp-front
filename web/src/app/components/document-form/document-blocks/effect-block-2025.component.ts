@@ -1,15 +1,15 @@
-import {Component, Input} from "@angular/core";
+import {Component, input} from "@angular/core";
 
 @Component({
     selector: 'app-effect-block-2025',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Возможный экономический и (или) социальный и (или) экологический эффект от реализации мероприятия.
+        {{num()}}. Возможный экономический и (или) социальный и (или) экологический эффект от реализации мероприятия.
       </label>
-      <textarea [(ngModel)]="_form.effect" rows="3" class="form-control"
+      <textarea [(ngModel)]="_form().effect" rows="3" class="form-control"
       placeholder="Обязательный текст."></textarea>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -23,12 +23,11 @@ import {Component, Input} from "@angular/core";
 })
 export class EffectBlock2025Component {
 
-    @Input()
-    num: string = "3";
+    readonly num = input<string>("3");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { effect: string };
+    readonly _form = input<{
+    effect: string;
+}>(undefined);
 }

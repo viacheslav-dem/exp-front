@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewContainerRef} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewContainerRef, input} from '@angular/core';
 import {Catalog, DataService} from "@app/services/data.service";
 import {CatalogDto} from "@app/dto/CatalogDto";
 import {PeriodDto} from "@app/dto/PeriodDto";
@@ -19,7 +19,7 @@ import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
 })
 export class ProjectFormComponent implements OnInit {
 
-    @Input() optionToString: Function;
+    readonly optionToString = input<Function>(undefined);
 
     @Output() save = new EventEmitter();
     @Output() cancel = new EventEmitter();
@@ -47,7 +47,6 @@ export class ProjectFormComponent implements OnInit {
     expectedResultList: any[] = [];
     outputTypeOfWorkList: any[] = typeOfWorkList;
     resultSpecificList: any[] = resultSpecificList;
-    // commerceList: CatalogDto[] = [];
     choiceOfResultCharacterAppliedList: any[] = choiceOfResultCharacterApplied;
     technologyTypeList: any[] = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'другое'];
 
@@ -291,20 +290,10 @@ export class ProjectFormComponent implements OnInit {
         finishDir.subDirectionDtos.push(this.subDirection);
         this.directions.push(finishDir);
      }
-      // this._project.directions.push(this.newDirection);
-      // this._project.subDirections.push(this.subDirection);
       this.newDirection = null;
       this.subDirection = null;
       flagDirection = false;
-    // }
   }
-
-    // addSocialEconomicGoal() {
-    //     if (this.newSocialEconomicGoal) {
-    //         this._project.socialEconomicGoals.push(this.newSocialEconomicGoal);
-    //         this.newSocialEconomicGoal = null;
-    //     }
-    // }
 
     canAddSocialEconomicGoals() {
         return this._project.code && this._project.code.code == '8.13';
@@ -327,10 +316,6 @@ export class ProjectFormComponent implements OnInit {
         this.funding = new FundingDto();
     }
 
-    // select(option: SubDirectionDto) {
-    //   console.log(option);
-    //   this.subDirection = option;
-    // }
 
     getSubDirectionName() {
         return this.newDirection.subDirectionDtos;

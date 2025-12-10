@@ -84,7 +84,6 @@ export const DataManagementRoutes: Route = {
     MethRecComponent,
     CommercializationMethodsComponent
   ],
-  providers: [],
   exports: [
     FundingComponent,
     ScienceAreaComponent,
@@ -108,5 +107,4 @@ export const DataManagementRoutes: Route = {
   ]
 })
 export class DataManagementModule {
-
 }

@@ -1,15 +1,15 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
     selector: 'app-priority-accordance-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Приоритетность направления инвестиций в технологию, обоснованность расходов.
+        {{num()}}. Приоритетность направления инвестиций в технологию, обоснованность расходов.
       </label>
-      <textarea [(ngModel)]="_form.priorityAccordance" rows="3" class="form-control"
+      <textarea [(ngModel)]="_form().priorityAccordance" rows="3" class="form-control"
       placeholder="Обязательный текст."></textarea>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -39,12 +39,11 @@ import {Component, Input} from '@angular/core';
 })
 export class PriorityAccordanceBlockComponent {
 
-  @Input()
-  num: string = "2";
+  readonly num = input<string>("2");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { priorityAccordance: string };
+  readonly _form = input<{
+    priorityAccordance: string;
+}>(undefined);
 }

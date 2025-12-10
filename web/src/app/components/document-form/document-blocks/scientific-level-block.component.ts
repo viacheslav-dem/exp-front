@@ -1,16 +1,16 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
     selector: 'app-scientific-level-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Оценка научно-технического уровня внедряемых технологий по сравнению с передовыми технологиями,
+        {{num()}}. Оценка научно-технического уровня внедряемых технологий по сравнению с передовыми технологиями,
         используемыми в мире, и возможности их применения на соответствующем производстве.
       </label>
-      <textarea [(ngModel)]="_form.scientificLevel" rows="3" class="form-control"
+      <textarea [(ngModel)]="_form().scientificLevel" rows="3" class="form-control"
       placeholder="Обязательный текст."></textarea>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -30,12 +30,11 @@ import {Component, Input} from '@angular/core';
 })
 export class ScientificLevelBlockComponent {
 
-  @Input()
-  num: string = "1.1";
+  readonly num = input<string>("1.1");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { scientificLevel: string };
+  readonly _form = input<{
+    scientificLevel: string;
+}>(undefined);
 }

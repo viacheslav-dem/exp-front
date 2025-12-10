@@ -1,23 +1,23 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-result-accordance-block',
     template: `
     <div class="form-sub-group">
       <label>
-        @if (num) {
-          <span>{{num}}.</span>
+        @if (num()) {
+          <span>{{num()}}.</span>
         }
         Соответствие достигнутого результата запланированному:
       </label>
-      <app-boolean-button [(ngModel)]="_form.accordance" [trueLabel]="'соответствует'"
+      <app-boolean-button [(ngModel)]="_form().accordance" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full) {
-        <textarea [(ngModel)]="_form.accordanceText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().accordanceText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -31,14 +31,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class ResultAccordanceBlockComponent {
 
-  @Input()
-  num: string;
+  readonly num = input<string>(undefined);
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { accordance: boolean, accordanceText: string };
+  readonly _form = input<{
+    accordance: boolean;
+    accordanceText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

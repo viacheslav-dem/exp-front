@@ -1,6 +1,6 @@
-<div [ngClass]="filterClass">
+<div [ngClass]="filterClass()">
   @for (field of _fields; track field) {
-    <div class="text-sm" [ngClass]="fieldClass">
+    <div class="text-sm" [ngClass]="fieldClass()">
       <!--TITLE-->
       @if (field.title) {
         <div class="mb-05">

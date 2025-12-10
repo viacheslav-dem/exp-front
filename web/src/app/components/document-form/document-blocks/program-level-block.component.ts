@@ -1,23 +1,23 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-program-level-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы
+        {{num()}}. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы
         в части научно-технического уровня для достижения запланированных государственной программой показателей:
       </label>
       <app-boolean-button
-        [(ngModel)]="_form.programLevel"
+        [(ngModel)]="_form().programLevel"
         [trueLabel]="'достаточно'"
         [falseLabel]="'недостаточно'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full) {
-        <textarea [(ngModel)]="_form.programLevelText" rows="3" class="form-control"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().programLevelText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -39,14 +39,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class ProgramLevelBlockComponent {
 
-  @Input()
-  num: string = "1";
+  readonly num = input<string>("1");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { programLevel: boolean, programLevelText: string };
+  readonly _form = input<{
+    programLevel: boolean;
+    programLevelText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

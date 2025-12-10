@@ -1,4 +1,4 @@
-import {Component, Input, ViewChild} from '@angular/core';
+import {Component, ViewChild, input} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {Role} from "@app/pipes/role.pipe";
@@ -19,20 +19,20 @@ export class ReturnFromCouncilWithoutExpertiseFormComponent extends DocumentForm
   Role = Role;
   Catalog = Catalog;
 
-  @Input() project: ProjectDto;
-  @Input() group: LifecycleGroupDto;
-  @Input() council: CouncilPlainDto;
+  readonly project = input<ProjectDto>(undefined);
+  readonly group = input<LifecycleGroupDto>(undefined);
+  readonly council = input<CouncilPlainDto>(undefined);
 
   @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
 
   ngOnInit() {
     super.ngOnInit();
-    this._form.chairman = this.group.bureauChairman;
+    this._form.chairman = this.group().bureauChairman;
   }
 
   validate() {
     super.validate();
-    if (this._form.targetCouncil && this._form.targetCouncil.id == this.council.id) {
+    if (this._form.targetCouncil && this._form.targetCouncil.id == this.council().id) {
       throw 'Рекомендуемый ГЭС совпадает с Вашим.';
     }
   }

@@ -1,19 +1,19 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-requirements-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Достаточность требований, предъявляемых к квалификации и опыту (компетенции) лиц,
+        {{num()}}. Достаточность требований, предъявляемых к квалификации и опыту (компетенции) лиц,
         привлекаемых для выполнения работ (оказания услуг), а также к уровню производственной, научной,
         конструкторско-технологической базы, необходимой для реализации мероприятия:
       </label>
-      <app-boolean-button [(ngModel)]="_form.requirements" [trueLabel]="'достаточны'"
+      <app-boolean-button [(ngModel)]="_form().requirements" [trueLabel]="'достаточны'"
         [falseLabel]="'недостаточны'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full) {
-        <textarea [(ngModel)]="_form.requirementsText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().requirementsText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст."></textarea>
       }
     </div>
@@ -22,17 +22,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class RequirementsBlockComponent {
 
-  @Input()
-  num: string = "8";
+  readonly num = input<string>("8");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: {
+  readonly _form = input<{
     requirements: boolean;
     requirementsText: string;
-  };
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, forwardRef, input} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 
@@ -10,18 +10,18 @@ export const BB_CONTROL_VALUE_ACCESSOR: any = {
 @Component({
     selector: 'app-boolean-button',
     template: `
-    <div [class.disabled]="disabled" (click)="toggle()" style="display: inline-block; height:30px;" class="mr-2">
-      <label  (click)="toggleTrue()" [class]="'btn btn-sm ' + trueStyle" [class.active]="_value" [class.disabled]="disabled">
-        @if (_value && (!disabled || showDisabledSelection)) {
+    <div [class.disabled]="disabled()" (click)="toggle()" style="display: inline-block; height:30px;" class="mr-2">
+      <label  (click)="toggleTrue()" [class]="'btn btn-sm ' + trueStyle" [class.active]="_value" [class.disabled]="disabled()">
+        @if (_value && (!disabled() || showDisabledSelection())) {
           <fa-icon icon="check"></fa-icon>
         }
-        {{trueLabel}}
+        {{trueLabel()}}
       </label>
-      <label (click)="toggleFalse()" [class]="'btn btn-sm ' + falseStyle" [class.active]="!_value" [class.disabled]="disabled">
-        @if (!_value && (!disabled || showDisabledSelection)) {
+      <label (click)="toggleFalse()" [class]="'btn btn-sm ' + falseStyle" [class.active]="!_value" [class.disabled]="disabled()">
+        @if (!_value && (!disabled() || showDisabledSelection())) {
           <fa-icon icon="check"></fa-icon>
         }
-        {{falseLabel}}
+        {{falseLabel()}}
       </label>
     </div>
     `,
@@ -45,33 +45,33 @@ export const BB_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class BooleanButtonComponent extends ControlComponent<boolean> {
 
-  @Input()
-  trueLabel:string = 'Да';
+  readonly trueLabel = input<string>('Да');
 
-  @Input()
-  falseLabel:string = 'Нет';
+  readonly falseLabel = input<string>('Нет');
 
-  @Input()
-  disabled: boolean = false;
+  readonly disabled = input<boolean>(false);
 
-  @Input()
-  showDisabledSelection: boolean = false;
+  readonly showDisabledSelection = input<boolean>(false);
 
   //Допускаются следующие типы: DEFAULT (стоит по-умолчанию), ONOFF
-  @Input()
-  type:string = 'ONOFF';
-  @Input()
-  trueStyle:string = 'btn-primary';
-  @Input()
-  falseStyle:string = 'btn-primary';
+  readonly type = input<string>('ONOFF');
+  readonly trueStyleInput = input<string>('btn-primary');
+  readonly falseStyleInput = input<string>('btn-primary');
+
+  trueStyle: string = 'btn-primary';
+  falseStyle: string = 'btn-primary';
 
   constructor() { super(); }
 
   ngOnInit() {
-    switch (this.type){
+    switch (this.type()){
       case 'ONOFF':
         this.trueStyle = 'btn-success';
         this.falseStyle = 'btn-danger';
+        break;
+      default:
+        this.trueStyle = this.trueStyleInput();
+        this.falseStyle = this.falseStyleInput();
     }
   }
 

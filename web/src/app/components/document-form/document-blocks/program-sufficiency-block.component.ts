@@ -1,23 +1,23 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-program-sufficiency-block',
     template: `
         <div class="form-sub-group">
           <label>
-            {{ num }}. Достаточность перечня мероприятий по научному обеспечению государственной программы / перечня
+            {{ num() }}. Достаточность перечня мероприятий по научному обеспечению государственной программы / перечня
             заданий
             государственной научно-технической программы для достижения запланированных программой целевых
             показателей:
           </label>
-          <app-boolean-button [(ngModel)]="_form.programSufficiency" [trueLabel]="'достаточен'"
+          <app-boolean-button [(ngModel)]="_form().programSufficiency" [trueLabel]="'достаточен'"
             [falseLabel]="'недостаточен'"
           (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-          @if (full) {
-            <textarea [(ngModel)]="_form.programSufficiencyText" rows="3" class="form-control mt-05"
+          @if (full()) {
+            <textarea [(ngModel)]="_form().programSufficiencyText" rows="3" class="form-control mt-05"
             placeholder="Обязательный текст"></textarea>
           }
-          @if (full) {
+          @if (full()) {
             <div class="hint">
               <p>
                 <b>Подсказка.</b>
@@ -53,17 +53,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class ProgramSufficiencyBlockComponent {
 
-    @Input()
-    num: string = "4";
+    readonly num = input<string>("4");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: {
-        programSufficiency: boolean;
-        programSufficiencyText: string;
-    };
+    readonly _form = input<{
+    programSufficiency: boolean;
+    programSufficiencyText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

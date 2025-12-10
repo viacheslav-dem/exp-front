@@ -31,7 +31,7 @@ export class MailTemplateComponent extends CatalogTemplate<MailTemplateDto> {
               public _dataService: DataService,
               public _mailPriorityPipe: MailPriorityPipe) {
     super(_toasty, _dataService);
-    this.type = Catalog.MAIL_TEMPLATE;
+    this._type = Catalog.MAIL_TEMPLATE;
   }
 
   ngOnInit() {

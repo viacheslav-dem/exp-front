@@ -1,15 +1,15 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-marketing-research-plain-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Проведение маркетинговых и патентных исследований, их результаты:
+        {{num()}}. Проведение маркетинговых и патентных исследований, их результаты:
       </label>
-      <app-dropdown [options]="marketingResearchOptions" [(ngModel)]="_form.marketingResearch"
+      <app-dropdown [options]="marketingResearchOptions" [(ngModel)]="_form().marketingResearch"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -30,14 +30,13 @@ export class MarketingResearchPlainBlockComponent {
     'не имеются',
   ];
 
-  @Input()
-  num: string = "5";
+  readonly num = input<string>("5");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { marketingResearch: string };
+  readonly _form = input<{
+    marketingResearch: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

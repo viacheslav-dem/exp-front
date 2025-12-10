@@ -1,21 +1,21 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-competence-sufficiency-block-2025',
     template: `
         <div class="form-sub-group">
           <label>
-            {{ num }}. Достаточность компетенции кадрового состава потенциального исполнителя работ:
+            {{ num() }}. Достаточность компетенции кадрового состава потенциального исполнителя работ:
           </label>
-          <app-dropdown [options]="competenceSufficiencyOptions" [(ngModel)]="_form.competenceSufficiency"
+          <app-dropdown [options]="competenceSufficiencyOptions" [(ngModel)]="_form().competenceSufficiency"
           (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-          @if (full) {
-            <textarea [(ngModel)]="_form.competenceSufficiencyText" rows="3" class="form-control mt-05"
+          @if (full()) {
+            <textarea [(ngModel)]="_form().competenceSufficiencyText" rows="3" class="form-control mt-05"
             placeholder="Обязательный текст"></textarea>
           }
-          @if (full) {
+          @if (full()) {
             <div class="hint">
-              @if (isExpertReview) {
+              @if (isExpertReview()) {
                 <div>
                   <p>
                     <b>Подсказка.</b>
@@ -34,7 +34,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
                   </p>
                 </div>
               }
-              @if (!isExpertReview) {
+              @if (!isExpertReview()) {
                 <div>
                   <p>
                     <b>Подсказка.</b>
@@ -56,17 +56,16 @@ export class CompetenceSufficiencyBlock2025Component {
 
     competenceSufficiencyOptions = competenceSufficiencyOptions;
 
-    @Input()
-    num: string = "5";
+    readonly num = input<string>("5");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { competenceSufficiency: string, competenceSufficiencyText: string };
+    readonly _form = input<{
+    competenceSufficiency: string;
+    competenceSufficiencyText: string;
+}>(undefined);
 
-    @Input()
-    isExpertReview: boolean = true;
+    readonly isExpertReview = input<boolean>(true);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

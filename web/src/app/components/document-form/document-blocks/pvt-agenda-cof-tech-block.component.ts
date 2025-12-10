@@ -1,14 +1,14 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-pvt-cof-tech-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Величина значения коэфициентп технологичности товара (работы, услуги):
+        {{num()}}. Величина значения коэфициентп технологичности товара (работы, услуги):
       </label>
-      @if (full) {
-        <textarea [(ngModel)]="_form.cofTech" rows="3" class="form-control"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().cofTech" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)." pattern="[0-9]+"></textarea>
       }
     </div>
@@ -17,16 +17,13 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class PvtAgendaCofTechBlockComponent {
 
-    @Input()
-    num: string = "6";
+    readonly num = input<string>("6");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: {
-        cofTech: string;
-    };
+    readonly _form = input<{
+    cofTech: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

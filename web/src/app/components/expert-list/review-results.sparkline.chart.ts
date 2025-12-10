@@ -1,7 +1,7 @@
 /**
  * Created by belous.dmitri on 08.02.2017.
  */
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, OnInit, input} from "@angular/core";
 import {Chart} from "@app/components/highchart/highchart.builder";
 import {MonthYearPipe} from "@app/pipes/mdate.pipe";
 import {acceptedClr, rejectedClr, returnedClr} from "@app/components/stats/colors";
@@ -15,8 +15,8 @@ import {ChartService} from "@app/services/chart.service";
 })
 export class ReviewResultsSparklineChart implements OnInit {
 
-  @Input() height: number = 80;
-  chart: any = Chart.chart().size(null, this.height).loading();
+  readonly height = input<number>(80);
+  chart: any = Chart.chart().size(null, this.height()).loading();
 
   _stats: ExpertStatsDto[] = [];
 
@@ -50,7 +50,7 @@ export class ReviewResultsSparklineChart implements OnInit {
       .reduce((prev, curr) => prev + curr, 0);
     this.chart = Chart.chart()
       .spacing()
-      .size(null, this.height)
+      .size(null, this.height())
       .xAxis(Chart.axis()
         .ticksDisabled()
         .categories(stats.map(stats => this.monthYear.transform(stats.startDate)))

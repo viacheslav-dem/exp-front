@@ -10,7 +10,7 @@
         </button>
         <div class="navbar-collapse" [class.show]="isMenuOpen()" [class.collapse]="!isMenuOpen()" id="navbarNavDropdown">
           <ul class="navbar-nav mr-auto" style="text-align: right">
-            @for (el of menu; track el) {
+            @for (el of menu(); track el) {
               @if (el.children == null || el.children.length == 0) {
                 <li class="nav-item">
                   <a class="nav-link" [routerLink]="el.link" [routerLinkActive]="'active'" (click)="closeMenu()">{{el.title}}</a>
@@ -25,7 +25,7 @@
                   <div class="dropdown-menu shadow" style="width: 300px">
                     @for (cel of el.children; track cel) {
                       <a class="dropdown-item" [routerLink]="cel.link"
-                      [routerLinkActive]="'active'" (click)="closeMenu()">{{cel.title}}</a>
+                      [routerLinkActive]="'active'" (click)="closeDropdown()">{{cel.title}}</a>
                     }
                   </div>
                 </li>

@@ -69,7 +69,7 @@ export class UserManualComponent extends CatalogTemplate<ManualDto> {
               private _rolePipe: RolePipe,
               private _documentService: DocumentService) {
     super(_toasty, _dataService,20);
-    this.type = Catalog.MANUAL;
+    this._type = Catalog.MANUAL;
   }
 
   ngOnInit() {

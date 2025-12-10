@@ -1,26 +1,26 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 
 @Component({
     selector: 'app-program-sufficiency-block-2025',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Достаточность перечня мероприятий по научному обеспечению государственной программы / перечня заданий
+        {{num()}}. Достаточность перечня мероприятий по научному обеспечению государственной программы / перечня заданий
         государственной научно-технической программы для достижения запланированных программой целевых показателей:
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.programSufficiency === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().programSufficiency === true}" (click)="stateButton(true)">
           Достаточен
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.programSufficiency === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().programSufficiency === false}" (click)="stateButton(false)">
           Недостаточен
         </button>
       </div>
-      @if (full) {
-        <textarea [(ngModel)]="_form.programSufficiencyText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().programSufficiencyText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -54,26 +54,23 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
 })
 export class ProgramSufficiencyBlock2025Component {
 
-    @Input()
-    num: string = "4";
+    readonly num = input<string>("4");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: {
-        programSufficiency: boolean;
-        programSufficiencyText: string;
-    };
+    readonly _form = input<{
+    programSufficiency: boolean;
+    programSufficiencyText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     stateButton(flag: boolean) {
         if(flag){
-            this._form.programSufficiency = true;
+            this._form().programSufficiency = true;
         } else {
-            this._form.programSufficiency = false;
+            this._form().programSufficiency = false;
         }
     }
 }

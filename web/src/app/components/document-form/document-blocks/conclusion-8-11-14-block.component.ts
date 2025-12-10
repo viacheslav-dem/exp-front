@@ -1,21 +1,21 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-conclusion-8-11-14-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Целесообразность реализации объекта государственной экспертизы и его финансирования за счет средств
+        {{num()}}. Целесообразность реализации объекта государственной экспертизы и его финансирования за счет средств
         республиканского бюджета и (или) других источников финансирования:
       </label>
       <app-boolean-button
-        [(ngModel)]="_form.conclusion"
-        [disabled]="disabled"
+        [(ngModel)]="_form().conclusion"
+        [disabled]="disabled()"
         [showDisabledSelection]="true"
         [trueLabel]="'целесообразно'"
         [falseLabel]="'нецелесообразно'"
         (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <textarea [(ngModel)]="_form.conclusionText" rows="3" class="form-control mt-05"
+      <textarea [(ngModel)]="_form().conclusionText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст"></textarea>
       <div class="hint">
         <p>
@@ -30,14 +30,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class Conclusion_8_11_14_BlockComponent {
 
-  @Input()
-  num: string = "1";
+  readonly num = input<string>("1");
 
-  @Input()
-  disabled: boolean = false;
+  readonly disabled = input<boolean>(false);
 
-  @Input()
-  _form: { conclusion: boolean, conclusionText: string };
+  readonly _form = input<{
+    conclusion: boolean;
+    conclusionText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

@@ -1,8 +1,8 @@
 <div>
   <div class="form-group">
-    <label class="form-group-label">Объект экспертизы: <i>{{project | titleAndCode}}</i></label>
-    @if (council) {
-      <label class="form-group-label">ГЭС: <i>{{council | councilCodeAndName}}</i></label>
+    <label class="form-group-label">Объект экспертизы: <i>{{project() | titleAndCode}}</i></label>
+    @if (council()) {
+      <label class="form-group-label">ГЭС: <i>{{council() | councilCodeAndName}}</i></label>
     }
   </div>
 
@@ -11,7 +11,7 @@
     <app-date-input class="width-100 input-group-sm" [(ngModel)]="_form.date"></app-date-input>
   </div>
 
-  @if (needCauses) {
+  @if (needCauses()) {
     <div class="form-group">
       <label>Причины возврата:</label>
       @if (causes.length == 0) {

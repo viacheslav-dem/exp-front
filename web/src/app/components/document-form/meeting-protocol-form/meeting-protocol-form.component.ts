@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, Input, Type, ViewChild, ViewContainerRef} from "@angular/core";
+import {Component, ComponentFactoryResolver, Input, Type, ViewChild, ViewContainerRef, input} from "@angular/core";
 import {MeetingDto} from "@app/dto/MeetingDto";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {Role} from "@app/pipes/role.pipe";
@@ -36,7 +36,7 @@ import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form
 export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNewFormContent> {
 
   _meeting: MeetingDto;
-  @Input() role: string;
+  readonly role = input<string>(undefined);
   currentPerson: PersonPlainDto;
   assessors: PersonPlainDto[] = [];
   invited: { name: string }[] = [];
@@ -111,7 +111,7 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
   }
 
   showSearchChairmanModal() {
-    this.searchPersonRoles = this.role;
+    this.searchPersonRoles = this.role();
     this.searchPersonModal.show();
   }
 

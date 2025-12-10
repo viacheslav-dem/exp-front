@@ -1,18 +1,18 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
     selector: 'app-export-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Экспортная ориентированность инновационного проекта (превышение экспорта над импортом):
+        {{num()}}. Экспортная ориентированность инновационного проекта (превышение экспорта над импортом):
       </label>
-      <app-boolean-button [ngModel]="_form.balance > 0"
+      <app-boolean-button [ngModel]="_form().balance > 0"
         [disabled]="true"
         [showDisabledSelection]="true"
         [trueLabel]="'да'"
       [falseLabel]="'нет'"></app-boolean-button>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -27,12 +27,11 @@ import {Component, Input} from '@angular/core';
 })
 export class ExportBlockComponent {
 
-  @Input()
-  num: string = "2.5";
+  readonly num = input<string>("2.5");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { balance: number };
+  readonly _form = input<{
+    balance: number;
+}>(undefined);
 }

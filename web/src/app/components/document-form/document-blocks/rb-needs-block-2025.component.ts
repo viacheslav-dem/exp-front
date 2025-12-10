@@ -1,22 +1,22 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-rb-needs-block-2025',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Потребность республики в результатах, получение которых запланировано в ходе реализации мероприятий
+        {{num()}}. Потребность республики в результатах, получение которых запланировано в ходе реализации мероприятий
         (заданий, проектов, планов, работ, услуг), являющихся объектами государственной экспертизы,
         в том числе с учетом возможностей расширения экспорта и (или) сокращения импорта продукции,
         поставки потребителю разработанной и осваиваемой продукции:
       </label>
-      <app-dropdown [options]="needsOptions" [(ngModel)]="_form.rbNeeds"
+      <app-dropdown [options]="needsOptions" [(ngModel)]="_form().rbNeeds"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      @if (full) {
-        <textarea [(ngModel)]="_form.rbNeedsText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().rbNeedsText" rows="3" class="form-control mt-05"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -37,14 +37,14 @@ export class RbNeedsBlock2025Component {
     'высокая'
   ];
 
-  @Input()
-  num: string = "3";
+  readonly num = input<string>("3");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { rbNeeds: string, rbNeedsText: string };
+  readonly _form = input<{
+    rbNeeds: string;
+    rbNeedsText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

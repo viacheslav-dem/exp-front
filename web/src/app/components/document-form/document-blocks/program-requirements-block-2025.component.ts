@@ -1,28 +1,28 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 
 @Component({
     selector: 'app-program-requirements-block-2025',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Соответствие требованиям, указанным в Положении о порядке формирования, финансирования, выполнения и оценки эффективности
+        {{num()}}. Соответствие требованиям, указанным в Положении о порядке формирования, финансирования, выполнения и оценки эффективности
         реализации государственных программ, утвержденном Указом Президента Республики Беларусь от 25 июля 2016 г. № 289 / Положении
         о порядке разработки и выполнения научно-технических программ, утвержденном постановлением Совета Министров Республики Беларусь
         от 31 августа 2005 г, № 961:
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.programRequirements === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().programRequirements === true}" (click)="stateButton(true)">
           Соответсвует
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.programRequirements === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().programRequirements === false}" (click)="stateButton(false)">
           Не соотвествует
         </button>
       </div>
-      @if (full) {
-        <textarea [(ngModel)]="_form.programRequirementsText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().programRequirementsText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -48,26 +48,23 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
 })
 export class ProgramRequirementsBlock2025Component {
 
-    @Input()
-    num: string = "1";
+    readonly num = input<string>("1");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: {
-        programRequirements: boolean;
-        programRequirementsText: string;
-    };
+    readonly _form = input<{
+    programRequirements: boolean;
+    programRequirementsText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     stateButton(flag: boolean) {
         if(flag){
-            this._form.programRequirements = true;
+            this._form().programRequirements = true;
         } else {
-            this._form.programRequirements = false;
+            this._form().programRequirements = false;
         }
     }
 

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
@@ -11,7 +11,7 @@ import {
     template: `
         <div class="form-sub-group" xmlns="http://www.w3.org/1999/html">
           <label>
-            {{num}}. Экономическая и (или) социальная значимость (эффективность) объекта государственной экспертизы.
+            {{num()}}. Экономическая и (или) социальная значимость (эффективность) объекта государственной экспертизы.
           </label>
           <label>
             Эффекты от инвестиций, которые потенциально смогут оказать воздействие на ускорение
@@ -22,7 +22,7 @@ import {
           </label>
           <div>
             <app-boolean-button class="d-inline-block"
-              [(ngModel)]="_form.isOpeningOfSubsidiaries"
+              [(ngModel)]="_form().isOpeningOfSubsidiaries"
               [trueLabel]="'да'"
               [falseLabel]="'нет'"
             (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
@@ -37,7 +37,7 @@ import {
             </label>
             <div>
               <app-boolean-button class="d-inline-block"
-                [(ngModel)]="_form.isParticipationInnovationAndInvestment"
+                [(ngModel)]="_form().isParticipationInnovationAndInvestment"
                 [trueLabel]="'да'"
                 [falseLabel]="'нет'"
               (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
@@ -49,7 +49,7 @@ import {
               </label>
               <div>
                 <app-boolean-button class="d-inline-block"
-                  [(ngModel)]="_form.isBuyMaterialSupplies"
+                  [(ngModel)]="_form().isBuyMaterialSupplies"
                   [trueLabel]="'да'"
                   [falseLabel]="'нет'"
                 (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
@@ -62,13 +62,13 @@ import {
                 </label>
                 <div>
                   <app-boolean-button class="d-inline-block"
-                    [(ngModel)]="_form.isUseOfIntellectualProperty"
+                    [(ngModel)]="_form().isUseOfIntellectualProperty"
                     [trueLabel]="'да'"
                     [falseLabel]="'нет'"
                   (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
                 </div>
                 <br>
-                  @if (full) {
+                  @if (full()) {
                     <div class="hint">
                       <p>
                         <b>Подсказка.</b>  При достижении одного и более эффектов:<br>
@@ -96,13 +96,13 @@ import {
                     выполнения работ,
                     предусмотренных объектом государственной экспертизы:
                   </label>
-                  <app-dropdown [options]="significanceOptions" [(ngModel)]="_form.economicSignificance"
+                  <app-dropdown [options]="significanceOptions" [(ngModel)]="_form().economicSignificance"
                   (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-                  @if (full) {
-                    <textarea [(ngModel)]="_form.economicSignificanceText" rows="3" class="form-control mt-05"
+                  @if (full()) {
+                    <textarea [(ngModel)]="_form().economicSignificanceText" rows="3" class="form-control mt-05"
                     placeholder="Обязательный текст"></textarea>
                   }
-                  @if (full) {
+                  @if (full()) {
                     <div class="hint">
                       <p>
                         <b>Подсказка.</b>
@@ -141,22 +141,20 @@ export class EconomicSignificance_8_8_BlockComponent {
     ProjectCodePlainDto = ProjectCodePlainDto;
     significanceOptions = economicSignificanceOptions;
 
-    @Input()
-    num: string = "2";
+    readonly num = input<string>("2");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    project: ProjectPlainDto | ProjectDto;
+    readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    @Input()
-    _form: { economicSignificance: string,
-        economicSignificanceText: string,
-        isOpeningOfSubsidiaries: boolean,
-        isParticipationInnovationAndInvestment: boolean,
-        isBuyMaterialSupplies: boolean,
-        isUseOfIntellectualProperty: boolean};
+    readonly _form = input<{
+    economicSignificance: string;
+    economicSignificanceText: string;
+    isOpeningOfSubsidiaries: boolean;
+    isParticipationInnovationAndInvestment: boolean;
+    isBuyMaterialSupplies: boolean;
+    isUseOfIntellectualProperty: boolean;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

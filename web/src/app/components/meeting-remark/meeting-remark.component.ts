@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 import {RemarkDto} from "@app/dto/RemarkDto";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {DialogService} from "@app/components/dialogs/dialog.service";
@@ -18,8 +18,8 @@ export class MeetingRemarkComponent {
   }
 
 
-  @Input() allRemarks: RemarksContainerDto;
-  @Input() role: Role;
+  readonly allRemarks = input<RemarksContainerDto>(undefined);
+  readonly role = input<Role>(undefined);
   Role = Role;
   newRemark: RemarkDto = new RemarkDto();
   isEdit: boolean = false;
@@ -33,21 +33,22 @@ export class MeetingRemarkComponent {
     }
     let rem = new RemarkDto();
     rem.question = remark.question;
-    if (this.role == Role.SECTION_CHAIRMAN) {
-      this.allRemarks.sectionMeetingRemark.push(rem);
+    const role = this.role();
+    if (role == Role.SECTION_CHAIRMAN) {
+      this.allRemarks().sectionMeetingRemark.push(rem);
     }
-    if (this.role == Role.BUREAU_CHAIRMAN) {
-      this.allRemarks.bureauMeetingRemark.push(rem);
+    if (role == Role.BUREAU_CHAIRMAN) {
+      this.allRemarks().bureauMeetingRemark.push(rem);
     }
     this.newRemark = new RemarkDto();
   }
 
   deleteSectionRemark(remark: RemarkDto) {
-    this.allRemarks.sectionMeetingRemark = this.allRemarks.sectionMeetingRemark.filter(value => value != remark);
+    this.allRemarks().sectionMeetingRemark = this.allRemarks().sectionMeetingRemark.filter(value => value != remark);
   }
 
   deleteBureauRemark(remark: RemarkDto) {
-    this.allRemarks.bureauMeetingRemark = this.allRemarks.bureauMeetingRemark.filter(value => value != remark);
+    this.allRemarks().bureauMeetingRemark = this.allRemarks().bureauMeetingRemark.filter(value => value != remark);
   }
 
   editRemark(remark: RemarkDto, index: number) {
@@ -65,6 +66,6 @@ export class MeetingRemarkComponent {
   }
 
   save() {
-    this.onSave.emit(this.allRemarks);
+    this.onSave.emit(this.allRemarks());
   }
 }

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {NewVoteResults} from "@app/components/document-form/meeting-protocol-form/NewVoteResults";
 import {DecisionStateBadge} from "@app/pipes/decision.pipe";
@@ -8,25 +8,25 @@ import {DecisionStateBadge} from "@app/pipes/decision.pipe";
     template: `
     <div class="form-sub-group">
       <label>
-        <span>{{num}}.</span>
+        <span>{{num()}}.</span>
         <span>
           Заключение секции/бюро по объекту государственной экспертизы
-          <i>{{project?.title}}</i>:
+          <i>{{project()?.title}}</i>:
         </span>
-        <span class="ml-05" [ngClass]="['badge', DecisionStateBadge[_form.conclusion.getDecision()] || 'badge-info']">
-          {{(_form.conclusion.getDecision() | decision) || 'не указано'}}
+        <span class="ml-05" [ngClass]="['badge', DecisionStateBadge[_form().conclusion.getDecision()] || 'badge-info']">
+          {{(_form().conclusion.getDecision() | decision) || 'не указано'}}
         </span>
       </label>
       <app-new-vote-results
-        [(ngModel)]="_form.conclusion"
-        [all]="allParticipants"
+        [(ngModel)]="_form().conclusion"
+        [all]="allParticipants()"
         (onChanged)="onConditionsChanged.emit(true)"
       ></app-new-vote-results>
-      @if (financeConclusionNum) {
+      @if (financeConclusionNum()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
-            Положительное решение принимается, только если в пункте {{financeConclusionNum}} имеется положительная оценка.
+            Положительное решение принимается, только если в пункте {{financeConclusionNum()}} имеется положительная оценка.
           </p>
         </div>
       }
@@ -38,26 +38,21 @@ export class ConclusionSectionBlockComponent {
 
   DecisionStateBadge = DecisionStateBadge;
 
-  @Input()
-  num: string = "11";
+  readonly num = input<string>("11");
 
-  @Input()
-  financeConclusionNum: string;
+  readonly financeConclusionNum = input<string>(undefined);
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  disabled: boolean = false;
+  readonly disabled = input<boolean>(false);
 
-  @Input()
-  project: ProjectPlainDto;
+  readonly project = input<ProjectPlainDto>(undefined);
 
-  @Input()
-  _form: { conclusion: NewVoteResults };
+  readonly _form = input<{
+    conclusion: NewVoteResults;
+}>(undefined);
 
-  @Input()
-  allParticipants: number;
+  readonly allParticipants = input<number>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

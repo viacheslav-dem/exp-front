@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 
 @Component({
     selector: 'app-conclusion-8-13-block-2025',
@@ -13,14 +13,14 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
         Целесообразность реализации объекта государственной экспертизы:
       </label>
         <div class="btn-group" role="group" aria-label="Basic example">
-            <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.conclusion === true}" (click)="stateButton(true)">
+            <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().conclusion === true}" (click)="stateButton(true)">
                 Целесообразно
             </button>
-            <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.conclusion === false}" (click)="stateButton(false)">
+            <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().conclusion === false}" (click)="stateButton(false)">
                 Нецелесообразно
             </button>
         </div>
-      <textarea [(ngModel)]="_form.conclusionText" rows="3" class="form-control mt-05"
+      <textarea [(ngModel)]="_form().conclusionText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст"></textarea>
       <div class="hint">
         <p>
@@ -36,20 +36,21 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
 })
 export class Conclusion_8_13_Block2025Component {
 
-    @Input()
-    disabled: boolean = false;
+    readonly disabled = input<boolean>(false);
 
-    @Input()
-    _form: { conclusion: boolean, conclusionText: string };
+    readonly _form = input<{
+    conclusion: boolean;
+    conclusionText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     stateButton(flag: boolean) {
         if(flag){
-            this._form.conclusion = true;
+            this._form().conclusion = true;
         } else {
-            this._form.conclusion = false;
+            this._form().conclusion = false;
         }
     }
 }

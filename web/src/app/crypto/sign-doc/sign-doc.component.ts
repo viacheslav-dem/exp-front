@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, OnInit, input} from '@angular/core';
 import {CryptoService} from "@app/crypto/crypto.service";
 import {IdDto} from "@app/dto/IdDto";
 
@@ -10,7 +10,7 @@ import {IdDto} from "@app/dto/IdDto";
 })
 export class SignDocComponent implements OnInit {
 
-  @Input() doc: IdDto;
+  readonly doc = input<IdDto>(undefined);
 
   constructor(private crypto: CryptoService) {
   }
@@ -19,6 +19,6 @@ export class SignDocComponent implements OnInit {
   }
 
   sign() {
-    this.crypto.signDoc(this.doc);
+    this.crypto.signDoc(this.doc());
   }
 }

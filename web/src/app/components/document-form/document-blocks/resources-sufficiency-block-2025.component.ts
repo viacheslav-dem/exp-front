@@ -1,19 +1,19 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-resources-sufficiency-block-2025',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Достаточность материально-технической базы и кадрового потенциала исполнителя работ:
+        {{num()}}. Достаточность материально-технической базы и кадрового потенциала исполнителя работ:
       </label>
-      <app-dropdown [options]="resourcesSufficiencyOptions" [(ngModel)]="_form.resourcesSufficiency"
+      <app-dropdown [options]="resourcesSufficiencyOptions" [(ngModel)]="_form().resourcesSufficiency"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      @if (full) {
-        <textarea [(ngModel)]="_form.resourcesSufficiencyText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().resourcesSufficiencyText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -36,14 +36,14 @@ export class ResourcesSufficiencyBlock2025Component {
 
     resourcesSufficiencyOptions = resourcesSufficiencyOptions;
 
-    @Input()
-    num: string = "4";
+    readonly num = input<string>("4");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { resourcesSufficiency: string, resourcesSufficiencyText: string };
+    readonly _form = input<{
+    resourcesSufficiency: string;
+    resourcesSufficiencyText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

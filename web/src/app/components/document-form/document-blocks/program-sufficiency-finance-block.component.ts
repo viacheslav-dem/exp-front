@@ -1,22 +1,22 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-program-sufficiency-finance-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы
+        {{num()}}. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы
         в части объемов их финансирования для достижения запланированных государственной программой показателей:
       </label>
-      <app-boolean-button [(ngModel)]="_form.programSufficiency"
+      <app-boolean-button [(ngModel)]="_form().programSufficiency"
         [trueLabel]="'достаточно'"
         [falseLabel]="'недостаточно'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full) {
-        <textarea [(ngModel)]="_form.programSufficiencyText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().programSufficiencyText" rows="3" class="form-control mt-05"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -38,17 +38,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class ProgramSufficiencyFinanceBlockComponent {
 
-  @Input()
-  num: string = "2";
+  readonly num = input<string>("2");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: {
+  readonly _form = input<{
     programSufficiency: boolean;
     programSufficiencyText: string;
-  };
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

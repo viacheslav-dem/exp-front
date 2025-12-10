@@ -32,7 +32,7 @@
       </div>
       @if (isExpanded) {
         <app-remark-response [remarks]="_lifecycle.remarks" [isEdit]="false"
-        [isExpired]="project.isSectionRemarksExpired"></app-remark-response>
+        [isExpired]="project().isSectionRemarksExpired"></app-remark-response>
       }
     }
   </div>

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-catalog-high-tech-block',
@@ -7,10 +7,10 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <label>
         Отнесение товара к высокотехнологичному для его включения в перечень высокотехнологичных товаров:
       </label>
-        <app-boolean-button [(ngModel)]="_form.catalogHighTech" 
+        <app-boolean-button [(ngModel)]="_form().catalogHighTech" 
                             [trueLabel]="'возможно отнесение'"
                             [falseLabel]="'невозможно отнесение'"
-                            [disabled]="disabled"
+                            [disabled]="disabled()"
                             (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
     </div>
   `,
@@ -18,11 +18,11 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class CatalogHighTechBlockComponent {
 
-    @Input()
-    _form: { catalogHighTech: boolean};
+    readonly _form = input<{
+    catalogHighTech: boolean;
+}>(undefined);
 
-    @Input()
-    disabled: boolean = false;
+    readonly disabled = input<boolean>(false);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

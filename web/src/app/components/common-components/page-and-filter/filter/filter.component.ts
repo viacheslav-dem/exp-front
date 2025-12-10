@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output, input} from "@angular/core";
 import {
   CheckboxField,
   MultiCheck,
@@ -21,8 +21,8 @@ export class FilterComponent implements OnInit {
   SearchFieldType = SearchFieldType;
   searcherTimer: any;
   _fields: SearchField[] = [];
-  @Input() fieldClass: string = '';
-  @Input() filterClass: string = '';
+  readonly fieldClass = input<string>('');
+  readonly filterClass = input<string>('');
   @Output() onFilterChanged = new EventEmitter<Filter<any>[]>();
 
   constructor(private dataService: DataService) {

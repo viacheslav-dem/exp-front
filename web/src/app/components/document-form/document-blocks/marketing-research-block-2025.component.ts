@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectDto} from "@app/dto/ProjectDto";
 
@@ -7,22 +7,22 @@ import {ProjectDto} from "@app/dto/ProjectDto";
     template: `
         <div class="form-sub-group">
           <label>
-            {{ num }}. Проведение маркетинговых и патентных исследований, их результаты:
+            {{ num() }}. Проведение маркетинговых и патентных исследований, их результаты:
           </label>
-          <app-dropdown [options]="marketingResearchOptions" [(ngModel)]="_form.marketingResearch"
+          <app-dropdown [options]="marketingResearchOptions" [(ngModel)]="_form().marketingResearch"
           (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-          @if (full) {
-            <textarea [(ngModel)]="_form.marketingResearchText" rows="3" class="form-control mt-05"
+          @if (full()) {
+            <textarea [(ngModel)]="_form().marketingResearchText" rows="3" class="form-control mt-05"
             placeholder="Обязательный текст"></textarea>
           }
-          @if (full) {
+          @if (full()) {
             <div class="hint">
               <p>
                 <b>Подсказка.</b>
                 Если в материалах по объекту государственной экспертизы отсутствует соответствующая информация,
                 эксперт должен указать: «Не представлено в материалах по объекту государственной экспертизы».
               </p>
-              @if (!isExpertReview) {
+              @if (!isExpertReview()) {
                 <div>
                   <p>
                     Оценивается наличие конкретных потребителей (возможности переориентации на альтернативные
@@ -35,7 +35,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
                   </p>
                 </div>
               }
-              @if (this.project.code.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
+              @if (this.project().code.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
                 <div>
                   <p>
                     Для объектов государственной экспертизы, указанных в подпункте 8.4 пункта 8 Положения,
@@ -81,20 +81,18 @@ export class MarketingResearchBlock2025Component {
         'не имеются',
     ];
 
-    @Input()
-    num: string = "6";
+    readonly num = input<string>("6");
 
-    @Input()
-    project: ProjectPlainDto | ProjectDto;
+    readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { marketingResearch: string, marketingResearchText: string };
+    readonly _form = input<{
+    marketingResearch: string;
+    marketingResearchText: string;
+}>(undefined);
 
-    @Input()
-    isExpertReview: boolean = true;
+    readonly isExpertReview = input<boolean>(true);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

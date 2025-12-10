@@ -50,10 +50,8 @@ import {StatsRoutingModule} from './stats-routing.module';
         CouncilResultsChart,
         CouncilProjectsChart,
         BestExpertComponent,
-        ResultFunComponent,
-
-    ],
-    providers: []
+        ResultFunComponent
+    ]
 })
 export class StatsModule {
 }

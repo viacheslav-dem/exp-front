@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-conclusion-block',
@@ -10,19 +10,19 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       </label>
         <br\>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button [disabled]=disabled type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.conclusion === true}" (click)="stateButton(true)">
+        <button [disabled]=disabled() type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().conclusion === true}" (click)="stateButton(true)">
           Положительное
         </button>
-        <button [disabled]=disabled type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.conclusion === false}" (click)="stateButton(false)">
+        <button [disabled]=disabled() type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().conclusion === false}" (click)="stateButton(false)">
           Отрицательное
         </button>
       </div>
-      <textarea [(ngModel)]="_form.conclusionText" rows="3" class="form-control mt-05"
+      <textarea [(ngModel)]="_form().conclusionText" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст"></textarea>
-      <div *ngIf="financeConclusionNum" class="hint">
+      <div *ngIf="financeConclusionNum()" class="hint">
         <p>
           <b>Подсказка.</b>
-          Положительное решение принимается, если в подпункте {{financeConclusionNum}} имеется оценка «целесообразно».
+          Положительное решение принимается, если в подпункте {{financeConclusionNum()}} имеется оценка «целесообразно».
         </p>
       </div>
     </div>
@@ -31,23 +31,23 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class ConclusionBlockComponent {
 
-  @Input()
-  disabled: boolean = false;
+  readonly disabled = input<boolean>(false);
 
-  @Input()
-  financeConclusionNum: string;
+  readonly financeConclusionNum = input<string>(undefined);
 
-  @Input()
-  _form: { conclusion: boolean, conclusionText: string };
+  readonly _form = input<{
+    conclusion: boolean;
+    conclusionText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   stateButton(flag: boolean) {
     if(flag){
-      this._form.conclusion = true;
+      this._form().conclusion = true;
     } else {
-      this._form.conclusion = false;
+      this._form().conclusion = false;
     }
   }
 

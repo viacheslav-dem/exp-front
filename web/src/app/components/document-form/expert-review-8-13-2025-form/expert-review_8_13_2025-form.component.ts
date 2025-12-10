@@ -22,7 +22,6 @@ export class ExpertReview_8_13_2025FormComponent extends ExpertReviewForm<Expert
     if (disabled) {
       this._form.conclusion = false;
     }
-    console.log(disabled);
     return disabled;
   }
 

@@ -10,7 +10,7 @@
 </div>
 
 <!--GROUPS-->
-@if (!groups.length) {
+@if (!groups().length) {
   <div>
     <div class="list-group-item text-muted text-sm italic">
       ГЭС не указаны
@@ -18,11 +18,11 @@
   </div>
 }
 <div>
-  @for (group of groups; track group) {
+  @for (group of groups(); track group) {
     <div class="lifecycle-group-item">
       <app-lifecycle-group
-        [group]="group" [project]="project" (onDeleted)="deleteGroup($event)"
-        [role]="role" (onChanged)="changed()" (onReplyChanged)="replyChanged($event)">
+        [group]="group" [project]="project()" (onDeleted)="deleteGroup($event)"
+        [role]="role()" (onChanged)="changed()" (onReplyChanged)="replyChanged($event)">
       </app-lifecycle-group>
     </div>
   }

@@ -21,7 +21,7 @@ export class ProjectCodesComponent extends CatalogTemplate<ProjectCodeDto> {
   constructor(public _toasty: GlobalToastyService,
               public _dataService: DataService) {
     super(_toasty, _dataService);
-    this.type = Catalog.PROJECT_CODE;
+    this._type = Catalog.PROJECT_CODE;
   }
 
   ngOnInit() {

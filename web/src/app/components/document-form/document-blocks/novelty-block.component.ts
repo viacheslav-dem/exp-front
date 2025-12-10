@@ -1,22 +1,22 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-novelty-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Новизна (инновационность) объекта государственной экспертизы.
+        {{num()}}. Новизна (инновационность) объекта государственной экспертизы.
       </label>
       <label>
         Степень новизны (уровень инновационности) объекта государственной экспертизы:
       </label>
-      <app-dropdown [options]="noveltyOptions" [(ngModel)]="_form.novelty"
+      <app-dropdown [options]="noveltyOptions" [(ngModel)]="_form().novelty"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      @if (full) {
-        <textarea [(ngModel)]="_form.noveltyText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().noveltyText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст."></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -38,17 +38,16 @@ export class NoveltyBlockComponent {
 
   noveltyOptions = noveltyOptions;
 
-  @Input()
-  num: string = "1";
+  readonly num = input<string>("1");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { novelty: string, noveltyText: string };
+  readonly _form = input<{
+    novelty: string;
+    noveltyText: string;
+}>(undefined);
 
-  @Input()
-  isTextRequired: boolean = false;
+  readonly isTextRequired = input<boolean>(false);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

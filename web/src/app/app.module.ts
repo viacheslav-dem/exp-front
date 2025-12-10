@@ -212,5 +212,4 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         provideHttpClient(withInterceptorsFromDi())
     ] })
 export class AppModule {
-
 }

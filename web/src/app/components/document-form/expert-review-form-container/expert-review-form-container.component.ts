@@ -1,4 +1,4 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, input} from "@angular/core";
 import {DocumentFormContainerComponent} from "@app/components/document-form/document-form-container/document-form-container.component";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ExpertReviewFormContent} from "@app/components/document-form/form-model/ExpertReviewFormContent";
@@ -32,8 +32,8 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
   _project: ProjectDto;
 
   // Override parent @Input to expose as component input (parent field is used directly)
-  @Input() draftService: DraftService<Form>;
-  @Input() draftOwner: IdDto;
+  readonly draftService = input<DraftService<Form>>(undefined);
+  readonly draftOwner = input<IdDto>(undefined);
 
   @Input()
   set project(project) {

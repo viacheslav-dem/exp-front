@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
     selector: 'app-conclusion-8-6-block',
@@ -7,7 +7,7 @@ import {Component, Input} from '@angular/core';
       <label>
         Заключение эксперта по объекту государственной экспертизы:
       </label>
-      <app-boolean-button [ngModel]="_form.accordance && _form.effectAccordance"
+      <app-boolean-button [ngModel]="_form().accordance && _form().effectAccordance"
                           [disabled]="true"
                           [showDisabledSelection]="true"
                           [trueLabel]="'положительное'"
@@ -25,6 +25,8 @@ import {Component, Input} from '@angular/core';
 })
 export class Conclusion_8_6_BlockComponent {
 
-  @Input()
-  _form: { effectAccordance: boolean, accordance: boolean };
+  readonly _form = input<{
+    effectAccordance: boolean;
+    accordance: boolean;
+}>(undefined);
 }

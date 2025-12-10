@@ -1,11 +1,11 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-sufficiency-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Достаточность запланированных этапов работ (услуг),
+        {{num()}}. Достаточность запланированных этапов работ (услуг),
         создаваемого и приобретаемого программного обеспечения,
         технических средств и (или) комплексов программно-технических средств для достижения
         целей государственной программы информатизации (подпрограммы),
@@ -13,19 +13,19 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         либо перечня научных исследований и разработок по развитию государственной системы научно-технической
         информации Республики Беларусь:
       </label>
-      <app-boolean-button [(ngModel)]="_form.sufficiency" [trueLabel]="'достаточно'"
+      <app-boolean-button [(ngModel)]="_form().sufficiency" [trueLabel]="'достаточно'"
         [falseLabel]="'недостаточно'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (!_form.sufficiency) {
+      @if (!_form().sufficiency) {
         <label>Рекомендуется добавить:</label>
         <textarea
-          [(ngModel)]="_form.sufficiencySuggestion" rows="2" class="form-control"
+          [(ngModel)]="_form().sufficiencySuggestion" rows="2" class="form-control"
           title="Рекомендуется добавить"
           placeholder="перечисление ресурсов, которые необходимо добавить в процессе реализации объекта экспертизы"
         ></textarea>
       }
-      @if (full) {
-        <textarea [(ngModel)]="_form.sufficiencyText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().sufficiencyText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст."></textarea>
       }
     </div>
@@ -34,18 +34,15 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class SufficiencyBlockComponent {
 
-  @Input()
-  num: string = "4";
+  readonly num = input<string>("4");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: {
+  readonly _form = input<{
     sufficiency: boolean;
     sufficiencyText: string;
     sufficiencySuggestion: string;
-  };
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

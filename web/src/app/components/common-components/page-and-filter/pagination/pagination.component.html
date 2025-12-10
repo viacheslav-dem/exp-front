@@ -1,42 +1,42 @@
-@if (page && pagination && pages.length > 0) {
+@if (page() && pagination() && pages.length > 0) {
   <div class="ng2-pagination">
     <ul class="pagination pagination-sm">
       <!-- Первая -->
-      <li class="pagination-first page-item" [class.disabled]="pagination.page <= 1">
+      <li class="pagination-first page-item" [class.disabled]="pagination().page <= 1">
         <a class="page-link" href=""
-          (click)="$event.preventDefault(); pagination.page > 1 && pageChanged({ page: 1, itemsPerPage: pagination.itemsPerPage })">
-          {{ firstText }}
+          (click)="$event.preventDefault(); pagination().page > 1 && pageChanged({ page: 1, itemsPerPage: pagination().itemsPerPage })">
+          {{ firstText() }}
         </a>
       </li>
       <!-- Предыдущая -->
-      <li class="pagination-prev page-item" [class.disabled]="pagination.page <= 1">
+      <li class="pagination-prev page-item" [class.disabled]="pagination().page <= 1">
         <a class="page-link" href=""
-          (click)="$event.preventDefault(); pagination.page > 1 && pageChanged({ page: pagination.page - 1, itemsPerPage: pagination.itemsPerPage })">
-          {{ previousText }}
+          (click)="$event.preventDefault(); pagination().page > 1 && pageChanged({ page: pagination().page - 1, itemsPerPage: pagination().itemsPerPage })">
+          {{ previousText() }}
         </a>
       </li>
       <!-- Номера страниц -->
       @for (p of pages; track p) {
         <li class="pagination-page page-item"
-          [class.active]="pagination.page === p">
+          [class.active]="pagination().page === p">
           <a class="page-link" href=""
-            (click)="$event.preventDefault(); pageChanged({ page: p, itemsPerPage: pagination.itemsPerPage })">
+            (click)="$event.preventDefault(); pageChanged({ page: p, itemsPerPage: pagination().itemsPerPage })">
             {{ p }}
           </a>
         </li>
       }
       <!-- Следующая -->
-      <li class="pagination-next page-item" [class.disabled]="pagination.page >= page.totalPages">
+      <li class="pagination-next page-item" [class.disabled]="pagination().page >= page().totalPages">
         <a class="page-link" href=""
-          (click)="$event.preventDefault(); pagination.page < page.totalPages && pageChanged({ page: pagination.page + 1, itemsPerPage: pagination.itemsPerPage })">
-          {{ nextText }}
+          (click)="$event.preventDefault(); pagination().page < page().totalPages && pageChanged({ page: pagination().page + 1, itemsPerPage: pagination().itemsPerPage })">
+          {{ nextText() }}
         </a>
       </li>
       <!-- Последняя -->
-      <li class="pagination-last page-item" [class.disabled]="pagination.page >= page.totalPages">
+      <li class="pagination-last page-item" [class.disabled]="pagination().page >= page().totalPages">
         <a class="page-link" href=""
-          (click)="$event.preventDefault(); pagination.page < page.totalPages && pageChanged({ page: page.totalPages, itemsPerPage: pagination.itemsPerPage })">
-          {{ lastText }}
+          (click)="$event.preventDefault(); pagination().page < page().totalPages && pageChanged({ page: page().totalPages, itemsPerPage: pagination().itemsPerPage })">
+          {{ lastText() }}
         </a>
       </li>
     </ul>

@@ -1,5 +1,5 @@
-@if (decision) {
-  <span class="tag" [ngClass]="['badge', DecisionStateBadge[decision]]">
-    {{decision | decision}}
+@if (decision()) {
+  <span class="tag" [ngClass]="['badge', DecisionStateBadge[decision()]]">
+    {{decision() | decision}}
   </span>
 }

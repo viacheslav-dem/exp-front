@@ -1,20 +1,20 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-target-analysis-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Анализ целевых показателей:
+        {{num()}}. Анализ целевых показателей:
       </label>
-      <app-boolean-button [(ngModel)]="_form.targetAnalysis" [trueLabel]="'достаточны'"
+      <app-boolean-button [(ngModel)]="_form().targetAnalysis" [trueLabel]="'достаточны'"
         [falseLabel]="'недостаточны'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full) {
-        <textarea [(ngModel)]="_form.targetAnalysisText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().targetAnalysisText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -34,17 +34,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class TargetAnalysisBlockComponent {
 
-  @Input()
-  num: string = "3";
+  readonly num = input<string>("3");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: {
+  readonly _form = input<{
     targetAnalysis: boolean;
     targetAnalysisText: string;
-  };
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

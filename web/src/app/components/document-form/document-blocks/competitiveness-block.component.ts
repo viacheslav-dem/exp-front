@@ -1,19 +1,19 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-competitiveness-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Обоснование конкурентоспособности разработки:
+        {{num()}}. Обоснование конкурентоспособности разработки:
       </label>
-      <app-dropdown [options]="competitivenessOptions" [(ngModel)]="_form.competitiveness"
+      <app-dropdown [options]="competitivenessOptions" [(ngModel)]="_form().competitiveness"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      @if (full) {
-        <textarea [(ngModel)]="_form.competitivenessText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().competitivenessText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -33,14 +33,14 @@ export class CompetitivenessBlockComponent {
     'недостаточно',
   ];
 
-  @Input()
-  num: string = "5.1";
+  readonly num = input<string>("5.1");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { competitiveness: string, competitivenessText: string };
+  readonly _form = input<{
+    competitiveness: string;
+    competitivenessText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

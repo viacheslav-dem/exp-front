@@ -1,16 +1,16 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
     selector: 'app-analog-params-description-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Признаки, которыми технологии и (или) продукция отличаются от аналогов на
+        {{num()}}. Признаки, которыми технологии и (или) продукция отличаются от аналогов на
         территории Республики Беларусь и (или) в мире.
       </label>
-      <textarea [(ngModel)]="_form.analogParamsText" rows="3" class="form-control"
+      <textarea [(ngModel)]="_form().analogParamsText" rows="3" class="form-control"
       placeholder="Обязательный текст."></textarea>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -30,12 +30,11 @@ import {Component, Input} from '@angular/core';
 })
 export class AnalogParamsDescriptionBlockComponent {
 
-  @Input()
-  num: string = "5.4";
+  readonly num = input<string>("5.4");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { analogParamsText: string };
+  readonly _form = input<{
+    analogParamsText: string;
+}>(undefined);
 }

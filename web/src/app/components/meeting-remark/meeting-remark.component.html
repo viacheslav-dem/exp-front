@@ -1,25 +1,25 @@
-@if (role==Role.SECTION_CHAIRMAN || role==Role.SECTION_ASSESSOR) {
+@if (role()==Role.SECTION_CHAIRMAN || role()==Role.SECTION_ASSESSOR) {
   <div class="row">
     <div class="col-6">
       <div class="bold mb-2">Замечания экспертов</div>
-      @for (remark of allRemarks.expertRemarks; track remark) {
+      @for (remark of allRemarks().expertRemarks; track remark) {
         <div>
-          @if (role == Role.SECTION_CHAIRMAN) {
+          @if (role() == Role.SECTION_CHAIRMAN) {
             <div
               class="list-group-item list-group-item-action selectable" style="white-space: pre-wrap"
             (click)="addRemark(remark)">{{remark.question}}</div>
           }
-          @if (role == Role.SECTION_ASSESSOR) {
+          @if (role() == Role.SECTION_ASSESSOR) {
             <div
             class="list-group-item list-group-item-action" style="white-space: pre-wrap">{{remark.question}}</div>
           }
         </div>
       }
     </div>
-    @if (role == Role.SECTION_CHAIRMAN) {
+    @if (role() == Role.SECTION_CHAIRMAN) {
       <div class="col-6">
         <div class="bold mb-2">Сформированные замечания</div>
-        @for (remark of allRemarks.sectionMeetingRemark; track remark; let i = $index) {
+        @for (remark of allRemarks().sectionMeetingRemark; track remark; let i = $index) {
           <div>
             @if (i!=indexForEdit) {
               <div class="list-group-item list-group-item-action selectable"
@@ -52,11 +52,11 @@
         }
       </div>
     }
-    @if (role == Role.SECTION_ASSESSOR || role == Role.BUREAU_ASSESSOR) {
+    @if (role() == Role.SECTION_ASSESSOR || role() == Role.BUREAU_ASSESSOR) {
       <div class="col-6">
-        @for (remark of allRemarks.sectionMeetingRemark; track remark) {
+        @for (remark of allRemarks().sectionMeetingRemark; track remark) {
           <div>
-            @if (role == Role.SECTION_ASSESSOR || role == Role.BUREAU_ASSESSOR) {
+            @if (role() == Role.SECTION_ASSESSOR || role() == Role.BUREAU_ASSESSOR) {
               <div
               class="list-group-item list-group-item-action" style="white-space: pre-wrap">{{remark.answer}}</div>
             }
@@ -67,19 +67,19 @@
   </div>
 }
 
-@if (role==Role.BUREAU_CHAIRMAN || role==Role.BUREAU_ASSESSOR) {
+@if (role()==Role.BUREAU_CHAIRMAN || role()==Role.BUREAU_ASSESSOR) {
   <div class="row">
     <div class="col-12">
       <div class="bold mb-2">Замечания экспертов</div>
-      @for (remark of allRemarks.expertRemarks; track remark) {
+      @for (remark of allRemarks().expertRemarks; track remark) {
         <div>
           <div class="list-group-item list-group-item-action" style="white-space: pre-wrap">{{remark.question}}</div>
         </div>
       }
       <div class="bold mb-2 mt-2">Замечания секции и ответы заказчика</div>
-      <app-remark-response [isEdit]="false" [remarks]="allRemarks.sectionMeetingRemark"></app-remark-response>
+      <app-remark-response [isEdit]="false" [remarks]="allRemarks().sectionMeetingRemark"></app-remark-response>
       <div class="bold mb-2 mt-2">Сформированные замечания</div>
-      @for (remark of allRemarks.bureauMeetingRemark; track remark; let i = $index) {
+      @for (remark of allRemarks().bureauMeetingRemark; track remark; let i = $index) {
         <div>
           @if (i!=indexForEdit) {
             <div class="list-group-item list-group-item-action selectable"
@@ -113,7 +113,7 @@
     </div>
   </div>
 }
-@if (role == Role.SECTION_CHAIRMAN || role == Role.BUREAU_CHAIRMAN) {
+@if (role() == Role.SECTION_CHAIRMAN || role() == Role.BUREAU_CHAIRMAN) {
   <div class="mt-2 btn-right">
     <button class="btn btn-primary" (click)="save()">Сохранить</button>
   </div>

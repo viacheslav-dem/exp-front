@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, input} from '@angular/core';
 import {Page} from "app/components/common-components/page-and-filter/model/Page";
 import {Pagination} from "app/components/common-components/page-and-filter/model/Pagination";
 import {PageRequest} from "@app/components/common-components/page-and-filter/model/PageRequest";
@@ -10,27 +10,29 @@ import {PageRequest} from "@app/components/common-components/page-and-filter/mod
 })
 export class PaginationComponent implements OnInit {
 
-  @Input() page: Page<any>;
-  @Input() pagination: Pagination;
-  @Input() previousText: string = 'Предыдущая';
-  @Input() nextText: string = 'Следующая';
-  @Input() firstText: string = 'Первая';
-  @Input() lastText: string = 'Последняя';
-  @Input() maxSize: number = 10;
+  readonly page = input<Page<any>>(undefined);
+  readonly pagination = input<Pagination>(undefined);
+  readonly previousText = input<string>('Предыдущая');
+  readonly nextText = input<string>('Следующая');
+  readonly firstText = input<string>('Первая');
+  readonly lastText = input<string>('Последняя');
+  readonly maxSize = input<number>(10);
   @Output() onPageChanged = new EventEmitter<PageRequest>();
 
   ngOnInit() {
-    if (this.pagination) {
-      this.pageChanged(this.pagination);
+    const pagination = this.pagination();
+    if (pagination) {
+      this.pageChanged(pagination);
     }
   }
 
   get pages(): number[] {
-    if (!this.page || !this.page.totalPages || this.page.totalPages < 1) {
+    const page = this.page();
+    if (!page || !page.totalPages || page.totalPages < 1) {
       return [];
     }
-    const total = this.page.totalPages;
-    const max = this.maxSize || 10;
+    const total = page.totalPages;
+    const max = this.maxSize() || 10;
 
     // если страниц меньше или равно maxSize - показываем все
     if (total <= max) {
@@ -42,7 +44,8 @@ export class PaginationComponent implements OnInit {
     }
 
     // скользящее окно вокруг текущей страницы
-    const current = this.pagination && this.pagination.page ? this.pagination.page : 1;
+    const pagination = this.pagination();
+    const current = pagination && pagination.page ? pagination.page : 1;
     let start = current - Math.floor(max / 2);
     if (start < 1) {
       start = 1;

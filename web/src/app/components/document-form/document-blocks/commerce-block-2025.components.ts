@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectDto} from "@app/dto/ProjectDto";
 
@@ -7,15 +7,15 @@ import {ProjectDto} from "@app/dto/ProjectDto";
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Способ коммерциализации результата (-ов) научно-технической деятельности:
+        {{num()}}. Способ коммерциализации результата (-ов) научно-технической деятельности:
       </label>
-      <app-dropdown [options]="noveltyOptions" [(ngModel)]="_form.commerce"
+      <app-dropdown [options]="noveltyOptions()" [(ngModel)]="_form().commerce"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      @if (full) {
-        <textarea [(ngModel)]="_form.commerceText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().commerceText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст."></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -23,7 +23,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
             о коммерциализации результатов научной и научно-технической деятельности, созданных за счет государственных средств,
             утвержденного Указом Президента Республики Беларусь от 4 февраля 2013 г. № 59.
           </p>
-          @if (project.code.expertReviewType=='EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
+          @if (project().code.expertReviewType=='EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
             <div>
               <p>
                 Для объектов государственной экспертизы, указанных в подпункте 8.4 пункта 8 Положения, дополнительно проводится
@@ -59,23 +59,20 @@ import {ProjectDto} from "@app/dto/ProjectDto";
 })
 export class CommerceBlock2025Component {
 
-    @Input()
-    noveltyOptions: string[] = noveltyOptions;
+    readonly noveltyOptions = input<string[]>(noveltyOptions);
 
-    @Input()
-    num: string = "3";
+    readonly num = input<string>("3");
 
-    @Input()
-    project: ProjectPlainDto | ProjectDto;
+    readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { commerce: string, commerceText: string };
+    readonly _form = input<{
+    commerce: string;
+    commerceText: string;
+}>(undefined);
 
-    @Input()
-    isTextRequired: boolean = false;
+    readonly isTextRequired = input<boolean>(false);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

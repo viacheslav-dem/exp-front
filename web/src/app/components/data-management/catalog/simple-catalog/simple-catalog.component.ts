@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {CatalogTemplate} from "@app/components/data-management/catalog/CatalogTemplate";
@@ -8,7 +8,7 @@ import {Direction} from "@app/components/common-components/page-and-filter/model
 
 @Component({
     selector: 'app-simple-catalog',
-    template: `<h5 class="mb-3">{{header}}</h5>
+    template: `<h5 class="mb-3">{{headerValue}}</h5>
   <div class="list-group">
   
     <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
@@ -18,7 +18,7 @@ import {Direction} from "@app/components/common-components/page-and-filter/model
       <!--ADD ITEM-->
       <div (click)="addItem()">
         <div class="list-group-item selectable link background-dark-sea-green">
-          {{addLabel}}
+          {{addLabelValue}}
         </div>
       </div>
   
@@ -28,7 +28,7 @@ import {Direction} from "@app/components/common-components/page-and-filter/model
           <!--ITEM HEADER-->
           <div class="list-group-item" [class.disabled]="item.disabled">
             <div class="text-mini font-weight-bold">
-              {{itemLabel}}
+              {{itemLabelValue}}
               @if (item.id == 0) {
                 <span>(не сохранено)</span>
               }
@@ -79,7 +79,7 @@ import {Direction} from "@app/components/common-components/page-and-filter/model
         @if (!items || items.length == 0) {
           <div>
             <div class="italic list-group-item background-light-blue">
-              {{noItemsLabel}}
+              {{noItemsLabelValue}}
             </div>
           </div>
         }
@@ -101,17 +101,31 @@ export class SimpleCatalogComponent<T extends CatalogDto> extends CatalogTemplat
     super(_toasty, _dataService);
   }
 
-  @Input()
-  addLabel: string;
+  readonly addLabel = input<string>(undefined);
+  readonly itemLabel = input<string>(undefined);
+  readonly noItemsLabel = input<string>(undefined);
+  readonly header = input<string>(undefined);
 
-  @Input()
-  itemLabel: string;
+  protected _addLabel: string;
+  protected _itemLabel: string;
+  protected _noItemsLabel: string;
+  protected _header: string;
 
-  @Input()
-  noItemsLabel: string;
+  get addLabelValue(): string {
+    return this._addLabel ?? this.addLabel() ?? '';
+  }
 
-  @Input()
-  header: string;
+  get itemLabelValue(): string {
+    return this._itemLabel ?? this.itemLabel() ?? '';
+  }
+
+  get noItemsLabelValue(): string {
+    return this._noItemsLabel ?? this.noItemsLabel() ?? '';
+  }
+
+  get headerValue(): string {
+    return this._header ?? this.header() ?? '';
+  }
 
   ngOnInit() {
     this._searchFields = [

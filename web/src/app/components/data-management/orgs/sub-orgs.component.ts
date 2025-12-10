@@ -1,10 +1,10 @@
-import {Component, Input} from "@angular/core";
+import {Component, input} from "@angular/core";
 import {OrgDto} from "@app/dto/OrgDto";
 
 @Component({
     selector: 'app-sub-orgs-list',
     template: `
-    @for (org of orgs; track org; let i = $index) {
+    @for (org of orgs(); track org; let i = $index) {
       <div><b>{{i + 1}}.</b> {{org.name}}</div>
     }
     `,
@@ -13,7 +13,7 @@ import {OrgDto} from "@app/dto/OrgDto";
 
 export class SubOrgsComponent {
 
-  @Input() orgs: OrgDto[];
+  readonly orgs = input<OrgDto[]>(undefined);
 
 
 }

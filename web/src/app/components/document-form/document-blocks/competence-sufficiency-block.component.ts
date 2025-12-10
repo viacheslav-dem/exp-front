@@ -1,19 +1,19 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-competence-sufficiency-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Достаточность компетенции кадрового состава потенциального исполнителя работ:
+        {{num()}}. Достаточность компетенции кадрового состава потенциального исполнителя работ:
       </label>
-      <app-dropdown [options]="competenceSufficiencyOptions" [(ngModel)]="_form.competenceSufficiency"
+      <app-dropdown [options]="competenceSufficiencyOptions" [(ngModel)]="_form().competenceSufficiency"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      @if (full) {
-        <textarea [(ngModel)]="_form.competenceSufficiencyText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().competenceSufficiencyText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -36,14 +36,14 @@ export class CompetenceSufficiencyBlockComponent {
 
   competenceSufficiencyOptions = competenceSufficiencyOptions;
 
-  @Input()
-  num: string = "4";
+  readonly num = input<string>("4");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { competenceSufficiency: string, competenceSufficiencyText: string };
+  readonly _form = input<{
+    competenceSufficiency: string;
+    competenceSufficiencyText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

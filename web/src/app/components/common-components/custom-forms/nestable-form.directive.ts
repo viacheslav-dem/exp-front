@@ -4,12 +4,12 @@ import {
   Directive,
   ElementRef,
   Injector,
-  Input,
   OnDestroy,
   OnInit,
   Optional,
   Renderer2,
   SkipSelf,
+  input
 } from '@angular/core';
 import {AbstractControl, FormArray, FormControl, FormGroup, NgForm} from '@angular/forms';
 import {Subject} from "rxjs";
@@ -56,10 +56,9 @@ export class NestableFormDirective implements OnInit, OnDestroy {
   //И этому формально помеченному компоненту нужно пропихнуть реальный appNestableForm, который учавствует в организации вложенности форм.
   //
   //Возможно, всё вышеописанное - догадки, а все проблемы из-за ngIf, который ломает последовательность lifecylce events
-  @Input() realAppNestableForm: NestableFormDirective;
+  readonly realAppNestableForm = input<NestableFormDirective>(undefined);
 
-  @Input()
-  submitFunc: () => void;
+  readonly submitFunc = input<() => void>(undefined);
 
   public ngForm: NgForm;
   public rootForm: NgForm;
@@ -117,7 +116,7 @@ export class NestableFormDirective implements OnInit, OnDestroy {
         // console.log("ngSubmit!!!!!!!!", this.ngForm);
         event.stopPropagation();
         if (this.ngForm.control.valid) {
-          this.submitFunc();
+          this.submitFunc()();
         } else {
           this._toasty.error("Пожалуйста, исправьте ошибки.")
         }
@@ -150,11 +149,12 @@ export class NestableFormDirective implements OnInit, OnDestroy {
 
   ngOnInit() {
     // console.log(this.debugName, "ON_INIT");
-    if (!this.realAppNestableForm && !this.ngForm) {
+    const realAppNestableForm = this.realAppNestableForm();
+    if (!realAppNestableForm && !this.ngForm) {
       throw new Error(`${this} hasn't neither "realAppNestableForm" nor "ngForm in template"`);
     }
 
-    if (!this.realAppNestableForm) {
+    if (!realAppNestableForm) {
       this.registerToParent();
       let root = this.getRootNestableForm();
       if (root) {
@@ -168,23 +168,25 @@ export class NestableFormDirective implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     // console.log("ngOnDestroy", this.currentForm, this.parentForm, this.isRoot);
-    if (!this.isRoot && !this.realAppNestableForm && this.parentForm) {
+    if (!this.isRoot && !this.realAppNestableForm() && this.parentForm) {
       // this.executePostponed(() => this.parentForm.removeNestedForm(this));
       this.parentForm.removeNestedForm(this);
     }
   }
 
   public removeNestedForm(nestableForm: NestableFormDirective): void {
-    if (this.realAppNestableForm) {
-      this.realAppNestableForm.removeNestedForm(nestableForm);
+    const realAppNestableForm = this.realAppNestableForm();
+    if (realAppNestableForm) {
+      realAppNestableForm.removeNestedForm(nestableForm);
     } else {
       this.removeControl(nestableForm.ngForm.control);
     }
   }
 
   public registerNestedForm(nestableForm: NestableFormDirective): void {
-    if (this.realAppNestableForm) {
-      this.realAppNestableForm.registerNestedForm(nestableForm);
+    const realAppNestableForm = this.realAppNestableForm();
+    if (realAppNestableForm) {
+      realAppNestableForm.registerNestedForm(nestableForm);
     } else {
       // NOTE: prevent circular reference (adding to itself)
       if (nestableForm.ngForm === this.ngForm) {
@@ -219,12 +221,13 @@ export class NestableFormDirective implements OnInit, OnDestroy {
       return this;
     else {
       let parent = this.parentForm;
-      if (parent && parent.realAppNestableForm)
-        parent = parent.realAppNestableForm
+      const realAppNestableForm = parent.realAppNestableForm();
+      if (parent && realAppNestableForm)
+        parent = realAppNestableForm
       while (parent && !parent.isRoot) {
         parent = parent.parentForm;
-        if (parent && parent.realAppNestableForm)
-          parent = parent.realAppNestableForm
+        if (parent && realAppNestableForm)
+          parent = realAppNestableForm
       }
       return parent;
     }

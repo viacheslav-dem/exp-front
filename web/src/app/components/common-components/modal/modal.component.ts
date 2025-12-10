@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild, Input, Output, EventEmitter, OnDestroy} from '@angular/core';
+import {Component, OnInit, ViewChild, Output, EventEmitter, OnDestroy, input} from '@angular/core';
 import {ModalDirective, ModalOptions} from "ngx-bootstrap/modal";
 
 @Component({
@@ -8,10 +8,10 @@ import {ModalDirective, ModalOptions} from "ngx-bootstrap/modal";
 })
 export class ModalComponent implements OnInit, OnDestroy {
 
-  @Input() title: string;
-  @Input() modalClasses: string = 'modal-lg';
+  readonly title = input<string>(undefined);
+  readonly modalClasses = input<string>('modal-lg');
   @Output() onClose: EventEmitter<any> = new EventEmitter();
-  @Input() closePermission: boolean = true;
+  readonly closePermission = input<boolean>(true);
   config: ModalOptions = new ModalOptions();
 
   @ViewChild('ng2Modal') public modal: ModalDirective;
@@ -54,7 +54,7 @@ export class ModalComponent implements OnInit, OnDestroy {
   }
 
   internalHide(): void {
-    if (this.closePermission) {
+    if (this.closePermission()) {
       this.modal.hide();
     }
     this.unlockBodyScroll();

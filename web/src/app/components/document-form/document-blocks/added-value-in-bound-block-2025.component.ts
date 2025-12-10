@@ -1,4 +1,4 @@
-import {Component, Input} from "@angular/core";
+import {Component, input} from "@angular/core";
 import {IndustryDto} from "@app/dto/IndustryDto";
 
 @Component({
@@ -6,19 +6,19 @@ import {IndustryDto} from "@app/dto/IndustryDto";
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Организация технологического процесса, обеспечивающего средний уровень добавленной стоимости на одного
+        {{num()}}. Организация технологического процесса, обеспечивающего средний уровень добавленной стоимости на одного
         работающего, аналогичный среднему уровню добавленной стоимости на одного работающего по соответствующему виду
         экономической деятельности в Европейском союзе либо превышающий этот уровень:
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.addedValue >= _form.section?.addedValueBound}">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().addedValue >= _form().section?.addedValueBound}">
           Соответсвует
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.addedValue < _form.section?.addedValueBound}">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().addedValue < _form().section?.addedValueBound}">
           Не соотвествует
         </button>
       </div>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -33,13 +33,13 @@ import {IndustryDto} from "@app/dto/IndustryDto";
 })
 export class AddedValueInBoundBlock2025Component {
 
-    @Input()
-    num: string = "2.3";
+    readonly num = input<string>("2.3");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { addedValue: number, section: IndustryDto };
+    readonly _form = input<{
+    addedValue: number;
+    section: IndustryDto;
+}>(undefined);
 
 }

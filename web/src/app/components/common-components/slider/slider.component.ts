@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges} from "@angular/core";
+import {Component, EventEmitter, OnInit, Output, OnChanges, SimpleChanges, input} from "@angular/core";
 import {Options} from '@angular-slider/ngx-slider';
 
 @Component({
@@ -10,8 +10,7 @@ export class SliderComponent implements OnInit, OnChanges {
 
   @Output() onChange = new EventEmitter();
 
-  @Input()
-  public slider: any;
+  public readonly slider = input<any>(undefined);
 
   value: number = 0;
   highValue: number = 100;
@@ -37,15 +36,16 @@ export class SliderComponent implements OnInit, OnChanges {
   }
 
   private updateSlider() {
-    if (this.slider) {
-      this.value = this.slider.from !== undefined ? this.slider.from : this.slider.min || 0;
-      this.highValue = this.slider.to !== undefined ? this.slider.to : this.slider.max || 100;
+    const slider = this.slider();
+    if (slider) {
+      this.value = slider.from !== undefined ? slider.from : slider.min || 0;
+      this.highValue = slider.to !== undefined ? slider.to : slider.max || 100;
       
       this.options = {
-        floor: this.slider.min || 0,
-        ceil: this.slider.max || 100,
-        step: this.slider.step || 1,
-        ...this.slider.options
+        floor: slider.min || 0,
+        ceil: slider.max || 100,
+        step: slider.step || 1,
+        ...slider.options
       };
     }
   }

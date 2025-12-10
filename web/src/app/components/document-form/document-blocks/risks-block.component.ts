@@ -1,19 +1,19 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-risks-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Риски реализации проекта:
+        {{num()}}. Риски реализации проекта:
       </label>
-      <app-dropdown [options]="risksOptions" [(ngModel)]="_form.risks"
+      <app-dropdown [options]="risksOptions" [(ngModel)]="_form().risks"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      @if (full) {
-        <textarea [(ngModel)]="_form.risksText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().risksText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -50,14 +50,14 @@ export class RisksBlockComponent {
     'высокие',
   ];
 
-  @Input()
-  num: string = "6";
+  readonly num = input<string>("6");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { risks: string, risksText: string };
+  readonly _form = input<{
+    risks: string;
+    risksText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

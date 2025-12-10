@@ -1,27 +1,27 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 
 @Component({
     selector: 'app-construction-work-block-2025',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Необходимость осуществления работ в сфере строительной деятельности. Возведение, реконструкция,
+        {{num()}}. Необходимость осуществления работ в сфере строительной деятельности. Возведение, реконструкция,
         реставрация, капитальный ремонт, техническая модернизация зданий и сооружений, их благоустройство:
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.constructionWorks === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().constructionWorks === true}" (click)="stateButton(true)">
           Требуется
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.constructionWorks === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().constructionWorks === false}" (click)="stateButton(false)">
           Не требуется
         </button>
       </div>
-      @if (full) {
-        <textarea [(ngModel)]="_form.constructionWorksText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().constructionWorksText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст."></textarea>
       }
     
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -39,23 +39,23 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
 })
 export class ConstructionWorkBlock2025Component {
 
-    @Input()
-    num: string = "3";
+    readonly num = input<string>("3");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { constructionWorks: boolean, constructionWorksText: string };
+    readonly _form = input<{
+    constructionWorks: boolean;
+    constructionWorksText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     stateButton(flag: boolean){
         if(flag){
-            this._form.constructionWorks = true;
+            this._form().constructionWorks = true;
         } else {
-            this._form.constructionWorks = false;
+            this._form().constructionWorks = false;
         }
     }
 }

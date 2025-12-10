@@ -1,4 +1,4 @@
-import {Component, EventEmitter, forwardRef, Input, Output} from '@angular/core';
+import {Component, EventEmitter, forwardRef, Output, input} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {NewVoteResults} from "@app/components/document-form/meeting-protocol-form/NewVoteResults";
@@ -52,7 +52,7 @@ export const NEW_VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
                 </div>
                 <div class="col-md-3 pl-2">
                   <div class="input-group input-group-sm">
-                    <input min="0" disabled numberInput type="text" class="form-control" [value]="all - _value.getVoted()"
+                    <input min="0" disabled numberInput type="text" class="form-control" [value]="all() - _value.getVoted()"
                       required>
                       <div class="input-group-append">
                         <div class="input-group-text">
@@ -92,8 +92,7 @@ export class NewVoteResultsComponent extends ControlComponent<NewVoteResults> {
   decisionOptions = getAllDecisionStates();
   decisionToString = d => d;
 
-  @Input()
-  all: number;
+  readonly all = input<number>(undefined);
 
   @Output()
   onChanged: EventEmitter<NewVoteResults> = new EventEmitter<NewVoteResults>();

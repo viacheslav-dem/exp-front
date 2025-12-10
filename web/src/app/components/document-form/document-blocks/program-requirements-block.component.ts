@@ -1,20 +1,20 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-program-requirements-block',
     template: `
       <div class="form-sub-group">
         <label>
-          {{ num }}. Соответствие требованиям, указанным в Положении о порядке реализации государственных программ:
+          {{ num() }}. Соответствие требованиям, указанным в Положении о порядке реализации государственных программ:
         </label>
-        <app-boolean-button [(ngModel)]="_form.programRequirements" [trueLabel]="'соответствует'"
+        <app-boolean-button [(ngModel)]="_form().programRequirements" [trueLabel]="'соответствует'"
           [falseLabel]="'не соответствует'"
         (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-        @if (full) {
-          <textarea [(ngModel)]="_form.programRequirementsText" rows="3" class="form-control mt-05"
+        @if (full()) {
+          <textarea [(ngModel)]="_form().programRequirementsText" rows="3" class="form-control mt-05"
           placeholder="Обязательный текст"></textarea>
         }
-        @if (full) {
+        @if (full()) {
           <div class="hint">
             <p>
               <b>Подсказка.</b>
@@ -45,17 +45,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class ProgramRequirementsBlockComponent {
 
-  @Input()
-  num: string = "1";
+  readonly num = input<string>("1");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: {
+  readonly _form = input<{
     programRequirements: boolean;
     programRequirementsText: string;
-  };
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

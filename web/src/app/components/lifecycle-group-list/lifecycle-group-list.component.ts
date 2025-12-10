@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, ViewChild, input} from '@angular/core';
 import {PersonService} from "@app/services/person.service";
 import {Router} from "@angular/router";
 import {Role} from "@app/pipes/role.pipe";
@@ -22,9 +22,9 @@ export class LifecycleGroupListComponent implements OnInit {
 
   Role = Role;
 
-  @Input() role;
-  @Input() groups: LifecycleGroupDto[] = [];
-  @Input() project: ProjectDto = new ProjectDto();
+  readonly role = input(undefined);
+  readonly groups = input<LifecycleGroupDto[]>([]);
+  readonly project = input<ProjectDto>(new ProjectDto());
 
   @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() onReplyChanged: EventEmitter<ProjectDto> = new EventEmitter<ProjectDto>();
@@ -40,7 +40,7 @@ export class LifecycleGroupListComponent implements OnInit {
   }
 
   changed() {
-    this.onChanged.emit(this.groups);
+    this.onChanged.emit(this.groups());
   }
 
   replyChanged(project: ProjectDto){
@@ -48,20 +48,22 @@ export class LifecycleGroupListComponent implements OnInit {
   }
 
   canEditGroups() {
-    return this.project.state == 'ON_CHECKING' && this.role == Role.GKNT_WORKER ||
-      this.project.state == 'ON_DEPARTMENT_SIGNING' && this.role == Role.GKNT_DEPARTMENT_CHAIRMAN;
+    const project = this.project();
+    const role = this.role();
+    return project.state == 'ON_CHECKING' && role == Role.GKNT_WORKER ||
+      project.state == 'ON_DEPARTMENT_SIGNING' && role == Role.GKNT_DEPARTMENT_CHAIRMAN;
   }
 
   onSelectedCouncil($event) {
-    this._projectService.attachCouncil(this.project, $event.id).subscribe(res => {
-      this.groups.push(res);
+    this._projectService.attachCouncil(this.project(), $event.id).subscribe(res => {
+      this.groups().push(res);
       this.searchCouncilComponent.hide();
       this.changed();
     });
   }
 
   deleteGroup(group) {
-    this.groups.splice(this.groups.indexOf(group), 1);
+    this.groups().splice(this.groups().indexOf(group), 1);
     this.changed();
   }
 }

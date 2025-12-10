@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
@@ -8,16 +8,16 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Значимость (экономическая и (или) социальная), которая должна быть достигнута по итогам выполнения работ,
+        {{num()}}. Значимость (экономическая и (или) социальная), которая должна быть достигнута по итогам выполнения работ,
         предусмотренных объектом государственной экспертизы:
       </label>
-      <app-dropdown [options]="significanceOptions" [(ngModel)]="_form.economicSignificance"
+      <app-dropdown [options]="significanceOptions" [(ngModel)]="_form().economicSignificance"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      @if (full) {
-        <textarea [(ngModel)]="_form.economicSignificanceText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().economicSignificanceText" rows="3" class="form-control mt-05"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -69,17 +69,16 @@ export class EconomicSignificance88BIFBlockComponent {
     ProjectCodePlainDto = ProjectCodePlainDto;
     significanceOptions = economicSignificanceOptions;
 
-    @Input()
-    num: string = "2";
+    readonly num = input<string>("2");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    project: ProjectPlainDto | ProjectDto;
+    readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    @Input()
-    _form: { economicSignificance: string, economicSignificanceText: string };
+    readonly _form = input<{
+    economicSignificance: string;
+    economicSignificanceText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

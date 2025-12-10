@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from "@angular/core";
+import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, input} from "@angular/core";
 import {DocType} from "@app/components/common-components/file-uploader/doc-type";
 
 @Component({
@@ -9,11 +9,11 @@ import {DocType} from "@app/components/common-components/file-uploader/doc-type"
 export class ChooseFilesComponent implements OnInit {
 
   @Output() onFilesChosen = new EventEmitter();
-  @Input() controlClass: any;
-  @Input() typesAccept: string = [
+  readonly controlClass = input<any>(undefined);
+  readonly typesAccept = input<string>([
     DocType.DOCX.extension, DocType.DOC.extension,
     DocType.PDF.extension, DocType.TIFF.extension
-  ].join(',');
+].join(','));
   @ViewChild('fileInput') fileInput: ElementRef;
 
   constructor() {
@@ -33,7 +33,7 @@ export class ChooseFilesComponent implements OnInit {
   private validateTypes(files: any) {
     // note that files is not array instance, so we can't use .forEach or .some
     for (let i = 0; i < files.length; ++i) {
-      if (this.typesAccept.indexOf(files[i].type) == -1) {
+      if (this.typesAccept().indexOf(files[i].type) == -1) {
         throw "Выбран файл недопустимого типа: " + files[i].name;
       }
       if (files[i].size > 10485760) {

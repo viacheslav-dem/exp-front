@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, input} from '@angular/core';
 import {PasswordDto} from "@app/dto/PasswordDto";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {StorageService} from "@app/services/storage.service";
@@ -25,8 +25,7 @@ export class ChangePasswordComponent implements OnInit {
 
   password: PasswordDto = new PasswordDto();
 
-  @Input()
-  userId: number;
+  readonly userId = input<number>(undefined);
 
   constructor(private _authService: AuthService,
               private _storage: StorageService,
@@ -40,15 +39,15 @@ export class ChangePasswordComponent implements OnInit {
   @Output() canceled = new EventEmitter();
 
   changePassword() {
-    this._authService.changePassword(this.userId, this.password).subscribe(() => {
+    this._authService.changePassword(this.userId(), this.password).subscribe(() => {
       this.toasty.success('Пароль успешно изменён.');
       this.password = new PasswordDto();
-      this.onSave.next(this.userId);
+      this.onSave.next(this.userId());
     });
   }
 
   cancel() {
     this.password = new PasswordDto();
-    this.canceled.next(this.userId);
+    this.canceled.next(this.userId());
   }
 }

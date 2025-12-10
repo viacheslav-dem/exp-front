@@ -11,7 +11,7 @@
 }
 <!--ACTIONS-->
 <div class="mb-3">
-  @for (meta of buttons; track meta) {
+  @for (meta of buttons(); track meta) {
     <button [ngClass]="meta.styleClass" class="mr-2" (click)="meta.onclick()">
       {{meta.title}}
     </button>
@@ -307,7 +307,7 @@
 
 
       <!--PROJECT DOCUMENTS-->
-      @if (visibleDocsForExpert) {
+      @if (visibleDocsForExpert()) {
         <div class="mt-2 mb-1 text-sm text-muted">
           Материалы объекта экспертизы
           @if (project.documents.length>0) {
@@ -322,7 +322,7 @@
             [typesAccept]="[DocType.DOCX.extension, DocType.DOC.extension, DocType.PDF.extension]">
           </app-document-uploader>
         }
-        @if ((project.canAddDocumentsForCustomerForSection || project.canAddDocumentsForCustomerForBureau) && role==Role.CUSTOMER) {
+        @if ((project.canAddDocumentsForCustomerForSection || project.canAddDocumentsForCustomerForBureau) && role()==Role.CUSTOMER) {
           <app-document-uploader
             (saved)="addProjectDocument($event)"
             [url]="SERVER_URL + '/project/add/' + project.id + '/document'" [idDto]="project"

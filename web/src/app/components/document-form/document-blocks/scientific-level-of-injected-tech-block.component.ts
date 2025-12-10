@@ -1,17 +1,17 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-scientific-level-of-injected-tech-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Научно-технический уровень внедряемых технологий
+        {{num()}}. Научно-технический уровень внедряемых технологий
       </label>
       <br/>
-      <app-boolean-button [(ngModel)]="_form.scientificLevelOfInjectedTech" [trueLabel]="'подтверждается'"
+      <app-boolean-button [(ngModel)]="_form().scientificLevelOfInjectedTech" [trueLabel]="'подтверждается'"
         [falseLabel]="'не подтверждается'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -30,14 +30,13 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class ScientificLevelOfInjectedTechBlockComponent {
 
-    @Input()
-    num: string = "1.1";
+    readonly num = input<string>("1.1");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { scientificLevelOfInjectedTech: string };
+    readonly _form = input<{
+    scientificLevelOfInjectedTech: string;
+}>(undefined);
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 }

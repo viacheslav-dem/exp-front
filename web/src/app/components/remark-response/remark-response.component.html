@@ -1,14 +1,14 @@
-@for (remark of remarks; track remark; let i = $index) {
+@for (remark of remarks(); track remark; let i = $index) {
   <div>
     <div class="list-group-item list-group-item-action selectable" style="white-space: pre-wrap">
-      <div class="mb-05" [ngClass]="{'text-sm':!isEdit}">{{i + 1}}. {{remark.question}}</div>
-      @if (isEdit) {
+      <div class="mb-05" [ngClass]="{'text-sm':!isEdit()}">{{i + 1}}. {{remark.question}}</div>
+      @if (isEdit()) {
         <div class="form-group">
           <textarea [(ngModel)]="remark.answer" class="form-control"
           placeholder="ответ на замечание"></textarea>
         </div>
       }
-      @if (!isEdit) {
+      @if (!isEdit()) {
         <div class="form-group mt-05 text-sm">
           <div>{{remark.answer}}</div>
         </div>
@@ -16,14 +16,14 @@
     </div>
   </div>
 }
-@if (isExpired) {
+@if (isExpired()) {
   <div class="alert alert-warning">
     Сроки ответа на замечания истекли.
     Ожидаются действия ГЭС по возврату объекта экспертизы.
   </div>
 }
 
-@if (isEdit) {
+@if (isEdit()) {
   <div class="mt-2 btn-right">
     <button class="btn btn-primary ml-05" (click)="save()">Сохранить</button>
     <button class="btn btn-primary ml-05" (click)="reply()">Ответить</button>

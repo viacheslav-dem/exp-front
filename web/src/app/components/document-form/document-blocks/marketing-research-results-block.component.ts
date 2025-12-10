@@ -1,15 +1,15 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
     selector: 'app-marketing-research-results-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Сведения о проведении маркетинговых и патентных исследований и их результаты.
+        {{num()}}. Сведения о проведении маркетинговых и патентных исследований и их результаты.
       </label>
-      <textarea [(ngModel)]="_form.marketingResearchText" rows="3" class="form-control"
+      <textarea [(ngModel)]="_form().marketingResearchText" rows="3" class="form-control"
       placeholder="Обязательный текст."></textarea>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -28,12 +28,11 @@ import {Component, Input} from '@angular/core';
 })
 export class MarketingResearchResultsBlockComponent {
 
-  @Input()
-  num: string = "5.1";
+  readonly num = input<string>("5.1");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { marketingResearchText: string };
+  readonly _form = input<{
+    marketingResearchText: string;
+}>(undefined);
 }

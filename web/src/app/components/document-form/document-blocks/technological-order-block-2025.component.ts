@@ -1,19 +1,19 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 
 @Component({
     selector: 'app-technological-order-block-2025',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Уровень технологического уклада научно-технической продукции:
+        {{num()}}. Уровень технологического уклада научно-технической продукции:
       </label>
-      <app-dropdown [options]="targetOptions" [(ngModel)]="_form.technologicalOrder"
+      <app-dropdown [options]="targetOptions" [(ngModel)]="_form().technologicalOrder"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      @if (full) {
-        <textarea [(ngModel)]="_form.technologicalOrderText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().technologicalOrderText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -38,14 +38,14 @@ export class TechnologicalOrderBlock2025Component {
         'проект другого технологического уклада'
     ];
 
-    @Input()
-    num: string = "2.1";
+    readonly num = input<string>("2.1");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { technologicalOrder: string, technologicalOrderText: string };
+    readonly _form = input<{
+    technologicalOrder: string;
+    technologicalOrderText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output, input} from '@angular/core';
 import {PeriodDto} from "@app/dto/PeriodDto";
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
 
@@ -7,7 +7,7 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Соответствие сроков выполнения объекта государственной экспертизы необходимым:
+        {{num()}}. Соответствие сроков выполнения объекта государственной экспертизы необходимым:
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.termsAccordance === true}" (click)="stateButton(true)">
@@ -24,7 +24,7 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
           (ngModelChange)="onTermsChanged()"></app-date-period>
         </div>
       }
-      @if (full) {
+      @if (full()) {
         <textarea [(ngModel)]="_form.termsAccordanceText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
@@ -37,11 +37,9 @@ export class TermsAccordanceBlockComponent {
   _terms: DateRange;
   _form: { termsAccordance: boolean, termsSuggestion: PeriodDto, termsAccordanceText: string };
 
-  @Input()
-  num: string = "10.2";
+  readonly num = input<string>("10.2");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

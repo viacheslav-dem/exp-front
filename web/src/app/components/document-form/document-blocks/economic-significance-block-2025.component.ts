@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
@@ -9,27 +9,27 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
     template: `
         <div class="form-sub-group" xmlns="http://www.w3.org/1999/html">
           <label>
-            {{ num }}. Экономическая и (или) социальная значимость объекта государственной экспертизы.
+            {{ num() }}. Экономическая и (или) социальная значимость объекта государственной экспертизы.
           </label>
           <label>
             Значимость (экономическая и (или) социальная), которая должна быть достигнута по итогам выполнения
             работ,
             предусмотренных объектом государственной экспертизы:
           </label>
-          <app-dropdown [options]="significanceOptions" [(ngModel)]="_form.economicSignificance"
+          <app-dropdown [options]="significanceOptions" [(ngModel)]="_form().economicSignificance"
           (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-          @if (full) {
-            <textarea [(ngModel)]="_form.economicSignificanceText" rows="3" class="form-control mt-05"
+          @if (full()) {
+            <textarea [(ngModel)]="_form().economicSignificanceText" rows="3" class="form-control mt-05"
             placeholder="Обязательный текст"></textarea>
           }
-          @if (full) {
+          @if (full()) {
             <div class="hint">
               <div>
                 <b>Подсказка.</b>
                 <!-- Для экспертов и для протокола заседания разные тексты подсказок -->
-                @if (isExpertReview) {
+                @if (isExpertReview()) {
                   <div>
-                    @if (project.code.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
+                    @if (project().code.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
                       <div>
                         Эксперт должен (кроме объекта экспертизы, указанного в подпункте 8.4 пункта 8 Положения):
                         <ul>
@@ -44,8 +44,8 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
                         </ul>
                       </div>
                     }
-                    @if (project.code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025'
-                      || project.code.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
+                    @if (project().code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025'
+                      || project().code.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
                       <div>
                         <div>
                           <p>
@@ -86,7 +86,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
                         </div>
                       </div>
                     }
-                    @if (project.code.code == '8.4') {
+                    @if (project().code.code == '8.4') {
                       <div>
                         <p>
                           Для объектов государственной экспертизы, указанных в подпункте 8.4 пункта 8 Положения:
@@ -145,7 +145,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
                     </ul>
                   </div>
                 }
-                @if (project.code.expertReviewType == 'EXPERT_REVIEW_8_5_7_8_12IP_2025') {
+                @if (project().code.expertReviewType == 'EXPERT_REVIEW_8_5_7_8_12IP_2025') {
                   <div>
                     <p>
                       Эксперт должен оценить:
@@ -291,26 +291,26 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
                 }
               </div>
             }
-            @if (!isExpertReview) {
+            @if (!isExpertReview()) {
               <div>
                 @if (
                   (
-                  project.code.code.startsWith('8.1') &&
-                  !project.code.code.startsWith('8.11') &&
-                  !project.code.code.startsWith('8.12') &&
-                  !project.code.code.startsWith('8.13') &&
-                  !project.code.code.startsWith('8.14') &&
-                  !project.code.code.startsWith('8.15') &&
-                  !project.code.code.startsWith('8.16')
+                  project().code.code.startsWith('8.1') &&
+                  !project().code.code.startsWith('8.11') &&
+                  !project().code.code.startsWith('8.12') &&
+                  !project().code.code.startsWith('8.13') &&
+                  !project().code.code.startsWith('8.14') &&
+                  !project().code.code.startsWith('8.15') &&
+                  !project().code.code.startsWith('8.16')
                   ) ||
-                  project.code.code.startsWith('8.2') ||
-                  project.code.code.startsWith('8.3') ||
-                  project.code.code.startsWith('8.4') ||
-                  project.code.code.startsWith('8.5') ||
-                  project.code.code.startsWith('8.7') ||
-                  project.code.code.startsWith('8.8') ||
-                  project.code.code.startsWith('8.12') ||
-                  project.code.code.startsWith('8.14')) {
+                  project().code.code.startsWith('8.2') ||
+                  project().code.code.startsWith('8.3') ||
+                  project().code.code.startsWith('8.4') ||
+                  project().code.code.startsWith('8.5') ||
+                  project().code.code.startsWith('8.7') ||
+                  project().code.code.startsWith('8.8') ||
+                  project().code.code.startsWith('8.12') ||
+                  project().code.code.startsWith('8.14')) {
                   <div>
                     <p>
                       <b>1. Для заданий государственных программ научных исследований и проектов
@@ -532,7 +532,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
           </p>
         </div>
         }
-        @if (project.code.code.startsWith('8.12')) {
+        @if (project().code.code.startsWith('8.12')) {
           <div>
             <p>
               Для проектов государственной программы инновационного развития Республики Беларусь при
@@ -589,7 +589,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
             </p>
           </div>
         }
-        @if (project.code.code.startsWith('8.15')) {
+        @if (project().code.code.startsWith('8.15')) {
           <div>
             <p>
               <b>1. Для заданий государственных программ научных исследований и проектов
@@ -708,23 +708,20 @@ export class EconomicSignificanceBlock2025Component {
     ProjectCodePlainDto = ProjectCodePlainDto;
     significanceOptions = economicSignificanceOptions;
 
-    @Input()
-    num: string = "2";
+    readonly num = input<string>("2");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    project: ProjectPlainDto | ProjectDto;
+    readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    @Input()
-    _form: { economicSignificance: string, economicSignificanceText: string };
+    readonly _form = input<{
+    economicSignificance: string;
+    economicSignificanceText: string;
+}>(undefined);
 
-    @Input()
-    isTextRequired: boolean = false;
+    readonly isTextRequired = input<boolean>(false);
 
-    @Input()
-    isExpertReview: boolean = true;
+    readonly isExpertReview = input<boolean>(true);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

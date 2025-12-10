@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, OnInit, input} from '@angular/core';
 import {DecisionStateBadge} from "@app/pipes/decision.pipe";
 
 @Component({
@@ -10,7 +10,7 @@ export class DecisionTagComponent implements OnInit {
 
   DecisionStateBadge = DecisionStateBadge;
 
-  @Input() decision: any;
+  readonly decision = input<any>(undefined);
 
   constructor() {
   }

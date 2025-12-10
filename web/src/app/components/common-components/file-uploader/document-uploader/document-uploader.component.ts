@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
+import {Component, EventEmitter, Output, ViewChild, input} from "@angular/core";
 import {AuthService} from "app/services/auth.service";
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {ModalComponent} from "app/components/common-components/modal/modal.component";
@@ -18,9 +18,9 @@ export class DocumentUploaderComponent extends UploadHelper {
   fileDescription: string;
   isDragOver: boolean = false;
 
-  @Input() url: string;
-  @Input() idDto: IdDto;
-  @Input() typesAccept: string;
+  readonly url = input<string>(undefined);
+  readonly idDto = input<IdDto>(undefined);
+  readonly typesAccept = input<string>(undefined);
   @Output() saved = new EventEmitter();
 
   @ViewChild('fileLoaderModal') fileLoaderModal: ModalComponent;
@@ -87,7 +87,7 @@ export class DocumentUploaderComponent extends UploadHelper {
   }
 
   getUrl() {
-    return `${this.url}?id=${this.idDto.id}&name=${encodeURIComponent(this.fileName)}`
+    return `${this.url()}?id=${this.idDto().id}&name=${encodeURIComponent(this.fileName)}`
       + `&description=${this.fileDescription ? encodeURIComponent(this.fileDescription) : ''}`;
   }
 

@@ -1,4 +1,4 @@
-import {Component, Input} from "@angular/core";
+import {Component, input} from "@angular/core";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ProjectService} from "@app/services/project.service";
 
@@ -13,12 +13,26 @@ export class SameProjectListComponent {
     constructor(private _projectService: ProjectService) {
     }
 
-    @Input() sameProjects: ProjectDto[] = [];
-    @Input() title: string = '';
+    readonly sameProjectsInput = input<ProjectDto[]>([]);
+    _sameProjects: ProjectDto[] = [];
+    readonly titleInput = input<string>('');
+    _title: string = '';
+
+    get sameProjects(): ProjectDto[] {
+        return this._sameProjects.length > 0 ? this._sameProjects : this.sameProjectsInput();
+    }
+
+    get title(): string {
+        return this._title || this.titleInput();
+    }
+
+    set title(value: string) {
+        this._title = value;
+    }
 
     getSameProjects() {
         this._projectService.getTheSameProjectsByTitle(this.title).subscribe(value => {
-            this.sameProjects = value;
+            this._sameProjects = value;
         })
     }
 

@@ -1,28 +1,28 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 
 @Component({
     selector: 'app-competitiveness-block-agenda-2025',
     template: `
         <div class="form-sub-group">
           <label>
-            {{ num }}. Обоснование конкурентоспособности разработки:
+            {{ num() }}. Обоснование конкурентоспособности разработки:
           </label>
           <br>
             <div class="btn-group" role="group" aria-label="Basic example">
               <button type="button" class="btn btn-outline-success"
-                [ngClass]="{'active': _form.competitiveness === true}" (click)="stateButton(true)">
+                [ngClass]="{'active': _form().competitiveness === true}" (click)="stateButton(true)">
                 достаточно
               </button>
               <button type="button" class="btn btn-outline-danger"
-                [ngClass]="{'active': _form.competitiveness === false}" (click)="stateButton(false)">
+                [ngClass]="{'active': _form().competitiveness === false}" (click)="stateButton(false)">
                 недостаточно
               </button>
             </div>
-            @if (full) {
-              <textarea [(ngModel)]="_form.competitivenessText" rows="3" class="form-control mt-05"
+            @if (full()) {
+              <textarea [(ngModel)]="_form().competitivenessText" rows="3" class="form-control mt-05"
               placeholder="Обязательный текст"></textarea>
             }
-            @if (full) {
+            @if (full()) {
               <div class="hint">
                 <p>
                   <b>Подсказка.</b>
@@ -44,19 +44,19 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
 })
 export class CompetitivenessBlockAgenda2025Component {
 
-    @Input()
-    num: string = "6.1";
+    readonly num = input<string>("6.1");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { competitiveness: boolean, competitivenessText: string };
+    readonly _form = input<{
+    competitiveness: boolean;
+    competitivenessText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     stateButton(flag: boolean) {
-        this._form.competitiveness = flag;
+        this._form().competitiveness = flag;
     }
 }

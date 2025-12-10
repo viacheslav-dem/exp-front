@@ -1,21 +1,21 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-consequences-conclusion-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
+        {{num()}}. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
         и необходимости модернизации (реконструкции) взаимосвязанных действующих производственных объектов:
       </label>
-      <app-boolean-button [(ngModel)]="_form.consequences" [trueLabel]="'значительные'"
+      <app-boolean-button [(ngModel)]="_form().consequences" [trueLabel]="'значительные'"
         [falseLabel]="'незначительные'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full) {
-        <textarea [(ngModel)]="_form.consequencesText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().consequencesText" rows="3" class="form-control mt-05"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -51,14 +51,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class ConsequencesConclusionBlockComponent {
 
-  @Input()
-  num: string = "3";
+  readonly num = input<string>("3");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { consequences: boolean, consequencesText: string };
+  readonly _form = input<{
+    consequences: boolean;
+    consequencesText: string;
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

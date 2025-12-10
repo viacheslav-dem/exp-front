@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {DatePipe} from "@angular/common";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
@@ -12,7 +12,7 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
 
 export class ExpertRejectProject {
 
-  @Input() project: ProjectDto;
+  readonly project = input<ProjectDto>(undefined);
   @Output() cancel = new EventEmitter();
   @Output() confirm = new EventEmitter<string>();
   ExpertRejectionReason = ExpertRejectionReason;

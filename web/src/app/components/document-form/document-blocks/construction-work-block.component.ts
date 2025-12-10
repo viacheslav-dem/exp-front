@@ -1,22 +1,22 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 
 @Component({
     selector: 'app-construction-work-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Необходимость осуществления работ в сфере строительной деятельности. Возведение, реконструкция,
+        {{num()}}. Необходимость осуществления работ в сфере строительной деятельности. Возведение, реконструкция,
         реставрация, капитальный ремонт, техническая модернизация зданий и сооружений, их благоустройство:
       </label>
-      <app-boolean-button [(ngModel)]="_form.constructionWorks" [trueLabel]="'требуется'"
+      <app-boolean-button [(ngModel)]="_form().constructionWorks" [trueLabel]="'требуется'"
         [falseLabel]="'не требуется'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full) {
-        <textarea [(ngModel)]="_form.constructionWorksText" rows="3" class="form-control mt-05"
+      @if (full()) {
+        <textarea [(ngModel)]="_form().constructionWorksText" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст."></textarea>
       }
     
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -32,14 +32,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 })
 export class ConstructionWorkBlockComponent {
 
-    @Input()
-    num: string = "3";
+    readonly num = input<string>("3");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { constructionWorks: boolean, constructionWorksText: string };
+    readonly _form = input<{
+    constructionWorks: boolean;
+    constructionWorksText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

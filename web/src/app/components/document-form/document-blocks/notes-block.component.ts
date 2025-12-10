@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Output, input} from '@angular/core';
 import {Text} from "@app/components/document-form/form-model/Text";
 
 @Component({
@@ -12,10 +12,10 @@ import {Text} from "@app/components/document-form/form-model/Text";
           Замечания по материалам объекта госсударственной экспертизы, конкретные предложения о необходимости доработки и (или)
           корректировки материалов по объекту экспертизы:
         </label>
-        @if (_form.wrappedNotes.length == 0) {
+        @if (_form().wrappedNotes.length == 0) {
           <div class="mb-2 italic">не имеются</div>
         }
-        @for (note of _form.wrappedNotes; track note; let i = $index) {
+        @for (note of _form().wrappedNotes; track note; let i = $index) {
           <div class="input-group mb-2">
             <textarea [(ngModel)]="note.text" rows="2" class="form-control"
               title="Замечание"
@@ -35,19 +35,20 @@ import {Text} from "@app/components/document-form/form-model/Text";
 })
 export class NotesBlockComponent {
 
-  @Input()
-  _form: { wrappedNotes: Text[] };
+  readonly _form = input<{
+    wrappedNotes: Text[];
+}>(undefined);
 
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   deleteNote(i) {
-    this._form.wrappedNotes.splice(i, 1);
+    this._form().wrappedNotes.splice(i, 1);
     this.onConditionsChanged.emit(true);
   }
 
   addNote() {
-    this._form.wrappedNotes.push(new Text());
+    this._form().wrappedNotes.push(new Text());
     this.onConditionsChanged.emit(true);
   }
 }

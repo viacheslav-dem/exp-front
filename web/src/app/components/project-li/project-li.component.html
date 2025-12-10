@@ -1,5 +1,5 @@
 <a [attr.target]="environment.production ? '_blank' : ''"
-  [routerLink]="group != null ? [baseItemLink,project.id,{group:group}] : [baseItemLink,project.id]">
+  [routerLink]="group() != null ? [baseItemLink(),project.id,{group:group()}] : [baseItemLink(),project.id]">
   <div
       [ngClass]="{'list-group-item list-group-item-action selectable': true,
        'alert-danger': project.red,

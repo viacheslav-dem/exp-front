@@ -1,16 +1,16 @@
-import {Component, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
     selector: 'app-consequences-block',
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
+        {{num()}}. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
         и необходимости модернизации (реконструкции) взаимосвязанных действующих производственных объектов.
       </label>
-      <textarea [(ngModel)]="_form.consequences" rows="3" class="form-control"
+      <textarea [(ngModel)]="_form().consequences" rows="3" class="form-control"
       placeholder="Обязательный текст."></textarea>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             <b>Подсказка.</b>
@@ -47,12 +47,11 @@ import {Component, Input} from '@angular/core';
 })
 export class ConsequencesBlockComponent {
 
-  @Input()
-  num: string = "2.6";
+  readonly num = input<string>("2.6");
 
-  @Input()
-  full: boolean = true;
+  readonly full = input<boolean>(true);
 
-  @Input()
-  _form: { consequences: string };
+  readonly _form = input<{
+    consequences: string;
+}>(undefined);
 }

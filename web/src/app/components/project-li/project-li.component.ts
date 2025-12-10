@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, input} from '@angular/core';
 import {ProjectStateBadge} from "@app/pipes/project-state.pipe";
 import {ProjectService} from "@app/services/project.service";
 import {ProjectLiDto} from "@app/dto/ProjectLiDto";
@@ -26,8 +26,8 @@ export class ProjectLiComponent implements OnInit {
   Role = Role;
 
 
-  @Input() public baseItemLink: string = '';
-  @Input() public group: string = null;
+  public readonly baseItemLink = input<string>('');
+  public readonly group = input<string>(null);
 
   constructor(private _projectService: ProjectService,
               private _authService: AuthService,) {

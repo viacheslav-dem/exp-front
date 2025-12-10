@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, EventEmitter, Output, input} from "@angular/core";
 import {IndustryDto} from "@app/dto/IndustryDto";
 import {Catalog} from "@app/services/data.service";
 
@@ -7,22 +7,22 @@ import {Catalog} from "@app/services/data.service";
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Секция и подсекция основного вида экономической деятельности, которому соответствует
+        {{num()}}. Секция и подсекция основного вида экономической деятельности, которому соответствует
         планируемый к реализации инновационный проект:
       </label>
       <app-select-catalog [catalog]="Catalog.INDUSTRY"
         [optionToString]="sectionToString"
-        [(ngModel)]="_form.section"
+        [(ngModel)]="_form().section"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-select-catalog>
-      @if (full) {
+      @if (full()) {
         <div class="hint">
           <p>
             Пороговое значение валовой добавленной стоимости в расчете на одного занятого
-            по основным видам экономической деятельности в Европейском союзе: <b>{{_form.section?.addedValueBound || '-'}}</b> евро.
+            по основным видам экономической деятельности в Европейском союзе: <b>{{_form().section?.addedValueBound || '-'}}</b> евро.
           </p>
         </div>
       }
-      <textarea [(ngModel)]="_form.sectionText" rows="3" class="form-control mt-05"
+      <textarea [(ngModel)]="_form().sectionText" rows="3" class="form-control mt-05"
       placeholder="Обязательный текст"></textarea>
       <div class="hint">
         <p>
@@ -46,14 +46,14 @@ export class SectionBlock2025Component {
     Catalog = Catalog;
     sectionToString = (section: IndustryDto) => section.code + " - " + section.name
 
-    @Input()
-    num: string = "2.1";
+    readonly num = input<string>("2.1");
 
-    @Input()
-    full: boolean = true;
+    readonly full = input<boolean>(true);
 
-    @Input()
-    _form: { section: IndustryDto, sectionText: string };
+    readonly _form = input<{
+    section: IndustryDto;
+    sectionText: string;
+}>(undefined);
 
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();

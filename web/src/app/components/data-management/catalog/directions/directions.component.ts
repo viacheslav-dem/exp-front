@@ -115,7 +115,7 @@ export class DirectionsComponent <T extends DirectionDto> extends CatalogTemplat
               public _dataService: DataService) {
     super(_toasty, _dataService);
   }
-  type = Catalog.DIRECTION;
+  _type = Catalog.DIRECTION;
 
   subDirInput: string;
 

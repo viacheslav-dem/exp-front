@@ -35,7 +35,6 @@ import {FundingTypePipe} from "@app/pipes/funding-type.pipe";
 import {DatePipe} from "@angular/common";
 import {LastSignEnumPipe} from "@app/pipes/last-sign.pipe";
 import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
-//import {SystemNotificationTypePipe} from "@app/pipes/system-notification-type-pipe";
 
 @NgModule({
   imports: [],
@@ -79,8 +78,7 @@ import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
     FullDegreePipe,
     FundingTypePipe,
     LastSignEnumPipe,
-    SafeHtmlPipe,
- //   SystemNotificationTypePipe
+    SafeHtmlPipe
   ],
   declarations: [
     MTimePipe,
@@ -122,8 +120,7 @@ import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
     FullDegreePipe,
     FundingTypePipe,
     LastSignEnumPipe,
-    SafeHtmlPipe,
- //   SystemNotificationTypePipe
+    SafeHtmlPipe
   ],
   providers: [
     MTimePipe,
@@ -166,8 +163,7 @@ import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
     FundingTypePipe,
     DatePipe,
     LastSignEnumPipe,
-    SafeHtmlPipe,
- //   SystemNotificationTypePipe
+    SafeHtmlPipe
   ]
 })
 export class CustomPipesModule {

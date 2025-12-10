@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, forwardRef, input} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "app/components/common-components/control-component";
 import * as _ from "lodash";
@@ -18,7 +18,7 @@ export const PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR: any = {
              (change)="onChange()" (input)="onInput()"/>
       <label>Новый пароль</label>
       <input [(ngModel)]="value.password" name="password" class="form-control" type="password" required
-             [pattern]="pattern" (change)="onChange()" (input)="onInputNumber2()" #currentPasswordNgModel="ngModel"/>
+             [pattern]="pattern()" (change)="onChange()" (input)="onInputNumber2()" #currentPasswordNgModel="ngModel"/>
       <app-control-error-messages [control]="currentPasswordNgModel.control"></app-control-error-messages>
       <div>
         <div class="row p-l-3 m-0">
@@ -68,7 +68,7 @@ export const PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR: any = {
       </div>
       <label>Повторите новый пароль</label>
       <input [(ngModel)]="value.passwordConfirmation" name="passwordConfirmation" class="form-control" type="password"
-             required [pattern]="pattern" (change)="onChange()" (input)="onInput()"/>
+             required [pattern]="pattern()" (change)="onChange()" (input)="onInput()"/>
     </ng-container>
   `,
     providers: [PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR],
@@ -103,14 +103,12 @@ export class PasswordInputComponent extends ControlComponent<PasswordDto> {
     this.colors.set('GREEN4', false);
   }
 
-  @Input()
-  changeValueAfterBlur = true;
+  readonly changeValueAfterBlur = input(true);
 
-  @Input()
-  pattern: string = "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20})$";
+  readonly pattern = input<string>("^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20})$");
 
   onInput() {
-    if (!this.changeValueAfterBlur) {
+    if (!this.changeValueAfterBlur()) {
       this.onChange();
     }
   }
@@ -122,7 +120,7 @@ export class PasswordInputComponent extends ControlComponent<PasswordDto> {
     this.secondLineLevel();
     this.thirdLineLevel();
     this.fourthLineLevel();
-    if (!this.changeValueAfterBlur) {
+    if (!this.changeValueAfterBlur()) {
       this.onChange();
     }
   }

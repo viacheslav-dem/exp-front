@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild, input} from '@angular/core';
 import {ActionButtonMetadata} from "@app/components/project-info/action-button-metadata";
 import {ProjectState, ProjectStateBadge} from "@app/pipes/project-state.pipe";
 import {Role} from "@app/pipes/role.pipe";
@@ -39,10 +39,10 @@ export class BasicProjectInfoComponent implements OnInit {
   transitionHistory: ProjectTransitionHistoryDto;
   // Precomputed directions for display to avoid mutating project.directions during change detection
   displayedDirections: DirectionDto[] = [];
-  @Input() buttons: ActionButtonMetadata[] = [];
-  @Input() role: string;
-  @Input() lifecycleGroup: LifecycleGroupDto;
-  @Input() visibleDocsForExpert: boolean;
+  readonly buttons = input<ActionButtonMetadata[]>([]);
+  readonly role = input<string>(undefined);
+  readonly lifecycleGroup = input<LifecycleGroupDto>(undefined);
+  readonly visibleDocsForExpert = input<boolean>(undefined);
   @Output() onChanged: EventEmitter<any> = new EventEmitter();
 
   @ViewChild('decisionFormModal') decisionFormModal: ModalComponent;
@@ -85,11 +85,11 @@ export class BasicProjectInfoComponent implements OnInit {
   }
 
   canEditProjectDocuments(): boolean {
-    return this.project.state == ProjectState.ROUGH || this.role == Role.BELISA_EDIT;
+    return this.project.state == ProjectState.ROUGH || this.role() == Role.BELISA_EDIT;
   }
 
   addProjectDocument(doc) {
-    if (this.role == Role.CUSTOMER) {
+    if (this.role() == Role.CUSTOMER) {
       doc.isCustomer = true;
     }
     this.project.documents = this.project.documents.concat([doc]);
@@ -113,26 +113,29 @@ export class BasicProjectInfoComponent implements OnInit {
   }
 
   canEditDecision() {
-    return this.project.state == ProjectState.ON_CHECKING && this.role == Role.GKNT_WORKER ||
-      this.project.state == ProjectState.ON_DEPARTMENT_SIGNING && this.role == Role.GKNT_DEPARTMENT_CHAIRMAN;
+    const role = this.role();
+    return this.project.state == ProjectState.ON_CHECKING && role == Role.GKNT_WORKER ||
+      this.project.state == ProjectState.ON_DEPARTMENT_SIGNING && role == Role.GKNT_DEPARTMENT_CHAIRMAN;
   }
 
   canEditDecisionWithRemarks() {
-    return this.project.state == ProjectState.ON_DEPARTMENT_FINAL_SIGNING && (this.role == Role.GKNT_WORKER ||
-      this.role == Role.GKNT_DEPARTMENT_CHAIRMAN);
+    const role = this.role();
+    return this.project.state == ProjectState.ON_DEPARTMENT_FINAL_SIGNING && (role == Role.GKNT_WORKER ||
+      role == Role.GKNT_DEPARTMENT_CHAIRMAN);
   }
 
   canReadDecision() {
-    if (this.role == Role.CUSTOMER && this.project.state == ProjectState.RETURNED) {
+    const role = this.role();
+    if (role == Role.CUSTOMER && this.project.state == ProjectState.RETURNED) {
       return true;
     }
     return anyMatch(this.project.state,
       ProjectState.ON_CHECKING, ProjectState.ON_DEPARTMENT_SIGNING,
       ProjectState.ON_SIGNING, ProjectState.RETURNED
-    ) && anyMatch(this.role,
+    ) && anyMatch(role,
       Role.GKNT_WORKER, Role.GKNT_DEPARTMENT_CHAIRMAN, Role.GKNT_CHAIRMAN,
       Role.BELISA_EDIT, Role.BELISA_READ
-    ) || (anyMatch(this.role,
+    ) || (anyMatch(role,
       Role.GKNT_WORKER, Role.GKNT_DEPARTMENT_CHAIRMAN, Role.GKNT_CHAIRMAN,
       Role.BELISA_EDIT, Role.BELISA_READ) && ProjectState.ON_DEPARTMENT_FINAL_SIGNING &&
       (this.project.isBureauRemarksExpired || this.project.isSectionRemarksExpired));
@@ -158,8 +161,8 @@ export class BasicProjectInfoComponent implements OnInit {
   }
 
   checkVisibleForBureau(): boolean {
-    return (anyMatch(this.role, Role.BUREAU_CHAIRMAN, Role.BUREAU_ASSESSOR) && this.lifecycleGroup != null
-      && this.lifecycleGroup.state == null
+    return (anyMatch(this.role(), Role.BUREAU_CHAIRMAN, Role.BUREAU_ASSESSOR) && this.lifecycleGroup != null
+      && this.lifecycleGroup().state == null
         // ProjectLifecycleState.RETURNED
     );
   }
@@ -183,7 +186,6 @@ export class BasicProjectInfoComponent implements OnInit {
   }
 
   displayDirection() {
-    console.log(this.project);
     let subDirections = this.project.subDirections;
     // let directions = this.project.directions;
     let catalogDirections: DirectionDto[];

@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, forwardRef, input, Input} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {VoteResults} from "@app/components/document-form/meeting-protocol-form/VoteResults";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
@@ -18,7 +18,7 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
           <div class="row">
             <div class="col-md-4 pr-2">
               <div class="input-group input-group-sm">
-                <input min="0" [max]="all - _value.rejected" numberInput type="text" class="form-control"
+                <input min="0" [max]="all() - _value.rejected" numberInput type="text" class="form-control"
                   [(ngModel)]="_value.accepted" placeholder="проголосовали за" required>
                   <div class="input-group-append">
                     <div class="input-group-text">
@@ -29,7 +29,7 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
               </div>
               <div class="col-md-4 pl-2 pr-2">
                 <div class="input-group input-group-sm">
-                  <input min="0" [max]="all - _value.accepted" numberInput type="text" class="form-control"
+                  <input min="0" [max]="all() - _value.accepted" numberInput type="text" class="form-control"
                     [(ngModel)]="_value.rejected" placeholder="проголосовали против" required>
                     <div class="input-group-append">
                       <div class="input-group-text">
@@ -40,7 +40,7 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
                 </div>
                 <div class="col-md-4 pl-2">
                   <div class="input-group input-group-sm">
-                    <input min="0" disabled numberInput type="text" class="form-control" [value]="all - _value.getVoted()"
+                    <input min="0" disabled numberInput type="text" class="form-control" [value]="all() - _value.getVoted()"
                       placeholder="не участвовали в голосовании" required>
                       <div class="input-group-append">
                         <div class="input-group-text">
@@ -74,7 +74,16 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class VoteResultsComponent extends ControlComponent<VoteResults> {
 
-  @Input() all: number;
+  readonly all = input<number>(undefined);
+  readonly displayInput = input<boolean>(false);
+  _display: boolean | null = null;
+
   @Input()
-  display: boolean = false;
+  set display(value: boolean) {
+    this._display = value;
+  }
+
+  get display(): boolean {
+    return this._display !== null ? this._display : this.displayInput();
+  }
 }

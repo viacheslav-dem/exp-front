@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, Output, EventEmitter, AfterViewInit, signal, OnDestroy} from '@angular/core';
+import {Component, OnInit, signal, OnDestroy, input} from '@angular/core';
 import {Router, NavigationEnd} from '@angular/router';
 import {filter, Subscription} from 'rxjs';
 
@@ -15,8 +15,7 @@ import {filter, Subscription} from 'rxjs';
 })
 export class MenuComponent implements OnInit, OnDestroy {
 
-  @Input()
-  menu: MenuItem[];
+  readonly menu = input<MenuItem[]>(undefined);
 
   // Сигнал для управления видимостью мобильного меню
   isMenuOpen = signal<boolean>(false);
@@ -32,6 +31,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
         this.isMenuOpen.set(false);
+        this.closeAllDropdowns();
       });
   }
 
@@ -47,6 +47,28 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   closeMenu() {
     this.isMenuOpen.set(false);
+  }
+
+  private closeAllDropdowns() {
+    // Закрываем все открытые dropdown меню на странице
+    const allDropdowns = document.querySelectorAll('.dropdown.show');
+    allDropdowns.forEach(dropdown => {
+      dropdown.classList.remove('show');
+      const dropdownMenu = dropdown.querySelector('.dropdown-menu');
+      if (dropdownMenu) {
+        dropdownMenu.classList.remove('show');
+      }
+      // Также обновляем aria-expanded
+      const toggle = dropdown.querySelector('.dropdown-toggle');
+      if (toggle) {
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  closeDropdown() {
+    // Закрываем мобильное меню
+    this.closeMenu();
   }
 }
 

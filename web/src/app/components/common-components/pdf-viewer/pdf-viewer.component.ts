@@ -1,4 +1,4 @@
-import {Component, Input} from "@angular/core";
+import {Component, Input, input} from "@angular/core";
 import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
 import {StorageService} from "app/services/storage.service";
 import {SERVER_URL} from "app/config";
@@ -18,7 +18,7 @@ import {DocumentDto} from "@app/dto/DocumentDto";
 export class PdfViewerComponent {
 
   documentUrl: SafeResourceUrl;
-  @Input() url: string = 'document';
+  readonly url = input<string>('document');
 
   constructor(private sanitizer: DomSanitizer,
               private _storage: StorageService) {
@@ -32,7 +32,7 @@ export class PdfViewerComponent {
     
 	let filename = encodeURIComponent(doc.name + '.pdf');
 	let args = `token=${this._storage.getAccessToken()}&convert=true&id=${doc.id}&filename=${filename}`;
-	let serverUrl = `${SERVER_URL}/${this.url}?${args}`;
+	let serverUrl = `${SERVER_URL}/${this.url()}?${args}`;
 	
     return `${location.origin}${location.pathname}/assets/pdfjs/web/viewer.html?file=${encodeURIComponent(serverUrl)}`;
   }
