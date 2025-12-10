@@ -2,17 +2,18 @@
   <tr>
     <td>
       <nav class="main-menu navbar navbar-light bg-faded navbar-expand-lg">
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
-          data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
-          aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler navbar-toggler-right" type="button" 
+          (click)="toggleMenu()"
+          [attr.aria-expanded]="isMenuOpen()"
+          aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <div class="navbar-collapse" [class.show]="isMenuOpen()" [class.collapse]="!isMenuOpen()" id="navbarNavDropdown">
           <ul class="navbar-nav mr-auto" style="text-align: right">
             @for (el of menu; track el) {
               @if (el.children == null || el.children.length == 0) {
                 <li class="nav-item">
-                  <a class="nav-link" [routerLink]="el.link" [routerLinkActive]="'active'">{{el.title}}</a>
+                  <a class="nav-link" [routerLink]="el.link" [routerLinkActive]="'active'" (click)="closeMenu()">{{el.title}}</a>
                 </li>
               }
               @if (el.children != null && el.children.length > 0) {
@@ -24,7 +25,7 @@
                   <div class="dropdown-menu shadow" style="width: 300px">
                     @for (cel of el.children; track cel) {
                       <a class="dropdown-item" [routerLink]="cel.link"
-                      [routerLinkActive]="'active'">{{cel.title}}</a>
+                      [routerLinkActive]="'active'" (click)="closeMenu()">{{cel.title}}</a>
                     }
                   </div>
                 </li>

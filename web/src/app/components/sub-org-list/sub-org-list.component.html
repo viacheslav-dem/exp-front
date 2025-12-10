@@ -1,4 +1,4 @@
-@for (org of orgs; track org; let orgInd = $index) {
+@for (org of orgs(); track org; let orgInd = $index) {
   <div>
     <!--ORG HEADER-->
     <div class="list-group-item list-group-item-action selectable"
@@ -39,7 +39,7 @@
     }
   </div>
 }
-@if (!orgs || orgs.length == 0) {
+@if (orgs() && orgs().length == 0) {
   <div>
     <div class="italic list-group-item background-light-blue">
       Организации отсутствуют

@@ -1,6 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ChangeDetectionStrategy} from '@angular/core';
 import {AuditService} from "@app/services/audit.service";
 import {PersonPlainDto} from "@app/dto/PersonPlainDto";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
     selector: 'app-sessions',
@@ -13,7 +14,7 @@ import {PersonPlainDto} from "@app/dto/PersonPlainDto";
             </h5>
       
             <ul>
-              @for (p of sessions; track p) {
+              @for (p of sessions(); track p) {
                 <li>
                   {{p | fullName}}
                 </li>
@@ -24,17 +25,14 @@ import {PersonPlainDto} from "@app/dto/PersonPlainDto";
       </div>
       `,
     styles: [],
-    standalone: false
+    standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SessionsComponent implements OnInit {
+export class SessionsComponent {
 
-  sessions: PersonPlainDto[];
+  sessions = toSignal(this.auditService.getSessions(), { initialValue: [] as PersonPlainDto[] });
 
   constructor(private auditService: AuditService) {
-  }
-
-  ngOnInit() {
-    this.auditService.getSessions().subscribe(sessions => this.sessions = sessions);
   }
 
 }

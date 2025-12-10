@@ -195,7 +195,7 @@ export class ProjectService extends HasStateService {
   }
 
   markViewed(idDto: IdDto, idGroup: string): Observable<ProjectDto> {
-    return this._http.postBlock(`${this.url}/mark-viewed/${idDto.id}`, idGroup);
+    return this._http.postBlock(`${this.url}/mark-viewed/${idDto.id}`, {idGroup: idGroup});
   }
 
   getTheSameProjectsByTitle(title: string): Observable<ProjectDto[]> {

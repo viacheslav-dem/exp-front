@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild} from "@angular/core";
+import {Component, ElementRef, ViewChild, ChangeDetectionStrategy, signal, ChangeDetectorRef} from "@angular/core";
 import {
   Direction,
   sortByName,
@@ -45,23 +45,23 @@ import {PeriodDto} from "@app/dto/PeriodDto";
           padding: 0.75rem 0.5rem;
       }
   `],
-    standalone: false
+    standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AccountingComponent extends FilterAndPages<AccountingDto> {
 
   AccountingState = AccountingState;
   SortClass = SortClass;
 
-  dateFrom: number = dayjs().subtract(1, 'day').valueOf();
-  dateTo: number = dayjs().subtract(1, 'day').valueOf();
-
+  dateFrom = signal<number>(dayjs().subtract(1, 'day').valueOf());
+  dateTo = signal<number>(dayjs().subtract(1, 'day').valueOf());
 
   sortOrder: SortOrder = new SortOrder('id', Direction.DESC);
-  accounting: AccountingDto[] = [];
-  selectedRecord: AccountingDto;
-  selectedDocument: DocumentDto;
-  filterName: string;
-  payDate: Date;
+  accounting = signal<AccountingDto[]>([]);
+  selectedRecord = signal<AccountingDto | undefined>(undefined);
+  selectedDocument = signal<DocumentDto | undefined>(undefined);
+  filterName = signal<string | undefined>(undefined);
+  payDate = signal<Date | undefined>(undefined);
 
   @ViewChild('fileViewerModal', { static: false }) fileViewer: ModalComponent;
   @ViewChild('confirmFinishAccountingModal', { static: false }) confirmFinishAccountingModal: ModalComponent;
@@ -74,7 +74,8 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
               private _accountingTypePipe: AccountingTypePipe,
               private _dialogService: DialogService,
               private _toasty: GlobalToastyService,
-              private _router: Router) {
+              private _router: Router,
+              private cdr: ChangeDetectorRef) {
     super(10);
   }
 
@@ -84,8 +85,9 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
       this._accountingService.filter = null;
     }
     if (this._accountingService.filterName) {
-      this.filterName = this._accountingService.filterName;
+      this.filterName.set(this._accountingService.filterName);
       this._filters = [this._accountingService.filter];
+      this.update();
     } else {
       this._router.navigateByUrl('accounting').then();
       this._searchFields = [
@@ -100,16 +102,25 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
           .setOperation(Operation.RANGE),
       ];
       this.enableFilterCache("accounting");
+      this.update();
     }
   }
 
   loadPage() {
-    this._accountingService.getAccountingPage(this._searchRequest).subscribe(res => {
-      this.setLoading(false);
-      this._page = res;
-      this.accounting = res.content;
-      this.accounting.forEach(accounting => this._accountingService.prepareAccounting(accounting));
-    }, () => this.setLoading(false));
+    this._accountingService.getAccountingPage(this._searchRequest).subscribe({
+      next: (res) => {
+        this.setLoading(false);
+        this._page = res;
+        const accountingList = res.content;
+        accountingList.forEach(accounting => this._accountingService.prepareAccounting(accounting));
+        this.accounting.set(accountingList);
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.setLoading(false);
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   showDocument(doc: DocumentDto) {
@@ -134,9 +145,14 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
     ).subscribe(() => {
       this._accountingService.refreshContract(accounting
       //    , new PeriodDto()
-      ).subscribe(res => {
-        accounting.contract = res.contract;
-        this._toasty.success("Документ успешно обновлён.");
+      ).subscribe({
+        next: (res) => {
+          accounting.contract = res.contract;
+          this._toasty.success("Документ успешно обновлён.");
+          // Update the signal to trigger change detection
+          this.accounting.set([...this.accounting()]);
+          this.cdr.markForCheck();
+        }
       });
     });
   }
@@ -147,22 +163,29 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
       `Пересоздать акт в соответствии с изменившимися данными в системе?`,
       'Дата акта и сумма выплат при этом останутся неизменными'
     ).subscribe(() => {
-      this._accountingService.refreshAct(accounting).subscribe(res => {
-        accounting.act = res.act;
-        this._toasty.success("Документ успешно обновлён.");
+      this._accountingService.refreshAct(accounting).subscribe({
+        next: (res) => {
+          accounting.act = res.act;
+          this._toasty.success("Документ успешно обновлён.");
+          // Update the signal to trigger change detection
+          this.accounting.set([...this.accounting()]);
+          this.cdr.markForCheck();
+        }
       });
     });
   }
 
   showFinishAccountingModal(accounting: AccountingDto) {
-    this.payDate = new Date();
-    this.selectedRecord = accounting;
+    this.payDate.set(new Date());
+    this.selectedRecord.set(accounting);
     this.confirmFinishAccountingModal.show();
   }
 
   finishAccounting() {
-
-    if (this.payDate == null) {
+    const payDateValue = this.payDate();
+    const selectedRecordValue = this.selectedRecord();
+    
+    if (payDateValue == null) {
       this._toasty.error('Заполните дату оплаты');
       return;
     }
@@ -171,10 +194,12 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
       return;
     }
     this.confirmFinishAccountingModal.hide();
-    this._accountingService.finishAccounting(this.selectedRecord, this.payDate, this.paySumInput.nativeElement.value).subscribe(() => {
-      this._toasty.success('Произведена отметка об оплате.');
-      this.update();
-    });
+    if (selectedRecordValue) {
+      this._accountingService.finishAccounting(selectedRecordValue, payDateValue, this.paySumInput.nativeElement.value).subscribe(() => {
+        this._toasty.success('Произведена отметка об оплате.');
+        this.update();
+      });
+    }
   }
 
   closeFinishAccountingModal() {
@@ -204,18 +229,18 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
   }
 
   changeDateToValue(dateTo: number) {
-    this.dateTo = dateTo;
+    this.dateTo.set(dateTo);
     this.update();
   }
 
   changeDateFromValue(dateFrom: number) {
-    this.dateFrom = dateFrom;
+    this.dateFrom.set(dateFrom);
     this.update();
   }
 
 
   downloadAgreements() {
-    this._accountingService.downloadAgreements(this.dateFrom, this.dateTo).subscribe(res => {
+    this._accountingService.downloadAgreements(this.dateFrom(), this.dateTo()).subscribe(res => {
         this._toasty.success("Документ успешно сформирован.");
     });
 

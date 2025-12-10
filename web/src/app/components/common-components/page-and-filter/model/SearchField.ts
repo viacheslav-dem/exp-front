@@ -91,6 +91,17 @@ export class SearchField {
   }
 
   isEmpty() {
+    // Для текстовых полей пустая строка считается пустым значением
+    if (this.type === SearchFieldType.TEXT) {
+      if (this.value === null || this.value === undefined) {
+        return true;
+      }
+      if (typeof this.value === 'string') {
+        return this.value.trim().length === 0;
+      }
+      // Если значение не строка, считаем его пустым для текстового поля
+      return true;
+    }
     return !this.value;
   }
 
@@ -348,7 +359,8 @@ export class MultiSelectField extends SearchField {
   }
 
   isEmpty() {
-    return !this.value || this.value.length == 0;
+    // Для MultiSelectField значение - это массив
+    return !this.value || !Array.isArray(this.value) || this.value.length === 0;
   }
 
   getItemAsString(item: any) {

@@ -141,7 +141,7 @@ export class ProjectInfoComponent implements OnInit {
   loadProject(idDto: IdDto, group: string) {
     this._projectService.getProject(idDto).subscribe(res => {
       this.project = res;
-      if (group != null && group != 'null') {
+      if (group != null && group != 'null' && typeof group === 'string' && !group.includes('=>')) {
         this._projectService.markViewed(this.project, group).subscribe();
       }
       this.initActionButtons();

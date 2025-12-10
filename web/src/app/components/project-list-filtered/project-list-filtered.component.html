@@ -1,12 +1,17 @@
 <div>
-  <h5 class="mb-3">{{filterName}}</h5>
+  <h5 class="mb-3">{{filterName()}}</h5>
   <div [loadingData]="_loading" class="list-group">
     <div>
       <span class="text-sm italic">
         Количество объектов: <b>{{_page.totalElements == null ? '...' : _page.totalElements}}</b>
       </span>
     </div>
-    @for (item of projects; track item) {
+    @if (_page.totalElements != null && _page.totalElements === 0 && projects().length == 0) {
+      <div class="alert alert-info italic mb-0">
+        Объектов экспертизы не найдено
+      </div>
+    }
+    @for (item of projects(); track item) {
       <div>
         <app-project-li [item]="item" [baseItemLink]="'/projects/'"></app-project-li>
       </div>

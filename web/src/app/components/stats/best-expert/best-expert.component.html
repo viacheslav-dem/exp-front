@@ -14,11 +14,11 @@
   </form>
 </div>
 
-@if (loading) {
+@if (loading()) {
   <div class="spinner"></div>
 }
 
-@if (expertsList.length > 0) {
+@if (expertsList().length > 0) {
   <div>
     <table class="experts-table">
       <thead>
@@ -28,7 +28,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (expert of expertsList; track expert) {
+        @for (expert of expertsList(); track expert) {
           <tr>
             <td>
               <div>{{ expert|fullName }}</div>

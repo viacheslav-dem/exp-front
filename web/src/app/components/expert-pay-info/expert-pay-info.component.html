@@ -1,4 +1,4 @@
-@if (expertInfoDtos.length>0) {
+@if (expertInfoDtos().length>0) {
   <table class="border">
     <tr>
       <th class="border " style="width: 35%">
@@ -20,7 +20,7 @@
         <div class="m-2">Дата оплаты</div>
       </th>
     </tr>
-    @for (project of expertInfoDtos; track project) {
+    @for (project of expertInfoDtos(); track project) {
       <tr>
         <td class="border" style="width: 35%">
           <a target="_blank"
@@ -51,7 +51,7 @@
     }
   </table>
 }
-@if (expertInfoDtos.length==0) {
+@if (_page.totalElements != null && _page.totalElements === 0 && expertInfoDtos().length == 0) {
   <div>Информация об эксперте отсутствует</div>
 }
 <app-pagination [page]="_page" [pagination]="_pagination"

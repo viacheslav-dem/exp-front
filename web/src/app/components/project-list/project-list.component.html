@@ -1,5 +1,5 @@
 <div>
-  @if (role == Role.CUSTOMER || role == Role.SUB_CUSTOMER) {
+  @if (role() == Role.CUSTOMER || role() == Role.SUB_CUSTOMER) {
     <div class="mb-1">
       <div class="row">
         <div class="col-lg-8 pr-0">
@@ -11,7 +11,7 @@
       </div>
     </div>
   }
-  @if (role != Role.CUSTOMER && role != Role.SUB_CUSTOMER) {
+  @if (role() != Role.CUSTOMER && role() != Role.SUB_CUSTOMER) {
     <div class="mb-1">
       <span class="text-sm italic">
         Количество проектов: <b>{{_page.totalElements == null ? '...' : _page.totalElements}}</b>
@@ -21,16 +21,16 @@
   <div class="row">
     <div class="col-lg-8 pr-0">
       <div [loadingData]="_loading" class="list-group">
-        @if (projects.length == 0) {
+        @if (_page.totalElements != null && _page.totalElements === 0 && projects().length == 0) {
           <div
             class="alert alert-info italic mb-0">
             Объектов экспертизы не найдено
           </div>
         }
-        @for (item of projects; track item) {
+        @for (item of projects(); track item) {
           <div>
             <app-project-li [item]="item" [baseItemLink]="'/projects/'"
-            [group]="selectedGroup"></app-project-li>
+            [group]="selectedGroup()"></app-project-li>
           </div>
         }
         <app-pagination [page]="_page" [pagination]="_pagination"
@@ -39,23 +39,23 @@
     </div>
 
     <div class="col-lg-4">
-      @if (role != Role.SUB_CUSTOMER) {
+      @if (role() != Role.SUB_CUSTOMER) {
         <div class="card pt-3">
-          <div class="card-title" (click)="showGroup = !showGroup">
+          <div class="card-title" (click)="showGroup.set(!showGroup())">
             <h5 style="margin: 0" class="d-inline-block">Группы</h5>
             <span class="float-lg-right">
-              @if (!showGroup) {
+              @if (!showGroup()) {
                 <fa-icon icon="angle-down" size="lg"></fa-icon>
               }
-              @if (showGroup) {
+              @if (showGroup()) {
                 <fa-icon icon="angle-up" size="lg"></fa-icon>
               }
             </span>
           </div>
-          @if (showGroup) {
-            @for (group of groups; track group) {
+          @if (showGroup()) {
+            @for (group of groups(); track group) {
               <button class="list-group-item list-group-item-action selectable"
-                [class.active]="group.idGroup==selectedGroup"
+                [class.active]="group.idGroup==selectedGroup()"
                 (click)="selectGroup(group.idGroup)">
                 {{group.nameGroup}} ({{group.allProjects}}/{{group.newProjects}})
               </button>

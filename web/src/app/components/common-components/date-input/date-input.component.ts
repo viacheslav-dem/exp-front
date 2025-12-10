@@ -58,12 +58,7 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
   }
 
   ngAfterViewInit() {
-    // Обновляем отображение после инициализации если есть значение
-    if (this.dateValue && this.dateInput) {
-      setTimeout(() => {
-        this.updateInputDisplay();
-      }, 0);
-    }
+    // Метод для будущих расширений
   }
 
   private updateBsConfig() {
@@ -89,35 +84,16 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
       .replace(/Y/g, 'y');
   }
 
-  private updateInputDisplay() {
-    if (this.dateInput && this.dateInput.nativeElement && this.dateValue) {
-      const formatted = dayjs(this.dateValue).locale('ru').format(this.dateFormat);
-      if (this.dateInput.nativeElement.value !== formatted) {
-        this.dateInput.nativeElement.value = formatted;
-      }
-    }
-  }
-
   prepareValue(): void {
     if (this._value != null) {
       this.dateValue = this.getDate(this._value);
-      // Обновляем отображение после установки значения
-      setTimeout(() => {
-        this.updateInputDisplay();
-      }, 0);
     } else {
       this.dateValue = null;
     }
   }
 
   onModelChange(value: Date) {
-    // Workaround: ngx-bootstrap имеет баг с форматированием года
-    // Обновляем отображение после того, как ngx-bootstrap обновит значение
-    if (value && this.dateInput?.nativeElement) {
-      requestAnimationFrame(() => {
-        this.updateDisplayValue(value);
-      });
-    }
+    // Метод для обработки изменений модели
   }
 
   onChange(d: Date) {
@@ -126,30 +102,8 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
       let date: Date = new Date(this.value);
       date.setHours(0, 0, 0, 0);
       this.onSelect.emit(date.getTime());
-      
-      // Workaround: обновляем отображение после выбора даты
-      // Двойной requestAnimationFrame гарантирует обновление после ngx-bootstrap
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          this.updateDisplayValue(date);
-        });
-      });
     } else {
       this.value = null;
-    }
-  }
-
-  /**
-   * Обновляет отображаемое значение в input поле
-   * Использует dayjs для форматирования с поддержкой формата Moment.js (DD.MM.YYYY)
-   */
-  private updateDisplayValue(date: Date): void {
-    if (this.dateInput?.nativeElement) {
-      const formatted = dayjs(date).locale('ru').format(this.dateFormat);
-      // Обновляем только если значение отличается (избегаем лишних обновлений)
-      if (this.dateInput.nativeElement.value !== formatted) {
-        this.dateInput.nativeElement.value = formatted;
-      }
     }
   }
 

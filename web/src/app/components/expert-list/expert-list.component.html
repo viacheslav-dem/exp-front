@@ -4,26 +4,30 @@
       <h5>Справочник экспертов</h5>
     </div>
     <div class="col">
-      <button class="btn btn-outline-primary no-focus filter-collapse float-right collapsed" type="button"
-        data-toggle="collapse"
-        data-target="#collapseFilter" aria-expanded="false" aria-controls="collapseExample">
-        <span class="show-filter">Показать фильтр</span>
-        <span class="hide-filter">Скрыть фильтр</span>
+      <button class="btn btn-outline-primary no-focus filter-collapse float-right" type="button"
+        (click)="showFilter.set(!showFilter())">
+        @if (!showFilter()) {
+          <span>Показать фильтр</span>
+        } @else {
+          <span>Скрыть фильтр</span>
+        }
       </button>
     </div>
 
   </div>
   <!--FILTER-->
-  <div class="collapse" id="collapseFilter">
-    <app-filter
-      [fieldClass]="'col-lg-3'" [filterClass]="'row'" [fields]="_searchFields"
-      (onFilterChanged)="onFilterChanged()">
-    </app-filter>
-  </div>
+  @if (showFilter()) {
+    <div>
+      <app-filter
+        [fieldClass]="'col-lg-3'" [filterClass]="'row'" [fields]="_searchFields"
+        (onFilterChanged)="onFilterChanged()">
+      </app-filter>
+    </div>
+  }
 
   <div class="mt-2" [loadingData]="_loading">
     <div class="list-group">
-      @for (expert of experts; track expert) {
+      @for (expert of experts(); track expert) {
         <div class="list-group-item list-group-item-action">
           <div class="row">
             <div class="col-lg-3">
@@ -112,25 +116,52 @@
         }
       </div>
     </div>
-    <div class="row">
+    <div class="row" #chartContainer [attr.data-expert-id]="expert.id">
       <div class="col-xl-4 text-center">
         <div class="text-sm text-muted pt-2">Подготовлено экспертных заключений за год</div>
-        <app-finished-reviews-sparkline-chart
-        [stats]="expert.stats"></app-finished-reviews-sparkline-chart>
+        @if (isChartsLoaded(expert.id)) {
+          <app-finished-reviews-sparkline-chart
+          [stats]="expert.stats"></app-finished-reviews-sparkline-chart>
+        } @else {
+          <div style="height: 60px; display: flex; align-items: center; justify-content: center;">
+            <div class="spinner" style="margin: 0;">
+              <div class="double-bounce1"></div>
+              <div class="double-bounce2"></div>
+            </div>
+          </div>
+        }
       </div>
       <div class="col-xl-4 text-center">
         <div class="text-sm text-muted pt-2">Статистика работы эксперта за год</div>
-        <app-review-results-sparkline-chart [stats]="expert.stats"></app-review-results-sparkline-chart>
+        @if (isChartsLoaded(expert.id)) {
+          <app-review-results-sparkline-chart [stats]="expert.stats"></app-review-results-sparkline-chart>
+        } @else {
+          <div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+            <div class="spinner" style="margin: 0;">
+              <div class="double-bounce1"></div>
+              <div class="double-bounce2"></div>
+            </div>
+          </div>
+        }
       </div>
       <div class="col-xl-4 text-center">
         <div class="text-sm text-muted pt-2">Время подготовки заключения</div>
-        <app-reviews-violation-sparkline-chart
-        [stats]="expert.stats"></app-reviews-violation-sparkline-chart>
+        @if (isChartsLoaded(expert.id)) {
+          <app-reviews-violation-sparkline-chart
+          [stats]="expert.stats"></app-reviews-violation-sparkline-chart>
+        } @else {
+          <div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+            <div class="spinner" style="margin: 0;">
+              <div class="double-bounce1"></div>
+              <div class="double-bounce2"></div>
+            </div>
+          </div>
+        }
       </div>
     </div>
   </div>
 }
-@if (experts.length == 0) {
+        @if (_page.totalElements != null && _page.totalElements === 0 && experts().length == 0) {
   <div class="alert alert-info italic mb-0">
     Эксперты не найдены
   </div>
@@ -141,5 +172,5 @@
 </div>
 </div>
 <app-modal #expertPayInfo [title]="'Список проектов'" [modalClasses]="'modal-xl'">
-  <app-expert-pay-info [expert]="expertId"></app-expert-pay-info>
+  <app-expert-pay-info [expert]="expertId()"></app-expert-pay-info>
 </app-modal>

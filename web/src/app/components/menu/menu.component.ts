@@ -1,4 +1,6 @@
-import {Component, OnInit, Input, Output, EventEmitter, AfterViewInit} from '@angular/core';
+import {Component, OnInit, Input, Output, EventEmitter, AfterViewInit, signal, OnDestroy} from '@angular/core';
+import {Router, NavigationEnd} from '@angular/router';
+import {filter, Subscription} from 'rxjs';
 
 @Component({
     selector: 'app-menu',
@@ -11,15 +13,40 @@ import {Component, OnInit, Input, Output, EventEmitter, AfterViewInit} from '@an
   `],
     standalone: false
 })
-export class MenuComponent implements OnInit {
+export class MenuComponent implements OnInit, OnDestroy {
 
   @Input()
   menu: MenuItem[];
 
-  constructor() {
+  // Сигнал для управления видимостью мобильного меню
+  isMenuOpen = signal<boolean>(false);
+
+  private routerSubscription?: Subscription;
+
+  constructor(private router: Router) {
   }
 
   ngOnInit() {
+    // Подписываемся на события навигации, чтобы закрывать меню при переходе
+    this.routerSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.isMenuOpen.set(false);
+      });
+  }
+
+  ngOnDestroy() {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+  }
+
+  toggleMenu() {
+    this.isMenuOpen.set(!this.isMenuOpen());
+  }
+
+  closeMenu() {
+    this.isMenuOpen.set(false);
   }
 }
 
