@@ -4,40 +4,58 @@
     <div class="card pt-3">
       <h5 class="card-title">Аудит</h5>
       <div [loadingData]="_loading">
-        <table *ngIf="audit.length > 0" class="table table-responsive mb-0">
-          <thead>
-          <tr>
-            <th class="selectable text-nowrap" (click)="sortBy('date')">
-              <span>Дата </span>
-              <fa-icon class="fa-active" *ngIf="sort.property == 'date'" [icon]="SortClass[this.sort.direction]"></fa-icon>
-            </th>
-            <th (click)="sortBy('person')" class="selectable" style="width: 33%">
-              <span>Пользователь </span>
-              <fa-icon class="fa-active" *ngIf="sort.property == 'person'" [icon]="SortClass[this.sort.direction]"></fa-icon>
-            </th>
-            <th (click)="sortBy('type')" class="selectable" style="width: 33%">
-              <span>Тип </span>
-              <fa-icon class="fa-active" *ngIf="sort.property == 'type'" [icon]="SortClass[this.sort.direction]"></fa-icon>
-            </th>
-            <th (click)="sortBy('message')" class="selectable" style="width: 34%">
-              <span>Сообщение </span>
-              <fa-icon class="fa-active" *ngIf="sort.property == 'message'" [icon]="SortClass[this.sort.direction]"></fa-icon>
-            </th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr class="list-group-item-action" *ngFor="let record of audit">
-            <td class="text-nowrap">{{record.date | date:'dd.MM.yyyy HH:mm'}}</td>
-            <td *ngIf="record.person">{{record.person | fullName}}</td>
-            <td *ngIf="!record.person">Неавторизованный пользователь</td>
-            <td>{{record.type | auditType}}</td>
-            <td>{{record.message | short:120}}</td>
-          </tr>
-          </tbody>
-        </table>
-        <div *ngIf="audit.length == 0" class="alert alert-info italic mb-0">Записи отсутствуют</div>
+        @if (audit.length > 0) {
+          <table class="table table-responsive mb-0">
+            <thead>
+              <tr>
+                <th class="selectable text-nowrap" (click)="sortBy('date')">
+                  <span>Дата </span>
+                  @if (sort.property == 'date') {
+                    <fa-icon class="fa-active" [icon]="SortClass[this.sort.direction]"></fa-icon>
+                  }
+                </th>
+                <th (click)="sortBy('person')" class="selectable" style="width: 33%">
+                  <span>Пользователь </span>
+                  @if (sort.property == 'person') {
+                    <fa-icon class="fa-active" [icon]="SortClass[this.sort.direction]"></fa-icon>
+                  }
+                </th>
+                <th (click)="sortBy('type')" class="selectable" style="width: 33%">
+                  <span>Тип </span>
+                  @if (sort.property == 'type') {
+                    <fa-icon class="fa-active" [icon]="SortClass[this.sort.direction]"></fa-icon>
+                  }
+                </th>
+                <th (click)="sortBy('message')" class="selectable" style="width: 34%">
+                  <span>Сообщение </span>
+                  @if (sort.property == 'message') {
+                    <fa-icon class="fa-active" [icon]="SortClass[this.sort.direction]"></fa-icon>
+                  }
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (record of audit; track record) {
+                <tr class="list-group-item-action">
+                  <td class="text-nowrap">{{record.date | date:'dd.MM.yyyy HH:mm'}}</td>
+                  @if (record.person) {
+                    <td>{{record.person | fullName}}</td>
+                  }
+                  @if (!record.person) {
+                    <td>Неавторизованный пользователь</td>
+                  }
+                  <td>{{record.type | auditType}}</td>
+                  <td>{{record.message | short:120}}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+        @if (audit.length == 0) {
+          <div class="alert alert-info italic mb-0">Записи отсутствуют</div>
+        }
         <app-pagination [page]="_page" [pagination]="_pagination"
-                        (onPageChanged)="onPageChanged($event)"></app-pagination>
+        (onPageChanged)="onPageChanged($event)"></app-pagination>
       </div>
     </div>
   </div>

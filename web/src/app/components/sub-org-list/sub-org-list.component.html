@@ -1,42 +1,49 @@
-<div *ngFor="let org of orgs; let orgInd = index">
-
-  <!--ORG HEADER-->
-  <div class="list-group-item list-group-item-action selectable"
-       [class.border-bottom-none]="org.isExpanded" [class.disabled]="org.disabled"
-       (click)="org.isExpanded=!org.isExpanded">
-    <div class="text-mini font-weight-bold">
-      организация
-      <span *ngIf="org.id == 0">(не сохранена)</span>
-      <span *ngIf="org.disabled">(неактивная)</span>
+@for (org of orgs; track org; let orgInd = $index) {
+  <div>
+    <!--ORG HEADER-->
+    <div class="list-group-item list-group-item-action selectable"
+      [class.border-bottom-none]="org.isExpanded" [class.disabled]="org.disabled"
+      (click)="org.isExpanded=!org.isExpanded">
+      <div class="text-mini font-weight-bold">
+        организация
+        @if (org.id == 0) {
+          <span>(не сохранена)</span>
+        }
+        @if (org.disabled) {
+          <span>(неактивная)</span>
+        }
+      </div>
+      <div>{{org.name | orElse : 'Наименование отсутствует'}}</div>
     </div>
-    <div>{{org.name | orElse : 'Наименование отсутствует'}}</div>
+    @if (org.isExpanded) {
+      <div class="list-group-item border-top-none pt-0">
+        <!--SHOW ORG-->
+        <div>
+          <div>Глава организации:
+            <span class="italic">{{org.chairman | fullName}}</span>
+          </div>
+          <div>Краткое наименование:
+            <span class="italic">{{org.shortName | orElse: 'не указано'}}</span>
+          </div>
+          <div>УНП:
+            <span class="italic">{{org.unp | orElse: 'не указан'}}</span>
+          </div>
+          <div>Адрес:
+            <span class="italic">{{org.orgAddress | orElse: 'не указан'}}</span>
+          </div>
+          <div>Код организации:
+            <span class="italic">{{org.code | orElse: 'не указан'}}</span>
+          </div>
+        </div>
+      </div>
+    }
   </div>
-
-  <div *ngIf="org.isExpanded" class="list-group-item border-top-none pt-0">
-
-    <!--SHOW ORG-->
-    <div>
-      <div>Глава организации:
-        <span class="italic">{{org.chairman | fullName}}</span>
-      </div>
-      <div>Краткое наименование:
-        <span class="italic">{{org.shortName | orElse: 'не указано'}}</span>
-      </div>
-      <div>УНП:
-        <span class="italic">{{org.unp | orElse: 'не указан'}}</span>
-      </div>
-      <div>Адрес:
-        <span class="italic">{{org.orgAddress | orElse: 'не указан'}}</span>
-      </div>
-      <div>Код организации:
-        <span class="italic">{{org.code | orElse: 'не указан'}}</span>
-      </div>
+}
+@if (!orgs || orgs.length == 0) {
+  <div>
+    <div class="italic list-group-item background-light-blue">
+      Организации отсутствуют
     </div>
   </div>
-</div>
-<div *ngIf="!orgs || orgs.length == 0">
-  <div class="italic list-group-item background-light-blue">
-    Организации отсутствуют
-  </div>
-</div>
+}
 

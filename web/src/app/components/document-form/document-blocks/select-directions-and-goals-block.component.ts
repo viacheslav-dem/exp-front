@@ -6,39 +6,50 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 @Component({
     selector: 'app-select-directions-and-goals-block',
     template: `
-    <ng-container *ngIf="_project">
-      <div *ngIf="_allDirections.length > 0" class="form-group">
-        <label>
-          <span *ngIf="num">{{num}}.</span>
-          Выберите приоритетные направления научной,
-          научно-технической и инновационной деятельности в Республике Беларусь,
-          которым объект экспертизы <b>соответствует</b>:
-        </label>
-        <div *ngFor="let direction of _allDirections">
-          <app-checkbox [(ngModel)]="direction.isChecked"
-                        (ngModelChange)="onDirectionChanged()">{{direction.name}}</app-checkbox>
+    @if (_project) {
+      @if (_allDirections.length > 0) {
+        <div class="form-group">
+          <label>
+            @if (num) {
+              <span>{{num}}.</span>
+            }
+            Выберите приоритетные направления научной,
+            научно-технической и инновационной деятельности в Республике Беларусь,
+            которым объект экспертизы <b>соответствует</b>:
+          </label>
+          @for (direction of _allDirections; track direction) {
+            <div>
+              <app-checkbox [(ngModel)]="direction.isChecked"
+              (ngModelChange)="onDirectionChanged()">{{direction.name}}</app-checkbox>
+            </div>
+          }
         </div>
-      </div>
-
-      <div *ngIf="canHasSocialEconomicGoals() && _allGoals.length > 0" class="form-group">
-        <label>
-          Выберите цели (приоритеты) социально-экономического развития,
-          которым объект экспертизы <b>соответствует</b>:
-        </label>
-        <div *ngFor="let item of _allGoals">
-          <app-checkbox [(ngModel)]="item.isChecked" (ngModelChange)="onGoalChanged()">{{item.name}}</app-checkbox>
+      }
+      @if (canHasSocialEconomicGoals() && _allGoals.length > 0) {
+        <div class="form-group">
+          <label>
+            Выберите цели (приоритеты) социально-экономического развития,
+            которым объект экспертизы <b>соответствует</b>:
+          </label>
+          @for (item of _allGoals; track item) {
+            <div>
+              <app-checkbox [(ngModel)]="item.isChecked" (ngModelChange)="onGoalChanged()">{{item.name}}</app-checkbox>
+            </div>
+          }
+          <textarea [(ngModel)]="_form.directionsAndGoalsText" rows="3" class="form-control mt-05"
+          placeholder="Пояснительный текст (при необходимости)."></textarea>
         </div>
-        <textarea [(ngModel)]="_form.directionsAndGoalsText" rows="3" class="form-control mt-05"
-                  placeholder="Пояснительный текст (при необходимости)."></textarea>
-      </div>
-        <div *ngIf="full" class="hint">
-            <p>
-                <b>Подсказка.</b>
-                Оценивается соответствие / несоответствие объекта государственной экспертизы приоритету(-ам) и цели(-ям) государственной политики в сфере социально-экономического развития (для проектов государственных программ (за исключением государственной программы в сфере цифрового развития), в рамках которых предусматривается реализация мероприятий в сферах научной, научно-технической и инновационной деятельности) / приоритетному(-ым) направлению(-ям) научной, научно-технической и инновационной деятельности в Республике Беларусь, в том числе сквозному(-ым) приоритетному(-ым) направлению(-ям)* (для проектов государственных научно-технических программ), указанному(-ым) в материалах объекта государственной экспертизы и в пункте 5, а также их соответствие / несоответствие действующим нормативным правовым актам.
-            </p>
+      }
+      @if (full) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
+            Оценивается соответствие / несоответствие объекта государственной экспертизы приоритету(-ам) и цели(-ям) государственной политики в сфере социально-экономического развития (для проектов государственных программ (за исключением государственной программы в сфере цифрового развития), в рамках которых предусматривается реализация мероприятий в сферах научной, научно-технической и инновационной деятельности) / приоритетному(-ым) направлению(-ям) научной, научно-технической и инновационной деятельности в Республике Беларусь, в том числе сквозному(-ым) приоритетному(-ым) направлению(-ям)* (для проектов государственных научно-технических программ), указанному(-ым) в материалах объекта государственной экспертизы и в пункте 5, а также их соответствие / несоответствие действующим нормативным правовым актам.
+          </p>
         </div>
-    </ng-container>
-  `,
+      }
+    }
+    `,
     standalone: false
 })
 export class SelectDirectionsAndGoalsBlockComponent {

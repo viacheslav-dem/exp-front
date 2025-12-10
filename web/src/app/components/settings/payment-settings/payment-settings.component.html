@@ -1,75 +1,79 @@
 <div class="list-group-item">
 
-    <!--SHOW-->
-    <div *ngIf="!isEdit && value">
-    <div class="form-group">
-      <label class="form-group-label">Общие параметры</label>
-      <a class="btn btn-icon float-right" (click)="edit()">
-        <fa-icon icon="cog" size="lg"></fa-icon>
-      </a>
-      <div class="form-sub-group">
-        Тарифная ставка первого разряда:
-        <i><b>{{value.tariffRate1}}</b>&nbsp;BYN</i>
-      </div>
-      <div class="form-sub-group">
-        Пенсионное страхование (кроме инвалидов I и II группы):
-        <i><b>{{value.pensionInsurance}}</b>&nbsp;%</i>
-      </div>
-      <div class="form-sub-group">
-        Пенсионное страхование для инвалидов I и II группы:
-        <i><b>{{value.pensionInsuranceForDisabled}}</b>&nbsp;%</i>
-      </div>
-      <div class="form-sub-group">
-        Социальное страхование:
-        <i><b>{{value.socialInsurance}}</b>&nbsp;%</i>
-      </div>
-      <div class="form-sub-group">
-        Максимальное оплачиваемое время затраченное на подготовку заседания для <b>руководителя</b>:
-        <i><b>{{value.maxHoursChairman}}</b>&nbsp;часов</i>
-      </div>
-      <div class="form-sub-group">
-        Максимальное оплачиваемое время затраченное на подготовку заседания для <b>секретаря</b>:
-        <i><b>{{value.maxHoursSecretary}}</b>&nbsp;часов</i>
+  <!--SHOW-->
+  @if (!isEdit && value) {
+    <div>
+      <div class="form-group">
+        <label class="form-group-label">Общие параметры</label>
+        <a class="btn btn-icon float-right" (click)="edit()">
+          <fa-icon icon="cog" size="lg"></fa-icon>
+        </a>
+        <div class="form-sub-group">
+          Тарифная ставка первого разряда:
+          <i><b>{{value.tariffRate1}}</b>&nbsp;BYN</i>
+        </div>
+        <div class="form-sub-group">
+          Пенсионное страхование (кроме инвалидов I и II группы):
+          <i><b>{{value.pensionInsurance}}</b>&nbsp;%</i>
+        </div>
+        <div class="form-sub-group">
+          Пенсионное страхование для инвалидов I и II группы:
+          <i><b>{{value.pensionInsuranceForDisabled}}</b>&nbsp;%</i>
+        </div>
+        <div class="form-sub-group">
+          Социальное страхование:
+          <i><b>{{value.socialInsurance}}</b>&nbsp;%</i>
+        </div>
+        <div class="form-sub-group">
+          Максимальное оплачиваемое время затраченное на подготовку заседания для <b>руководителя</b>:
+          <i><b>{{value.maxHoursChairman}}</b>&nbsp;часов</i>
+        </div>
+        <div class="form-sub-group">
+          Максимальное оплачиваемое время затраченное на подготовку заседания для <b>секретаря</b>:
+          <i><b>{{value.maxHoursSecretary}}</b>&nbsp;часов</i>
+        </div>
       </div>
     </div>
-  </div>
+  }
 
   <!--EDIT-->
-  <div *ngIf="isEdit">
-    <label class="form-group-label">Общие параметры</label>
-    <div class="form-group">
-      <label>Тарифная ставка первого разряда, руб.</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.tariffRate1" placeholder="белорусских рублей"
-             class="form-control" title="Тарифная ставка первого разряда, руб.">
-    </div>
-    <div class="form-group">
-      <label>Пенсионное страхование (кроме инвалидов I и II группы), %</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.pensionInsurance" placeholder="процентов"
-             class="form-control" title="Пенсионное страхование (кроме инвалидов I и II группы), %">
-    </div>
-    <div class="form-group">
-      <label>Пенсионное страхование для инвалидов I и II группы, %</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.pensionInsuranceForDisabled" placeholder="процентов"
-             class="form-control" title="Пенсионное страхование для инвалидов I и II группы, %">
-    </div>
-    <div class="form-group">
-      <label>Социальное страхование, %</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.socialInsurance" placeholder="процентов"
-             class="form-control" title="Социальное страхование, %">
-    </div>
-    <div class="form-group">
-      <label>Максимальное оплачиваемое время затраченное на подготовку заседания для <b>руководителя</b>, часов</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.maxHoursChairman" placeholder="часов"
-             class="form-control" title="Максимальное оплачиваемое время затраченное на подготовку заседания для руководителя, часов">
-    </div>
-    <div class="form-group">
-      <label>Максимальное оплачиваемое время затраченное на подготовку заседания для <b>секретаря</b>, часов</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.maxHoursSecretary" placeholder="часов"
-             class="form-control" title="Максимальное оплачиваемое время затраченное на подготовку заседания для секретаря, часов">
-    </div>
-    <div class="mt-1">
-      <button class="btn btn-secondary" (click)="isEdit = false">Отмена</button>
-      <button class="btn btn-primary" (click)="savePropertyValue()">Сохранить</button>
-    </div>
-  </div>
-</div>
+  @if (isEdit) {
+    <div>
+      <label class="form-group-label">Общие параметры</label>
+      <div class="form-group">
+        <label>Тарифная ставка первого разряда, руб.</label>
+        <input numberInput type="text" [(ngModel)]="editedValue.tariffRate1" placeholder="белорусских рублей"
+          class="form-control" title="Тарифная ставка первого разряда, руб.">
+        </div>
+        <div class="form-group">
+          <label>Пенсионное страхование (кроме инвалидов I и II группы), %</label>
+          <input numberInput type="text" [(ngModel)]="editedValue.pensionInsurance" placeholder="процентов"
+            class="form-control" title="Пенсионное страхование (кроме инвалидов I и II группы), %">
+          </div>
+          <div class="form-group">
+            <label>Пенсионное страхование для инвалидов I и II группы, %</label>
+            <input numberInput type="text" [(ngModel)]="editedValue.pensionInsuranceForDisabled" placeholder="процентов"
+              class="form-control" title="Пенсионное страхование для инвалидов I и II группы, %">
+            </div>
+            <div class="form-group">
+              <label>Социальное страхование, %</label>
+              <input numberInput type="text" [(ngModel)]="editedValue.socialInsurance" placeholder="процентов"
+                class="form-control" title="Социальное страхование, %">
+              </div>
+              <div class="form-group">
+                <label>Максимальное оплачиваемое время затраченное на подготовку заседания для <b>руководителя</b>, часов</label>
+                <input numberInput type="text" [(ngModel)]="editedValue.maxHoursChairman" placeholder="часов"
+                  class="form-control" title="Максимальное оплачиваемое время затраченное на подготовку заседания для руководителя, часов">
+                </div>
+                <div class="form-group">
+                  <label>Максимальное оплачиваемое время затраченное на подготовку заседания для <b>секретаря</b>, часов</label>
+                  <input numberInput type="text" [(ngModel)]="editedValue.maxHoursSecretary" placeholder="часов"
+                    class="form-control" title="Максимальное оплачиваемое время затраченное на подготовку заседания для секретаря, часов">
+                  </div>
+                  <div class="mt-1">
+                    <button class="btn btn-secondary" (click)="isEdit = false">Отмена</button>
+                    <button class="btn btn-primary" (click)="savePropertyValue()">Сохранить</button>
+                  </div>
+                </div>
+              }
+            </div>

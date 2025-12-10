@@ -14,15 +14,17 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         </span>
       </label>
       <textarea [(ngModel)]="form.conclusionText" rows="3" class="form-control"
-                placeholder="Выводы и предложения (при необходимости)."></textarea>
-      <div *ngIf="financeConclusionNum" class="hint">
-        <p>
-          <b>Подсказка.</b>
-          Положительное решение принимается, только если в пункте {{financeConclusionNum}} имеется положительная оценка.
-        </p>
-      </div>
+      placeholder="Выводы и предложения (при необходимости)."></textarea>
+      @if (financeConclusionNum) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
+            Положительное решение принимается, только если в пункте {{financeConclusionNum}} имеется положительная оценка.
+          </p>
+        </div>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class ConclusionCouncilBlockComponent {

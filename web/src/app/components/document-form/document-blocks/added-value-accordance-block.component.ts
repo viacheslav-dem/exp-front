@@ -14,11 +14,13 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         [(ngModel)]="_form.addedValue"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <textarea *ngIf="full" [(ngModel)]="_form.addedValueText" rows="3" class="form-control"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      @if (full) {
+        <textarea [(ngModel)]="_form.addedValueText" rows="3" class="form-control"
+        placeholder="Пояснительный текст (при необходимости)."></textarea>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class AddedValueAccordanceBlockComponent {

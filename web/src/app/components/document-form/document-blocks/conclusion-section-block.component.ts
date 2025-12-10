@@ -10,7 +10,7 @@ import {DecisionStateBadge} from "@app/pipes/decision.pipe";
       <label>
         <span>{{num}}.</span>
         <span>
-          Заключение секции/бюро по объекту государственной экспертизы 
+          Заключение секции/бюро по объекту государственной экспертизы
           <i>{{project?.title}}</i>:
         </span>
         <span class="ml-05" [ngClass]="['badge', DecisionStateBadge[_form.conclusion.getDecision()] || 'badge-info']">
@@ -22,14 +22,16 @@ import {DecisionStateBadge} from "@app/pipes/decision.pipe";
         [all]="allParticipants"
         (onChanged)="onConditionsChanged.emit(true)"
       ></app-new-vote-results>
-      <div *ngIf="financeConclusionNum" class="hint">
-        <p>
-          <b>Подсказка.</b>
-          Положительное решение принимается, только если в пункте {{financeConclusionNum}} имеется положительная оценка.
-        </p>
-      </div>
+      @if (financeConclusionNum) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
+            Положительное решение принимается, только если в пункте {{financeConclusionNum}} имеется положительная оценка.
+          </p>
+        </div>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class ConclusionSectionBlockComponent {

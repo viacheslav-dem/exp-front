@@ -9,21 +9,23 @@ import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/Confirm
     selector: 'app-meth-rec-pdf',
     template: `
         <div>
-            <div class="mb-2">{{message}}</div>
-            <div class="form-sub-group" *ngFor="let field of fields">
-                <label>{{field.label}}</label>
-                <input class="form-control" [type]="field.type" [(ngModel)]="field.value" required [name]="field.name"/>
+          <div class="mb-2">{{message}}</div>
+          @for (field of fields; track field) {
+            <div class="form-sub-group">
+              <label>{{field.label}}</label>
+              <input class="form-control" [type]="field.type" [(ngModel)]="field.value" required [name]="field.name"/>
             </div>
-            <iframe [src]="getFileUrl()" class="viewer" align="left" allowfullscreen>
-                Ваш браузер не поддерживает плавающие фреймы!
-            </iframe>
-            <div class="text-sm">{{description}}</div>
-            <div class="mt-3">
-                <button class="btn btn-primary mr-1" (click)="confirm()">{{okBtnMessage}}</button>
-                <button class="btn btn-dark" (click)="cancel()">{{cancelBtnMessage}}</button>
-            </div>
+          }
+          <iframe [src]="getFileUrl()" class="viewer" align="left" allowfullscreen>
+            Ваш браузер не поддерживает плавающие фреймы!
+          </iframe>
+          <div class="text-sm">{{description}}</div>
+          <div class="mt-3">
+            <button class="btn btn-primary mr-1" (click)="confirm()">{{okBtnMessage}}</button>
+            <button class="btn btn-dark" (click)="cancel()">{{cancelBtnMessage}}</button>
+          </div>
         </div>
-  `,
+        `,
     standalone: false
 })
 export class MethRecPdfComponent {

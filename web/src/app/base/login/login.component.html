@@ -1,23 +1,25 @@
 <div class="card card-login py-3">
   <div class="mb-1 title">Экспертиза</div>
   <input type="text" class="form-control list-input" placeholder="Логин" required="" autofocus=""
-         [(ngModel)]="user.login" (keyup.enter)="login()">
+    [(ngModel)]="user.login" (keyup.enter)="login()">
 
-  <div class="login-form-password">
-    <fa-icon icon="eye" id="password-icon" class="password-icon" [fixedWidth]="true"
-             (click)="toggleVisibility()"></fa-icon>
-    <fa-icon icon="eye-slash" id="password-icon-crossed" class="password-icon" [fixedWidth]="true"
-             (click)="toggleVisibility()"></fa-icon>
-    <input type="password" class="form-control list-input" id="input-password" placeholder="Пароль" required=""
-           [(ngModel)]="user.password" (keyup.enter)="login()">
-  </div>
+    <div class="login-form-password">
+      <fa-icon icon="eye" id="password-icon" class="password-icon" [fixedWidth]="true"
+      (click)="toggleVisibility()"></fa-icon>
+      <fa-icon icon="eye-slash" id="password-icon-crossed" class="password-icon" [fixedWidth]="true"
+      (click)="toggleVisibility()"></fa-icon>
+      <input type="password" class="form-control list-input" id="input-password" placeholder="Пароль" required=""
+        [(ngModel)]="user.password" (keyup.enter)="login()">
+      </div>
 
-  <button class="btn btn btn-primary btn-block mt-1" (click)="login()">Войти</button>
+      <button class="btn btn btn-primary btn-block mt-1" (click)="login()">Войти</button>
 
-</div>
+    </div>
 
-<div class="card-notification-block" *ngIf="systemLoginNotification.enabled">
-  <div class="card card-notification py-3" [ngClass]= "systemLoginNotification.type">
-    <div [innerHTML]="notificationToSafeHtml(systemLoginNotification.message)"> </div>
-  </div>
-</div>
+    @if (systemLoginNotification.enabled) {
+      <div class="card-notification-block">
+        <div class="card card-notification py-3" [ngClass]= "systemLoginNotification.type">
+          <div [innerHTML]="notificationToSafeHtml(systemLoginNotification.message)"> </div>
+        </div>
+      </div>
+    }

@@ -3,27 +3,33 @@
     <td>
       <nav class="main-menu navbar navbar-light bg-faded navbar-expand-lg">
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
-                data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
-                aria-expanded="false" aria-label="Toggle navigation">
+          data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
+          aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
           <ul class="navbar-nav mr-auto" style="text-align: right">
-            <ng-container *ngFor="let el of menu">
-              <li class="nav-item" *ngIf="el.children == null || el.children.length == 0">
-                <a class="nav-link" [routerLink]="el.link" [routerLinkActive]="'active'">{{el.title}}</a>
-              </li>
-              <li class="nav-item dropdown" *ngIf="el.children != null && el.children.length > 0">
-                <a class="nav-link dropdown-toggle" data-toggle="dropdown"
-                   href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                  {{el.title}}
-                </a>
-                <div class="dropdown-menu shadow" style="width: 300px">
-                  <a *ngFor="let cel of el.children" class="dropdown-item" [routerLink]="cel.link"
-                     [routerLinkActive]="'active'">{{cel.title}}</a>
-                </div>
-              </li>
-            </ng-container>
+            @for (el of menu; track el) {
+              @if (el.children == null || el.children.length == 0) {
+                <li class="nav-item">
+                  <a class="nav-link" [routerLink]="el.link" [routerLinkActive]="'active'">{{el.title}}</a>
+                </li>
+              }
+              @if (el.children != null && el.children.length > 0) {
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" data-toggle="dropdown"
+                    href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    {{el.title}}
+                  </a>
+                  <div class="dropdown-menu shadow" style="width: 300px">
+                    @for (cel of el.children; track cel) {
+                      <a class="dropdown-item" [routerLink]="cel.link"
+                      [routerLinkActive]="'active'">{{cel.title}}</a>
+                    }
+                  </div>
+                </li>
+              }
+            }
           </ul>
         </div>
       </nav>

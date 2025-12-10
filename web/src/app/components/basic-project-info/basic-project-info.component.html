@@ -1,19 +1,21 @@
 <!--PROJECT TITLE-->
 
-<ng-container *ngIf="!checkVisibleForBureau()">
+@if (!checkVisibleForBureau()) {
   <div class="mb-2">
-  <span (click)="showTransitionHistoryModal()" class="selectable"
-        [ngClass]="['badge', ProjectStateBadge[project.state]]">
-    {{project.state | projectState}}
-  </span>
+    <span (click)="showTransitionHistoryModal()" class="selectable"
+      [ngClass]="['badge', ProjectStateBadge[project.state]]">
+      {{project.state | projectState}}
+    </span>
     <span class="text-muted"> Объект экспертизы</span>
   </div>
-</ng-container>
+}
 <!--ACTIONS-->
 <div class="mb-3">
-  <button *ngFor="let meta of buttons" [ngClass]="meta.styleClass" class="mr-2" (click)="meta.onclick()">
-    {{meta.title}}
-  </button>
+  @for (meta of buttons; track meta) {
+    <button [ngClass]="meta.styleClass" class="mr-2" (click)="meta.onclick()">
+      {{meta.title}}
+    </button>
+  }
 </div>
 
 <!--PROJECT INFO-->
@@ -31,264 +33,353 @@
     <span class="italic">{{project.code?.code | orElse : 'не указан'}}</span>
   </div>
 
-  <div class="text-sm" *ngIf="project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'">
-    <span *ngIf="project.code?.code != '8.4'">Наименование программы (подпрограммы): </span>
-    <span *ngIf="project.code?.code == '8.4'">Наименование двусторонней научно-технической программы с: </span>
-    <span class="italic">{{project.program | orElse : 'не указан'}}</span>
-  </div>
+  @if (project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
+    <div class="text-sm">
+      @if (project.code?.code != '8.4') {
+        <span>Наименование программы (подпрограммы): </span>
+      }
+      @if (project.code?.code == '8.4') {
+        <span>Наименование двусторонней научно-технической программы с: </span>
+      }
+      <span class="italic">{{project.program | orElse : 'не указан'}}</span>
+    </div>
+  }
 
-  <div class="text-sm" *ngIf="project.customer!=null">
-    <span>Заказчик экспертизы: </span>
-    <span class="italic">{{project.customer?.org?.name | orElse : 'организация не указана' }}</span>
-  </div>
+  @if (project.customer!=null) {
+    <div class="text-sm">
+      <span>Заказчик экспертизы: </span>
+      <span class="italic">{{project.customer?.org?.name | orElse : 'организация не указана' }}</span>
+    </div>
+  }
 
-  <div class="text-sm" *ngIf="project.subCustomer!=null">
-    <span>Инициатор экспертизы: </span>
-    <span class="italic">{{project.subCustomer?.org?.name | orElse : 'организация не указана' }}</span>
-  </div>
+  @if (project.subCustomer!=null) {
+    <div class="text-sm">
+      <span>Инициатор экспертизы: </span>
+      <span class="italic">{{project.subCustomer?.org?.name | orElse : 'организация не указана' }}</span>
+    </div>
+  }
 
-  <div *ngIf="project.registerDate" class="text-sm">
-    <span>Дата регистрации: </span>
-    <span class="italic">{{project.registerDate | mdate}}</span>
-  </div>
+  @if (project.registerDate) {
+    <div class="text-sm">
+      <span>Дата регистрации: </span>
+      <span class="italic">{{project.registerDate | mdate}}</span>
+    </div>
+  }
 
-  <div *ngIf="project.registrationNumber" class="text-sm">
-    <span>Регистрационный номер: </span>
-    <span class="italic">{{project.registrationNumber}}</span>
-  </div>
+  @if (project.registrationNumber) {
+    <div class="text-sm">
+      <span>Регистрационный номер: </span>
+      <span class="italic">{{project.registrationNumber}}</span>
+    </div>
+  }
 
-  <div *ngIf="project.executor" class="text-sm">
-    <span>Организация исполнитель: </span>
-    <span class="italic">{{project.executor}}</span>
-  </div>
+  @if (project.executor) {
+    <div class="text-sm">
+      <span>Организация исполнитель: </span>
+      <span class="italic">{{project.executor}}</span>
+    </div>
+  }
 
-  <div *ngIf="project.period?.start || project.period?.end" class="text-sm">
-    <span>Сроки реализации: </span>
-    <span class="italic">
-      {{project.period?.start | mdate | orElse: 'дд.мм.гггг'}} -
-      {{project.period?.end | mdate | orElse: 'дд.мм.гггг'}}
-    </span>
-  </div>
+  @if (project.period?.start || project.period?.end) {
+    <div class="text-sm">
+      <span>Сроки реализации: </span>
+      <span class="italic">
+        {{project.period?.start | mdate | orElse: 'дд.мм.гггг'}} -
+        {{project.period?.end | mdate | orElse: 'дд.мм.гггг'}}
+      </span>
+    </div>
+  }
 
-  <div *ngIf="project.financing.length" class="text-sm">
-    <span>Финансирование: </span>
-    <ul class="mb-0 pl-4">
-      <li *ngFor="let fin of project.financing" class="italic">
-        <span>{{fin.type | fundingType}} финансирование, </span>
-        <span>{{fin.comment ? fin.comment + ' - ' : ''}}</span>
-        <span>{{fin.source.name}}: </span>
-        <span>{{fin.value}} {{project.currency?.name || 'руб.'}}</span>
-      </li>
-    </ul>
-  </div>
-
-  <div *ngIf="project.directions.length > 0" class="text-sm">
-    <span>
-      Приоритетное направление научных исследований и (или) научно-технической деятельности:
-    </span>
-    <ul class="mb-0 pl-4">
-      <li *ngFor="let dir of displayedDirections">
-        <span class="italic">{{dir.name}}</span>
-        <ul *ngIf="dir.subDirectionDtos.length != 0">
-          <li *ngFor="let subDir of dir.subDirectionDtos">
-            {{subDir.directionName}}
+  @if (project.financing.length) {
+    <div class="text-sm">
+      <span>Финансирование: </span>
+      <ul class="mb-0 pl-4">
+        @for (fin of project.financing; track fin) {
+          <li class="italic">
+            <span>{{fin.type | fundingType}} финансирование, </span>
+            <span>{{fin.comment ? fin.comment + ' - ' : ''}}</span>
+            <span>{{fin.source.name}}: </span>
+            <span>{{fin.value}} {{project.currency?.name || 'руб.'}}</span>
           </li>
-        </ul>
+        }
+      </ul>
+    </div>
+  }
 
-      </li>
-    </ul>
-  </div>
+  @if (project.directions.length > 0) {
+    <div class="text-sm">
+      <span>
+        Приоритетное направление научных исследований и (или) научно-технической деятельности:
+      </span>
+      <ul class="mb-0 pl-4">
+        @for (dir of displayedDirections; track dir) {
+          <li>
+            <span class="italic">{{dir.name}}</span>
+            @if (dir.subDirectionDtos.length != 0) {
+              <ul>
+                @for (subDir of dir.subDirectionDtos; track subDir) {
+                  <li>
+                    {{subDir.directionName}}
+                  </li>
+                }
+              </ul>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+  }
 
-  <div *ngIf="project.socialEconomicGoals.length > 0" class="text-sm">
-    <span>
-      Цель (приоритет) социально-экономического развития:
-    </span>
-    <ul class="mb-0 pl-4">
-      <li *ngFor="let item of project.socialEconomicGoals">
-        <span class="italic">{{item.name}}</span>
-      </li>
-    </ul>
-  </div>
+  @if (project.socialEconomicGoals.length > 0) {
+    <div class="text-sm">
+      <span>
+        Цель (приоритет) социально-экономического развития:
+      </span>
+      <ul class="mb-0 pl-4">
+        @for (item of project.socialEconomicGoals; track item) {
+          <li>
+            <span class="italic">{{item.name}}</span>
+          </li>
+        }
+      </ul>
+    </div>
+  }
 
-  <div *ngIf="project.gkntChairman" class="text-sm">
-    <span>Зам. Председателя ГКНТ: </span>
-    <span class="italic">{{project.gkntChairman | fullName}}</span>
-  </div>
+  @if (project.gkntChairman) {
+    <div class="text-sm">
+      <span>Зам. Председателя ГКНТ: </span>
+      <span class="italic">{{project.gkntChairman | fullName}}</span>
+    </div>
+  }
 
-  <div *ngIf="project.gkntDepartment" class="text-sm">
-    <span>Подразделение ГКНТ: </span>
-    <span class="italic">{{project.gkntDepartment.name}}</span>
-  </div>
+  @if (project.gkntDepartment) {
+    <div class="text-sm">
+      <span>Подразделение ГКНТ: </span>
+      <span class="italic">{{project.gkntDepartment.name}}</span>
+    </div>
+  }
 
-  <div *ngIf="project.gkntDepartmentChairman" class="text-sm">
-    <span>Начальник подразделения ГКНТ: </span>
-    <span class="italic">{{project.gkntDepartmentChairman | fullName}}</span>
-  </div>
+  @if (project.gkntDepartmentChairman) {
+    <div class="text-sm">
+      <span>Начальник подразделения ГКНТ: </span>
+      <span class="italic">{{project.gkntDepartmentChairman | fullName}}</span>
+    </div>
+  }
 
-  <div *ngIf="project.gkntWorker" class="text-sm">
-    <span>Ответственный сотрудник ГКНТ: </span>
-    <span class="italic">{{project.gkntWorker | fullName}}</span>
-  </div>
+  @if (project.gkntWorker) {
+    <div class="text-sm">
+      <span>Ответственный сотрудник ГКНТ: </span>
+      <span class="italic">{{project.gkntWorker | fullName}}</span>
+    </div>
+  }
 
-  <div *ngIf="project.returnReason" class="text-sm">
-    <span>Причина возврата: </span>
-    <span class="italic">{{project.returnReason}}</span>
-  </div>
+  @if (project.returnReason) {
+    <div class="text-sm">
+      <span>Причина возврата: </span>
+      <span class="italic">{{project.returnReason}}</span>
+    </div>
+  }
 
-  <div *ngIf="project.productName" class="text-sm">
-    <span>Название продукта: </span>
-    <span class="italic">{{project.productName}}</span>
-  </div>
+  @if (project.productName) {
+    <div class="text-sm">
+      <span>Название продукта: </span>
+      <span class="italic">{{project.productName}}</span>
+    </div>
+  }
 
-  <div *ngIf="project.orgProduction" class="text-sm">
-    <span>Название организации(ий) : </span>
-    <span class="italic">{{project.orgProduction}}</span>
-  </div>
+  @if (project.orgProduction) {
+    <div class="text-sm">
+      <span>Название организации(ий) : </span>
+      <span class="italic">{{project.orgProduction}}</span>
+    </div>
+  }
 
-  <div *ngIf="project.highTechProduction" class="text-sm">
-    <span>Новые и высоки технологии:</span>
-    <span class="italic">{{project.highTechProduction}}</span>
-  </div>
+  @if (project.highTechProduction) {
+    <div class="text-sm">
+      <span>Новые и высоки технологии:</span>
+      <span class="italic">{{project.highTechProduction}}</span>
+    </div>
+  }
 
-  <div *ngIf="project.productionOnRB" class="text-sm">
-    <span>Обьём производства на территории РБ:</span>
-    <span class="italic">{{project.productionOnRB}}</span>
-  </div>
+  @if (project.productionOnRB) {
+    <div class="text-sm">
+      <span>Обьём производства на территории РБ:</span>
+      <span class="italic">{{project.productionOnRB}}</span>
+    </div>
+  }
 
-  <div *ngIf="project.exportAndImport" class="text-sm">
-    <span>Общий объем экспорта и импорта:</span>
-    <span class="italic">{{project.exportAndImport}}</span>
-  </div>
+  @if (project.exportAndImport) {
+    <div class="text-sm">
+      <span>Общий объем экспорта и импорта:</span>
+      <span class="italic">{{project.exportAndImport}}</span>
+    </div>
+  }
 
-    <div *ngIf="!project.code?.code.startsWith('8.10') && !project.code?.code.startsWith('8.16')">
+  @if (!project.code?.code.startsWith('8.10') && !project.code?.code.startsWith('8.16')) {
+    <div>
+      <div class="text-sm">
+        <span>Ожидаемый результат объекта экспертизы: </span>
+        @if (project.expectedResult && project.expectedResult.expectedResultType !== 'другое') {
+          <span
+          class="italic">{{ project.expectedResult.expectedResultType }}</span>
+        }
+        @if (project.expectedResult && project.expectedResult.expectedResultType === 'другое') {
+          <span
+          class="italic">{{ project.otherExpectedResult }}</span>
+        }
+      </div>
+      <div class="text-sm">
+        <span>Описание ожидаемого результата экспертизы: </span>
+        <span class="italic">{{ project.expectedResultDescription }}</span>
+      </div>
+      <div class="text-sm">
+        <span>Вид работ/Способ реализации объекта экспертизы: </span>
+        @if (project.workType !== 'другое') {
+          <span class="italic">{{ project.workType }}</span>
+        }
+        @if (project.workType === 'другое') {
+          <span class="italic">{{ project.otherWorkType }}</span>
+        }
+      </div>
+      <div class="text-sm">
+        <span>Характер результата: </span>
+        <span class="italic">{{ project.selectedResultSpecific }}</span>
+      </div>
+      @if (project.selectedResultSpecific === 'прикладной') {
         <div class="text-sm">
-            <span>Ожидаемый результат объекта экспертизы: </span>
-            <span *ngIf="project.expectedResult && project.expectedResult.expectedResultType !== 'другое'"
-                  class="italic">{{ project.expectedResult.expectedResultType }}</span>
-            <span *ngIf="project.expectedResult && project.expectedResult.expectedResultType === 'другое'"
-                  class="italic">{{ project.otherExpectedResult }}</span>
-        </div>
-        <div class="text-sm">
-            <span>Описание ожидаемого результата экспертизы: </span>
-            <span class="italic">{{ project.expectedResultDescription }}</span>
-        </div>
-
-        <div class="text-sm">
-            <span>Вид работ/Способ реализации объекта экспертизы: </span>
-            <span *ngIf="project.workType !== 'другое'" class="italic">{{ project.workType }}</span>
-            <span *ngIf="project.workType === 'другое'" class="italic">{{ project.otherWorkType }}</span>
-        </div>
-
-        <div class="text-sm">
-            <span>Характер результата: </span>
-            <span class="italic">{{ project.selectedResultSpecific }}</span>
-        </div>
-
-        <div class="text-sm" *ngIf="project.selectedResultSpecific === 'прикладной'">
+          <div class="text-sm">
+            <span>Результат подлежит коммерциализации: </span>
+            <span>{{ project.resultCommercialization }}</span>
+          </div>
+          @if (project.resultCommercialization === 'Подлежит') {
             <div class="text-sm">
-                <span>Результат подлежит коммерциализации: </span>
-                <span>{{ project.resultCommercialization }}</span>
-            </div>
-            <div class="text-sm" *ngIf="project.resultCommercialization === 'Подлежит'">
-                <span>Объект коммерциализации: </span>
-                <span>{{ project.commercializationDescription }}</span>
-                <br>
+              <span>Объект коммерциализации: </span>
+              <span>{{ project.commercializationDescription }}</span>
+              <br>
                 <span>Способ коммерциализации: </span>
                 <ul class="mb-0 pl-4">
-                    <li *ngFor="let item of project.commercializationMethods">
-                        <span class="italic">{{item.name}}</span>
+                  @for (item of project.commercializationMethods; track item) {
+                    <li>
+                      <span class="italic">{{item.name}}</span>
                     </li>
+                  }
                 </ul>
-            </div>
-            <div class="text-sm" *ngIf="project.resultCommercialization === 'Не подлежит'">
+              </div>
+            }
+            @if (project.resultCommercialization === 'Не подлежит') {
+              <div class="text-sm">
                 <span>Характер результата - прикладной:  </span>
                 <span>{{ project.implementationResult }}</span>
                 <br>
-                <span>Объект внедрения:  </span>
-                <span>{{ project.implementationDescription }}</span>
-                <br>
-                <span>Способ внедрения:  </span>
-                <span>{{ project.implementationSpecifying }}</span>
-            </div>
-            <div class="text-sm">
+                  <span>Объект внедрения:  </span>
+                  <span>{{ project.implementationDescription }}</span>
+                  <br>
+                    <span>Способ внедрения:  </span>
+                    <span>{{ project.implementationSpecifying }}</span>
+                  </div>
+                }
+                <div class="text-sm">
+                  <span>Технологический уклад: </span>
+                  @if (project.technologicalOrder !== 'другое') {
+                    <span class="italic">{{ project.technologicalOrder }}</span>
+                  }
+                  @if (project.technologicalOrder === 'другое') {
+                    <span class="italic">{{ project.otherTechnologicalOrder }}</span>
+                  }
+                </div>
+              </div>
+            }
+            @if (project.selectedResultSpecific === 'не предусмотрен') {
+              <div class="text-sm">
                 <span>Технологический уклад: </span>
-                <span class="italic" *ngIf="project.technologicalOrder !== 'другое'">{{ project.technologicalOrder }}</span>
-                <span class="italic" *ngIf="project.technologicalOrder === 'другое'">{{ project.otherTechnologicalOrder }}</span>
+                @if (project.technologicalOrder !== 'другое') {
+                  <span class="italic">{{ project.technologicalOrder }}</span>
+                }
+                @if (project.technologicalOrder === 'другое') {
+                  <span class="italic"
+                  >{{ project.otherTechnologicalOrder }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+
+      <!--PROJECT DOCUMENTS-->
+      @if (visibleDocsForExpert) {
+        <div class="mt-2 mb-1 text-sm text-muted">
+          Материалы объекта экспертизы
+          @if (project.documents.length>0) {
+            <a class="italic link" (click)="downloadAllDocuments(project)">(скачать
+            все)</a>
+          }
+        </div>
+        @if (canEditProjectDocuments()) {
+          <app-document-uploader
+            (saved)="addProjectDocument($event)"
+            [url]="SERVER_URL + '/project/add/' + project.id + '/document'" [idDto]="project"
+            [typesAccept]="[DocType.DOCX.extension, DocType.DOC.extension, DocType.PDF.extension]">
+          </app-document-uploader>
+        }
+        @if ((project.canAddDocumentsForCustomerForSection || project.canAddDocumentsForCustomerForBureau) && role==Role.CUSTOMER) {
+          <app-document-uploader
+            (saved)="addProjectDocument($event)"
+            [url]="SERVER_URL + '/project/add/' + project.id + '/document'" [idDto]="project"
+            [typesAccept]="[DocType.DOCX.extension, DocType.DOC.extension, DocType.PDF.extension]">
+          </app-document-uploader>
+        }
+        <div class="mt-2 mb-1 text-sm text-muted">
+          Документы заказчика экспертизы
+        </div>
+        <app-document-list #projectDocumentsComponent [documents]="isCustomer()"
+          [canDelete]="canEditProjectDocuments()" [canUpdate]="canEditProjectDocuments()"
+          (onDelete)="deleteProjectDocument($event)" (onUpdate)="updateProjectDocument($event)">
+        </app-document-list>
+        <div class="mt-2 mb-1 text-sm text-muted">
+          Остальные документы
+        </div>
+        <app-document-list #projectDocumentsComponent [documents]="isNotCustomer()"
+          [canDelete]="canEditProjectDocuments()" [canUpdate]="canEditProjectDocuments()"
+          (onDelete)="deleteProjectDocument($event)" (onUpdate)="updateProjectDocument($event)">
+        </app-document-list>
+      }
+
+      <!--RETURN DECISION-->
+      @if (canReadDecision()) {
+        <div>
+          <div class="mt-2 mb-1">
+            <div class="d-inline-block text-muted text-sm">
+              Письмо о возврате без рассмотрения
             </div>
+            @if (canEditDecision() || canEditDecisionWithRemarks()) {
+              <div class="btn-right-sm">
+                <button class="btn btn-sm btn-primary" (click)="decisionFormModal.show()">
+                  Создать
+                </button>
+              </div>
+            }
+          </div>
+          <app-document-list
+            [documents]="project.decisionDocument"
+            [canDelete]="canEditDecision()"
+            (onDelete)="deleteDecisionDocument()">
+          </app-document-list>
         </div>
-        <div class="text-sm" *ngIf="project.selectedResultSpecific === 'не предусмотрен'">
-            <span>Технологический уклад: </span>
-            <span class="italic" *ngIf="project.technologicalOrder !== 'другое'">{{ project.technologicalOrder }}</span>
-            <span class="italic"
-                  *ngIf="project.technologicalOrder === 'другое'">{{ project.otherTechnologicalOrder }}</span>
+      }
+
+      <!--DECISION FORM MODAL-->
+      @if (canEditDecision() || canEditDecisionWithRemarks()) {
+        <app-modal #decisionFormModal
+          [title]="'Письмо о возврате без рассмотрения'">
+          <app-decision-document-form [project]="project" (onSave)="generateDecisionDocument($event)"
+            (onClose)="decisionFormModal.hide()">
+          </app-decision-document-form>
+        </app-modal>
+      }
+
+      <app-modal #transitionHistoryModal [title]="'Информация о ходе проведения экспертизы'" [modalClasses]="'modal-xl'">
+        <div class="transition-history">
+          <app-project-transition-history [history]="transitionHistory"></app-project-transition-history>
         </div>
-    </div>
-</div>
-
-
-<!--PROJECT DOCUMENTS-->
-<ng-container *ngIf="visibleDocsForExpert">
-  <div class="mt-2 mb-1 text-sm text-muted">
-    Материалы объекта экспертизы
-    <a class="italic link" *ngIf="project.documents.length>0" (click)="downloadAllDocuments(project)">(скачать
-      все)</a>
-  </div>
-  <app-document-uploader
-      *ngIf="canEditProjectDocuments()" (saved)="addProjectDocument($event)"
-      [url]="SERVER_URL + '/project/add/' + project.id + '/document'" [idDto]="project"
-      [typesAccept]="[DocType.DOCX.extension, DocType.DOC.extension, DocType.PDF.extension]">
-  </app-document-uploader>
-  <app-document-uploader
-      *ngIf="(project.canAddDocumentsForCustomerForSection || project.canAddDocumentsForCustomerForBureau) && role==Role.CUSTOMER"
-      (saved)="addProjectDocument($event)"
-      [url]="SERVER_URL + '/project/add/' + project.id + '/document'" [idDto]="project"
-      [typesAccept]="[DocType.DOCX.extension, DocType.DOC.extension, DocType.PDF.extension]">
-  </app-document-uploader>
-  <div class="mt-2 mb-1 text-sm text-muted">
-    Документы заказчика экспертизы
-  </div>
-    <app-document-list #projectDocumentsComponent [documents]="isCustomer()"
-                       [canDelete]="canEditProjectDocuments()" [canUpdate]="canEditProjectDocuments()"
-                       (onDelete)="deleteProjectDocument($event)" (onUpdate)="updateProjectDocument($event)">
-    </app-document-list>
-  <div class="mt-2 mb-1 text-sm text-muted">
-    Остальные документы
-  </div>
-  <app-document-list #projectDocumentsComponent [documents]="isNotCustomer()"
-                     [canDelete]="canEditProjectDocuments()" [canUpdate]="canEditProjectDocuments()"
-                     (onDelete)="deleteProjectDocument($event)" (onUpdate)="updateProjectDocument($event)">
-  </app-document-list>
-</ng-container>
-
-<!--RETURN DECISION-->
-<div *ngIf="canReadDecision()">
-  <div class="mt-2 mb-1">
-    <div class="d-inline-block text-muted text-sm">
-      Письмо о возврате без рассмотрения
-    </div>
-    <div class="btn-right-sm" *ngIf="canEditDecision() || canEditDecisionWithRemarks()">
-      <button class="btn btn-sm btn-primary" (click)="decisionFormModal.show()">
-        Создать
-      </button>
-    </div>
-  </div>
-  <app-document-list
-      [documents]="project.decisionDocument"
-      [canDelete]="canEditDecision()"
-      (onDelete)="deleteDecisionDocument()">
-  </app-document-list>
-</div>
-
-<!--DECISION FORM MODAL-->
-<app-modal #decisionFormModal *ngIf="canEditDecision() || canEditDecisionWithRemarks()"
-           [title]="'Письмо о возврате без рассмотрения'">
-  <app-decision-document-form [project]="project" (onSave)="generateDecisionDocument($event)"
-                              (onClose)="decisionFormModal.hide()">
-  </app-decision-document-form>
-</app-modal>
-
-<app-modal #transitionHistoryModal [title]="'Информация о ходе проведения экспертизы'" [modalClasses]="'modal-xl'">
-  <div class="transition-history">
-    <app-project-transition-history [history]="transitionHistory"></app-project-transition-history>
-  </div>
-</app-modal>
+      </app-modal>

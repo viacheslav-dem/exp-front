@@ -12,15 +12,19 @@ export const BB_CONTROL_VALUE_ACCESSOR: any = {
     template: `
     <div [class.disabled]="disabled" (click)="toggle()" style="display: inline-block; height:30px;" class="mr-2">
       <label  (click)="toggleTrue()" [class]="'btn btn-sm ' + trueStyle" [class.active]="_value" [class.disabled]="disabled">
-        <fa-icon *ngIf="_value && (!disabled || showDisabledSelection)" icon="check"></fa-icon>
+        @if (_value && (!disabled || showDisabledSelection)) {
+          <fa-icon icon="check"></fa-icon>
+        }
         {{trueLabel}}
       </label>
       <label (click)="toggleFalse()" [class]="'btn btn-sm ' + falseStyle" [class.active]="!_value" [class.disabled]="disabled">
-        <fa-icon *ngIf="!_value && (!disabled || showDisabledSelection)" icon="check"></fa-icon>
+        @if (!_value && (!disabled || showDisabledSelection)) {
+          <fa-icon icon="check"></fa-icon>
+        }
         {{falseLabel}}
       </label>
     </div>
-  `,
+    `,
     styles: [`
     .disabled {
         pointer-events: none;

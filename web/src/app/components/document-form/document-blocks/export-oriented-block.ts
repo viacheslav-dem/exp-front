@@ -4,21 +4,23 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
     selector: 'app-export-oriented-block',
     template: `
     <div class="form-sub-group">
-        
+    
       <label>
         {{num}}. Экспортная ориентированность инновационного проекта (превышение экспорта над импортом):
       </label>
-        <div>
-            <app-boolean-button class="d-inline-block"
-                                [(ngModel)]="_form.isExportOriented"
-                                [trueLabel]="'да'"
-                                [falseLabel]="'нет'"
-                                (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-        </div>
-      <div *ngIf="full" class="hint">
+      <div>
+        <app-boolean-button class="d-inline-block"
+          [(ngModel)]="_form.isExportOriented"
+          [trueLabel]="'да'"
+          [falseLabel]="'нет'"
+        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       </div>
+      @if (full) {
+        <div class="hint">
+        </div>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class ExportOrientedBlockComponent {

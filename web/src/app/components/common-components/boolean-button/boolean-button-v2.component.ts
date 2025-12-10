@@ -11,20 +11,26 @@ export const BB_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'app-boolean-button-v2',
     template: `
         <div [class.disabled]="disabled" (click)="toggle()" style="display: inline-block; height:30px;" class="mr-2">
-            <label  (click)="toggle1()" [class]="'btn btn-sm ' + trueStyle" [class.active]="_value" [class.disabled]="disabled">
-                <fa-icon *ngIf="_value && (!disabled || showDisabledSelection)" icon="check"></fa-icon>
-                {{label1}}
-            </label>
-            <label (click)="toggle2()" [class]="'btn btn-sm ' + falseStyle" [class.active]="!_value" [class.disabled]="disabled">
-                <fa-icon *ngIf="!_value && (!disabled || showDisabledSelection)" icon="check"></fa-icon>
-                {{label2}}
-            </label>
-            <label (click)="toggle3()" [class]="'btn btn-sm ' + averageStyle" [class.active]="!_value" [class.disabled]="disabled">
-                <fa-icon *ngIf="!_value && (!disabled || showDisabledSelection)" icon="check"></fa-icon>
-                {{label3}}
-            </label>
+          <label  (click)="toggle1()" [class]="'btn btn-sm ' + trueStyle" [class.active]="_value" [class.disabled]="disabled">
+            @if (_value && (!disabled || showDisabledSelection)) {
+              <fa-icon icon="check"></fa-icon>
+            }
+            {{label1}}
+          </label>
+          <label (click)="toggle2()" [class]="'btn btn-sm ' + falseStyle" [class.active]="!_value" [class.disabled]="disabled">
+            @if (!_value && (!disabled || showDisabledSelection)) {
+              <fa-icon icon="check"></fa-icon>
+            }
+            {{label2}}
+          </label>
+          <label (click)="toggle3()" [class]="'btn btn-sm ' + averageStyle" [class.active]="!_value" [class.disabled]="disabled">
+            @if (!_value && (!disabled || showDisabledSelection)) {
+              <fa-icon icon="check"></fa-icon>
+            }
+            {{label3}}
+          </label>
         </div>
-  `,
+        `,
     styles: [`
     .disabled {
         pointer-events: none;

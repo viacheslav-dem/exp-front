@@ -9,12 +9,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         и (или) мировой экономики продукции:
       </label>
       <app-boolean-button [(ngModel)]="_form.noveltyExists" [trueLabel]="'соответствует'"
-                          [falseLabel]="'не соответствует'"
-                          (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <textarea *ngIf="full" [(ngModel)]="_form.noveltyExistsText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
+        [falseLabel]="'не соответствует'"
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      @if (full) {
+        <textarea [(ngModel)]="_form.noveltyExistsText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class NoveltyExistsBlockComponent {

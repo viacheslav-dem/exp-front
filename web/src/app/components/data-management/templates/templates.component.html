@@ -6,68 +6,71 @@
   <div [loadingData]="_loading">
 
     <!--TEMPLATES-->
-    <div *ngFor="let template of templates">
-
-      <!--TEMPLATE HEADER-->
-      <div class="list-group-item border-bottom-none" [class.disabled]="template.disabled">
-        <div class="text-mini font-weight-bold" style="height: 1.5rem">
-          шаблон
-          <span *ngIf="template.disabled">(неактивный)</span>
-          <span class="italic text-sm text-muted float-right templateType"
-                tooltip="Строковый идентификатор" placement="bottom">
-            {{template.templateType | orElse: 'не указан'}}
-          </span>
+    @for (template of templates; track template) {
+      <div>
+        <!--TEMPLATE HEADER-->
+        <div class="list-group-item border-bottom-none" [class.disabled]="template.disabled">
+          <div class="text-mini font-weight-bold" style="height: 1.5rem">
+            шаблон
+            @if (template.disabled) {
+              <span>(неактивный)</span>
+            }
+            <span class="italic text-sm text-muted float-right templateType"
+              tooltip="Строковый идентификатор" placement="bottom">
+              {{template.templateType | orElse: 'не указан'}}
+            </span>
+          </div>
+          <div>
+            {{template.name | orElse: 'Наименование отсутствует'}}
+            @if (!template.isEdit) {
+              <a class="btn btn-icon" (click)="editTemplate(template)">
+                <fa-icon icon="cog" size="lg"></fa-icon>
+              </a>
+            }
+          </div>
+          <div class="text-sm italic">{{template.description}}</div>
         </div>
-        <div>
-          {{template.name | orElse: 'Наименование отсутствует'}}
-          <a *ngIf="!template.isEdit" class="btn btn-icon" (click)="editTemplate(template)">
-            <fa-icon icon="cog" size="lg"></fa-icon>
-          </a>
-        </div>
-        <div class="text-sm italic">{{template.description}}</div>
-      </div>
-
-      <div class="list-group-item border-top-none pt-0" [class.disabled]="template.disabled">
-
-        <!--EDIT TEMPLATE-->
-        <div *ngIf="template.isEdit">
-          <div class="form-sub-group">
-            <app-checkbox [(ngModel)]="editedTemplate.disabled">Неактивный (шаблон больше не актуален)</app-checkbox>
-          </div>
-          <div class="form-sub-group">
-            <div>Наименование документа</div>
-            <input type="text" [(ngModel)]="editedTemplate.name"
-                   placeholder="Наименование документа" class="form-control" title="Наименование документа">
-          </div>
-          <div class="form-group">
-            <div>Дополнительная информация</div>
-            <input type="text" [(ngModel)]="editedTemplate.description"
-                   placeholder="Дополнительная информация" class="form-control" title="Дополнительная информация">
-          </div>
-          <div class="mt-1 form-group">
-            <button class="btn btn-secondary" (click)="cancelEditTemplate()">Отмена</button>
-            <button class="btn btn-primary" (click)="saveEditedTemplate()">Сохранить</button>
-          </div>
-        </div>
-
-        <!--TEMPLATE FILES-->
-        <div>
-          <div class="form-sub-group">
-            <div class="row align-items-center">
-              <div class="col-auto" style="width: 150px;">
-                Шаблон в .docx:
+        <div class="list-group-item border-top-none pt-0" [class.disabled]="template.disabled">
+          <!--EDIT TEMPLATE-->
+          @if (template.isEdit) {
+            <div>
+              <div class="form-sub-group">
+                <app-checkbox [(ngModel)]="editedTemplate.disabled">Неактивный (шаблон больше не актуален)</app-checkbox>
               </div>
-              <div class="col-auto">
-                <button class="btn btn-sm btn-outline-primary" (click)="downloadTemplate(template)">
-                  Скачать <fa-icon icon="arrow-down"></fa-icon>
-                </button>
-              </div>
-              <div class="col-auto">
-                <span class="mx-1">или</span>
-              </div>
-              <div class="col">
-                <app-silent-file-uploader
-                  [controlClass]="'width-auto custom-file-inline'" [typesAccept]="DocType.DOCX.extension"
+              <div class="form-sub-group">
+                <div>Наименование документа</div>
+                <input type="text" [(ngModel)]="editedTemplate.name"
+                  placeholder="Наименование документа" class="form-control" title="Наименование документа">
+                </div>
+                <div class="form-group">
+                  <div>Дополнительная информация</div>
+                  <input type="text" [(ngModel)]="editedTemplate.description"
+                    placeholder="Дополнительная информация" class="form-control" title="Дополнительная информация">
+                  </div>
+                  <div class="mt-1 form-group">
+                    <button class="btn btn-secondary" (click)="cancelEditTemplate()">Отмена</button>
+                    <button class="btn btn-primary" (click)="saveEditedTemplate()">Сохранить</button>
+                  </div>
+                </div>
+              }
+              <!--TEMPLATE FILES-->
+              <div>
+                <div class="form-sub-group">
+                  <div class="row align-items-center">
+                    <div class="col-auto" style="width: 150px;">
+                      Шаблон в .docx:
+                    </div>
+                    <div class="col-auto">
+                      <button class="btn btn-sm btn-outline-primary" (click)="downloadTemplate(template)">
+                        Скачать <fa-icon icon="arrow-down"></fa-icon>
+                      </button>
+                    </div>
+                    <div class="col-auto">
+                      <span class="mx-1">или</span>
+                    </div>
+                    <div class="col">
+                      <app-silent-file-uploader
+                        [controlClass]="'width-auto custom-file-inline'" [typesAccept]="DocType.DOCX.extension"
                   [url]="SERVER_URL + '/document/template/source?id=' + template.id">
                 </app-silent-file-uploader>
               </div>
@@ -97,12 +100,15 @@
         </div>
       </div>
     </div>
+}
 
-    <div *ngIf="!templates || templates.length == 0">
+    @if (!templates || templates.length == 0) {
+<div>
       <div class="italic list-group-item background-light-blue">
         Шаблоны отсутствуют
       </div>
     </div>
+}
 
     <app-pagination
       [page]="_page" [pagination]="_pagination"

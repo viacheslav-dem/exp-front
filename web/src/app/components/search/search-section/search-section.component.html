@@ -1,8 +1,10 @@
 <app-modal #searchModal [title]="'Секции'">
   <ul class="list-group selectable">
-    <li class="list-group-item list-group-item-action selectable list-group-item-sm" (click)="onSelected(section)"
-        *ngFor="let section of data">
-      {{section | sectionFullName}}
-    </li>
+    @for (section of data; track section) {
+      <li class="list-group-item list-group-item-action selectable list-group-item-sm" (click)="onSelected(section)"
+        >
+        {{section | sectionFullName}}
+      </li>
+    }
   </ul>
 </app-modal>

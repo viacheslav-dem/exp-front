@@ -1,20 +1,30 @@
 <div class="card card-login py-3">
   <h5 class="card-title">Выберите роль</h5>
   <ul class="list-group">
-    <li [ngClass]="{'list-group-item list-group-item-action selectable': true,
-       'alert-danger': mapInfoRole[r].color=='red',
-       'alert-warning': mapInfoRole[r].color=='yellow',
-       'alert-primary': mapInfoRole[r].color=='blue'
-     }" *ngFor="let r of roles"
-        (click)="enterHow(r)">
-      <span class="row">
-        <div class="col-10">{{r | role}}</div>
-        <span *ngIf="mapInfoRole[r].count!=0" class="col-2 badge badge-info badge-pill">{{mapInfoRole[r].count}}</span>
-      </span>
-    <li class="list-group-item" *ngIf="roles.length == 0">Вам не назначена ни одна роль</li>
-  </ul>
-  <div class="mt-3">
-    <button class="btn btn-primary" *ngIf="currRole" (click)="cancel()">Отмена</button>
-    <button class="btn btn-primary" style="margin-left: 10px" (click)="exit()">Выход из системы</button>
+    @if (roles.length == 0) {
+      <li class="list-group-item">Вам не назначена ни одна роль</li>
+    } @else {
+      @for (r of roles; track r) {
+        <li [ngClass]="{'list-group-item list-group-item-action selectable': true,
+           'alert-danger': mapInfoRole[r]?.color=='red',
+           'alert-warning': mapInfoRole[r]?.color=='yellow',
+           'alert-primary': mapInfoRole[r]?.color=='blue'
+         }"
+            (click)="enterHow(r)">
+            <span class="row">
+              <div class="col-10">{{r | role}}</div>
+              @if (mapInfoRole[r]?.count != 0) {
+                <span class="col-2 badge badge-info badge-pill">{{mapInfoRole[r].count}}</span>
+              }
+            </span>
+          </li>
+      }
+    }
+    </ul>
+    <div class="mt-3">
+      @if (currRole) {
+        <button class="btn btn-primary" (click)="cancel()">Отмена</button>
+      }
+      <button class="btn btn-primary" style="margin-left: 10px" (click)="exit()">Выход из системы</button>
+    </div>
   </div>
-</div>

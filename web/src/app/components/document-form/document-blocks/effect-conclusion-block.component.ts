@@ -11,11 +11,13 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         [(ngModel)]="_form.effect"
         [trueLabel]="'присутствует'"
         [falseLabel]="'отсутствует'"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <textarea *ngIf="full" [(ngModel)]="_form.effectText" rows="3" class="form-control"
-                placeholder="Пояснительный текст (при необходимости)."></textarea>
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      @if (full) {
+        <textarea [(ngModel)]="_form.effectText" rows="3" class="form-control"
+        placeholder="Пояснительный текст (при необходимости)."></textarea>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class EffectConclusionBlockComponent {

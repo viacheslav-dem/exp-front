@@ -10,31 +10,33 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <div>
         <span>V технологический уклад: </span>
         <app-boolean-button class="d-inline-block"
-                            [(ngModel)]="_form.technologyType5"
-                            [trueLabel]="'да'"
-                            [falseLabel]="'нет'"
-                            (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+          [(ngModel)]="_form.technologyType5"
+          [trueLabel]="'да'"
+          [falseLabel]="'нет'"
+        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       </div>
       <div>
         <span>VI технологический уклад: </span>
         <app-boolean-button class="d-inline-block"
-                            [(ngModel)]="_form.technologyType6"
-                            [trueLabel]="'да'"
-                            [falseLabel]="'нет'"
-                            (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+          [(ngModel)]="_form.technologyType6"
+          [trueLabel]="'да'"
+          [falseLabel]="'нет'"
+        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       </div>
       <div>
         <span>проект другого технологического уклада: </span>
         <app-boolean-button class="d-inline-block"
-                            [(ngModel)]="_form.technologyOtherType"
-                            [trueLabel]="'да'"
-                            [falseLabel]="'нет'"
-                            (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+          [(ngModel)]="_form.technologyOtherType"
+          [trueLabel]="'да'"
+          [falseLabel]="'нет'"
+        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       </div>
-      <textarea *ngIf="full" [(ngModel)]="_form.technologyTypeText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
+      @if (full) {
+        <textarea [(ngModel)]="_form.technologyTypeText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class TechnologyTypeBlockComponent {

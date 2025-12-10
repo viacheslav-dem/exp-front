@@ -1,25 +1,33 @@
 <!--HEADER-->
 <div class="mb-2">
   <div class="d-inline-block text-muted">ГЭС</div>
-  <button *ngIf="canEditGroups()" class="btn btn-sm btn-primary btn-right"
-          (click)="searchCouncilComponent.show()">
-    Добавить ГЭС
-  </button>
+  @if (canEditGroups()) {
+    <button class="btn btn-sm btn-primary btn-right"
+      (click)="searchCouncilComponent.show()">
+      Добавить ГЭС
+    </button>
+  }
 </div>
 
 <!--GROUPS-->
-<div *ngIf="!groups.length">
-  <div class="list-group-item text-muted text-sm italic">
-    ГЭС не указаны
+@if (!groups.length) {
+  <div>
+    <div class="list-group-item text-muted text-sm italic">
+      ГЭС не указаны
+    </div>
   </div>
-</div>
+}
 <div>
-  <div *ngFor="let group of groups" class="lifecycle-group-item">
-    <app-lifecycle-group
-      [group]="group" [project]="project" (onDeleted)="deleteGroup($event)"
-      [role]="role" (onChanged)="changed()" (onReplyChanged)="replyChanged($event)">
-    </app-lifecycle-group>
-  </div>
+  @for (group of groups; track group) {
+    <div class="lifecycle-group-item">
+      <app-lifecycle-group
+        [group]="group" [project]="project" (onDeleted)="deleteGroup($event)"
+        [role]="role" (onChanged)="changed()" (onReplyChanged)="replyChanged($event)">
+      </app-lifecycle-group>
+    </div>
+  }
 </div>
 <!--SEARCH COUNCIL MODAL-->
-<app-search-council *ngIf="canEditGroups()" (selected)="onSelectedCouncil($event)"></app-search-council>
+@if (canEditGroups()) {
+  <app-search-council (selected)="onSelectedCouncil($event)"></app-search-council>
+}

@@ -1,86 +1,87 @@
-<div *ngIf="realTimeStats" class="card pt-3">
-  <h5 class="card-title">
+@if (realTimeStats) {
+  <div class="card pt-3">
+    <h5 class="card-title">
       В настоящее время
       <span class="text-sm text-muted italic selectable" (click)="ngOnInit()">
         (обновлено {{realTimeStats.date | formatDate}})
       </span>
-  </h5>
-  <div class="row px-3">
-    <div class="col-lg-3 col-md-4 col-sm-6 stats-pane selectable" (click)="showGkntProjects()">
-      <div class="stats-number">
-        {{realTimeStats.gkntProjects}}
+    </h5>
+    <div class="row px-3">
+      <div class="col-lg-3 col-md-4 col-sm-6 stats-pane selectable" (click)="showGkntProjects()">
+        <div class="stats-number">
+          {{realTimeStats.gkntProjects}}
+        </div>
+        <div class="stats-label">
+          Обрабатываются в ГКНТ объекты экспертизы
+        </div>
       </div>
-      <div class="stats-label">
-        Обрабатываются в ГКНТ объекты экспертизы
+      <div class="col-lg-3 col-md-4 col-sm-6 stats-pane selectable" (click)="showCouncilProjects()">
+        <div class="stats-number">
+          {{realTimeStats.councilProjects}}
+        </div>
+        <div class="stats-label">
+          Рассматриваются в ГЭС объекты экспертизы
+        </div>
       </div>
+      <div class="col-lg-3 col-md-4 col-sm-6 stats-pane selectable" (click)="showProjectsOnExpertExamination()">
+        <div class="stats-number">
+          {{realTimeStats.expertReviewsOnExamination}}
+        </div>
+        <div class="stats-label">
+          Готовятся экспертные заключения
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-4 col-sm-6 stats-pane selectable" (click)="showProjectsOnExpertConfirmation()">
+        <div class="stats-number">
+          {{realTimeStats.expertReviewsOnConfirmation}}
+        </div>
+        <div class="stats-label">
+          Ожидают назначения эксперты
+        </div>
+      </div>
+      <!--
+      <div class="col-lg-2 col-md-4 col-sm-6 stats-pane selectable" (click)="showPaymentWaiting()">
+        <div class="stats-number">
+          {{realTimeStats.paymentWaiting}}
+        </div>
+        <div class="stats-label">
+          Ожидают оплаты по договорам
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-4 col-sm-6 stats-pane selectable" (click)="showPaymentWaiting()">
+        <div class="stats-number-sm">
+          {{realTimeStats.paymentWaitingSum | number: 2}}
+        </div>
+        <div class="stats-label">
+          Сумма ожидающих выплат,&nbsp;BYN
+        </div>
+      </div>
+      -->
     </div>
-    <div class="col-lg-3 col-md-4 col-sm-6 stats-pane selectable" (click)="showCouncilProjects()">
-      <div class="stats-number">
-        {{realTimeStats.councilProjects}}
+    <div class="row">
+      <div class="col-lg-6 col-sm-6">
+        <app-violation-chart (onClick)="showProjectTermsViolation($event)"
+          [title]="'По объектам экспертизы'" [violation]="realTimeStats.projectTermsViolation">
+        </app-violation-chart>
       </div>
-      <div class="stats-label">
-        Рассматриваются в ГЭС объекты экспертизы
+      <div class="col-lg-6 col-sm-6">
+        <app-violation-chart (onClick)="showExpertReviewsTermsViolation($event)" [filterKeyPrefix]="'expertReviews.'"
+          [title]="'По экспертным оценкам'" [violation]="realTimeStats.expertReviewsTermsViolation">
+        </app-violation-chart>
       </div>
+      <!--
+      <div class="col-lg-4 col-sm-6">
+        <app-violation-chart (onClick)="showPaymentTermsViolation($event)"
+          [title]="'По оплате'" [violation]="realTimeStats.paymentTermsViolation">
+        </app-violation-chart>
+      </div>
+      -->
     </div>
-    <div class="col-lg-3 col-md-4 col-sm-6 stats-pane selectable" (click)="showProjectsOnExpertExamination()">
-      <div class="stats-number">
-        {{realTimeStats.expertReviewsOnExamination}}
-      </div>
-      <div class="stats-label">
-        Готовятся экспертные заключения
-      </div>
+    <div class="text-center pb-3">
+      <span class="legend-text"><fa-icon class="red" icon="circle"></fa-icon> Срок нарушен</span>
+      <span class="legend-text"><fa-icon class="yellow" icon="circle"></fa-icon> Последний день</span>
+      <span class="legend-text"><fa-icon class="blue" icon="circle"></fa-icon> Прошла половина срока</span>
+      <span class="legend-text"><fa-icon class="no-violation" icon="circle"></fa-icon> Менее половины срока</span>
     </div>
-    <div class="col-lg-3 col-md-4 col-sm-6 stats-pane selectable" (click)="showProjectsOnExpertConfirmation()">
-      <div class="stats-number">
-        {{realTimeStats.expertReviewsOnConfirmation}}
-      </div>
-      <div class="stats-label">
-        Ожидают назначения эксперты
-      </div>
-    </div>
-    <!--
-    <div class="col-lg-2 col-md-4 col-sm-6 stats-pane selectable" (click)="showPaymentWaiting()">
-      <div class="stats-number">
-        {{realTimeStats.paymentWaiting}}
-      </div>
-      <div class="stats-label">
-        Ожидают оплаты по договорам
-      </div>
-    </div>
-
-    <div class="col-lg-2 col-md-4 col-sm-6 stats-pane selectable" (click)="showPaymentWaiting()">
-      <div class="stats-number-sm">
-        {{realTimeStats.paymentWaitingSum | number: 2}}
-      </div>
-      <div class="stats-label">
-        Сумма ожидающих выплат,&nbsp;BYN
-      </div>
-    </div>
-    -->
   </div>
-  <div class="row">
-    <div class="col-lg-6 col-sm-6">
-      <app-violation-chart (onClick)="showProjectTermsViolation($event)"
-        [title]="'По объектам экспертизы'" [violation]="realTimeStats.projectTermsViolation">
-      </app-violation-chart>
-    </div>
-    <div class="col-lg-6 col-sm-6">
-      <app-violation-chart (onClick)="showExpertReviewsTermsViolation($event)" [filterKeyPrefix]="'expertReviews.'"
-        [title]="'По экспертным оценкам'" [violation]="realTimeStats.expertReviewsTermsViolation">
-      </app-violation-chart>
-    </div>
-    <!--
-    <div class="col-lg-4 col-sm-6">
-      <app-violation-chart (onClick)="showPaymentTermsViolation($event)"
-        [title]="'По оплате'" [violation]="realTimeStats.paymentTermsViolation">
-      </app-violation-chart>
-    </div>
-    -->
-  </div>
-  <div class="text-center pb-3">
-    <span class="legend-text"><fa-icon class="red" icon="circle"></fa-icon> Срок нарушен</span>
-    <span class="legend-text"><fa-icon class="yellow" icon="circle"></fa-icon> Последний день</span>
-    <span class="legend-text"><fa-icon class="blue" icon="circle"></fa-icon> Прошла половина срока</span>
-    <span class="legend-text"><fa-icon class="no-violation" icon="circle"></fa-icon> Менее половины срока</span>
-  </div>
-</div>
+}

@@ -10,25 +10,29 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         регистрации в соответствии с законодательством Республики Беларусь:
       </label>
       <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.stages === true}"
-              (click)="stateButton(true)">
+        (click)="stateButton(true)">
         Имеются
       </button>
       <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.stages === false}"
-              (click)="stateButton(false)">
+        (click)="stateButton(false)">
         Не имеются
       </button>
-
-      <textarea *ngIf="full || _form.stages" [(ngModel)]="_form.stagesText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст."></textarea>
-      <div *ngIf="full" class="hint">
-        <p>
-          <b>Подсказка.</b>
-          При наличии в календарном плане этапов, подлежащих
-          государственной регистрации, перечисляются номера данных этапов.
-        </p>
-      </div>
+    
+      @if (full || _form.stages) {
+        <textarea [(ngModel)]="_form.stagesText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст."></textarea>
+      }
+      @if (full) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
+            При наличии в календарном плане этапов, подлежащих
+            государственной регистрации, перечисляются номера данных этапов.
+          </p>
+        </div>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class StagesBlock2025Component {

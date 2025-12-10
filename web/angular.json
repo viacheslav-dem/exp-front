@@ -31,9 +31,6 @@
               "node_modules/highcharts/modules/exporting.js",
               "node_modules/highcharts/modules/no-data-to-display.js",
               "node_modules/highcharts/highcharts-more.js",
-              "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/popper.js/dist/umd/popper.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.min.js",
               "src/resources/avest/avcmxwebp-1.1.5.js"
             ],
             "aot": false,
@@ -87,11 +84,7 @@
             "styles": [
               "src/resources/css/style.scss"
             ],
-            "scripts": [
-              "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/popper.js/dist/umd/popper.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.min.js"
-            ],
+            "scripts": [],
             "assets": [
               "src/assets",
               "src/WEB-INF"

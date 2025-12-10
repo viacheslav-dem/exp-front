@@ -10,18 +10,22 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         с законодательством Республики Беларусь:
       </label>
       <app-dropdown [options]="stagesOptions" [(ngModel)]="_form.stagesExist"
-                    (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      <textarea *ngIf="full" [(ngModel)]="_form.stagesExistText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
-      <div *ngIf="full && askStages" class="hint">
-        <p>
-          <b>Подсказка.</b>
-          При наличии в календарном плане этапов, подлежащих
-          государственной регистрации, перечисляются номера данных этапов.
-        </p>
-      </div>
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      @if (full) {
+        <textarea [(ngModel)]="_form.stagesExistText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
+      }
+      @if (full && askStages) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
+            При наличии в календарном плане этапов, подлежащих
+            государственной регистрации, перечисляются номера данных этапов.
+          </p>
+        </div>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class StagesExistsBlockComponent {

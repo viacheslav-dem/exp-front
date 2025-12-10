@@ -1,37 +1,41 @@
 <div class="list-group-item">
 
   <!--SHOW-->
-    <div *ngIf="!isEdit && value">
-    <a class="btn btn-icon float-right" (click)="edit()">
-      <fa-icon icon="cog" size="lg"></fa-icon>
-    </a>
-    <div class="form-sub-group">
-      ГКНТ: <i>{{value.gknt?.name | orElse: 'не указан'}}</i>
+  @if (!isEdit && value) {
+    <div>
+      <a class="btn btn-icon float-right" (click)="edit()">
+        <fa-icon icon="cog" size="lg"></fa-icon>
+      </a>
+      <div class="form-sub-group">
+        ГКНТ: <i>{{value.gknt?.name | orElse: 'не указан'}}</i>
+      </div>
+      <div class="form-sub-group">
+        БелИСА: <i>{{value.belisa?.name | orElse: 'не указан'}}</i>
+      </div>
     </div>
-    <div class="form-sub-group">
-      БелИСА: <i>{{value.belisa?.name | orElse: 'не указан'}}</i>
-    </div>
-  </div>
+  }
 
   <!--EDIT-->
-  <div *ngIf="isEdit">
-    <div class="form-group">
-      <label>ГКНТ</label>
-      <app-dropdown
-        [options]="allOrgs" [notSelected]="'Организация не выбрана'"
-        [(ngModel)]="editedValue.gknt" [emptyOptionsLabel]="'Данные об организациях отсутствуют'"
-      ></app-dropdown>
+  @if (isEdit) {
+    <div>
+      <div class="form-group">
+        <label>ГКНТ</label>
+        <app-dropdown
+          [options]="allOrgs" [notSelected]="'Организация не выбрана'"
+          [(ngModel)]="editedValue.gknt" [emptyOptionsLabel]="'Данные об организациях отсутствуют'"
+        ></app-dropdown>
+      </div>
+      <div class="form-group">
+        <label>БелИСА</label>
+        <app-dropdown
+          [options]="allOrgs" [notSelected]="'Организация не выбрана'"
+          [(ngModel)]="editedValue.belisa" [emptyOptionsLabel]="'Данные об организациях отсутствуют'"
+        ></app-dropdown>
+      </div>
+      <div class="mt-1">
+        <button class="btn btn-secondary" (click)="isEdit = false">Отмена</button>
+        <button class="btn btn-primary" (click)="savePropertyValue()">Сохранить</button>
+      </div>
     </div>
-    <div class="form-group">
-      <label>БелИСА</label>
-      <app-dropdown
-        [options]="allOrgs" [notSelected]="'Организация не выбрана'"
-        [(ngModel)]="editedValue.belisa" [emptyOptionsLabel]="'Данные об организациях отсутствуют'"
-      ></app-dropdown>
-    </div>
-    <div class="mt-1">
-      <button class="btn btn-secondary" (click)="isEdit = false">Отмена</button>
-      <button class="btn btn-primary" (click)="savePropertyValue()">Сохранить</button>
-    </div>
-  </div>
+  }
 </div>

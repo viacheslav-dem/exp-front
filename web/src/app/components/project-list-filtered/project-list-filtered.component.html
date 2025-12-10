@@ -2,14 +2,16 @@
   <h5 class="mb-3">{{filterName}}</h5>
   <div [loadingData]="_loading" class="list-group">
     <div>
-        <span class="text-sm italic">
-            Количество объектов: <b>{{_page.totalElements == null ? '...' : _page.totalElements}}</b>
-        </span>
+      <span class="text-sm italic">
+        Количество объектов: <b>{{_page.totalElements == null ? '...' : _page.totalElements}}</b>
+      </span>
     </div>
-    <div *ngFor="let item of projects">
-      <app-project-li [item]="item" [baseItemLink]="'/projects/'"></app-project-li>
-    </div>
+    @for (item of projects; track item) {
+      <div>
+        <app-project-li [item]="item" [baseItemLink]="'/projects/'"></app-project-li>
+      </div>
+    }
     <app-pagination [page]="_page" [pagination]="_pagination"
-                    (onPageChanged)="onPageChanged($event)"></app-pagination>
+    (onPageChanged)="onPageChanged($event)"></app-pagination>
   </div>
 </div>

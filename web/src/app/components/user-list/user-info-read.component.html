@@ -1,140 +1,181 @@
-<ng-container *ngIf="_user">
+@if (_user) {
   <div class="form-group row">
     <div class="img-holder media col-4" style="text-align: center">
       <img class="media-object" [src]='photo' alt="Фото пользователя">
     </div>
     <div class="form-group col-8">
       <label class="form-group-label mb-0">Полномочия</label>
-      <div *ngFor="let r of _user.roles">
-        <label *ngIf="AutoActivatedRole[r]">
-          {{r | role}}
-          <ul class="mb-0">
-            <li *ngFor="let s of getInfoForRole(r)">{{s}}</li>
-          </ul>
-        </label>
-      </div>
-      <div *ngIf="!hasRights()" class="italic mb-05">Отсутствуют</div>
-
-      <div class="form-sub-group" *ngIf="_user.roles.length>0">
-        <label class="form-group-label mb-0">Роли</label>
-        <ng-container *ngFor="let role of _user.roles">
-          <li> {{(role | role)}}</li>
-        </ng-container>
-
-        <div class="form-sub-group" *ngIf="_user.user!=undefined">
-          <label class="form-group-label">Предоставление доступа к системе</label>
-          <div class="mb-03">{{_user.user.login}}</div>
+      @for (r of _user.roles; track r) {
+        <div>
+          @if (AutoActivatedRole[r]) {
+            <label>
+              {{r | role}}
+              <ul class="mb-0">
+                @for (s of getInfoForRole(r); track s) {
+                  <li>{{s}}</li>
+                }
+              </ul>
+            </label>
+          }
         </div>
-
-        <div class="form-sub-group" *ngIf="_user.email!=undefined">
-          <label class="form-group-label">Электронная почта</label>
-          <div>{{_user.email}}</div>
-        </div>
-
-        <div class="form-sub-group" *ngIf="_user?.phones?.length>=1">
-          <label class="form-group-label">Телефоны</label>
-          <div *ngFor="let phone of _user.phones">
-            {{phone.type | phoneType}}: {{phone.phone}}
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div class="form-sub-group" *ngIf="_user.org">
-            <label class="form-group-label">Наименование организации</label>
-            <div>{{_user.org?.name}}</div>
-          </div>
-          <div class="form-sub-group" *ngIf="_user.post!=undefined">
-            <div class="form-group-label">Должность</div>
-            <div>{{_user.post}}</div>
-          </div>
-        </div>
-
-
-        <div *ngIf="isExpert() && !_user.isExpertOrg" class="form-group">
-          <label class="form-group-label">Данные эксперта</label>
-          <div class="form-sub-group" *ngIf="_user.personInfo.fullDegrees.length>0">
-            <label for id="degree">Учёная степень</label>
-            <div *ngFor="let fd of _user.personInfo.fullDegrees" class="input-group btn-group">
-              <li>{{fd.degreeType | degreeType}} {{fd.scienceArea.nameInGen}}</li>
-            </div>
-          </div>
-
-          <div class="form-sub-group">
-            <label for id="academicTitle">Учёное звание</label>
-            <li>{{_user.personInfo.academicTitleType | academicTitleType}}</li>
-          </div>
-
-          <div class="form-sub-group" *ngIf="_user.personInfo.specialities.length>0">
-            <label>Специальность</label>
-            <div *ngFor="let speciality of _user.personInfo.specialities">
-              <li>{{speciality.name}}</li>
-            </div>
-          </div>
-
-          <div class="form-sub-group" *ngIf=" _user.personInfo.specializations.length>0">
-            <label>Специализация</label>
-            <div *ngFor="let specialization of _user.personInfo.specializations">
-              <li>{{specialization.name}}</li>
-            </div>
-          </div>
-
-          <div class="form-sub-group" *ngIf="_user.areas.length>0">
-            <label>Области компетенции</label>
-            <div *ngFor="let area of _user.areas">
-              <li>{{area.name}}</li>
-            </div>
-          </div>
-        </div>
-
-        <div *ngIf="isExpert() && !_user.isExpertOrg" class="form-group">
-          <label class="form-group-label">Личные данные</label>
-          <div class="form-sub-group" *ngIf="_user.personInfo.birthDate!=undefined">
-            <label>Дата рождения</label>
-            <div>{{_user.personInfo.birthDate | date:'dd.MM.yyyy'}}</div>
-          </div>
-          <div class="form-sub-group" *ngIf="_user.personInfo.address!=undefined">
-            <label>Адрес регистрации</label>
-            <div>{{_user.personInfo.address}}</div>
-          </div>
-          <div class="form-sub-group" *ngIf="_user.personInfo.disability!=undefined">
-            <label *ngIf="_user.personInfo.disability.isPensioner">Пенсионер</label>
-            <div>{{_user.personInfo.disability.pensionerStartDate | date:'dd.MM.yyyy'}}
-              {{_user.personInfo.disability.administration}}
-            </div>
-            <label *ngIf="_user.personInfo.disability.isDisabled">Группа инвалидности</label>
-            <div>{{_user.personInfo.disability.disabledGroup}}</div>
-          </div>
-
-        </div>
-
-        <div *ngIf="isExpert() && !_user.isExpertOrg" class="form-group">
-          <ng-container *ngIf="(_user.personInfo.passport | json) != '{}'">
-            <label class="form-group-label">Паспортные данные</label>
+      }
+      @if (!hasRights()) {
+        <div class="italic mb-05">Отсутствуют</div>
+      }
+      @if (_user.roles.length>0) {
+        <div class="form-sub-group">
+          <label class="form-group-label mb-0">Роли</label>
+          @for (role of _user.roles; track role) {
+            <li> {{(role | role)}}</li>
+          }
+          @if (_user.user!=undefined) {
             <div class="form-sub-group">
-              <div>Серия и номер:
-                <span> {{_user.personInfo.passport.series}} {{_user.personInfo.passport.number}}</span>
-              </div>
-              <div>Идентификационный номер:
-                <span> {{_user.personInfo.passport.idNumber}}</span></div>
-              <div>Когда и кем выдан:
-                <span> {{_user.personInfo.passport.startDate | date:'dd.MM.yyyy'}}
-                    {{_user.personInfo.passport.authority }}
-                  </span></div>
+              <label class="form-group-label">Предоставление доступа к системе</label>
+              <div class="mb-03">{{_user.user.login}}</div>
             </div>
-          </ng-container>
+          }
+          @if (_user.email!=undefined) {
+            <div class="form-sub-group">
+              <label class="form-group-label">Электронная почта</label>
+              <div>{{_user.email}}</div>
+            </div>
+          }
+          @if (_user?.phones?.length>=1) {
+            <div class="form-sub-group">
+              <label class="form-group-label">Телефоны</label>
+              @for (phone of _user.phones; track phone) {
+                <div>
+                  {{phone.type | phoneType}}: {{phone.phone}}
+                </div>
+              }
+            </div>
+          }
+          <div class="form-group">
+            @if (_user.org) {
+              <div class="form-sub-group">
+                <label class="form-group-label">Наименование организации</label>
+                <div>{{_user.org?.name}}</div>
+              </div>
+            }
+            @if (_user.post!=undefined) {
+              <div class="form-sub-group">
+                <div class="form-group-label">Должность</div>
+                <div>{{_user.post}}</div>
+              </div>
+            }
+          </div>
+          @if (isExpert() && !_user.isExpertOrg) {
+            <div class="form-group">
+              <label class="form-group-label">Данные эксперта</label>
+              @if (_user.personInfo.fullDegrees.length>0) {
+                <div class="form-sub-group">
+                  <label for id="degree">Учёная степень</label>
+                  @for (fd of _user.personInfo.fullDegrees; track fd) {
+                    <div class="input-group btn-group">
+                      <li>{{fd.degreeType | degreeType}} {{fd.scienceArea.nameInGen}}</li>
+                    </div>
+                  }
+                </div>
+              }
+              <div class="form-sub-group">
+                <label for id="academicTitle">Учёное звание</label>
+                <li>{{_user.personInfo.academicTitleType | academicTitleType}}</li>
+              </div>
+              @if (_user.personInfo.specialities.length>0) {
+                <div class="form-sub-group">
+                  <label>Специальность</label>
+                  @for (speciality of _user.personInfo.specialities; track speciality) {
+                    <div>
+                      <li>{{speciality.name}}</li>
+                    </div>
+                  }
+                </div>
+              }
+              @if ( _user.personInfo.specializations.length>0) {
+                <div class="form-sub-group">
+                  <label>Специализация</label>
+                  @for (specialization of _user.personInfo.specializations; track specialization) {
+                    <div>
+                      <li>{{specialization.name}}</li>
+                    </div>
+                  }
+                </div>
+              }
+              @if (_user.areas.length>0) {
+                <div class="form-sub-group">
+                  <label>Области компетенции</label>
+                  @for (area of _user.areas; track area) {
+                    <div>
+                      <li>{{area.name}}</li>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+          @if (isExpert() && !_user.isExpertOrg) {
+            <div class="form-group">
+              <label class="form-group-label">Личные данные</label>
+              @if (_user.personInfo.birthDate!=undefined) {
+                <div class="form-sub-group">
+                  <label>Дата рождения</label>
+                  <div>{{_user.personInfo.birthDate | date:'dd.MM.yyyy'}}</div>
+                </div>
+              }
+              @if (_user.personInfo.address!=undefined) {
+                <div class="form-sub-group">
+                  <label>Адрес регистрации</label>
+                  <div>{{_user.personInfo.address}}</div>
+                </div>
+              }
+              @if (_user.personInfo.disability!=undefined) {
+                <div class="form-sub-group">
+                  @if (_user.personInfo.disability.isPensioner) {
+                    <label>Пенсионер</label>
+                  }
+                  <div>{{_user.personInfo.disability.pensionerStartDate | date:'dd.MM.yyyy'}}
+                    {{_user.personInfo.disability.administration}}
+                  </div>
+                  @if (_user.personInfo.disability.isDisabled) {
+                    <label>Группа инвалидности</label>
+                  }
+                  <div>{{_user.personInfo.disability.disabledGroup}}</div>
+                </div>
+              }
+            </div>
+          }
+          @if (isExpert() && !_user.isExpertOrg) {
+            <div class="form-group">
+              @if ((_user.personInfo.passport | json) != '{}') {
+                <label class="form-group-label">Паспортные данные</label>
+                <div class="form-sub-group">
+                  <div>Серия и номер:
+                    <span> {{_user.personInfo.passport.series}} {{_user.personInfo.passport.number}}</span>
+                  </div>
+                  <div>Идентификационный номер:
+                    <span> {{_user.personInfo.passport.idNumber}}</span></div>
+                    <div>Когда и кем выдан:
+                      <span> {{_user.personInfo.passport.startDate | date:'dd.MM.yyyy'}}
+                        {{_user.personInfo.passport.authority }}
+                      </span></div>
+                    </div>
+                  }
+                </div>
+              }
+              @if (isExpert()) {
+                <div class="form-group">
+                  @if (_user.personInfo.bankAccount.account != undefined) {
+                    @if (_user.personInfo.bankAccount.account!='') {
+                      <label class="form-group-label">Банковские реквизиты в
+                      ОПЕРУ ОАО «АСБ Беларусбанк»</label>
+                    }
+                    <div>{{_user.personInfo.bankAccount.account}}</div>
+                    <div>{{_user.personInfo.bankAccount.accountTerms | date:'dd.MM.yyyy'}}</div>
+                  }
+                </div>
+              }
+            </div>
+          }
         </div>
-
-        <div *ngIf="isExpert()" class="form-group">
-          <ng-container *ngIf="_user.personInfo.bankAccount.account != undefined">
-            <label *ngIf="_user.personInfo.bankAccount.account!=''" class="form-group-label">Банковские реквизиты в
-              ОПЕРУ ОАО «АСБ Беларусбанк»</label>
-            <div>{{_user.personInfo.bankAccount.account}}</div>
-            <div>{{_user.personInfo.bankAccount.accountTerms | date:'dd.MM.yyyy'}}</div>
-          </ng-container>
-        </div>
-
       </div>
-
-    </div>
-  </div>
-</ng-container>
+    }

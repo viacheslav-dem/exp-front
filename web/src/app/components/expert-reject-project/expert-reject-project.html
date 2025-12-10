@@ -2,18 +2,18 @@
   <div class="mb-2">Укажите причину отказа от проведения государственной экспертизы:</div>
   <app-dropdown [options]="variants" [(ngModel)]="selectReason"></app-dropdown>
 
-  <ng-container *ngIf="selectReason==ExpertRejectionReason.TIME">
+  @if (selectReason==ExpertRejectionReason.TIME) {
     <div class="mb-2 mt-2">Укажите возможные сроки начала проведения государственной экспертизы:</div>
     <app-date-input [(ngModel)]="date"></app-date-input>
-  </ng-container>
+  }
 
-  <ng-container *ngIf="selectReason==ExpertRejectionReason.OTHER">
+  @if (selectReason==ExpertRejectionReason.OTHER) {
     <input style="width: 100%" class="form-control width-auto mt-2" type="text" title="Укажите причину"
-           [(ngModel)]="otherReason" placeholder="укажите причину"/>
-  </ng-container>
+      [(ngModel)]="otherReason" placeholder="укажите причину"/>
+    }
 
-  <div class="text-xs-center mt-3">
-    <button class="btn btn-primary btn-sm mr-1" (click)="onSave()">Подтвердить</button>
-    <button class="btn btn-secondary btn-sm" (click)="onCancel()">Отмена</button>
+    <div class="text-xs-center mt-3">
+      <button class="btn btn-primary btn-sm mr-1" (click)="onSave()">Подтвердить</button>
+      <button class="btn btn-secondary btn-sm" (click)="onCancel()">Отмена</button>
+    </div>
   </div>
-</div>

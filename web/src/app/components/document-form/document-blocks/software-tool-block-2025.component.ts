@@ -9,39 +9,43 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
       <label>
         {{num}}. Соответствие заявленному программному инструменту реализации:
       </label>
-        <div class="btn-group" role="group" aria-label="Basic example">
-            <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.softwareTool === 1}" (click)="stateButton(1)">
-                Соответсвует
-            </button>
-            <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.softwareTool === 2}" (click)="stateButton(2)">
-                Не соотвествует
-            </button>
-            <button type="button" class="btn btn-outline-warning" [ngClass]="{'active': _form.softwareTool === 3}" (click)="stateButton(3)">
-                Целесообразна реализация вне рамок программ
-            </button>
-        </div>
-        <ng-container *ngIf="_form.softwareTool == 2">
-            <label class="mt-2">Рекомендуемые программный инструмент:</label>
-            <textarea [(ngModel)]="_form.softwareToolSuggestion" rows="2" class="form-control"
-                      title="Рекомендуемый программный инструмент"
-                      placeholder="Рекомендуемый программный инструмент"></textarea>
-        </ng-container>
-      <textarea *ngIf="full" [(ngModel)]="_form.softwareToolText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.softwareTool === 1}" (click)="stateButton(1)">
+          Соответсвует
+        </button>
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.softwareTool === 2}" (click)="stateButton(2)">
+          Не соотвествует
+        </button>
+        <button type="button" class="btn btn-outline-warning" [ngClass]="{'active': _form.softwareTool === 3}" (click)="stateButton(3)">
+          Целесообразна реализация вне рамок программ
+        </button>
+      </div>
+      @if (_form.softwareTool == 2) {
+        <label class="mt-2">Рекомендуемые программный инструмент:</label>
+        <textarea [(ngModel)]="_form.softwareToolSuggestion" rows="2" class="form-control"
+          title="Рекомендуемый программный инструмент"
+        placeholder="Рекомендуемый программный инструмент"></textarea>
+      }
+      @if (full) {
+        <textarea [(ngModel)]="_form.softwareToolText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
+      }
     </div>
-    <div *ngIf="full" class="hint">
+    @if (full) {
+      <div class="hint">
         <p>
-            <b>Подсказка.</b>
-            Решение о соответствии заявленному программному инструменту реализации принимается при соответствии следующей схеме выполнения 
-            научных исследований и разработок:
-            <p> - фундаментальные научные исследования - в государственных программах научных исследований (для проектов заданий государственных 
-                программ научных исследований);
-            </p>
-            <p> - прикладные научные исследования и разработки - в рамках научно-технических программ (для проектов заданий государственных программ
-                научных исследований, научные исследования по которым носят прикладной характер).
-            </p>
-    </div>
-  `,
+          <b>Подсказка.</b>
+          Решение о соответствии заявленному программному инструменту реализации принимается при соответствии следующей схеме выполнения
+          научных исследований и разработок:
+          <p> - фундаментальные научные исследования - в государственных программах научных исследований (для проектов заданий государственных
+            программ научных исследований);
+          </p>
+          <p> - прикладные научные исследования и разработки - в рамках научно-технических программ (для проектов заданий государственных программ
+            научных исследований, научные исследования по которым носят прикладной характер).
+          </p>
+        </div>
+      }
+    `,
     standalone: false
 })
 export class SoftwareToolBlock2025Component {

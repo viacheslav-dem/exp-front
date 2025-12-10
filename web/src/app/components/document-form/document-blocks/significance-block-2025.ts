@@ -5,20 +5,22 @@ import {Component, Input} from "@angular/core";
     template: `
     <div class="form-sub-group">
       <label>
-        {{num}}. Значение работы для реализации приоритетов социально-экономического развития, разработки новых 
-        технологических процессов, наукоемкой, конкурентоспособной продукции, 
+        {{num}}. Значение работы для реализации приоритетов социально-экономического развития, разработки новых
+        технологических процессов, наукоемкой, конкурентоспособной продукции,
         формирования перспективных научных направлений.
       </label>
       <textarea [(ngModel)]="_form.significance" rows="3" class="form-control"
-                placeholder="Обязательный текст."></textarea>
-      <div *ngIf="full" class="hint">
-        <p>
-          <b>Подсказка.</b>
+      placeholder="Обязательный текст."></textarea>
+      @if (full) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
             Эксперт должен конкретно раскрыть суть значения и важности работы для республики.
-        </p>
-      </div>
+          </p>
+        </div>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class SignificanceBlock2025Component {

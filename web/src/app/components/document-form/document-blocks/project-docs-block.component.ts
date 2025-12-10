@@ -11,26 +11,30 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       </label>
       <div>
         <app-boolean-button class="d-inline-block"
-                            [(ngModel)]="_form.projectDocs"
-                            [trueLabel]="'разработана'"
-                            [falseLabel]="'не разработана'"
-                            (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+          [(ngModel)]="_form.projectDocs"
+          [trueLabel]="'разработана'"
+          [falseLabel]="'не разработана'"
+        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       </div>
-        
-            <div>
-                <textarea *ngIf="full" [(ngModel)]="_form.projectDocsText" rows="3" class="form-control mt-05"
-                          placeholder="Обязательный текст."></textarea>
-            </div>
-
-        <div *ngIf="full" class="hint">
-            <p>
-                <b>Подсказка.</b>
-                Если в материалах по обьекту государственной экспертизы отсутствует соответствующая информация, эксперт 
-                должен указать в даннном пункте заключения фразу «не представлено в материалах по обьекту государственной экспертизы»
-            </p>
+    
+      <div>
+        @if (full) {
+          <textarea [(ngModel)]="_form.projectDocsText" rows="3" class="form-control mt-05"
+          placeholder="Обязательный текст."></textarea>
+        }
+      </div>
+    
+      @if (full) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
+            Если в материалах по обьекту государственной экспертизы отсутствует соответствующая информация, эксперт
+            должен указать в даннном пункте заключения фразу «не представлено в материалах по обьекту государственной экспертизы»
+          </p>
         </div>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class ProjectDocsBlockComponent {

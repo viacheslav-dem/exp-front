@@ -15,16 +15,18 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
           Не соотвествует
         </button>
       </div>
-      <ng-container *ngIf="!_form.nameAccordance" >
+      @if (!_form.nameAccordance) {
         <label class="ml-2">Рекомендуемое наименование:</label>
         <textarea [(ngModel)]="_form.nameSuggestion" rows="2" class="form-control mt-2"
-                  title="Рекомендуемое наименование"
-                  placeholder="Предлагаемое наименование"></textarea>
-      </ng-container>
-      <textarea *ngIf="full" [(ngModel)]="_form.nameAccordanceText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
+          title="Рекомендуемое наименование"
+        placeholder="Предлагаемое наименование"></textarea>
+      }
+      @if (full) {
+        <textarea [(ngModel)]="_form.nameAccordanceText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class NameAccordanceBlockComponent {

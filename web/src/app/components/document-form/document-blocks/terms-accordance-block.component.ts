@@ -17,17 +17,19 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
           Не соотвествует
         </button>
       </div>
-      <ng-container *ngIf="!_form.termsAccordance">
+      @if (!_form.termsAccordance) {
         <label class="ml-2">Рекомендуемые сроки реализации:</label>
         <div class="input-group">
           <app-date-period class="form-control mt-2" [(ngModel)]="_terms"
-                           (ngModelChange)="onTermsChanged()"></app-date-period>
+          (ngModelChange)="onTermsChanged()"></app-date-period>
         </div>
-      </ng-container>
-      <textarea *ngIf="full" [(ngModel)]="_form.termsAccordanceText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
+      }
+      @if (full) {
+        <textarea [(ngModel)]="_form.termsAccordanceText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class TermsAccordanceBlockComponent {

@@ -70,6 +70,15 @@
     white-space: normal;
     text-align: left;
   }
+  
+  // Современный подход без Bootstrap JS
+  .dropdown-menu {
+    display: none;
+  }
+  
+  &.show .dropdown-menu {
+    display: block;
+  }
 }
 
 .btn-link-sm {

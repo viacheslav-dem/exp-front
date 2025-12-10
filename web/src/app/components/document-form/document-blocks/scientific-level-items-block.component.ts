@@ -8,13 +8,17 @@ import {Text} from "@app/components/document-form/form-model/Text";
       <label>
         {{num}}. Выберите пункты, наличие которых подтверждает научно-технический уровень внедряемых технологий:
       </label>
-      <div *ngFor="let opt of scientificLevelItems">
-        <app-checkbox [(ngModel)]="opt.isChecked" (onChecked)="onChecked()"> {{opt.text}}</app-checkbox>
-      </div>
-      <textarea *ngIf="full" [(ngModel)]="_form.scientificLevelItemsText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст."></textarea>
+      @for (opt of scientificLevelItems; track opt) {
+        <div>
+          <app-checkbox [(ngModel)]="opt.isChecked" (onChecked)="onChecked()"> {{opt.text}}</app-checkbox>
+        </div>
+      }
+      @if (full) {
+        <textarea [(ngModel)]="_form.scientificLevelItemsText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст."></textarea>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class ScientificLevelItemsBlockComponent {

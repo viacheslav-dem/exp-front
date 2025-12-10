@@ -8,11 +8,13 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
         {{num}}. Оценка перечня задач проекта, планируемый способ их реализации и обеспечение достижения поставленных целей проекта:
       </label>
       <app-dropdown [options]="taskListsOptions" [(ngModel)]="_form.taskLists"
-                    (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      <textarea *ngIf="full" [(ngModel)]="_form.taskListsText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      @if (full) {
+        <textarea [(ngModel)]="_form.taskListsText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class TaskListsBlock2025Component {

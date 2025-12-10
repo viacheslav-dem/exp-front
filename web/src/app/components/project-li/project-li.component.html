@@ -1,5 +1,5 @@
 <a [attr.target]="environment.production ? '_blank' : ''"
-   [routerLink]="group != null ? [baseItemLink,project.id,{group:group}] : [baseItemLink,project.id]">
+  [routerLink]="group != null ? [baseItemLink,project.id,{group:group}] : [baseItemLink,project.id]">
   <div
       [ngClass]="{'list-group-item list-group-item-action selectable': true,
        'alert-danger': project.red,
@@ -8,37 +8,39 @@
        'border-red':(role == Role.GKNT_CHAIRMAN || role== Role.GKNT_WORKER || role == Role.BELISA_EDIT)
        && project.isExpertReviewFiftyFifty
      }">
-  <span class="float-right text-mini text-muted" style="margin-right: -0.25rem; margin-left: 0.25rem;">
-    <span>№</span>
-    <span (click)="onNumberClick($event); false">{{project.id}}</span>
-    <br>
-    <ng-container *ngFor="let number of project.councilReferences">
-        <ng-container *ngIf="number!=null">
-     <span>№</span>
-         <span (click)="onNumberClick($event); false">{{number.number}}</span>
-        <br>
-        <span (click)="onNumberClick($event); false">{{number.date | date:'dd.MM.yyyy HH:mm'}}</span>
-        <br>
-            </ng-container>
-    </ng-container>
-  </span>
-    <span [ngClass]="['badge', ProjectStateBadge[project.state]]">{{project.state | projectState}}</span>
-    <span [ngClass]="project.viewed ? 'font-weight':'font-weight-bold'">{{project.title}}</span>
-    <span class="text-muted bold text-sm italic">{{project.termsMessage}}</span>
-    <div class="text-sm text-muted">
-      Код объекта: {{project.code?.code | orElse: 'не указан'}} |
-      Заказчик: {{project.customer?.org?.name | orElse: 'организация не указана'}} |
-      {{project.period?.start | mdate | orElse: 'дд.мм.гггг'}} -
-      {{project.period?.end | mdate | orElse: 'дд.мм.гггг'}}
-      <div
-          *ifRole="[Role.EXPERT, Role.GKNT_WORKER, Role.GKNT_CHAIRMAN, Role.GKNT_DEPARTMENT_CHAIRMAN, Role.BELISA_EDIT]">
-        Контакты:
-        <span
-            *ngFor="let contact of belisaPersons">{{contact.personName.lastName}} {{contact.personName.firstName}} {{contact.personName.middleName}}
-          - {{contact.phones | phones: true | orElse: 'телефон не указан' }};
+    <span class="float-right text-mini text-muted" style="margin-right: -0.25rem; margin-left: 0.25rem;">
+      <span>№</span>
+      <span (click)="onNumberClick($event); false">{{project.id}}</span>
+      <br>
+        @for (number of project.councilReferences; track number) {
+          @if (number!=null) {
+            <span>№</span>
+            <span (click)="onNumberClick($event); false">{{number.number}}</span>
+            <br>
+              <span (click)="onNumberClick($event); false">{{number.date | date:'dd.MM.yyyy HH:mm'}}</span>
+              <br>
+              }
+            }
           </span>
-      </div>
-    </div>
-    <div class="text-sm text-muted"></div>
-  </div>
-</a>
+          <span [ngClass]="['badge', ProjectStateBadge[project.state]]">{{project.state | projectState}}</span>
+          <span [ngClass]="project.viewed ? 'font-weight':'font-weight-bold'">{{project.title}}</span>
+          <span class="text-muted bold text-sm italic">{{project.termsMessage}}</span>
+          <div class="text-sm text-muted">
+            Код объекта: {{project.code?.code | orElse: 'не указан'}} |
+            Заказчик: {{project.customer?.org?.name | orElse: 'организация не указана'}} |
+            {{project.period?.start | mdate | orElse: 'дд.мм.гггг'}} -
+            {{project.period?.end | mdate | orElse: 'дд.мм.гггг'}}
+            <div
+              *ifRole="[Role.EXPERT, Role.GKNT_WORKER, Role.GKNT_CHAIRMAN, Role.GKNT_DEPARTMENT_CHAIRMAN, Role.BELISA_EDIT]">
+              Контакты:
+              @for (contact of belisaPersons; track contact) {
+                <span
+                  >{{contact.personName.lastName}} {{contact.personName.firstName}} {{contact.personName.middleName}}
+                  - {{contact.phones | phones: true | orElse: 'телефон не указан' }};
+                </span>
+              }
+            </div>
+          </div>
+          <div class="text-sm text-muted"></div>
+        </div>
+      </a>

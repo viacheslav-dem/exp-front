@@ -1,35 +1,39 @@
 <div class="list-group-item">
 
   <!--SHOW-->
-  <div *ngIf="!isEdit && value">
-    <a class="btn btn-icon float-right" (click)="edit()">
-      <fa-icon icon="cog" size="lg"></fa-icon>
-    </a>
-    <div class="">
-      Количество попыток входа: <i><b>{{value.authCount}}</b> (попыток)</i>
-    </div>
-    <!-- <div class="">
-       Таймаут сессии: <i><b>{{value.idle}}</b> (секунд)</i>
-     </div>-->
+  @if (!isEdit && value) {
+    <div>
+      <a class="btn btn-icon float-right" (click)="edit()">
+        <fa-icon icon="cog" size="lg"></fa-icon>
+      </a>
+      <div class="">
+        Количество попыток входа: <i><b>{{value.authCount}}</b> (попыток)</i>
+      </div>
+      <!-- <div class="">
+      Таймаут сессии: <i><b>{{value.idle}}</b> (секунд)</i>
+    </div>-->
   </div>
+}
 
-  <!--EDIT-->
-  <div *ngIf="isEdit">
+<!--EDIT-->
+@if (isEdit) {
+  <div>
     <div class="form-group">
       <label>Количество попыток входа</label>
       <input numberInput type="text" [(ngModel)]="editedValue.authCount"
-             placeholder="Количество попыток входа" class="form-control" title="Количество попыток входа">
-    </div>
-    <!--
-    <div class="form-group">
-      <label>Таймаут сессии, секунд</label>
-      <input numberInput type="text" [(ngModel)]="editedValue.idle"
-             placeholder="Таймаут сессии" class="form-control" title="Таймаут сессии, секунд">
-    </div>
-    -->
-    <div class="mt-1">
-      <button class="btn btn-secondary" (click)="isEdit = false">Отмена</button>
-      <button class="btn btn-primary" (click)="savePropertyValue()">Сохранить</button>
-    </div>
+        placeholder="Количество попыток входа" class="form-control" title="Количество попыток входа">
+      </div>
+      <!--
+      <div class="form-group">
+        <label>Таймаут сессии, секунд</label>
+        <input numberInput type="text" [(ngModel)]="editedValue.idle"
+          placeholder="Таймаут сессии" class="form-control" title="Таймаут сессии, секунд">
+        </div>
+        -->
+        <div class="mt-1">
+          <button class="btn btn-secondary" (click)="isEdit = false">Отмена</button>
+          <button class="btn btn-primary" (click)="savePropertyValue()">Сохранить</button>
+        </div>
+      </div>
+    }
   </div>
-</div>

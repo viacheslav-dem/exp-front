@@ -5,33 +5,43 @@
   <div class="row">
     <div class="col-lg-8 pr-0">
       <div [loadingData]="_loading" class="list-group">
-        <div *ngIf="meetings.length == 0" class="alert alert-info italic mb-0">
-          Заседаний не найдено
-        </div>
-        <div *ngFor="let meeting of meetings" class="list-group-item list-group-item-action"
-             [routerLink]="meeting.routerLink"
-             [class.selectable]="role == Role.SECTION_CHAIRMAN || role == Role.BUREAU_CHAIRMAN">
-          <div>
-            <span [ngClass]="['badge', MeetingStateBadge[meeting.state]]">{{meeting.state | meetingState}}</span>
-            <span>{{meeting.description}}</span>
+        @if (meetings.length == 0) {
+          <div class="alert alert-info italic mb-0">
+            Заседаний не найдено
           </div>
-          <div *ngIf="meeting.state == 'CANCELED'" class="italic text-sm">
-            <b>Причина отмены:</b> {{meeting.cancelReason | orElse: 'не указана'}}
+        }
+        @for (meeting of meetings; track meeting) {
+          <div class="list-group-item list-group-item-action"
+            [routerLink]="meeting.routerLink"
+            [class.selectable]="role == Role.SECTION_CHAIRMAN || role == Role.BUREAU_CHAIRMAN">
+            <div>
+              <span [ngClass]="['badge', MeetingStateBadge[meeting.state]]">{{meeting.state | meetingState}}</span>
+              <span>{{meeting.description}}</span>
+            </div>
+            @if (meeting.state == 'CANCELED') {
+              <div class="italic text-sm">
+                <b>Причина отмены:</b> {{meeting.cancelReason | orElse: 'не указана'}}
+              </div>
+            }
+            <div class="text-sm">
+              <div>Время проведения заседания: <i>{{meeting.period.start | mtime}}-{{meeting.period.end | mtime}}</i></div>
+              <div>Место проведения заседания: <i>{{meeting.place | orElse: 'не указано'}}</i></div>
+            </div>
+            <div class="text-muted text-sm mt-2">Объекты экспертизы</div>
+            @for (a of meeting.agendas; track a) {
+              <div class="text-sm link"
+                [routerLink]="['/projects', a.project.id, 'agendas', a.id]">
+                <app-decision-tag [decision]="a.decision"></app-decision-tag>
+                {{a.project.title}}
+              </div>
+            }
+            @if (meeting.agendas.length == 0) {
+              <div class="text-sm italic">Объекты экспертизы отсутствуют</div>
+            }
           </div>
-          <div class="text-sm">
-            <div>Время проведения заседания: <i>{{meeting.period.start | mtime}}-{{meeting.period.end | mtime}}</i></div>
-            <div>Место проведения заседания: <i>{{meeting.place | orElse: 'не указано'}}</i></div>
-          </div>
-          <div class="text-muted text-sm mt-2">Объекты экспертизы</div>
-          <div class="text-sm link" *ngFor="let a of meeting.agendas"
-               [routerLink]="['/projects', a.project.id, 'agendas', a.id]">
-            <app-decision-tag [decision]="a.decision"></app-decision-tag>
-            {{a.project.title}}
-          </div>
-          <div *ngIf="meeting.agendas.length == 0" class="text-sm italic">Объекты экспертизы отсутствуют</div>
-        </div>
+        }
         <app-pagination [page]="_page" [pagination]="_pagination"
-                        (onPageChanged)="onPageChanged($event)"></app-pagination>
+        (onPageChanged)="onPageChanged($event)"></app-pagination>
       </div>
     </div>
     <div class="col-lg-4">

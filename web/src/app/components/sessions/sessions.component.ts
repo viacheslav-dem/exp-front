@@ -6,21 +6,23 @@ import {PersonPlainDto} from "@app/dto/PersonPlainDto";
     selector: 'app-sessions',
     template: `
       <div class="row">
-          <div class="col-12">
-              <div class="card pt-3">
-                  <h5 class="card-title">
-                      Активные пользователи:
-                  </h5>
-
-                  <ul>
-                      <li *ngFor="let p of sessions">
-                          {{p | fullName}}
-                      </li>
-                  </ul>
-              </div>
+        <div class="col-12">
+          <div class="card pt-3">
+            <h5 class="card-title">
+              Активные пользователи:
+            </h5>
+      
+            <ul>
+              @for (p of sessions; track p) {
+                <li>
+                  {{p | fullName}}
+                </li>
+              }
+            </ul>
           </div>
+        </div>
       </div>
-  `,
+      `,
     styles: [],
     standalone: false
 })

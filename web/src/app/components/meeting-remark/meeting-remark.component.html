@@ -1,83 +1,120 @@
-<div class="row" *ngIf="role==Role.SECTION_CHAIRMAN || role==Role.SECTION_ASSESSOR">
-  <div class="col-6">
-    <div class="bold mb-2">Замечания экспертов</div>
-    <div *ngFor="let remark of allRemarks.expertRemarks">
-      <div *ngIf="role == Role.SECTION_CHAIRMAN"
-           class="list-group-item list-group-item-action selectable" style="white-space: pre-wrap"
-           (click)="addRemark(remark)">{{remark.question}}</div>
-      <div *ngIf="role == Role.SECTION_ASSESSOR"
-           class="list-group-item list-group-item-action" style="white-space: pre-wrap">{{remark.question}}</div>
+@if (role==Role.SECTION_CHAIRMAN || role==Role.SECTION_ASSESSOR) {
+  <div class="row">
+    <div class="col-6">
+      <div class="bold mb-2">Замечания экспертов</div>
+      @for (remark of allRemarks.expertRemarks; track remark) {
+        <div>
+          @if (role == Role.SECTION_CHAIRMAN) {
+            <div
+              class="list-group-item list-group-item-action selectable" style="white-space: pre-wrap"
+            (click)="addRemark(remark)">{{remark.question}}</div>
+          }
+          @if (role == Role.SECTION_ASSESSOR) {
+            <div
+            class="list-group-item list-group-item-action" style="white-space: pre-wrap">{{remark.question}}</div>
+          }
+        </div>
+      }
     </div>
-  </div>
-  <div class="col-6" *ngIf="role == Role.SECTION_CHAIRMAN">
-    <div class="bold mb-2">Сформированные замечания</div>
-    <div *ngFor="let remark of allRemarks.sectionMeetingRemark; index as i">
-      <div *ngIf="i!=indexForEdit" class="list-group-item list-group-item-action selectable"
-           style="white-space: pre-wrap">{{remark.question}}
-        <button class="btn btn-icon ml-2" (click)="editRemark(remark, i)">
-          <fa-icon icon="pencil-alt"></fa-icon>
-        </button>
-        <button class="btn btn-icon ml-2" (click)="deleteSectionRemark(remark)">
-          <fa-icon icon="minus"></fa-icon>
-        </button>
-      </div>
-      <ng-container *ngIf="isEdit && i==indexForEdit">
-      <textarea type="text" id="remarkEdit" class="form-control mt-2" mdbInput
-                placeholder="замечание" [(ngModel)]="remarkForEdit.question"></textarea>
-        <button *ngIf="remarkForEdit!=null" class="btn btn-outline-primary toasty-position-bottom-right mt-1"
-                (click)="confirmEditRemark(remarkForEdit)">Исправить замечание
-        </button>
-      </ng-container>
-    </div>
-    <textarea type="text" id="remark" class="form-control mt-2" mdbInput
-              placeholder="замечание" [(ngModel)]="newRemark.question"></textarea>
-    <button *ngIf="newRemark!=null" class="btn btn-outline-primary toasty-position-bottom-right mt-1"
+    @if (role == Role.SECTION_CHAIRMAN) {
+      <div class="col-6">
+        <div class="bold mb-2">Сформированные замечания</div>
+        @for (remark of allRemarks.sectionMeetingRemark; track remark; let i = $index) {
+          <div>
+            @if (i!=indexForEdit) {
+              <div class="list-group-item list-group-item-action selectable"
+                style="white-space: pre-wrap">{{remark.question}}
+                <button class="btn btn-icon ml-2" (click)="editRemark(remark, i)">
+                  <fa-icon icon="pencil-alt"></fa-icon>
+                </button>
+                <button class="btn btn-icon ml-2" (click)="deleteSectionRemark(remark)">
+                  <fa-icon icon="minus"></fa-icon>
+                </button>
+              </div>
+            }
+            @if (isEdit && i==indexForEdit) {
+              <textarea type="text" id="remarkEdit" class="form-control mt-2" mdbInput
+              placeholder="замечание" [(ngModel)]="remarkForEdit.question"></textarea>
+              @if (remarkForEdit!=null) {
+                <button class="btn btn-outline-primary toasty-position-bottom-right mt-1"
+                  (click)="confirmEditRemark(remarkForEdit)">Исправить замечание
+                </button>
+              }
+            }
+          </div>
+        }
+        <textarea type="text" id="remark" class="form-control mt-2" mdbInput
+        placeholder="замечание" [(ngModel)]="newRemark.question"></textarea>
+        @if (newRemark!=null) {
+          <button class="btn btn-outline-primary toasty-position-bottom-right mt-1"
             (click)="addRemark(newRemark)">Добавить замечание
-    </button>
-  </div>
-  <div class="col-6" *ngIf="role == Role.SECTION_ASSESSOR || role == Role.BUREAU_ASSESSOR">
-    <div *ngFor="let remark of allRemarks.sectionMeetingRemark">
-      <div *ngIf="role == Role.SECTION_ASSESSOR || role == Role.BUREAU_ASSESSOR"
-           class="list-group-item list-group-item-action" style="white-space: pre-wrap">{{remark.answer}}</div>
-    </div>
-  </div>
-</div>
-
-<div class="row" *ngIf="role==Role.BUREAU_CHAIRMAN || role==Role.BUREAU_ASSESSOR">
-  <div class="col-12">
-    <div class="bold mb-2">Замечания экспертов</div>
-    <div *ngFor="let remark of allRemarks.expertRemarks">
-      <div class="list-group-item list-group-item-action" style="white-space: pre-wrap">{{remark.question}}</div>
-    </div>
-    <div class="bold mb-2 mt-2">Замечания секции и ответы заказчика</div>
-    <app-remark-response [isEdit]="false" [remarks]="allRemarks.sectionMeetingRemark"></app-remark-response>
-    <div class="bold mb-2 mt-2">Сформированные замечания</div>
-
-    <div *ngFor="let remark of allRemarks.bureauMeetingRemark; index as i">
-      <div *ngIf="i!=indexForEdit" class="list-group-item list-group-item-action selectable"
-           style="white-space: pre-wrap">{{remark.question}}
-        <button class="btn btn-icon ml-2" (click)="editRemark(remark, i)">
-          <fa-icon icon="pencil-alt"></fa-icon>
-        </button>
-        <button class="btn btn-icon ml-2" (click)="deleteBureauRemark(remark)">
-          <fa-icon icon="minus"></fa-icon>
-        </button>
+          </button>
+        }
       </div>
-      <ng-container *ngIf="isEdit && i==indexForEdit">
-      <textarea type="text" id="remarkBureauEdit" class="form-control mt-2" mdbInput
-                placeholder="замечание" [(ngModel)]="remarkForEdit.question"></textarea>
-        <button *ngIf="remarkForEdit!=null" class="btn btn-outline-primary toasty-position-bottom-right mt-1"
-                (click)="confirmEditRemark(remarkForEdit)">Исправить замечание
-        </button>
-      </ng-container>
-    </div>
-    <textarea type="text" id="remarkBureau" class="form-control mt-2" mdbInput
-              placeholder="замечание" [(ngModel)]="newRemark.question"></textarea>
-    <button *ngIf="newRemark!=null" class="btn btn-outline-primary toasty-position-bottom-right mt-1"
-            (click)="addRemark(newRemark)">Добавить замечание
-    </button>
+    }
+    @if (role == Role.SECTION_ASSESSOR || role == Role.BUREAU_ASSESSOR) {
+      <div class="col-6">
+        @for (remark of allRemarks.sectionMeetingRemark; track remark) {
+          <div>
+            @if (role == Role.SECTION_ASSESSOR || role == Role.BUREAU_ASSESSOR) {
+              <div
+              class="list-group-item list-group-item-action" style="white-space: pre-wrap">{{remark.answer}}</div>
+            }
+          </div>
+        }
+      </div>
+    }
   </div>
-</div>
-<div class="mt-2 btn-right" *ngIf="role == Role.SECTION_CHAIRMAN || role == Role.BUREAU_CHAIRMAN">
-  <button class="btn btn-primary" (click)="save()">Сохранить</button>
-</div>
+}
+
+@if (role==Role.BUREAU_CHAIRMAN || role==Role.BUREAU_ASSESSOR) {
+  <div class="row">
+    <div class="col-12">
+      <div class="bold mb-2">Замечания экспертов</div>
+      @for (remark of allRemarks.expertRemarks; track remark) {
+        <div>
+          <div class="list-group-item list-group-item-action" style="white-space: pre-wrap">{{remark.question}}</div>
+        </div>
+      }
+      <div class="bold mb-2 mt-2">Замечания секции и ответы заказчика</div>
+      <app-remark-response [isEdit]="false" [remarks]="allRemarks.sectionMeetingRemark"></app-remark-response>
+      <div class="bold mb-2 mt-2">Сформированные замечания</div>
+      @for (remark of allRemarks.bureauMeetingRemark; track remark; let i = $index) {
+        <div>
+          @if (i!=indexForEdit) {
+            <div class="list-group-item list-group-item-action selectable"
+              style="white-space: pre-wrap">{{remark.question}}
+              <button class="btn btn-icon ml-2" (click)="editRemark(remark, i)">
+                <fa-icon icon="pencil-alt"></fa-icon>
+              </button>
+              <button class="btn btn-icon ml-2" (click)="deleteBureauRemark(remark)">
+                <fa-icon icon="minus"></fa-icon>
+              </button>
+            </div>
+          }
+          @if (isEdit && i==indexForEdit) {
+            <textarea type="text" id="remarkBureauEdit" class="form-control mt-2" mdbInput
+            placeholder="замечание" [(ngModel)]="remarkForEdit.question"></textarea>
+            @if (remarkForEdit!=null) {
+              <button class="btn btn-outline-primary toasty-position-bottom-right mt-1"
+                (click)="confirmEditRemark(remarkForEdit)">Исправить замечание
+              </button>
+            }
+          }
+        </div>
+      }
+      <textarea type="text" id="remarkBureau" class="form-control mt-2" mdbInput
+      placeholder="замечание" [(ngModel)]="newRemark.question"></textarea>
+      @if (newRemark!=null) {
+        <button class="btn btn-outline-primary toasty-position-bottom-right mt-1"
+          (click)="addRemark(newRemark)">Добавить замечание
+        </button>
+      }
+    </div>
+  </div>
+}
+@if (role == Role.SECTION_CHAIRMAN || role == Role.BUREAU_CHAIRMAN) {
+  <div class="mt-2 btn-right">
+    <button class="btn btn-primary" (click)="save()">Сохранить</button>
+  </div>
+}

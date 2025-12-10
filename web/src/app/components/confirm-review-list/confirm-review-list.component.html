@@ -1,250 +1,288 @@
 <div class="list-group">
-    <div [loadingData]="_loading">
-        <div class="card card-block" *ngFor="let project of projects">
-            <a class="h5 bold" target="_blank" [routerLink]="['/projects/',project.id]">{{project |
-                titleAndCode}}</a>
-
+  <div [loadingData]="_loading">
+    @for (project of projects; track project) {
+      <div class="card card-block">
+        <a class="h5 bold" target="_blank" [routerLink]="['/projects/',project.id]">{{project |
+        titleAndCode}}</a>
+        <div class="text-sm">
+          <span>Регистрационный номер: </span>
+          <span class="italic">{{project.id}}</span>
+        </div>
+        <div class="text-sm">
+          <span>Дата регистрации: </span>
+          <span class="italic">{{project.registerDate | date:'dd.MM.yyyy'}} г.</span>
+        </div>
+        <div class="text-sm">
+          @for (group of project.groups; track group) {
+            <span>
+              ГЭС: <span class="italic">№{{group.council.code}} {{group.council.name}}</span></span>
+            }
+          </div>
+          <div class="text-sm">
+            <span>Заказчик экспертизы: </span>
+            <span class="italic">{{project.customer?.org?.name | orElse : 'организация не указана' }}</span>
+          </div>
+          @if (project.executor) {
             <div class="text-sm">
-                <span>Регистрационный номер: </span>
-                <span class="italic">{{project.id}}</span>
+              <span>Организация-исполнитель: </span>
+              <span class="italic">{{project.executor | orElse: 'не указан'}}</span>
             </div>
-            <div class="text-sm">
-                <span>Дата регистрации: </span>
-                <span class="italic">{{project.registerDate | date:'dd.MM.yyyy'}} г.</span>
-            </div>
-            <div class="text-sm">
-        <span *ngFor="let group of project.groups">
-          ГЭС: <span class="italic">№{{group.council.code}} {{group.council.name}}</span></span>
-            </div>
-
-            <div class="text-sm">
-                <span>Заказчик экспертизы: </span>
-                <span class="italic">{{project.customer?.org?.name | orElse : 'организация не указана' }}</span>
-            </div>
-            <div *ngIf="project.executor" class="text-sm">
-                <span>Организация-исполнитель: </span>
-                <span class="italic">{{project.executor | orElse: 'не указан'}}</span>
-            </div>
-            <table *ngIf="projects.length > 0" class="table table-responsive mb-0 mt-3">
-                <thead>
+          }
+          @if (projects.length > 0) {
+            <table class="table table-responsive mb-0 mt-3">
+              <thead>
                 <tr>
-                    <th class="align-top" style="min-width: 180px">Эксперт</th>
-                    <th class="align-top" style="width: 100%">Сфера деятельности</th>
-                    <!-- <th class="align-top" style="min-width: 220px">В настоящее время</th> -->
-                    <th class="align-top" style="min-width: 150px"></th>
+                  <th class="align-top" style="min-width: 180px">Эксперт</th>
+                  <th class="align-top" style="width: 100%">Сфера деятельности</th>
+                  <!-- <th class="align-top" style="min-width: 220px">В настоящее время</th> -->
+                  <th class="align-top" style="min-width: 150px"></th>
                 </tr>
-                </thead>
-                <tbody>
-                <tr *ngFor="let review of project.expertReviews" class="list-group-item-action">
+              </thead>
+              <tbody>
+                @for (review of project.expertReviews; track review) {
+                  <tr class="list-group-item-action">
                     <td>
-                        <div class="cursor-pointer"
-                             (click)="showExpertInfoDialog(review.expert)">{{review.expert|fullName}}</div>
-                        <div class="text-sm italic text-muted">{{review.expert.personInfo | academicInfo}}</div>
+                      <div class="cursor-pointer"
+                      (click)="showExpertInfoDialog(review.expert)">{{review.expert|fullName}}</div>
+                      <div class="text-sm italic text-muted">{{review.expert.personInfo | academicInfo}}</div>
                     </td>
                     <td class="text-sm">
-                        <div *ngIf="review.expert.areas.length > 0">
-                            Области компетенции:&nbsp;<span class="italic">{{review.expert | areas}}</span>
+                      @if (review.expert.areas.length > 0) {
+                        <div>
+                          Области компетенции:&nbsp;<span class="italic">{{review.expert | areas}}</span>
                         </div>
-                        <div *ngIf="review.expert.org?.name">
-                            Организация:&nbsp;<span class="italic">{{review.expert.org?.name}}</span>
+                      }
+                      @if (review.expert.org?.name) {
+                        <div>
+                          Организация:&nbsp;<span class="italic">{{review.expert.org?.name}}</span>
                         </div>
-                        <div *ngIf="review.expert.post">
-                            Должность:&nbsp;<span class="italic">{{review.expert.post}}</span>
+                      }
+                      @if (review.expert.post) {
+                        <div>
+                          Должность:&nbsp;<span class="italic">{{review.expert.post}}</span>
                         </div>
-                        <div *ngIf="review.expert.personInfo.specialization">
-                            Специализация:&nbsp;<span class="italic">{{review.expert.personInfo.specialization}}</span>
+                      }
+                      @if (review.expert.personInfo.specialization) {
+                        <div>
+                          Специализация:&nbsp;<span class="italic">{{review.expert.personInfo.specialization}}</span>
                         </div>
-                        <div *ngIf="review.expert.personInfo.specialty">
-                            Специальность:&nbsp;<span class="italic">{{review.expert.personInfo.specialty}}</span>
+                      }
+                      @if (review.expert.personInfo.specialty) {
+                        <div>
+                          Специальность:&nbsp;<span class="italic">{{review.expert.personInfo.specialty}}</span>
                         </div>
+                      }
                     </td>
                     <!-- <td class="text-sm"> -->
-                        <!-- <div> -->
-                            <!-- Объектов на экспертизе:&nbsp;<span -->
-                                <!-- class="bold">{{review.expert.realTimeStats.projectsOnExamination}}</span> -->
-                        <!-- </div> -->
-                        <!-- <div> -->
-                            <!-- Ожидают подтверждения:&nbsp; -->
-                            <!-- <span class="bold">{{review.expert.realTimeStats.reviewsOnConfirmation}}</span> -->
-                        <!-- </div> -->
-                        <!-- <div> -->
-                            <!-- Нарушены сроки:&nbsp;<span -->
-                                <!-- class="bold">{{review.expert.realTimeStats.reviewsTermsViolation.red}}</span> -->
-                        <!-- </div> -->
-                        <!-- <div> -->
-                            <!-- Завершено заключений:&nbsp; -->
-                            <!-- <span class="bold"> -->
-                                <!-- {{review.expert.realTimeStats.acceptedProjects + review.expert.realTimeStats.rejectedProjects}} -->
-                            <!-- </span> -->
-                        <!-- </div> -->
-                        <!-- <div class=""> -->
-                            <!-- <div class="d-inline-block text-nowrap mr-2"> -->
-                                <!-- Отказы эксперта:&nbsp; -->
-                                <!-- <span class="bold"> -->
-                                    <!-- {{review.expert.realTimeStats.rejectedReviewsByExpert}} -->
-                                <!-- </span> -->
-                            <!-- </div> -->
-                            <!-- <div class="d-inline-block text-nowrap"> -->
-                                <!-- Отказы ГКНТ:&nbsp; -->
-                                <!-- <span class="bold"> -->
-                                    <!-- {{review.expert.realTimeStats.rejectedReviewsByGknt}} -->
-                                <!-- </span> -->
-                            <!-- </div> -->
-                        <!-- </div> -->
-                    <!-- </td> -->
-                    <td class="text-sm">
-                        <ng-container *ngIf="review.state==ExpertReviewState.ON_GKNT_CONFIRMATION">
-                            <button class="btn btn-icon" (click)="confirmExpert(review, project)">
-                                <fa-icon icon="check" size="lg"></fa-icon>
-                            </button>
-                            <button class="btn btn-icon" (click)="rejectExpert(review, project)">
-                                <fa-icon icon="times" size="lg"></fa-icon>
-                            </button>
-                            <div class="italic">
-                                Дата поступления запроса на согласование:&nbsp;<div
-                                    class="bold">{{review.stateStartDate |
-                                date:'dd.MM.yyyy'}}
-                            </div>
-                            </div>
-                        </ng-container>
-                        <div *ngIf="review.state!='ON_GKNT_CONFIRMATION'">
-                            <ng-container [ngSwitch]="review.state">
-                                <ng-container *ngSwitchCase="ExpertReviewState.REJECTED">
-                  <span class="badge badge-danger">
-                    Отклонён
-                  </span>
-                                    <div>
-                                        <span class="italic">{{review.rejectionReason}}</span>
-                                    </div>
-
-                                </ng-container>
-
-                                <span *ngSwitchCase="ExpertReviewState.ON_EXPERT_CONFIRMATION" class="badge badge-info">
-                  Ожидание эксперта
-                </span>
-                                <span *ngSwitchDefault class="badge badge-success">
-                  Согласован
-                </span>
-                            </ng-container>
-                            <!--<span *ngIf="review.state == ExpertReviewState.REJECTED" class="badge badge-danger">-->
-                            <!--Отклонён-->
-                            <!--</span>-->
-                            <!--<span *ngIf="review.state == ExpertReviewState." class="badge badge-success">-->
-                            <!--Согласован-->
-                            <!--</span>-->
-                            <!--<span *ngIf="review.state != ExpertReviewState.REJECTED" class="badge badge-success">-->
-                            <!--Ожидание эксперта-->
-                            <!--</span>-->
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div *ngIf="projects.length == 0" class="alert alert-info italic mb-0 card card-block">
-            Не требуется
-        </div>
-        <app-pagination [page]="_page" [pagination]="_pagination"
-                        (onPageChanged)="onPageChanged($event)"></app-pagination>
+                    <!-- <div> -->
+                    <!-- Объектов на экспертизе:&nbsp;<span -->
+                  <!-- class="bold">{{review.expert.realTimeStats.projectsOnExamination}}</span> -->
+                <!-- </div> -->
+                <!-- <div> -->
+                <!-- Ожидают подтверждения:&nbsp; -->
+                <!-- <span class="bold">{{review.expert.realTimeStats.reviewsOnConfirmation}}</span> -->
+              <!-- </div> -->
+              <!-- <div> -->
+              <!-- Нарушены сроки:&nbsp;<span -->
+            <!-- class="bold">{{review.expert.realTimeStats.reviewsTermsViolation.red}}</span> -->
+          <!-- </div> -->
+          <!-- <div> -->
+          <!-- Завершено заключений:&nbsp; -->
+          <!-- <span class="bold"> -->
+          <!-- {{review.expert.realTimeStats.acceptedProjects + review.expert.realTimeStats.rejectedProjects}} -->
+        <!-- </span> -->
+      <!-- </div> -->
+      <!-- <div class=""> -->
+      <!-- <div class="d-inline-block text-nowrap mr-2"> -->
+      <!-- Отказы эксперта:&nbsp; -->
+      <!-- <span class="bold"> -->
+      <!-- {{review.expert.realTimeStats.rejectedReviewsByExpert}} -->
+    <!-- </span> -->
+  <!-- </div> -->
+  <!-- <div class="d-inline-block text-nowrap"> -->
+  <!-- Отказы ГКНТ:&nbsp; -->
+  <!-- <span class="bold"> -->
+  <!-- {{review.expert.realTimeStats.rejectedReviewsByGknt}} -->
+<!-- </span> -->
+<!-- </div> -->
+<!-- </div> -->
+<!-- </td> -->
+<td class="text-sm">
+  @if (review.state==ExpertReviewState.ON_GKNT_CONFIRMATION) {
+    <button class="btn btn-icon" (click)="confirmExpert(review, project)">
+      <fa-icon icon="check" size="lg"></fa-icon>
+    </button>
+    <button class="btn btn-icon" (click)="rejectExpert(review, project)">
+      <fa-icon icon="times" size="lg"></fa-icon>
+    </button>
+    <div class="italic">
+      Дата поступления запроса на согласование:&nbsp;<div
+      class="bold">{{review.stateStartDate |
+      date:'dd.MM.yyyy'}}
     </div>
+  </div>
+}
+@if (review.state!='ON_GKNT_CONFIRMATION') {
+  <div>
+    @switch (review.state) {
+      @case (ExpertReviewState.REJECTED) {
+        <span class="badge badge-danger">
+          Отклонён
+        </span>
+        <div>
+          <span class="italic">{{review.rejectionReason}}</span>
+        </div>
+      }
+      @case (ExpertReviewState.ON_EXPERT_CONFIRMATION) {
+        <span class="badge badge-info">
+          Ожидание эксперта
+        </span>
+      }
+      @default {
+        <span class="badge badge-success">
+          Согласован
+        </span>
+      }
+    }
+    <!--<span *ngIf="review.state == ExpertReviewState.REJECTED" class="badge badge-danger">-->
+    <!--Отклонён-->
+  <!--</span>-->
+  <!--<span *ngIf="review.state == ExpertReviewState." class="badge badge-success">-->
+  <!--Согласован-->
+<!--</span>-->
+<!--<span *ngIf="review.state != ExpertReviewState.REJECTED" class="badge badge-success">-->
+<!--Ожидание эксперта-->
+<!--</span>-->
+</div>
+}
+</td>
+</tr>
+}
+</tbody>
+</table>
+}
+</div>
+}
+@if (projects.length == 0) {
+  <div class="alert alert-info italic mb-0 card card-block">
+    Не требуется
+  </div>
+}
+<app-pagination [page]="_page" [pagination]="_pagination"
+(onPageChanged)="onPageChanged($event)"></app-pagination>
+</div>
 </div>
 <app-modal #expertInfo [title]="'Информация об эксперте'" [modalClasses]="'modal-xl'">
-    <div class="container" style="min-height:auto;" *ngIf="expert!=null">
-        <div class="row">
-            <div class="col-lg-3">
-                <div class="bold">{{expert|fullName}}</div>
-                <div class="text-sm italic text-muted">{{expert.personInfo | academicInfo}}</div>
-                <div class="text-sm italic">{{expert.email}}</div>
-                <div class="text-sm italic">{{expert.phones | phones}}</div>
-            </div>
-            <div class="col-lg-3 text-sm px-0">
-                <div *ngIf="expert?.areas?.length > 0">
-                    Области компетенции:&nbsp;
-                    <span class="italic">{{ expert | areas }}</span>
-                </div>
-
-                <div *ngIf="expert?.personInfo?.specializations?.length">
-                    Специализация:&nbsp;
-                    <div *ngFor="let spec of expert.personInfo.specializations"
-                         class="italic">
-                        {{ spec.name }}
-                    </div>
-                </div>
-
-                <div *ngIf="expert?.personInfo?.specialities?.length">
-                    Специальность:&nbsp;
-                    <div *ngFor="let special of expert.personInfo.specialities"
-                         class="italic">
-                        {{ special.name }}
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 text-sm pr-0">
-                <div *ngIf="expert.org?.name">
-                    Организация:&nbsp;<span class="italic">{{ expert.org?.name }}</span>
-                </div>
-                <div *ngIf="expert.post">
-                    Должность:&nbsp;<span class="italic">{{ expert.post }}</span>
-                </div>
-            </div>
-            <div class="col-lg-3 text-sm">
-                <div>
-                    Объектов на&nbsp;экспертизе:&nbsp;
-                    <span class="bold">
-      {{ expert?.realTimeStats?.projectsOnExamination }}
-    </span>
-                </div>
-                <div>
-                    Ожидают подтверждения:&nbsp;
-                    <span class="bold">
-      {{ expert?.realTimeStats?.reviewsOnConfirmation }}
-    </span>
-                </div>
-                <div>
-                    Нарушены сроки:&nbsp;
-                    <span class="bold">
-      {{ expert?.realTimeStats?.reviewsTermsViolation?.red }}
-    </span>
-                </div>
-                <div>
-                    Завершено заключений:&nbsp;
-                    <span class="bold">
-      {{ (expert?.realTimeStats?.acceptedProjects || 0) + (expert?.realTimeStats?.rejectedProjects || 0) }}
-    </span>
-                </div>
-                <div class="">
-                    <div class="d-inline-block text-nowrap mr-2">
-                        Отказы эксперта:&nbsp;
-                        <span class="bold">
-        {{ expert?.realTimeStats?.rejectedReviewsByExpert }}
-      </span>
-                    </div>
-                    <div class="d-inline-block text-nowrap">
-                        Отказы ГКНТ:&nbsp;
-                        <span class="bold">
-        {{ expert?.realTimeStats?.rejectedReviewsByGknt }}
-      </span>
-                    </div>
-                </div>
-            </div>
+  @if (expert!=null) {
+    <div class="container" style="min-height:auto;">
+      <div class="row">
+        <div class="col-lg-3">
+          <div class="bold">{{expert|fullName}}</div>
+          <div class="text-sm italic text-muted">{{expert.personInfo | academicInfo}}</div>
+          <div class="text-sm italic">{{expert.email}}</div>
+          <div class="text-sm italic">{{expert.phones | phones}}</div>
         </div>
-        <!-- <div class="text-center col-lg-12" > -->
-            <!-- <div class="text-sm text-muted pt-2">Подготовлено экспертных заключений за год</div> -->
-            <!-- <app-finished-reviews-sparkline-chart -->
-              <!-- [stats]="expert.stats" -->
-            <!-- ></app-finished-reviews-sparkline-chart> -->
-        <!-- </div> -->
-        <!-- <div class="text-center col-lg-12"> -->
-            <!-- <div class="text-sm text-muted pt-2">Статистика работы эксперта за год</div> -->
-            <!-- <app-review-results-sparkline-chart -->
-              <!-- [stats]="expert.stats" -->
-            <!-- ></app-review-results-sparkline-chart> -->
-        <!-- </div> -->
-        <!-- <div class="text-center col-lg-12"> -->
-            <!-- <div class="text-sm text-muted pt-2">Время подготовки заключения</div> -->
-            <!-- <app-reviews-violation-sparkline-chart -->
-              <!-- [stats]="expert.stats" -->
-            <!-- ></app-reviews-violation-sparkline-chart> -->
-        <!-- </div> -->
-    </div>
+        <div class="col-lg-3 text-sm px-0">
+          @if (expert?.areas?.length > 0) {
+            <div>
+              Области компетенции:&nbsp;
+              <span class="italic">{{ expert | areas }}</span>
+            </div>
+          }
+          @if (expert?.personInfo?.specializations?.length) {
+            <div>
+              Специализация:&nbsp;
+              @for (spec of expert.personInfo.specializations; track spec) {
+                <div
+                  class="italic">
+                  {{ spec.name }}
+                </div>
+              }
+            </div>
+          }
+          @if (expert?.personInfo?.specialities?.length) {
+            <div>
+              Специальность:&nbsp;
+              @for (special of expert.personInfo.specialities; track special) {
+                <div
+                  class="italic">
+                  {{ special.name }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+        <div class="col-lg-3 text-sm pr-0">
+          @if (expert.org?.name) {
+            <div>
+              Организация:&nbsp;<span class="italic">{{ expert.org?.name }}</span>
+            </div>
+          }
+          @if (expert.post) {
+            <div>
+              Должность:&nbsp;<span class="italic">{{ expert.post }}</span>
+            </div>
+          }
+        </div>
+        <div class="col-lg-3 text-sm">
+          <div>
+            Объектов на&nbsp;экспертизе:&nbsp;
+            <span class="bold">
+              {{ expert?.realTimeStats?.projectsOnExamination }}
+            </span>
+          </div>
+          <div>
+            Ожидают подтверждения:&nbsp;
+            <span class="bold">
+              {{ expert?.realTimeStats?.reviewsOnConfirmation }}
+            </span>
+          </div>
+          <div>
+            Нарушены сроки:&nbsp;
+            <span class="bold">
+              {{ expert?.realTimeStats?.reviewsTermsViolation?.red }}
+            </span>
+          </div>
+          <div>
+            Завершено заключений:&nbsp;
+            <span class="bold">
+              {{ (expert?.realTimeStats?.acceptedProjects || 0) + (expert?.realTimeStats?.rejectedProjects || 0) }}
+            </span>
+          </div>
+          <div class="">
+            <div class="d-inline-block text-nowrap mr-2">
+              Отказы эксперта:&nbsp;
+              <span class="bold">
+                {{ expert?.realTimeStats?.rejectedReviewsByExpert }}
+              </span>
+            </div>
+            <div class="d-inline-block text-nowrap">
+              Отказы ГКНТ:&nbsp;
+              <span class="bold">
+                {{ expert?.realTimeStats?.rejectedReviewsByGknt }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="text-center col-lg-12" > -->
+      <!-- <div class="text-sm text-muted pt-2">Подготовлено экспертных заключений за год</div> -->
+      <!-- <app-finished-reviews-sparkline-chart -->
+      <!-- [stats]="expert.stats" -->
+    <!-- ></app-finished-reviews-sparkline-chart> -->
+  <!-- </div> -->
+  <!-- <div class="text-center col-lg-12"> -->
+  <!-- <div class="text-sm text-muted pt-2">Статистика работы эксперта за год</div> -->
+  <!-- <app-review-results-sparkline-chart -->
+  <!-- [stats]="expert.stats" -->
+<!-- ></app-review-results-sparkline-chart> -->
+<!-- </div> -->
+<!-- <div class="text-center col-lg-12"> -->
+<!-- <div class="text-sm text-muted pt-2">Время подготовки заключения</div> -->
+<!-- <app-reviews-violation-sparkline-chart -->
+<!-- [stats]="expert.stats" -->
+<!-- ></app-reviews-violation-sparkline-chart> -->
+<!-- </div> -->
+</div>
+}
 </app-modal>

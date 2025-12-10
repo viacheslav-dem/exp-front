@@ -7,14 +7,16 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
       <label>
         {{num}}. Экспортная ориентированность товара:
       </label><br>
-        <app-boolean-button [(ngModel)]="_form.exportOrientation" [trueLabel]="'соответствует'"
-                            [falseLabel]="'не соответствует'"
-                            (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <textarea *ngIf="full || _form.exportOrientation" 
-                [(ngModel)]="_form.exportOrientationText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст."></textarea>
+      <app-boolean-button [(ngModel)]="_form.exportOrientation" [trueLabel]="'соответствует'"
+        [falseLabel]="'не соответствует'"
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      @if (full || _form.exportOrientation) {
+        <textarea
+          [(ngModel)]="_form.exportOrientationText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст."></textarea>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class ExportOrientatedBlockComponent {

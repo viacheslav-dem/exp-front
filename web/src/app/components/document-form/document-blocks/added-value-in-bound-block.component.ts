@@ -11,19 +11,21 @@ import {IndustryDto} from "@app/dto/IndustryDto";
         экономической деятельности в Европейском союзе либо превышающий этот уровень:
       </label>
       <app-boolean-button [ngModel]="_form.addedValue >= _form.section?.addedValueBound"
-                          [disabled]="true"
-                          [showDisabledSelection]="true"
-                          [trueLabel]="'соответствует'"
-                          [falseLabel]="'не соответствует'"></app-boolean-button>
-      <div *ngIf="full" class="hint">
-        <p>
-          <b>Подсказка.</b>
-          Если в настоящем заключении значение в подпункте 2.2 больше или равно значения в подпункте 2.1,
-          то <b>соответствует</b>, если менее, то <b>не соответствует</b>.
-        </p>
-      </div>
+        [disabled]="true"
+        [showDisabledSelection]="true"
+        [trueLabel]="'соответствует'"
+      [falseLabel]="'не соответствует'"></app-boolean-button>
+      @if (full) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
+            Если в настоящем заключении значение в подпункте 2.2 больше или равно значения в подпункте 2.1,
+            то <b>соответствует</b>, если менее, то <b>не соответствует</b>.
+          </p>
+        </div>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class AddedValueInBoundBlockComponent {

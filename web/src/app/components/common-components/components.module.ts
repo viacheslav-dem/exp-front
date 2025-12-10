@@ -16,6 +16,7 @@ import {DisabilityComponent} from './disability/disability.component';
 import {PassportComponent} from './passport/passport.component';
 import {BankAccountComponent} from './bank-account/bank-account.component';
 import {DropdownComponent} from "app/components/common-components/dropdown/dropdown.component";
+import {DropdownToggleDirective} from "app/components/common-components/dropdown/dropdown-toggle.directive";
 import {IfRoleDirective} from "@app/components/common-components/if-role/if-role.directive";
 import {NumberRangeComponent} from "@app/components/common-components/number-range/number-range.component";
 import {DatePeriodComponent} from "@app/components/common-components/date-period/date-period.component";
@@ -85,6 +86,7 @@ import {GlobalToastsComponent} from "@app/components/common-components/global-to
     PassportComponent,
     BankAccountComponent,
     DropdownComponent,
+    DropdownToggleDirective,
     DatePeriodComponent,
     NumberRangeComponent,
     FilterComponent,
@@ -122,6 +124,7 @@ import {GlobalToastsComponent} from "@app/components/common-components/global-to
     PassportComponent,
     BankAccountComponent,
     DropdownComponent,
+    DropdownToggleDirective,
     DatePeriodComponent,
     NumberRangeComponent,
     FilterComponent,

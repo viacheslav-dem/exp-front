@@ -4,10 +4,10 @@ import {OrgDto} from "@app/dto/OrgDto";
 @Component({
     selector: 'app-sub-orgs-list',
     template: `
-    <ng-container *ngFor="let org of orgs; index as i">
+    @for (org of orgs; track org; let i = $index) {
       <div><b>{{i + 1}}.</b> {{org.name}}</div>
-    </ng-container>
-  `,
+    }
+    `,
     standalone: false
 })
 

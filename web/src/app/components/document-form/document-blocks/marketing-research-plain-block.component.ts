@@ -8,17 +8,19 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
         {{num}}. Проведение маркетинговых и патентных исследований, их результаты:
       </label>
       <app-dropdown [options]="marketingResearchOptions" [(ngModel)]="_form.marketingResearch"
-                    (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      <div *ngIf="full" class="hint">
-        <p>
-          <b>Подсказка.</b>
-          Укажите результаты проведения маркетинговых и патентных исследований по объекту государственной
-          экспертизы. При необходимости проведения маркетинговых и патентных исследований и их отсутствии в заявочных документах
-          объекта государственной экспертизы, укажите в замечаниях на необходимость их проведения.
-        </p>
-      </div>
+      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      @if (full) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
+            Укажите результаты проведения маркетинговых и патентных исследований по объекту государственной
+            экспертизы. При необходимости проведения маркетинговых и патентных исследований и их отсутствии в заявочных документах
+            объекта государственной экспертизы, укажите в замечаниях на необходимость их проведения.
+          </p>
+        </div>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class MarketingResearchPlainBlockComponent {

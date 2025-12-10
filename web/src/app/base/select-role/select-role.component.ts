@@ -21,7 +21,7 @@ export class SelectRoleComponent implements OnInit {
   roles: string[] = [];
   currRole: string;
   rolesInfo: RoleInfoDto[] = [];
-  mapInfoRole: [] = [];
+  mapInfoRole: { [key: string]: RoleInfoDto } = {};
   user: any = {};
 
   @ViewChild(ProjectListComponent) projectListComponent: ProjectListComponent;

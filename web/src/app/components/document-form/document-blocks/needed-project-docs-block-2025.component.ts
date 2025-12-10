@@ -9,33 +9,37 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <label>
         {{num}}. Разработка проектной (предпроектной) документации:
       </label>
-        <div class="btn-group" role="group" aria-label="Basic example">
-            <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.neededProjectDocs === true}" (click)="stateButton(true)">
-                Требуется
-            </button>
-            <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.neededProjectDocs === false}" (click)="stateButton(false)">
-                Не требуется
-            </button>
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.neededProjectDocs === true}" (click)="stateButton(true)">
+          Требуется
+        </button>
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.neededProjectDocs === false}" (click)="stateButton(false)">
+          Не требуется
+        </button>
+      </div>
+    
+      <div>
+        @if (full) {
+          <textarea [(ngModel)]="_form.neededProjectDocsText" rows="3" class="form-control mt-05"
+          placeholder="Обязательный текст."></textarea>
+        }
+      </div>
+    
+    
+      @if (full) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
+            При отсутствии разработанной проектной (предпроектной) документации на обьект (в случае, когда ее разработка требуется)
+            на момент проведения государственной экспертизы или отсутствие соответствующей информации в материалах по обьекту государственной
+            экспертизы (в случае, когда экспертом сделан вывод о целесообразном проведении работ в сфере строительной деятельности) оценка по обьекту
+            государственной экспертизы дается с государственную экспертизу с актуализацией бизнес-плана с учетом новых обьемов и источников
+            финансирования после разработки проектной (предпроектной) документации на обьект и прохождения ею соответствующих экспертиз.
+          </p>
         </div>
-        
-            <div>
-                <textarea *ngIf="full" [(ngModel)]="_form.neededProjectDocsText" rows="3" class="form-control mt-05"
-                    placeholder="Обязательный текст."></textarea>
-            </div>
-        
-        
-        <div *ngIf="full" class="hint">
-            <p>
-                <b>Подсказка.</b>
-                При отсутствии разработанной проектной (предпроектной) документации на обьект (в случае, когда ее разработка требуется)
-                на момент проведения государственной экспертизы или отсутствие соответствующей информации в материалах по обьекту государственной 
-                экспертизы (в случае, когда экспертом сделан вывод о целесообразном проведении работ в сфере строительной деятельности) оценка по обьекту 
-                государственной экспертизы дается с государственную экспертизу с актуализацией бизнес-плана с учетом новых обьемов и источников 
-                финансирования после разработки проектной (предпроектной) документации на обьект и прохождения ею соответствующих экспертиз.
-            </p>
-        </div>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class NeededProjectDocsBlock2025Component {

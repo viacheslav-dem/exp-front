@@ -9,41 +9,43 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
       </label>
       <div>
         <span>V технологический уклад: </span>
-          <div class="btn-group" role="group" aria-label="Basic example">
-              <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.technologyType5 === true}" (click)="stateButtonTechnologyType5(true)">
-                  Да
-              </button>
-              <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.technologyType5 === false}" (click)="stateButtonTechnologyType5(false)">
-                  Нет
-              </button>
-          </div>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.technologyType5 === true}" (click)="stateButtonTechnologyType5(true)">
+            Да
+          </button>
+          <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.technologyType5 === false}" (click)="stateButtonTechnologyType5(false)">
+            Нет
+          </button>
+        </div>
       </div>
       <div>
         <span>VI технологический уклад: </span>
-          <div class="btn-group" role="group" aria-label="Basic example">
-              <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.technologyType6 === true}" (click)="stateButtonTechnologyType6(true)">
-                  Да
-              </button>
-              <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.technologyType6 === false}" (click)="stateButtonTechnologyType6(false)">
-                  Нет
-              </button>
-          </div>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.technologyType6 === true}" (click)="stateButtonTechnologyType6(true)">
+            Да
+          </button>
+          <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.technologyType6 === false}" (click)="stateButtonTechnologyType6(false)">
+            Нет
+          </button>
+        </div>
       </div>
       <div>
         <span>проект другого технологического уклада: </span>
-          <div class="btn-group" role="group" aria-label="Basic example">
-              <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.technologyOtherType === true}" (click)="stateButtonTechnologyOtherType(true)">
-                  Да
-              </button>
-              <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.technologyOtherType === false}" (click)="stateButtonTechnologyOtherType(false)">
-                  Нет
-              </button>
-          </div>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.technologyOtherType === true}" (click)="stateButtonTechnologyOtherType(true)">
+            Да
+          </button>
+          <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.technologyOtherType === false}" (click)="stateButtonTechnologyOtherType(false)">
+            Нет
+          </button>
+        </div>
       </div>
-      <textarea *ngIf="full" [(ngModel)]="_form.technologyTypeText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
+      @if (full) {
+        <textarea [(ngModel)]="_form.technologyTypeText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class TechnologyTypeBlock2025Component {

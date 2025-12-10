@@ -6,47 +6,60 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 @Component({
     selector: 'app-select-directions-and-goals-block-2025',
     template: `
-    <ng-container *ngIf="_project">
-      <div *ngIf="_allDirections.length > 0" class="form-group">
-        <label>
-          <span *ngIf="num">{{ num }}.</span>
-          Выберите приоритетные направления научной,
-          научно-технической и инновационной деятельности в Республике Беларусь,
-          которым объект экспертизы <b>соответствует</b>:
-        </label>
-        <div *ngFor="let direction of _allDirections">
-          <app-checkbox [(ngModel)]="direction.isChecked"
-                        (ngModelChange)="onDirectionChanged()">{{ direction.name }}
-          </app-checkbox>
+    @if (_project) {
+      @if (_allDirections.length > 0) {
+        <div class="form-group">
+          <label>
+            @if (num) {
+              <span>{{ num }}.</span>
+            }
+            Выберите приоритетные направления научной,
+            научно-технической и инновационной деятельности в Республике Беларусь,
+            которым объект экспертизы <b>соответствует</b>:
+          </label>
+          @for (direction of _allDirections; track direction) {
+            <div>
+              <app-checkbox [(ngModel)]="direction.isChecked"
+                (ngModelChange)="onDirectionChanged()">{{ direction.name }}
+              </app-checkbox>
+            </div>
+          }
         </div>
-      </div>
-
-      <div *ngIf="canHasSocialEconomicGoals() && _allGoals.length > 0" class="form-group">
-        <label>
-          Выберите цели (приоритеты) социально-экономического развития,
-          которым объект экспертизы <b>соответствует</b>:
-        </label>
-        <div *ngFor="let item of _allGoals">
-          <app-checkbox [(ngModel)]="item.isChecked" (ngModelChange)="onGoalChanged()">{{ item.name }}
-          </app-checkbox>
+      }
+      @if (canHasSocialEconomicGoals() && _allGoals.length > 0) {
+        <div class="form-group">
+          <label>
+            Выберите цели (приоритеты) социально-экономического развития,
+            которым объект экспертизы <b>соответствует</b>:
+          </label>
+          @for (item of _allGoals; track item) {
+            <div>
+              <app-checkbox [(ngModel)]="item.isChecked" (ngModelChange)="onGoalChanged()">{{ item.name }}
+              </app-checkbox>
+            </div>
+          }
+          <textarea [(ngModel)]="_form.directionsAndGoalsText" rows="3" class="form-control mt-05"
+          placeholder="Пояснительный текст (при необходимости)."></textarea>
         </div>
-        <textarea [(ngModel)]="_form.directionsAndGoalsText" rows="3" class="form-control mt-05"
-                  placeholder="Пояснительный текст (при необходимости)."></textarea>
-      </div>
-      <textarea *ngIf="showTarget8_4()" [(ngModel)]="_form.multilateralDirectionsText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст."></textarea>
-      <div *ngIf="showTarget8_4()" class="hint">
-        <p>
-          <b>Подсказка.</b>
-          Для объектов государственной экспертизы, указанных в подпункте 8.4 пункта 8 Положения, дополнительно
-          указывается соответствие приоритетным направлениям двустороннего (многостороннего) научно-технического
-          сотрудничества с государством-партнером (государствами-партнерами):
-          соответствует (перечисляются соответствующие приоритетные направления, заявленные в рамках проводимого
-          конкурса совместных проектов, к которым относится объект государственной экспертизы) / не соответствует.
-        </p>
-      </div>
-    </ng-container>
-  `,
+      }
+      @if (showTarget8_4()) {
+        <textarea [(ngModel)]="_form.multilateralDirectionsText" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст."></textarea>
+      }
+      @if (showTarget8_4()) {
+        <div class="hint">
+          <p>
+            <b>Подсказка.</b>
+            Для объектов государственной экспертизы, указанных в подпункте 8.4 пункта 8 Положения, дополнительно
+            указывается соответствие приоритетным направлениям двустороннего (многостороннего) научно-технического
+            сотрудничества с государством-партнером (государствами-партнерами):
+            соответствует (перечисляются соответствующие приоритетные направления, заявленные в рамках проводимого
+            конкурса совместных проектов, к которым относится объект государственной экспертизы) / не соответствует.
+          </p>
+        </div>
+      }
+    }
+    `,
     standalone: false
 })
 export class SelectDirectionsAndGoalsBlock2025Component {
