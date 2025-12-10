@@ -44,7 +44,7 @@ import {TariffRateDto} from "@app/dto/TariffRateDto";
                   <div>Коэффициент для экспертов без научной степени: {{item.withoutDegree}}</div>
                   <div>Коэффициент для членов экспертного совета: {{item.councilMember}}</div>
                 </div>
-                <div class="col-1 text-right">
+                <div class="col-1 text-end">
                   @if (!item.isEdit) {
                     <a class="btn btn-icon" (click)="editItem(item)">
                       <fa-icon icon="cog" size="lg"></fa-icon>

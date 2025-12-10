@@ -27,7 +27,7 @@ export const BANK_CONTROL_VALUE_ACCESSOR: any = {
             [(ngModel)]="_value.account"
             title="Номер счёта" placeholder="BY_ _АКВВ_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _">
             <button type="button" class="btn btn-primary dropdown-toggle"
-              data-toggle="dropdown">
+              data-bs-toggle="dropdown">
               {{_value?.type | bankAccountType}}
             </button>
             <ul class="dropdown-menu scrollable-menu">

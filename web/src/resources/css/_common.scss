@@ -393,19 +393,22 @@ body {
   border-bottom: 0;
 }
 
-//some tricks for BS3 => BS4 migrate...
-.fade.in {
+// Bootstrap 5 compatibility
+.fade.show {
   opacity: 1;
 }
 
-.modal-backdrop.in {
-  filter: alpha(opacity=50);
-  opacity: .5;
+.modal-backdrop.show {
+  opacity: 0.5;
 }
 
 .modal.fade .modal-dialog {
-  -webkit-transform: translate(0, 0);
-  transform: translate(0, 0);
+  transition: transform 0.3s ease-out;
+  transform: translate(0, -50px);
+}
+
+.modal.fade.show .modal-dialog {
+  transform: none;
 }
 
 @media (min-width: 576px) {

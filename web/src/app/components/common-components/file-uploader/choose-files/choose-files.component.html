@@ -1,5 +1,5 @@
-<div class="custom-file custom-file-sm" [ngClass]="controlClass()">
-  <label class="custom-file-label">Выбрать файл не более 10 МБ...</label>
-  <input type="file" class="custom-file-input" #fileInput
+<div class="file-input-wrapper custom-file-sm" [ngClass]="controlClass()">
+  <input type="file" class="form-control file-input" #fileInput
          [accept]="typesAccept()" (change)="chooseFiles($event)">
+  <label class="file-input-label">Выбрать файл не более 10 МБ...</label>
 </div>

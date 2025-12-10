@@ -11,9 +11,9 @@ export const CHECKBOX_VALUE_ACCESSOR: any = {
 @Component({
     selector: 'app-checkbox',
     template: `
-    <div class="custom-control custom-checkbox" (click)="check()">
-      <input type="checkbox" class="custom-control-input" [(ngModel)]="value">
-      <label class="custom-control-label">
+    <div class="form-check" (click)="check()">
+      <input type="checkbox" class="form-check-input" [(ngModel)]="value">
+      <label class="form-check-label">
         <ng-content></ng-content>
       </label>
     </div>

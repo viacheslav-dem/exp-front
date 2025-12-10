@@ -64,13 +64,13 @@
           <div>
             <app-decision-tag [decision]="agenda.decision"></app-decision-tag>
             @if (agenda.project.expertRemarksCount>0) {
-              <span data-toggle="tooltip" data-placement="top"
+              <span data-bs-toggle="tooltip" data-bs-placement="top"
                 title="Количество замечаний: {{agenda.project.expertRemarksCount}}">
                 <fa-icon class="fa" icon="exclamation-triangle" style="color: darkorange"></fa-icon></span>
               }
               <span
                 [routerLink]="['/projects', agenda.project.id, 'agendas', agenda.id]"
-              class="ml-2 link">{{agenda.project.title}} </span>
+              class="ms-2 link">{{agenda.project.title}} </span>
               <span class="text-primary selectable" (click)="loadAgendaData(agenda)">
                 <fa-icon class="m-auto fa" [icon]="agenda.isCollapsed?'chevron-up':'chevron-down'"></fa-icon>
               </span>

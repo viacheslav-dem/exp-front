@@ -88,7 +88,7 @@
                               <div class="btn-group">
                                 <button type="button"
                                   class="btn btn-outline-primary dropdown-toggle border-right-radius-0"
-                                  data-toggle="dropdown">
+                                  data-bs-toggle="dropdown">
                                   {{ (role ? role : "Выберите роль") | role }}
                                 </button>
                                 <div class="dropdown-menu scrollable-menu">
@@ -172,7 +172,7 @@
                                 placeholder="+375 XX XXXXXXX">
                                 <div class="input-group-append">
                                   <div class="btn-group">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
                                       {{ (phone.type ? phone.type : "Выберите тип") | phoneType }}
                                     </button>
                                     <div class="dropdown-menu scrollable-menu">
@@ -250,7 +250,7 @@
                               <div class="degree-entry mb-3">
                                 <div class="input-group mb-2">
                                   <div class="btn-group">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
                                       {{ fd.degreeType | orElse: 'Выберите тип' | degreeType }}
                                     </button>
                                     <div class="dropdown-menu">
@@ -293,7 +293,7 @@
                             <label for id ="academicTitle">Учёное звание</label>
                             <div class="input-group">
                               <div class="btn-group">
-                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
                                   {{ _user.personInfo.academicTitleType | orElse: 'Выберите тип' | academicTitleType }}
                                 </button>
                                 <div class="dropdown-menu scrollable-menu">
@@ -312,7 +312,7 @@
                             <label>Специальности</label>
                             @for (speciality of _user.personInfo.specialities; track speciality; let i = $index) {
                               <div class="dropdown btn-group mb-2">
-                                <button class="btn btn-outline-primary dropdown-toggle border-right-radius-0" title="Специальность" data-toggle="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle border-right-radius-0" title="Специальность" data-bs-toggle="dropdown">
                                   {{ speciality?.name }}
                                 </button>
                                 <div class="dropdown-menu scrollable-menu">
@@ -343,7 +343,7 @@
                             <label>Специализации</label>
                             @for (specialization of _user.personInfo.specializations; track specialization; let i = $index) {
                               <div class="dropdown btn-group mb-2">
-                                <button class="btn btn-outline-primary dropdown-toggle border-right-radius-0" title="Специализация" data-toggle="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle border-right-radius-0" title="Специализация" data-bs-toggle="dropdown">
                                   {{ specialization?.name }}
                                 </button>
                                 <div class="dropdown-menu scrollable-menu">
@@ -374,7 +374,7 @@
                             <label>Области компетенции</label>
                             @for (area of _user.areas; track area; let i = $index) {
                               <div class="dropdown btn-group mb-2">
-                                <button class="btn btn-outline-primary dropdown-toggle border-right-radius-0" title="Область компетенции" data-toggle="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle border-right-radius-0" title="Область компетенции" data-bs-toggle="dropdown">
                                   {{ area?.name }}
                                 </button>
                                 <div class="dropdown-menu scrollable-menu">

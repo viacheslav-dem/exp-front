@@ -14,7 +14,7 @@ import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/Confirm
       }
       <div class="text-sm">{{description()}}</div>
       <div class="mt-3">
-        <button class="btn btn-primary mr-1" (click)="confirm()">{{okBtnMessage()}}</button>
+        <button class="btn btn-primary me-1" (click)="confirm()">{{okBtnMessage()}}</button>
         <button class="btn btn-dark" (click)="cancel()">{{cancelBtnMessage()}}</button>
       </div>
     </div>

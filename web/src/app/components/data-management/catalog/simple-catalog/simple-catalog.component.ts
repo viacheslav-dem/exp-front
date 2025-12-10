@@ -38,7 +38,7 @@ import {Direction} from "@app/components/common-components/page-and-filter/model
             </div>
             <div class="row">
               <div class="col-11">{{item.name | orElse: 'наименование отсутствует'}}</div>
-              <div class="col-1 text-right">
+              <div class="col-1 text-end">
                 @if (!item.isEdit) {
                   <a class="btn btn-icon" (click)="editItem(item)">
                     <fa-icon icon="cog" size="lg"></fa-icon>

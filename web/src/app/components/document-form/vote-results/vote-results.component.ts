@@ -16,7 +16,7 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
         <div [class.d-none]="!display">
           <label><i>Результаты голосования</i></label>
           <div class="row">
-            <div class="col-md-4 pr-2">
+            <div class="col-md-4 pe-2">
               <div class="input-group input-group-sm">
                 <input min="0" [max]="all() - _value.rejected" numberInput type="text" class="form-control"
                   [(ngModel)]="_value.accepted" placeholder="проголосовали за" required>
@@ -27,7 +27,7 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
                   </div>
                 </div>
               </div>
-              <div class="col-md-4 pl-2 pr-2">
+              <div class="col-md-4 ps-2 pe-2">
                 <div class="input-group input-group-sm">
                   <input min="0" [max]="all() - _value.accepted" numberInput type="text" class="form-control"
                     [(ngModel)]="_value.rejected" placeholder="проголосовали против" required>
@@ -38,7 +38,7 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4 pl-2">
+                <div class="col-md-4 ps-2">
                   <div class="input-group input-group-sm">
                     <input min="0" disabled numberInput type="text" class="form-control" [value]="all() - _value.getVoted()"
                       placeholder="не участвовали в голосовании" required>

@@ -9,7 +9,7 @@
       <label class="form-group-label">Код объекта экспертизы</label>
       <div class="dropdown">
         <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
-          data-toggle="dropdown">{{ _project.code ? _project.code.code : "Выберите код" }}
+          data-bs-toggle="dropdown">{{ _project.code ? _project.code.code : "Выберите код" }}
         </button>
         <ul class="dropdown-menu scrollable-menu">
           @for (code of codes; track code) {
@@ -240,7 +240,7 @@
                           [options]="getSubDirectionName()"
                         [resetEnabled]="true" [optionToString]="optionToString()"></app-dropdown>
                         <!--          <div class="dropdown" >-->
-                        <!--              <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown">-->
+                        <!--              <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">-->
                         <!--                {{subDirection.directionName}}-->
                       <!--              </button>-->
                       <!--            <ul class="dropdown-menu scrollable-menu" role="menu">-->
@@ -351,7 +351,7 @@
           <div class="dropdown">
             <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
               [disabled]="disableExpectedResultButton"
-              data-toggle="dropdown">{{ _project.expectedResult ? _project.expectedResult.expectedResultType : "Выберите вид ожидаемого результата" }}
+              data-bs-toggle="dropdown">{{ _project.expectedResult ? _project.expectedResult.expectedResultType : "Выберите вид ожидаемого результата" }}
             </button>
             <ul class="dropdown-menu scrollable-menu">
               @for (result of expectedResultList; track result) {
@@ -402,7 +402,7 @@
         <div class="dropdown">
           <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
             [disabled]="disableTypeOfWorkButton"
-            data-toggle="dropdown">{{ _project.workType ? _project.workType : 'Выберите вид работ' }}
+            data-bs-toggle="dropdown">{{ _project.workType ? _project.workType : 'Выберите вид работ' }}
           </button>
           <ul class="dropdown-menu scrollable-menu">
             @for (typeOfWork of outputTypeOfWorkList; track typeOfWork) {
@@ -431,7 +431,7 @@
         <div class="dropdown">
           <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
             [disabled]="disableResultSpecificButton"
-            data-toggle="dropdown">{{ _project.selectedResultSpecific ? _project.selectedResultSpecific : "Выберите характер результата" }}
+            data-bs-toggle="dropdown">{{ _project.selectedResultSpecific ? _project.selectedResultSpecific : "Выберите характер результата" }}
           </button>
           <ul class="dropdown-menu scrollable-menu">
             @for (typeOfWork of resultSpecificList; track typeOfWork) {
@@ -509,7 +509,7 @@
               <div class="form-sub-group">
                 <div class="dropdown">
                   <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
-                    data-toggle="dropdown">{{ _project.implementationResult ? _project.implementationResult : "Выберите характер результата - прикладной" }}
+                    data-bs-toggle="dropdown">{{ _project.implementationResult ? _project.implementationResult : "Выберите характер результата - прикладной" }}
                   </button>
                   <ul class="dropdown-menu scrollable-menu">
                     @for (selectedElement of choiceOfResultCharacterAppliedList; track selectedElement) {
@@ -542,7 +542,7 @@
           <div class="form-sub-group">
             <div class="dropdown">
               <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
-                data-toggle="dropdown">{{ _project.technologicalOrder ? _project.technologicalOrder : "Выберите технологический уклад" }}
+                data-bs-toggle="dropdown">{{ _project.technologicalOrder ? _project.technologicalOrder : "Выберите технологический уклад" }}
               </button>
               <ul class="dropdown-menu scrollable-menu">
                 @for (technologyType of technologyTypeList; track technologyType) {

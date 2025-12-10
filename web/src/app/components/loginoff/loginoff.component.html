@@ -1,12 +1,12 @@
 <div class="dropdown">
   @if (user) {
-    <div class="link dropdown-toggle pl-2" data-toggle="dropdown">
+    <div class="link dropdown-toggle ps-2" data-bs-toggle="dropdown">
       {{user | fullName}}
       <br>
         ({{role | role}})
       </div>
     }
-    <ul class="dropdown-menu dropdown-menu-right shadow" #dropdownMenu>
+    <ul class="dropdown-menu dropdown-menu-end shadow" #dropdownMenu>
       <li class="dropdown-item selectable" (click)="showEditUserModal()">
         <fa-icon icon="user" [fixedWidth]="true"></fa-icon>
         Редактировать профиль

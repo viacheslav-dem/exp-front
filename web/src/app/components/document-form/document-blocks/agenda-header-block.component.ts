@@ -9,12 +9,12 @@ import {AgendaNewFormContent} from "@app/components/document-form/meeting-protoc
     <label class="form-group-label mb-0 selectable">
       <span>{{ind() + 1}}. {{project() | titleAndCode}}</span>
       <span> | Решение:</span>
-      <span class="ml-05" [ngClass]="['badge', DecisionStateBadge[_form().conclusion.getDecision()] || 'badge-info']">
+      <span class="ms-05" [ngClass]="['badge', DecisionStateBadge[_form().conclusion.getDecision()] || 'badge-info']">
         {{(_form().conclusion.getDecision() | decision) || 'не указано'}}
       </span>
-      <button class="btn btn-icon ml-05 d-none"
-              data-toggle="collapse"
-              [attr.data-target]="'#meeting-project-' + project()?.id">
+      <button class="btn btn-icon ms-05 d-none"
+              data-bs-toggle="collapse"
+              [attr.data-bs-target]="'#meeting-project-' + project()?.id">
       </button>
     </label>
   `,

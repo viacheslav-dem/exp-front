@@ -1,5 +1,5 @@
 <div class="form-group">
-  <label class="mr-1">
+  <label class="me-1">
     Конечный результат проекта:
   </label>
   <div class="btn-group">
@@ -55,13 +55,13 @@
         4. Секция и подсекция основного вида экономической деятельности, которому соответствует
         планируемый к реализации инновационный проект:
       </label>
-      <div class="custom-control custom-checkbox mb-2" (click)="onChooseSection()">
-        <input type="checkbox" class="custom-control-input" title="Выбор" [(ngModel)]="_form.sectionNotPresented">
-        <label class="custom-control-label"> - не представлено в материалах по объекту экспертизы</label>
+      <div class="form-check mb-2" (click)="onChooseSection()">
+        <input type="checkbox" class="form-check-input" title="Выбор" [(ngModel)]="_form.sectionNotPresented">
+        <label class="form-check-label"> - не представлено в материалах по объекту экспертизы</label>
       </div>
       @if (!_form.sectionNotPresented) {
         <div class="dropdown form-sub-group">
-          <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-toggle="dropdown">
+          <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-bs-toggle="dropdown">
             <span class="bold">{{_form.section.code}}</span> - {{_form.section.name}}
           </button>
           <ul class="dropdown-menu scrollable-menu">
@@ -102,9 +102,9 @@
         6. Уровень добавленной стоимости на одного работающего по инновационному проекту, соответствующий году,
         следующему за годом выхода на проектную мощность, евро:
       </label>
-      <div class="custom-control custom-checkbox mb-2" (click)="_form.addedValueNotPresented = !_form.addedValueNotPresented">
-        <input type="checkbox" class="custom-control-input" title="Выбор" [(ngModel)]="_form.addedValueNotPresented">
-        <label class="custom-control-label"> - не представлено в материалах по объекту экспертизы</label>
+      <div class="form-check mb-2" (click)="_form.addedValueNotPresented = !_form.addedValueNotPresented">
+        <input type="checkbox" class="form-check-input" title="Выбор" [(ngModel)]="_form.addedValueNotPresented">
+        <label class="form-check-label"> - не представлено в материалах по объекту экспертизы</label>
       </div>
       @if (!_form.addedValueNotPresented) {
         <div class="form-sub-group">
@@ -125,9 +125,9 @@
         <label>
           7. Сальдо потока денежных средств от текущей (операционной) деятельности, евро:
         </label>
-        <div class="custom-control custom-checkbox mb-2" (click)="_form.balanceNotPresented = !_form.balanceNotPresented">
-          <input type="checkbox" class="custom-control-input" title="Выбор" [(ngModel)]="_form.balanceNotPresented">
-          <label class="custom-control-label"> - не представлено в материалах по объекту экспертизы</label>
+        <div class="form-check mb-2" (click)="_form.balanceNotPresented = !_form.balanceNotPresented">
+          <input type="checkbox" class="form-check-input" title="Выбор" [(ngModel)]="_form.balanceNotPresented">
+          <label class="form-check-label"> - не представлено в материалах по объекту экспертизы</label>
         </div>
         @if (!_form.balanceNotPresented) {
           <div class="form-sub-group">

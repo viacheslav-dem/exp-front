@@ -53,7 +53,12 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
   }
 
   ngAfterViewInit() {
-    // Метод для будущих расширений
+    // Обновляем отображение после инициализации если есть значение
+    if (this.bsRangeValue && this.bsRangeValue.length === 2 && this.dateInput) {
+      requestAnimationFrame(() => {
+        this.updateInputDisplay();
+      });
+    }
   }
 
   private updateBsConfig() {
@@ -83,13 +88,38 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
   prepareValue(): void {
     if (this._value != null && this._value.start != null && this._value.end != null) {
       this.bsRangeValue = [this.getDate(this._value.start), this.getDate(this._value.end)];
+      // Обновляем отображение после установки значения
+      requestAnimationFrame(() => {
+        this.updateInputDisplay();
+      });
     } else {
       this.bsRangeValue = [];
     }
   }
 
+  private updateInputDisplay() {
+    if (this.dateInput && this.dateInput.nativeElement && this.bsRangeValue && this.bsRangeValue.length === 2) {
+      const startDate = this.bsRangeValue[0];
+      const endDate = this.bsRangeValue[1];
+      if (startDate && endDate) {
+        const formatted = dayjs(startDate).locale('ru').format(this.dateFormat()) + 
+                         ' - ' + 
+                         dayjs(endDate).locale('ru').format(this.dateFormat());
+        if (this.dateInput.nativeElement.value !== formatted) {
+          this.dateInput.nativeElement.value = formatted;
+        }
+      }
+    }
+  }
+
   onModelChange(value: any[]) {
-    // Метод для обработки изменений модели
+    // Workaround: ngx-bootstrap имеет баг с форматированием года
+    // Обновляем отображение после того, как ngx-bootstrap обновит значение
+    if (value && value.length === 2 && value[0] && value[1] && this.dateInput?.nativeElement) {
+      requestAnimationFrame(() => {
+        this.updateDisplayValue(value);
+      });
+    }
   }
 
   onChange(d: Date[]) {
@@ -104,6 +134,31 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
         date.setHours(0, 0, 0, 0);
         result.end = dayjs(date).add(1, 'day').valueOf();
         this.onSelect.emit(result);
+        
+        // Workaround: обновляем отображение после выбора даты
+        // Используем исходные даты из d для отображения
+        // Двойной requestAnimationFrame гарантирует обновление после ngx-bootstrap
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            this.updateDisplayValue(d);
+          });
+        });
+      }
+    }
+  }
+
+  /**
+   * Обновляет отображаемое значение в input поле
+   * Использует dayjs для форматирования с поддержкой формата Moment.js (DD.MM.YYYY)
+   */
+  private updateDisplayValue(dates: Date[]): void {
+    if (this.dateInput?.nativeElement && dates && dates.length === 2 && dates[0] && dates[1]) {
+      const formatted = dayjs(dates[0]).locale('ru').format(this.dateFormat()) + 
+                       ' - ' + 
+                       dayjs(dates[1]).locale('ru').format(this.dateFormat());
+      // Обновляем только если значение отличается (избегаем лишних обновлений)
+      if (this.dateInput.nativeElement.value !== formatted) {
+        this.dateInput.nativeElement.value = formatted;
       }
     }
   }

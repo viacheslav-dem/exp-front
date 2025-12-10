@@ -12,7 +12,7 @@
 <!--ACTIONS-->
 <div class="mb-3">
   @for (meta of buttons(); track meta) {
-    <button [ngClass]="meta.styleClass" class="mr-2" (click)="meta.onclick()">
+    <button [ngClass]="meta.styleClass" class="me-2" (click)="meta.onclick()">
       {{meta.title}}
     </button>
   }
@@ -93,7 +93,7 @@
   @if (project.financing.length) {
     <div class="text-sm">
       <span>Финансирование: </span>
-      <ul class="mb-0 pl-4">
+      <ul class="mb-0 ps-4">
         @for (fin of project.financing; track fin) {
           <li class="italic">
             <span>{{fin.type | fundingType}} финансирование, </span>
@@ -111,7 +111,7 @@
       <span>
         Приоритетное направление научных исследований и (или) научно-технической деятельности:
       </span>
-      <ul class="mb-0 pl-4">
+      <ul class="mb-0 ps-4">
         @for (dir of displayedDirections; track dir) {
           <li>
             <span class="italic">{{dir.name}}</span>
@@ -135,7 +135,7 @@
       <span>
         Цель (приоритет) социально-экономического развития:
       </span>
-      <ul class="mb-0 pl-4">
+      <ul class="mb-0 ps-4">
         @for (item of project.socialEconomicGoals; track item) {
           <li>
             <span class="italic">{{item.name}}</span>
@@ -257,7 +257,7 @@
               <span>{{ project.commercializationDescription }}</span>
               <br>
                 <span>Способ коммерциализации: </span>
-                <ul class="mb-0 pl-4">
+                <ul class="mb-0 ps-4">
                   @for (item of project.commercializationMethods; track item) {
                     <li>
                       <span class="italic">{{item.name}}</span>
