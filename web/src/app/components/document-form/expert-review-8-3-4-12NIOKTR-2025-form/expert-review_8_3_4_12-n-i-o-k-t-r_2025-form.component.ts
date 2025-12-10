@@ -15,6 +15,7 @@ import {CatalogDto} from "@app/dto/CatalogDto";
 export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewForm<ExpertReview_8_3_4_12NIOKTR_2025FormContent> {
 
   noveltyOptions: string[] = [];
+  private _isFormInitialized: boolean = false;
 
   constructor(private _dataService: DataService) {
     super();
@@ -311,6 +312,27 @@ export class ExpertReview_8_3_4_12NIOKTR_2025FormComponent extends ExpertReviewF
   setForm(form: ExpertReview_8_3_4_12NIOKTR_2025FormContent) {
     super.setForm(form);
     this._form.termsSuggestion = this._form.termsSuggestion || new PeriodDto();
+    
+    // Нормализуем boolean поля при первой загрузке: если они false и нет текстовых комментариев,
+    // это означает, что они не были выбраны пользователем, устанавливаем в undefined
+    if (!this._isFormInitialized) {
+      if (this._form.nameAccordance === false && !this._form.nameAccordanceText) {
+        this._form.nameAccordance = undefined;
+      }
+      if (this._form.termsAccordance === false && !this._form.termsAccordanceText) {
+        this._form.termsAccordance = undefined;
+      }
+      if (this._form.socialOrSecurity === false && !this._form.socialOrSecurityText) {
+        this._form.socialOrSecurity = undefined;
+      }
+      if (this._form.financeAccordance === false && !this._form.financeAccordanceText) {
+        this._form.financeAccordance = undefined;
+      }
+      if (this._form.targetAccordance === false && !this._form.targetAccordanceText) {
+        this._form.targetAccordance = undefined;
+      }
+      this._isFormInitialized = true;
+    }
   }
 
 }

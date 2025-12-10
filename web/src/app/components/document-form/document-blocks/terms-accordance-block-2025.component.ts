@@ -13,7 +13,7 @@ import {PeriodDto} from "@app/dto/PeriodDto";
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.termsAccordance === true}" (click)="stateButton(true)">
           Соответсвует
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.termsAccordance === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.termsAccordance === false && _form.termsAccordance !== undefined}" (click)="stateButton(false)">
           Не соотвествует
         </button>
       </div>

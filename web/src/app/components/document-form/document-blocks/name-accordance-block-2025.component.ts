@@ -11,7 +11,7 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.nameAccordance === true}" (click)="stateButton(true)">
           Соответсвует
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.nameAccordance === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.nameAccordance === false && _form.nameAccordance !== undefined}" (click)="stateButton(false)">
           Не соотвествует
         </button>
       </div>
@@ -27,10 +27,6 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
   `
 })
 export class NameAccordanceBlock2025Component {
-
-    ngOnInit() {
-        this._form.nameAccordance = false;
-    }
 
     @Input()
     num: string = "10.1";

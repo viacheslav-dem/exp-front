@@ -13,7 +13,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
             <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.financeAccordance === true}" (click)="stateButton(true)">
                 Соответсвует
             </button>
-            <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.financeAccordance === false}" (click)="stateButton(false)">
+            <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.financeAccordance === false && _form.financeAccordance !== undefined}" (click)="stateButton(false)">
                 Не соотвествует
             </button>
         </div>

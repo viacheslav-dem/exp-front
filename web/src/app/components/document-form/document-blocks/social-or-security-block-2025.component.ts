@@ -13,7 +13,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
             <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.socialOrSecurity === true}" (click)="stateButton(true)">
                 Да (социально значимый / направлен на обеспечение национальной безопасности)
             </button>
-            <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.socialOrSecurity === false}" (click)="stateButton(false)">
+            <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.socialOrSecurity === false && _form.socialOrSecurity !== undefined}" (click)="stateButton(false)">
                 Нет
             </button>
         </div>

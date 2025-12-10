@@ -11,7 +11,7 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
                 <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.targetAccordance === true}" (click)="stateButton(true)">
                     Соответсвует
                 </button>
-                <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.targetAccordance === false}" (click)="stateButton(false)">
+                <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.targetAccordance === false && _form.targetAccordance !== undefined}" (click)="stateButton(false)">
                     Не соотвествует
                 </button>
             </div>
