@@ -1,272 +1,301 @@
-<div>
-  <div class="form-group row">
-    <div class="img-holder col-4 text-center">
-      <img class="img-fluid" [src]="photo" alt="Фото пользователя">
-      @if (_user.id != 0 && _user.id) {
-        <div class="hover-btn" style="width: 200px">
-          <app-silent-file-uploader
-            [controlClass]="'btn py-0'"
-            [typesAccept]="'image/jpeg,image/png,image/jpg'"
-            [url]="SERVER_URL + '/persons/' + _user.id + '/photo'"
-            (saved)="getPhoto(_user)">
-          </app-silent-file-uploader>
-        </div>
-      }
+<div class="user-form-container">
+  <div class="row g-4 mb-4">
+    <div class="col-md-4 text-center">
+      <div class="img-holder">
+        <img class="img-fluid rounded-4 shadow-sm" [src]="photo" alt="Фото пользователя">
+        @if (_user.id != 0 && _user.id) {
+          <div class="hover-btn">
+            <app-silent-file-uploader
+              [controlClass]="'btn btn-primary btn-sm rounded-pill mt-2'"
+              [typesAccept]="'image/jpeg,image/png,image/jpg'"
+              [url]="SERVER_URL + '/persons/' + _user.id + '/photo'"
+              (saved)="getPhoto(_user)">
+            </app-silent-file-uploader>
+          </div>
+        }
+      </div>
     </div>
 
-    <div class="form-sub-group col-8">
-      <label class="form-group-label mb-0">Полное имя</label>
-      <div class="input-group separated">
-        <input type="text" id="lastname" class="form-control" [(ngModel)]="_user.personName.lastName"
-          placeholder="Фамилия" minlength="2" maxlength="50" required>
-          <input type="text" id="firstname" class="form-control" [(ngModel)]="_user.personName.firstName"
-            placeholder="Имя" minlength="2" maxlength="50" required>
+    <div class="col-md-8">
+      <div class="mb-3">
+        <label class="form-label fw-semibold mb-2">Полное имя</label>
+        <div class="row g-2">
+          <div class="col-md-4">
+            <input type="text" id="lastname" class="form-control" [(ngModel)]="_user.personName.lastName"
+              placeholder="Фамилия" minlength="2" maxlength="50" required>
+          </div>
+          <div class="col-md-4">
+            <input type="text" id="firstname" class="form-control" [(ngModel)]="_user.personName.firstName"
+              placeholder="Имя" minlength="2" maxlength="50" required>
+          </div>
+          <div class="col-md-4">
             <input type="text" id="middlename" class="form-control" [(ngModel)]="_user.personName.middleName"
               placeholder="Отчество" minlength="2" maxlength="50" required>
-            </div>
+          </div>
+        </div>
+      </div>
 
-            <label class="form-group-label mb-0 mt-2">Полное имя в дательном падеже</label>
-            <div class="input-group separated">
-              <input type="text" id="lastnameInDative" class="form-control"
-                [(ngModel)]="_user.personInfo.nameInDative.lastName"
-                placeholder="Фамилия" minlength="2" maxlength="50" required>
-                <input type="text" id="firstnameInDative" class="form-control"
-                  [(ngModel)]="_user.personInfo.nameInDative.firstName"
-                  placeholder="Имя" minlength="2" maxlength="50" required>
-                  <input type="text" id="middlenameInDative" class="form-control"
-                    [(ngModel)]="_user.personInfo.nameInDative.middleName"
-                    placeholder="Отчество" minlength="2" maxlength="50" required>
-                  </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold mb-2">Полное имя в дательном падеже</label>
+        <div class="row g-2">
+          <div class="col-md-4">
+            <input type="text" id="lastnameInDative" class="form-control"
+              [(ngModel)]="_user.personInfo.nameInDative.lastName"
+              placeholder="Фамилия" minlength="2" maxlength="50">
+          </div>
+          <div class="col-md-4">
+            <input type="text" id="firstnameInDative" class="form-control"
+              [(ngModel)]="_user.personInfo.nameInDative.firstName"
+              placeholder="Имя" minlength="2" maxlength="50">
+          </div>
+          <div class="col-md-4">
+            <input type="text" id="middlenameInDative" class="form-control"
+              [(ngModel)]="_user.personInfo.nameInDative.middleName"
+              placeholder="Отчество" minlength="2" maxlength="50">
+          </div>
+        </div>
+      </div>
 
-                  <label class="form-group-label mb-0 mt-2">Полное имя в родительном падеже</label>
-                  <div class="input-group separated">
-                    <input type="text" id="lastnameInGenitive" class="form-control"
-                      [(ngModel)]="_user.personInfo.nameInGenitive.lastName"
-                      placeholder="Фамилия" minlength="2" maxlength="50" required>
-                      <input type="text" id="firstnameInGenitive" class="form-control"
-                        [(ngModel)]="_user.personInfo.nameInGenitive.firstName"
-                        placeholder="Имя" minlength="2" maxlength="50" required>
-                        <input type="text" id="middlenameInGenitive" class="form-control"
-                          [(ngModel)]="_user.personInfo.nameInGenitive.middleName"
-                          placeholder="Отчество" minlength="2" maxlength="50" required>
-                        </div>
-                      </div>
-                    </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold mb-2">Полное имя в родительном падеже</label>
+        <div class="row g-2">
+          <div class="col-md-4">
+            <input type="text" id="lastnameInGenitive" class="form-control"
+              [(ngModel)]="_user.personInfo.nameInGenitive.lastName"
+              placeholder="Фамилия" minlength="2" maxlength="50">
+          </div>
+          <div class="col-md-4">
+            <input type="text" id="firstnameInGenitive" class="form-control"
+              [(ngModel)]="_user.personInfo.nameInGenitive.firstName"
+              placeholder="Имя" minlength="2" maxlength="50">
+          </div>
+          <div class="col-md-4">
+            <input type="text" id="middlenameInGenitive" class="form-control"
+              [(ngModel)]="_user.personInfo.nameInGenitive.middleName"
+              placeholder="Отчество" minlength="2" maxlength="50">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-                    @if (isSingDate() != 0) {
-                      <div class="form-group">
-                        <label class="form-group-label mb-0">Дата последного входа:</label>
-                        <span class="form-group-label mb-0">{{ getSingDate() | date:'dd.MM.yyyy' }}</span>
-                      </div>
+  @if (isSingDate() != 0) {
+    <div class="mb-3 p-3 bg-light rounded-3">
+      <label class="form-label fw-semibold mb-1">Дата последнего входа:</label>
+      <div class="text-body-secondary">{{ getSingDate() | date:'dd.MM.yyyy' }}</div>
+    </div>
+  }
+
+  <!-- Блок для не-текущего пользователя: полномочия и роли -->
+  @if (!current) {
+    <div class="mb-4">
+      <div class="mb-3">
+        <label class="form-label fw-semibold mb-2">Полномочия</label>
+        @if (hasRights()) {
+          <div class="card border border-info-subtle rounded-3 p-3 bg-light bg-opacity-50">
+            @for (r of _user.roles; track r) {
+              @if (AutoActivatedRole[r]) {
+                <div class="mb-2">
+                  <div class="fw-medium text-dark mb-1">{{ r | role }}</div>
+                  <ul class="mb-0 ps-3">
+                    @for (s of getInfoForRole(r); track s) {
+                      <li class="text-body-secondary small">{{ s }}</li>
                     }
-
-                    <!-- Блок для не-текущего пользователя: полномочия и роли -->
-                    @if (!current) {
-                      <div class="form-group">
-                        <label class="form-group-label mb-0">Полномочия</label>
-                        @for (r of _user.roles; track r) {
-                          <div>
-                            @if (AutoActivatedRole[r]) {
-                              <label>
-                                {{ r | role }}
-                                <ul class="mb-0">
-                                  @for (s of getInfoForRole(r); track s) {
-                                    <li>{{ s }}</li>
-                                  }
-                                </ul>
-                              </label>
-                            }
-                          </div>
-                        }
-                        @if (!hasRights()) {
-                          <div class="italic mb-05">Отсутствуют</div>
-                        }
-                        <label class="form-group-label mb-2">Роли</label>
+                  </ul>
+                </div>
+              }
+            }
+          </div>
+        } @else {
+          <div class="fst-italic text-body-secondary">Отсутствуют</div>
+        }
+      </div>
+      
+      <div class="mb-3">
+        <label class="form-label fw-semibold mb-2">Роли</label>
                         @for (role of _user.roles; track role; let i = $index) {
                           @if (!AutoActivatedRole[role]) {
                             <div class="input-group mb-2">
-                              <div class="btn-group">
+                              <div class="dropdown flex-grow-1">
                                 <button type="button"
-                                  class="btn btn-outline-primary dropdown-toggle border-right-radius-0"
-                                  data-bs-toggle="dropdown">
+                                  class="btn btn-outline-primary dropdown-toggle"
+                                  data-bs-toggle="dropdown"
+                                  aria-expanded="false">
                                   {{ (role ? role : "Выберите роль") | role }}
                                 </button>
-                                <div class="dropdown-menu scrollable-menu">
+                                <ul class="dropdown-menu">
                                   @for (roleV of allRoles; track roleV) {
-                                    <button
-                                      class="dropdown-item"
-                                      type="button"
-                                      (click)="addRole(roleV, i)">
-                                      {{ roleV | role }}
-                                    </button>
+                                    <li>
+                                      <button
+                                        class="dropdown-item"
+                                        type="button"
+                                        (click)="addRole(roleV, i)">
+                                        {{ roleV | role }}
+                                      </button>
+                                    </li>
                                   }
-                                </div>
+                                </ul>
                               </div>
-                              <div class="input-group-append">
-                                <button type="button" class="btn btn-outline-danger" (click)="_user.roles.splice(i, 1)">&times;</button>
-                              </div>
+                              <button type="button" class="btn btn-outline-danger" (click)="_user.roles.splice(i, 1)">&times;</button>
                             </div>
                           }
                         }
-                        @if (!hasRoles()) {
-                          <div class="italic">Отсутствуют</div>
-                        }
-                        <div>
-                          <button type="button" class="btn btn-primary btn-sm" (click)="_user.roles.push(allRoles[0])" style="margin-top: 0.5rem;">
-                            Добавить роль
-                          </button>
-                        </div>
-                      </div>
-                    }
+        @if (!hasRoles()) {
+          <div class="fst-italic text-body-secondary mb-2">Отсутствуют</div>
+        }
+        <div>
+          <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" (click)="_user.roles.push(allRoles[0])">
+            <i class="fas fa-plus me-1"></i>Добавить роль
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
-                    <!-- Блок для текущего пользователя: только отображение ролей -->
-                    @if (current) {
-                      <div class="form-group">
-                        <label class="form-group-label">Роли</label>
-                        @for (role of _user.roles; track role) {
-                          <div>
-                            <label>
-                              {{ role | role }}
-                            </label>
-                          </div>
-                        }
-                      </div>
-                    }
+  <!-- Блок для текущего пользователя: только отображение ролей -->
+  @if (current) {
+    <div class="mb-4">
+      <label class="form-label fw-semibold mb-2">Роли</label>
+      <div class="d-flex flex-wrap gap-2">
+        @for (role of _user.roles; track role) {
+          <span class="badge bg-primary bg-opacity-10 text-dark rounded-pill px-3 py-2">
+            {{ role | role }}
+          </span>
+        }
+      </div>
+    </div>
+  }
 
-                    <!-- Эксперт/Организация -->
-                    @if (isExpert()) {
-                      <div class="form-group">
-                        <label class="form-group-label">Субъект, проводящий экспертизу</label>
-                        <app-boolean-button [(ngModel)]="_user.isExpertOrg" [trueLabel]="'Юридическое лицо'"
-                          [falseLabel]="'Физическое лицо'">
-                        </app-boolean-button>
-                      </div>
-                    }
+  <!-- Эксперт/Организация -->
+  @if (isExpert()) {
+    <div class="mb-4">
+      <label class="form-label fw-semibold mb-2">Субъект, проводящий экспертизу</label>
+      <app-boolean-button [(ngModel)]="_user.isExpertOrg" [trueLabel]="'Юридическое лицо'"
+        [falseLabel]="'Физическое лицо'">
+      </app-boolean-button>
+    </div>
+  }
 
-                    <!-- Доступ в систему -->
-                    <div class="form-group">
-                      <div class="form-sub-group">
-                        <label class="form-group-label">Предоставление доступа к системе</label>
-                        <div>
-                          <app-login-create [(ngModel)]="_user.user"></app-login-create>
-                        </div>
-                      </div>
-                    </div>
+  <!-- Доступ в систему -->
+  <div class="mb-4">
+    <label class="form-label fw-semibold mb-2">Предоставление доступа к системе</label>
+    <app-login-create [(ngModel)]="_user.user"></app-login-create>
+  </div>
 
-                    <!-- Контакты: email -->
-                    <div class="form-group">
-                      <label class="form-group-label">Контактные данные</label>
-                      <div class="form-sub-group">
-                        <label for="email">Электронная почта</label>
-                        <input type="text" id="email" class="form-control"
-                          placeholder="xxx@gmail.com, yyy@yandex.ru" [(ngModel)]="_user.email">
-                        </div>
+  <!-- Контакты: email -->
+  <div class="mb-4">
+    <label class="form-label fw-semibold mb-3">Контактные данные</label>
+    <div class="mb-3">
+      <label for="email" class="form-label small">Электронная почта</label>
+      <input type="text" id="email" class="form-control"
+        placeholder="xxx@gmail.com, yyy@yandex.ru" [(ngModel)]="_user.email">
+    </div>
 
-                        <!-- Блок телефонов -->
-                        <div class="form-sub-group mt-2">
-                          <label class="form-group-label">Телефоны</label>
+    <!-- Блок телефонов -->
+    <div class="mb-3">
+      <label class="form-label small">Телефоны</label>
 
                           @for (phone of _user.phones; track phone; let i = $index) {
                             <div class="input-group mb-2">
                               <input type="text" class="form-control" [(ngModel)]="phone.phone" title="Телефон"
                                 placeholder="+375 XX XXXXXXX">
-                                <div class="input-group-append">
-                                  <div class="btn-group">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
-                                      {{ (phone.type ? phone.type : "Выберите тип") | phoneType }}
-                                    </button>
-                                    <div class="dropdown-menu scrollable-menu">
-                                      @for (type of allPhoneTypes; track type) {
-                                        <button
-                                          class="dropdown-item"
-                                          type="button"
-                                          (click)="phone.type = type">
-                                          {{ type | phoneType }}
-                                        </button>
-                                      }
-                                    </div>
-                                  </div>
-                                </div>
-                                <div class="input-group-append">
-                                  <button type="button" class="btn btn-outline-danger" (click)="_user.phones.splice(i, 1)">&times;</button>
-                                </div>
+                              <div class="dropdown">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                  {{ (phone.type ? phone.type : "Выберите тип") | phoneType }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                  @for (type of allPhoneTypes; track type) {
+                                    <li>
+                                      <button
+                                        class="dropdown-item"
+                                        type="button"
+                                        (click)="phone.type = type">
+                                        {{ type | phoneType }}
+                                      </button>
+                                    </li>
+                                  }
+                                </ul>
                               </div>
-                            }
-
-                            <div class="mt-2">
-                              <button type="button" class="btn btn-primary btn-sm" (click)="addPhone()">Добавить телефон</button>
+                              <button type="button" class="btn btn-outline-danger" (click)="_user.phones.splice(i, 1)">&times;</button>
                             </div>
-                          </div>
-                        </div>
+                          }
 
-                        <!-- Место работы -->
-                        <div class="form-group">
-                          <label class="form-group-label">Место работы</label>
-                          <div class="form-sub-group">
-                            <label for="post">Должность</label>
-                            <input type="text" id="post" class="form-control" placeholder="должность" [(ngModel)]="_user.post">
-                          </div>
+      <div class="mt-2">
+        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" (click)="addPhone()">
+          <i class="fas fa-plus me-1"></i>Добавить телефон
+        </button>
+      </div>
+    </div>
+  </div>
 
-                          <div class="form-sub-group user-org-dropdown">
-                            <label>Наименование организации</label>
-                            <ng-select
-                              [items]="allOrgs"
-                              bindLabel="itemName"
-                              [(ngModel)]="_userSelectedOrg"
-                              [searchable]="true"
-                              [clearable]="true"
-                              placeholder="Организация не выбрана"
-                              (ngModelChange)="selectOrg($event)">
-                            </ng-select>
-                          </div>
-                        </div>
+  <!-- Место работы -->
+  <div class="mb-4">
+    <label class="form-label fw-semibold mb-3">Место работы</label>
+    <div class="mb-3">
+      <label for="post" class="form-label small">Должность</label>
+      <input type="text" id="post" class="form-control" placeholder="должность" [(ngModel)]="_user.post">
+    </div>
 
-                        <!-- Данные эксперта (если роль эксперт) -->
-                        @if (Role.EXPERT === role) {
-                          <div class="form-group">
-                            <label class="form-group-label">Данные эксперта</label>
-                            @if (_user.personInfo.fullDegrees && _user.personInfo.fullDegrees.length > 0) {
-                              <div class="form-sub-group">
-                                @for (fd of _user.personInfo.fullDegrees; track fd) {
-                                  <div class="input-group btn-group mb-2">
-                                    <ul class="mb-0 pl-3">
-                                      <li><strong>{{ fd.degreeType | degreeType }}</strong> {{ fd.scienceArea?.nameInGen }}</li>
-                                      <li>{{ fd.issuedBy }}</li>
-                                      <li>{{ fd.degreeNumber }}</li>
-                                    </ul>
-                                  </div>
-                                }
-                              </div>
-                            }
-                          </div>
-                        }
+    <div class="user-org-dropdown">
+      <label class="form-label small">Наименование организации</label>
+      <ng-select
+        [items]="allOrgs"
+        bindLabel="itemName"
+        [(ngModel)]="_userSelectedOrg"
+        [searchable]="true"
+        [clearable]="true"
+        placeholder="Организация не выбрана"
+        (ngModelChange)="selectOrg($event)">
+      </ng-select>
+    </div>
+  </div>
 
-                        <!-- Административный раздел: данные эксперта с возможностью редактировать (для ADMIN) -->
-                        <div *ifRole="Role.ADMIN" class="form-group">
-                          <label class="form-group-label">Данные эксперта</label>
-                          <div class="form-sub-group">
-                            <label for id ="degree">Учёная степень</label>
+  <!-- Данные эксперта (если роль эксперт) -->
+  @if (Role.EXPERT === role) {
+    <div class="mb-4">
+      <label class="form-label fw-semibold mb-3">Данные эксперта</label>
+      @if (_user.personInfo.fullDegrees && _user.personInfo.fullDegrees.length > 0) {
+        <div>
+          @for (fd of _user.personInfo.fullDegrees; track fd) {
+            <div class="card border border-2 border-info-subtle rounded-3 p-3 mb-2 bg-light bg-opacity-50">
+              <ul class="mb-0 ps-3">
+                <li class="mb-1"><strong>{{ fd.degreeType | degreeType }}</strong> {{ fd.scienceArea?.nameInGen }}</li>
+                <li class="mb-1">{{ fd.issuedBy }}</li>
+                <li>{{ fd.degreeNumber }}</li>
+              </ul>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Административный раздел: данные эксперта с возможностью редактировать (для ADMIN) -->
+  <div *ifRole="Role.ADMIN" class="mb-4">
+    <label class="form-label fw-semibold mb-3">Данные эксперта</label>
+    <div class="mb-3">
+      <label for="degree" class="form-label small">Учёная степень</label>
                             @for (fd of _user.personInfo.fullDegrees; track fd; let i = $index) {
                               <div class="degree-entry mb-3">
                                 <div class="input-group mb-2">
-                                  <div class="btn-group">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                  <div class="dropdown flex-grow-1">
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                       {{ fd.degreeType | orElse: 'Выберите тип' | degreeType }}
                                     </button>
-                                    <div class="dropdown-menu">
+                                    <ul class="dropdown-menu">
                                       @for (type of allDegreeTypes; track type) {
-                                        <button
-                                          class="dropdown-item"
-                                          type="button"
-                                          (click)="fd.degreeType = type">
-                                          {{ type | degreeType }}
-                                        </button>
+                                        <li>
+                                          <button
+                                            class="dropdown-item"
+                                            type="button"
+                                            (click)="fd.degreeType = type">
+                                            {{ type | degreeType }}
+                                          </button>
+                                        </li>
                                       }
-                                    </div>
+                                    </ul>
                                   </div>
-                                  <div class="input-group-append">
-                                    <button type="button" class="btn btn-outline-danger" (click)="_user.personInfo.fullDegrees.splice(i, 1)">&times;</button>
-                                  </div>
+                                  <button type="button" class="btn btn-outline-danger" (click)="_user.personInfo.fullDegrees.splice(i, 1)">&times;</button>
                                 </div>
                                 @if (hasDegree(fd.degreeType)) {
                                   <div class="mb-2">
@@ -284,167 +313,180 @@
                               </div>
                             }
 
-                            <button type="button" class="btn btn-primary btn-sm" (click)="addDegree()" style="margin-top: 0.5rem;">
-                              Добавить ученую степень
+                            <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 mt-2" (click)="addDegree()">
+                              <i class="fas fa-plus me-1"></i>Добавить ученую степень
                             </button>
                           </div>
 
-                          <div class="form-sub-group mt-3">
-                            <label for id ="academicTitle">Учёное звание</label>
+      <div class="mb-3">
+        <label for="academicTitle" class="form-label small">Учёное звание</label>
                             <div class="input-group">
-                              <div class="btn-group">
-                                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                              <div class="dropdown flex-grow-1">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                   {{ _user.personInfo.academicTitleType | orElse: 'Выберите тип' | academicTitleType }}
                                 </button>
-                                <div class="dropdown-menu scrollable-menu">
+                                <ul class="dropdown-menu">
                                   @for (type of allAcademicTitleTypes; track type) {
-                                    <button class="dropdown-item" type="button"
-                                      (click)="_user.personInfo.academicTitleType = type">
-                                      {{ type | academicTitleType }}
-                                    </button>
+                                    <li>
+                                      <button class="dropdown-item" type="button"
+                                        (click)="_user.personInfo.academicTitleType = type">
+                                        {{ type | academicTitleType }}
+                                      </button>
+                                    </li>
                                   }
-                                </div>
+                                </ul>
                               </div>
                             </div>
-                          </div>
+      </div>
 
-                          <div class="form-sub-group mt-3">
-                            <label>Специальности</label>
+      <div class="mb-3">
+        <label class="form-label small">Специальности</label>
                             @for (speciality of _user.personInfo.specialities; track speciality; let i = $index) {
-                              <div class="dropdown btn-group mb-2">
-                                <button class="btn btn-outline-primary dropdown-toggle border-right-radius-0" title="Специальность" data-bs-toggle="dropdown">
-                                  {{ speciality?.name }}
-                                </button>
-                                <div class="dropdown-menu scrollable-menu">
-                                  @for (specialityV of allSpecialities; track specialityV) {
-                                    <button class="dropdown-item" type="button"
-                                      (click)="_user.personInfo.specialities[i] = specialityV">
-                                      {{ specialityV.name }}
-                                    </button>
-                                  }
+                              <div class="input-group mb-2">
+                                <div class="dropdown flex-grow-1">
+                                  <button class="btn btn-outline-primary dropdown-toggle" title="Специальность" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{ speciality?.name }}
+                                  </button>
+                                  <ul class="dropdown-menu">
+                                    @for (specialityV of allSpecialities; track specialityV) {
+                                      <li>
+                                        <button class="dropdown-item" type="button"
+                                          (click)="_user.personInfo.specialities[i] = specialityV">
+                                          {{ specialityV.name }}
+                                        </button>
+                                      </li>
+                                    }
+                                  </ul>
                                 </div>
-                                <div class="input-group-append">
-                                  <button type="button" class="btn btn-outline-danger" (click)="_user.personInfo.specialities.splice(i, 1)">&times;</button>
-                                </div>
+                                <button type="button" class="btn btn-outline-danger" (click)="_user.personInfo.specialities.splice(i, 1)">&times;</button>
                               </div>
                             }
 
                             <div>
                               @if (allSpecialities && allSpecialities.length) {
-                                <button type="button" class="btn btn-primary btn-sm"
-                                  (click)="_user.personInfo.specialities.push(allSpecialities[0])" style="margin-top: 0.5rem;">
-                                  Добавить специальность
+                                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 mt-2"
+                                  (click)="_user.personInfo.specialities.push(allSpecialities[0])">
+                                  <i class="fas fa-plus me-1"></i>Добавить специальность
                                 </button>
                               }
                             </div>
                           </div>
 
-                          <div class="form-sub-group mt-3">
-                            <label>Специализации</label>
+      <div class="mb-3">
+        <label class="form-label small">Специализации</label>
                             @for (specialization of _user.personInfo.specializations; track specialization; let i = $index) {
-                              <div class="dropdown btn-group mb-2">
-                                <button class="btn btn-outline-primary dropdown-toggle border-right-radius-0" title="Специализация" data-bs-toggle="dropdown">
-                                  {{ specialization?.name }}
-                                </button>
-                                <div class="dropdown-menu scrollable-menu">
-                                  @for (specializationV of allSpecializations; track specializationV) {
-                                    <button class="dropdown-item" type="button"
-                                      (click)="_user.personInfo.specializations[i] = specializationV">
-                                      {{ specializationV.name }}
-                                    </button>
-                                  }
+                              <div class="input-group mb-2">
+                                <div class="dropdown flex-grow-1">
+                                  <button class="btn btn-outline-primary dropdown-toggle" title="Специализация" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{ specialization?.name }}
+                                  </button>
+                                  <ul class="dropdown-menu">
+                                    @for (specializationV of allSpecializations; track specializationV) {
+                                      <li>
+                                        <button class="dropdown-item" type="button"
+                                          (click)="_user.personInfo.specializations[i] = specializationV">
+                                          {{ specializationV.name }}
+                                        </button>
+                                      </li>
+                                    }
+                                  </ul>
                                 </div>
-                                <div class="input-group-append">
-                                  <button type="button" class="btn btn-outline-danger" (click)="_user.personInfo.specializations.splice(i, 1)">&times;</button>
-                                </div>
+                                <button type="button" class="btn btn-outline-danger" (click)="_user.personInfo.specializations.splice(i, 1)">&times;</button>
                               </div>
                             }
 
                             <div>
                               @if (allSpecializations && allSpecializations.length) {
-                                <button type="button" class="btn btn-primary btn-sm"
-                                  (click)="_user.personInfo.specializations.push(allSpecializations[0])" style="margin-top: 0.5rem;">
-                                  Добавить специализацию
+                                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 mt-2"
+                                  (click)="_user.personInfo.specializations.push(allSpecializations[0])">
+                                  <i class="fas fa-plus me-1"></i>Добавить специализацию
                                 </button>
                               }
                             </div>
                           </div>
 
-                          <div class="form-sub-group mt-3">
-                            <label>Области компетенции</label>
+      <div class="mb-3">
+        <label class="form-label small">Области компетенции</label>
                             @for (area of _user.areas; track area; let i = $index) {
-                              <div class="dropdown btn-group mb-2">
-                                <button class="btn btn-outline-primary dropdown-toggle border-right-radius-0" title="Область компетенции" data-bs-toggle="dropdown">
-                                  {{ area?.name }}
-                                </button>
-                                <div class="dropdown-menu scrollable-menu">
-                                  @for (areaV of allAreasOfCompetence; track areaV) {
-                                    <button class="dropdown-item" type="button"
-                                      (click)="_user.areas[i] = areaV">
-                                      {{ areaV.name }}
-                                    </button>
-                                  }
+                              <div class="input-group mb-2">
+                                <div class="dropdown flex-grow-1">
+                                  <button class="btn btn-outline-primary dropdown-toggle" title="Область компетенции" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{ area?.name }}
+                                  </button>
+                                  <ul class="dropdown-menu">
+                                    @for (areaV of allAreasOfCompetence; track areaV) {
+                                      <li>
+                                        <button class="dropdown-item" type="button"
+                                          (click)="_user.areas[i] = areaV">
+                                          {{ areaV.name }}
+                                        </button>
+                                      </li>
+                                    }
+                                  </ul>
                                 </div>
-                                <div class="input-group-append">
-                                  <button type="button" class="btn btn-outline-danger" (click)="_user.areas.splice(i, 1)">&times;</button>
-                                </div>
+                                <button type="button" class="btn btn-outline-danger" (click)="_user.areas.splice(i, 1)">&times;</button>
                               </div>
                             }
 
                             <div>
                               @if (allAreasOfCompetence && allAreasOfCompetence.length) {
-                                <button type="button" class="btn btn-primary btn-sm"
-                                  (click)="_user.areas.push(allAreasOfCompetence[0])" style="margin-top: 0.5rem;">
-                                  Добавить область компетенции
+                                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 mt-2"
+                                  (click)="_user.areas.push(allAreasOfCompetence[0])">
+                                  <i class="fas fa-plus me-1"></i>Добавить область компетенции
                                 </button>
                               }
                             </div>
                           </div>
                         </div>
 
-                        <!-- Личные данные эксперта (если физическое лицо) -->
-                        @if (isExpert() && !_user.isExpertOrg) {
-                          <div class="form-group">
-                            <label class="form-group-label">Личные данные</label>
-                            <div class="form-sub-group">
-                              <label>Дата рождения</label>
-                              <app-date-input class="width-100" [(ngModel)]="_user.personInfo.birthDate" [title]="'Дата рождения'"></app-date-input>
-                            </div>
-                            <div class="form-sub-group">
-                              <label for="address">Адрес регистрации</label>
-                              <input type="text" class="form-control" [(ngModel)]="_user.personInfo.address" id="address" placeholder="адрес регистрации">
-                            </div>
-                            <app-disability [(ngModel)]="_user.personInfo.disability"></app-disability>
-                          </div>
-                        }
+  <!-- Личные данные эксперта (если физическое лицо) -->
+  @if (isExpert() && !_user.isExpertOrg) {
+    <div class="mb-4">
+      <label class="form-label fw-semibold mb-3">Личные данные</label>
+      <div class="mb-3">
+        <label class="form-label small">Дата рождения</label>
+        <app-date-input class="width-100" [(ngModel)]="_user.personInfo.birthDate" [title]="'Дата рождения'"></app-date-input>
+      </div>
+      <div class="mb-3">
+        <label for="address" class="form-label small">Адрес регистрации</label>
+        <input type="text" class="form-control" [(ngModel)]="_user.personInfo.address" id="address" placeholder="адрес регистрации">
+      </div>
+      <app-disability [(ngModel)]="_user.personInfo.disability"></app-disability>
+    </div>
+  }
 
-                        @if (isExpert() && !_user.isExpertOrg) {
-                          <div class="form-group">
-                            <app-passport [(ngModel)]="_user.personInfo.passport"></app-passport>
-                          </div>
-                        }
+  @if (isExpert() && !_user.isExpertOrg) {
+    <div class="mb-4">
+      <app-passport [(ngModel)]="_user.personInfo.passport"></app-passport>
+    </div>
+  }
 
-                        @if (isExpert()) {
-                          <div class="form-group">
-                            <app-bank-account [(ngModel)]="_user.personInfo.bankAccount"></app-bank-account>
-                          </div>
-                        }
+  @if (isExpert()) {
+    <div class="mb-4">
+      <app-bank-account [(ngModel)]="_user.personInfo.bankAccount"></app-bank-account>
+    </div>
+  }
 
                         <!-- Кнопки: отмена, сохранить, админские действия -->
-                        <div class="mt-2">
-                          <button type="button" class="btn btn-secondary mr-2" (click)="cancel()">Отмена</button>
-                          <button type="button" class="btn btn-primary mr-2" (click)="save()">Сохранить</button>
+                        <div class="mt-4 pt-3 border-top d-flex gap-2 flex-wrap">
+                          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="cancel()">
+                            <i class="fas fa-times me-2"></i>Отмена
+                          </button>
+                          <button type="button" class="btn btn-primary rounded-pill px-4" (click)="save()">
+                            <i class="fas fa-save me-2"></i>Сохранить
+                          </button>
 
                           <ng-container *ifRole="Role.ADMIN">
-                            <button type="button" class="btn btn-warning mr-2" (click)="resetPassword()" [disabled]="_user.id == null">
-                              Сбросить пароль
+                            <button type="button" class="btn btn-warning rounded-pill px-4" (click)="resetPassword()" [disabled]="_user.id == null">
+                              <i class="fas fa-key me-2"></i>Сбросить пароль
                             </button>
 
                             @if (!current && _user.user && _user.user?.id != 0) {
-                              <button type="button" class="btn mr-2"
+                              <button type="button" class="btn rounded-pill px-4"
                                 [class.btn-danger]="!_user.user.blocked"
                                 [class.btn-success]="_user.user.blocked"
                                 (click)="toggleBlock()">
+                                <i class="fas me-2" [class.fa-unlock]="_user.user.blocked" [class.fa-lock]="!_user.user.blocked"></i>
                                 {{ _user.user.blocked ? 'Разблокировать' : 'Заблокировать' }}
                               </button>
                             }

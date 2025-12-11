@@ -13,25 +13,25 @@ export class SameProjectListComponent {
     constructor(private _projectService: ProjectService) {
     }
 
-    readonly sameProjectsInput = input<ProjectDto[]>([]);
+    readonly sameProjects = input<ProjectDto[]>([]);
     _sameProjects: ProjectDto[] = [];
-    readonly titleInput = input<string>('');
+    readonly title = input<string>('');
     _title: string = '';
 
-    get sameProjects(): ProjectDto[] {
-        return this._sameProjects.length > 0 ? this._sameProjects : this.sameProjectsInput();
+    get sameProjectsValue(): ProjectDto[] {
+        return this._sameProjects.length > 0 ? this._sameProjects : this.sameProjects();
     }
 
-    get title(): string {
-        return this._title || this.titleInput();
+    get titleValue(): string {
+        return this._title || this.title();
     }
 
-    set title(value: string) {
+    set titleValue(value: string) {
         this._title = value;
     }
 
     getSameProjects() {
-        this._projectService.getTheSameProjectsByTitle(this.title).subscribe(value => {
+        this._projectService.getTheSameProjectsByTitle(this.titleValue).subscribe(value => {
             this._sameProjects = value;
         })
     }

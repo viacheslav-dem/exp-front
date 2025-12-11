@@ -1,44 +1,63 @@
 @if (page() && pagination() && pages.length > 0) {
-  <div class="ng2-pagination">
-    <ul class="pagination pagination-sm">
+  <nav aria-label="Навигация по страницам">
+    <ul class="pagination pagination-modern justify-content-center mb-0">
       <!-- Первая -->
-      <li class="pagination-first page-item" [class.disabled]="pagination().page <= 1">
-        <a class="page-link" href=""
-          (click)="$event.preventDefault(); pagination().page > 1 && pageChanged({ page: 1, itemsPerPage: pagination().itemsPerPage })">
-          {{ firstText() }}
+      <li class="page-item" [class.disabled]="pagination().page <= 1">
+        <a class="page-link page-link-nav rounded-start" 
+           href=""
+           [attr.aria-label]="'Перейти на ' + firstText()"
+           (click)="$event.preventDefault(); pagination().page > 1 && pageChanged({ page: 1, itemsPerPage: pagination().itemsPerPage })">
+          <i class="fas fa-angle-double-left"></i>
+          <span class="d-none d-md-inline ms-1">{{ firstText() }}</span>
         </a>
       </li>
       <!-- Предыдущая -->
-      <li class="pagination-prev page-item" [class.disabled]="pagination().page <= 1">
-        <a class="page-link" href=""
-          (click)="$event.preventDefault(); pagination().page > 1 && pageChanged({ page: pagination().page - 1, itemsPerPage: pagination().itemsPerPage })">
-          {{ previousText() }}
+      <li class="page-item" [class.disabled]="pagination().page <= 1">
+        <a class="page-link page-link-nav" 
+           href=""
+           [attr.aria-label]="'Перейти на ' + previousText()"
+           (click)="$event.preventDefault(); pagination().page > 1 && pageChanged({ page: pagination().page - 1, itemsPerPage: pagination().itemsPerPage })">
+          <i class="fas fa-angle-left"></i>
+          <span class="d-none d-md-inline ms-1">{{ previousText() }}</span>
         </a>
       </li>
       <!-- Номера страниц -->
       @for (p of pages; track p) {
-        <li class="pagination-page page-item"
+        <li class="page-item"
           [class.active]="pagination().page === p">
-          <a class="page-link" href=""
-            (click)="$event.preventDefault(); pageChanged({ page: p, itemsPerPage: pagination().itemsPerPage })">
+          <a class="page-link" 
+             href=""
+             [attr.aria-label]="'Страница ' + p"
+             [attr.aria-current]="pagination().page === p ? 'page' : null"
+             (click)="$event.preventDefault(); pageChanged({ page: p, itemsPerPage: pagination().itemsPerPage })">
             {{ p }}
           </a>
         </li>
       }
       <!-- Следующая -->
-      <li class="pagination-next page-item" [class.disabled]="pagination().page >= page().totalPages">
-        <a class="page-link" href=""
-          (click)="$event.preventDefault(); pagination().page < page().totalPages && pageChanged({ page: pagination().page + 1, itemsPerPage: pagination().itemsPerPage })">
-          {{ nextText() }}
+      <li class="page-item" [class.disabled]="pagination().page >= page().totalPages">
+        <a class="page-link page-link-nav" 
+           href=""
+           [attr.aria-label]="'Перейти на ' + nextText()"
+           (click)="$event.preventDefault(); pagination().page < page().totalPages && pageChanged({ page: pagination().page + 1, itemsPerPage: pagination().itemsPerPage })">
+          <span class="d-none d-md-inline me-1">{{ nextText() }}</span>
+          <i class="fas fa-angle-right"></i>
         </a>
       </li>
       <!-- Последняя -->
-      <li class="pagination-last page-item" [class.disabled]="pagination().page >= page().totalPages">
-        <a class="page-link" href=""
-          (click)="$event.preventDefault(); pagination().page < page().totalPages && pageChanged({ page: page().totalPages, itemsPerPage: pagination().itemsPerPage })">
-          {{ lastText() }}
+      <li class="page-item" [class.disabled]="pagination().page >= page().totalPages">
+        <a class="page-link page-link-nav rounded-end" 
+           href=""
+           [attr.aria-label]="'Перейти на ' + lastText()"
+           (click)="$event.preventDefault(); pagination().page < page().totalPages && pageChanged({ page: page().totalPages, itemsPerPage: pagination().itemsPerPage })">
+          <span class="d-none d-md-inline me-1">{{ lastText() }}</span>
+          <i class="fas fa-angle-double-right"></i>
         </a>
       </li>
     </ul>
-  </div>
+    <div class="text-center mt-3 text-body-secondary small">
+      Страница <strong>{{ pagination().page }}</strong> из <strong>{{ page().totalPages }}</strong> 
+      <span class="ms-2">(Всего: <strong>{{ page().totalElements }}</strong>)</span>
+    </div>
+  </nav>
 }

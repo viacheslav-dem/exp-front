@@ -18,7 +18,12 @@
             "tsConfig": "src/tsconfig.json",
             "assets": [
               "src/assets",
-              "src/WEB-INF"
+              "src/WEB-INF",
+              {
+                "glob": "pdf.worker.min.mjs",
+                "input": "node_modules/pdfjs-dist/build",
+                "output": "/assets"
+              }
             ],
             "styles": [
               "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",

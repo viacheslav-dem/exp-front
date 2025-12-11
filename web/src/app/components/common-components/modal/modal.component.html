@@ -2,10 +2,8 @@
   <div class="modal-dialog" [ngClass]="modalClasses()">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title float-start">{{title()}}</h4>
-        <button type="button" class="btn btn-outline-danger float-end" aria-label="Закрыть" (click)="internalHide()">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <h4 class="modal-title">{{title()}}</h4>
+        <button type="button" class="btn-close" aria-label="Закрыть" (click)="internalHide()"></button>
       </div>
       <div class="modal-body">
         <ng-content></ng-content>

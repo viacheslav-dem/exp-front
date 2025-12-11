@@ -15,6 +15,38 @@ import {PropertyComponent} from "@app/components/settings/property.component";
 @Component({
     selector: 'app-settings',
     templateUrl: './settings.component.html',
+    styles: [`
+      .settings-item {
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0.75rem 1rem;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        background-color: #ffffff;
+      }
+      
+      .settings-item:hover:not(.active):not(.disabled) {
+        background-color: #f8f9fa;
+        transform: translateX(4px);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        border-color: rgba(13, 110, 253, 0.25);
+      }
+      
+      .settings-item.active {
+        background-color: #e7f1ff;
+        border-color: #0d6efd;
+        box-shadow: 0 0.25rem 0.5rem rgba(13, 110, 253, 0.2);
+      }
+      
+      .settings-item.disabled {
+        opacity: 0.6;
+        background-color: #f8f9fa;
+      }
+      
+      .settings-item:focus {
+        outline: 2px solid #0d6efd;
+        outline-offset: 2px;
+      }
+    `],
     standalone: false
 })
 export class SettingsComponent extends FilterAndPages<PropertyDto> {

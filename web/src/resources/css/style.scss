@@ -1,8 +1,9 @@
 @charset "UTF-8";
-@import "bootstrap";
-@import "common";
-@import "list-group";
-@import "controls";
-@import "alert";
-@import "transition-history";
-@import "datepicker-fix";
+@use "bootstrap" as *;
+// @use "bootstrap4-compat"; // Отключено для уменьшения размера - мигрируйте классы на BS5 (mr-* → me-*, ml-* → ms-*, etc.)
+@use "common";
+@use "list-group";
+@use "controls";
+@use "alert";
+@use "transition-history";
+@use "datepicker-fix";

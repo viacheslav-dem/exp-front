@@ -1,24 +1,30 @@
 <div [ngClass]="filterClass()">
   @for (field of _fields; track field) {
-    <div class="text-sm" [ngClass]="fieldClass()">
+    <div class="mb-3" [ngClass]="fieldClass()">
       <!--TITLE-->
       @if (field.title) {
-        <div class="mb-05">
+        <label class="form-label fw-semibold mb-2 small text-dark">
           {{field.title}}
-        </div>
+        </label>
       }
-      <div class="mb-05 input-group input-group-sm">
+      <div class="input-group input-group-sm">
         <!--SORT-->
         @if (field.sortable) {
-          <div class="input-group-prepend selectable" (click)="sortBy(field)">
-            <div class="input-group-text sort-icon">
-              <fa-icon [class.fa-active]="field.sortDirection" [icon]="sortIconClass(field)"></fa-icon>
-            </div>
-          </div>
+          <span class="input-group-text selectable cursor-pointer bg-light rounded-start border-end-0" 
+                (click)="sortBy(field)"
+                role="button"
+                tabindex="0"
+                (keyup.enter)="sortBy(field)"
+                title="Сортировка">
+            <fa-icon [class.fa-active]="field.sortDirection" [icon]="sortIconClass(field)"></fa-icon>
+          </span>
         }
         <!--SEARCH FIELD-->
         @if (field.type == SearchFieldType.TEXT) {
-          <input type="text" title="Текст для поиска" class="form-control"
+          <input type="text" title="Текст для поиска" 
+            [class.rounded-end]="!field.sortable && !field.resetEnabled"
+            [class.rounded-0]="field.sortable || field.resetEnabled"
+            class="form-control"
             (input)="changeSearchText($event, field)" [value]="field.value"
             (keyup.enter)="filterChanged()"
             [placeholder]="field.placeholder | orElse: 'Поиск...'">
@@ -26,6 +32,8 @@
         <!--DATE PERIOD-->
         @if (field.type == SearchFieldType.DATE_PERIOD) {
           <app-date-period
+            [class.rounded-end]="!field.sortable && !field.resetEnabled"
+            [class.rounded-0]="field.sortable || field.resetEnabled"
             class="form-control" [(ngModel)]="field.value"
             (onSelect)="filterChanged()" [placeholder]="field.placeholder | orElse: 'Выбрать период...'"
           ></app-date-period>
@@ -33,58 +41,64 @@
         <!--NUMBER RANGE-->
         @if (field.type == SearchFieldType.NUMBER_RANGE) {
           <input numberInput type="text" title="от" [placeholder]="field.placeholderFrom | orElse: 'от'"
-            [value]="field.value.start" step="1" (input)="changePeriod($event, field, 'start')" class="form-control"/>
-            <div class="input-group-prepend input-group-append">
-              <div class="input-group-text">
-                <span> – </span>
-              </div>
-            </div>
-            <input numberInput type="text" title="до" [placeholder]="field.placeholderTo | orElse: 'до'"
-              [value]="field.value.end" step="1" (input)="changePeriod($event, field, 'end')" class="form-control"/>
-            }
-            <!--CHECKBOXES-->
-            @if (field.type == SearchFieldType.MULTI_CHECK) {
-              <div class="input-group-append">
-                @for (check of field.multiCheck; track check) {
-                  <div class="btn btn-primary" [class.active]="check.selected"
-                    (click)="changeMultiCheck(field, check)">
-                    {{check.getItemAsString()}}
-                  </div>
-                }
-              </div>
-            }
-            <!--SINGLE CHECKBOX-->
-            @if (field.type == SearchFieldType.CHECKBOX) {
-              <app-checkbox class="text-sm"
-                [ngModel]="field.checked" (onChecked)="changeCheckbox(field)">
-                {{field.label}}
-              </app-checkbox>
-            }
-            <!--MULTISELECT-->
-            @if (field.type == SearchFieldType.MULTI_SELECT) {
-              <ng-select
-                [items]="field.allItems"
-                bindLabel="itemName"
-                [multiple]="true"
-                [(ngModel)]="field.selectedItems"
-                [searchable]="true"
-                [clearable]="true"
-                [placeholder]="field.settings.text || 'Выбрать'"
-                (ngModelChange)="changeMultiSelect(field)">
-              </ng-select>
-            }
-            @if (field.resetEnabled && !field.isEmpty()) {
-              <div class="input-group-append selectable">
-                <button class="btn btn-primary" (click)="filterChanged()">Поиск</button>
-              </div>
-            }
-            <!--RESET-->
-            @if (field.resetEnabled && !field.isEmpty()) {
-              <div class="input-group-append selectable">
-                <button class="btn btn-primary" (click)="reset(field)"><fa-icon icon="times"></fa-icon></button>
-              </div>
+            [value]="field.value.start" step="1" (input)="changePeriod($event, field, 'start')" 
+            class="form-control rounded-start"/>
+          <span class="input-group-text bg-light border-start-0 border-end-0">
+            –
+          </span>
+          <input numberInput type="text" title="до" [placeholder]="field.placeholderTo | orElse: 'до'"
+            [value]="field.value.end" step="1" (input)="changePeriod($event, field, 'end')" 
+            class="form-control rounded-end"/>
+        }
+        <!--CHECKBOXES-->
+        @if (field.type == SearchFieldType.MULTI_CHECK) {
+          <div class="d-flex flex-wrap gap-2 mt-2 w-100">
+            @for (check of field.multiCheck; track check) {
+              <button type="button" class="btn btn-sm btn-outline-primary" 
+                      [class.active]="check.selected"
+                      (click)="changeMultiCheck(field, check)">
+                {{check.getItemAsString()}}
+              </button>
             }
           </div>
-        </div>
-      }
+        }
+        <!--SINGLE CHECKBOX-->
+        @if (field.type == SearchFieldType.CHECKBOX) {
+          <div class="w-100 mt-2">
+            <app-checkbox class="text-sm"
+              [ngModel]="field.checked" (onChecked)="changeCheckbox(field)">
+              {{field.label}}
+            </app-checkbox>
+          </div>
+        }
+        <!--MULTISELECT-->
+        @if (field.type == SearchFieldType.MULTI_SELECT) {
+          <ng-select
+            [items]="field.allItems"
+            bindLabel="itemName"
+            [multiple]="true"
+            [(ngModel)]="field.selectedItems"
+            [searchable]="true"
+            [clearable]="true"
+            [placeholder]="field.settings.text || 'Выбрать'"
+            (ngModelChange)="changeMultiSelect(field)"
+            [class.rounded-end]="!field.sortable && !field.resetEnabled"
+            [class.rounded-0]="field.sortable || field.resetEnabled"
+            class="form-control">
+          </ng-select>
+        }
+        @if (field.resetEnabled && !field.isEmpty()) {
+          <button type="button" class="btn btn-primary btn-sm" (click)="filterChanged()">
+            <i class="fas fa-search me-1"></i>Поиск
+          </button>
+        }
+        <!--RESET-->
+        @if (field.resetEnabled && !field.isEmpty()) {
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="reset(field)">
+            <fa-icon icon="times"></fa-icon>
+          </button>
+        }
+      </div>
     </div>
+  }
+</div>

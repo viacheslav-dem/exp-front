@@ -1,4 +1,4 @@
-import {ErrorHandler, NgModule, NO_ERRORS_SCHEMA} from "@angular/core";
+import {ErrorHandler, NgModule} from "@angular/core";
 import {RouterModule} from "@angular/router";
 import {appRoutes} from "./app.routing";
 import {AppComponent} from "./app.component";
@@ -166,7 +166,7 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
     bootstrap: [
         AppComponent
     ],
-    schemas: [NO_ERRORS_SCHEMA], imports: [BrowserModule,
+    imports: [BrowserModule,
         RouterModule.forRoot(appRoutes),
         NgSelectModule,
         DialogModule.forRoot(),

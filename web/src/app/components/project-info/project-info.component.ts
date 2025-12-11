@@ -611,7 +611,7 @@ export class ProjectInfoComponent implements OnInit {
   }
 
   findTheSameProjects(title: string) {
-    this.sameProjectList.title = title;
+    this.sameProjectList.titleValue = title;
     this._projectService.getTheSameProjectsByTitle(title).subscribe(value => {
       this.listSameProjects = value;
       this.listProjects.show();

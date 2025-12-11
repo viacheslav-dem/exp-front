@@ -6,6 +6,83 @@ import {PageRequest} from "@app/components/common-components/page-and-filter/mod
 @Component({
     selector: 'app-pagination',
     templateUrl: './pagination.component.html',
+    styles: [`
+      .pagination-modern {
+        gap: 0.15rem;
+        flex-wrap: nowrap;
+        font-size: 0.875rem;
+      }
+      
+      .pagination-modern .page-link {
+        border-radius: 0.375rem;
+        border: 1px solid #dee2e6;
+        padding: 0.375rem 0.5rem;
+        color: #495057;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        min-width: 2rem;
+        text-align: center;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        line-height: 1.2;
+      }
+      
+      .pagination-modern .page-link-nav {
+        min-width: auto;
+        padding: 0.375rem 0.5rem;
+      }
+      
+      @media (min-width: 768px) {
+        .pagination-modern .page-link-nav {
+          min-width: 3.5rem;
+          padding: 0.375rem 0.75rem;
+        }
+      }
+      
+      .pagination-modern .page-link i {
+        font-size: 0.875rem;
+      }
+      
+      .pagination-modern .page-link:hover:not(.disabled) {
+        background-color: #e9ecef;
+        border-color: #0d6efd;
+        color: #0d6efd;
+        box-shadow: 0 0.125rem 0.25rem rgba(13, 110, 253, 0.15);
+      }
+      
+      .pagination-modern .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+        box-shadow: 0 0.125rem 0.25rem rgba(13, 110, 253, 0.2);
+        font-weight: 600;
+      }
+      
+      .pagination-modern .page-item.disabled .page-link {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #6c757d;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+      
+      .pagination-modern .page-item.disabled .page-link:hover {
+        box-shadow: none;
+      }
+      
+      .pagination-modern .page-link.rounded-start {
+        border-top-left-radius: 0.375rem !important;
+        border-bottom-left-radius: 0.375rem !important;
+      }
+      
+      .pagination-modern .page-link.rounded-end {
+        border-top-right-radius: 0.375rem !important;
+        border-bottom-right-radius: 0.375rem !important;
+      }
+    `],
     standalone: false
 })
 export class PaginationComponent implements OnInit {

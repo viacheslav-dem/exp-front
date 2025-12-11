@@ -47,6 +47,7 @@ import {BooleanButtonV2Component} from "@app/components/common-components/boolea
 import {MethRecPdfComponent} from "@app/components/dialogs/meth-rec/meth-rec-pdf.component";
 import {HighchartComponent} from "@app/components/highchart/highchart.component";
 import {GlobalToastsComponent} from "@app/components/common-components/global-toasts/global-toasts.component";
+import {PdfViewerModule} from "ng2-pdf-viewer";
 
 @NgModule({
   imports: [
@@ -63,6 +64,7 @@ import {GlobalToastsComponent} from "@app/components/common-components/global-to
     FontAwesomeModule,
     NgSelectModule,
     NgxSliderModule,
+    PdfViewerModule,
   ],
   exports: [
     CommonModule,
@@ -77,6 +79,7 @@ import {GlobalToastsComponent} from "@app/components/common-components/global-to
     FontAwesomeModule,
     NgSelectModule,
     NgxSliderModule,
+    PdfViewerModule,
     DocumentListComponent,
     FileEditorComponent,
     PasswordInputComponent,

@@ -161,8 +161,9 @@ export class BasicProjectInfoComponent implements OnInit {
   }
 
   checkVisibleForBureau(): boolean {
-    return (anyMatch(this.role(), Role.BUREAU_CHAIRMAN, Role.BUREAU_ASSESSOR) && this.lifecycleGroup != null
-      && this.lifecycleGroup().state == null
+    const lifecycleGroup = this.lifecycleGroup();
+    return (anyMatch(this.role(), Role.BUREAU_CHAIRMAN, Role.BUREAU_ASSESSOR) && lifecycleGroup != null
+      && lifecycleGroup.state == null
         // ProjectLifecycleState.RETURNED
     );
   }

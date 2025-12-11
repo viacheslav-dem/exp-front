@@ -16,15 +16,14 @@ import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
     }
 
     .password-icon {
-      color: #babec4;
-      position: absolute;
-      right: 8%;
-      top: 52%;
-      cursor: pointer;
+      color: #6c757d;
+      font-size: 1.1rem;
+      transition: color 0.3s ease;
     }
     
-    #password-icon-crossed{
-      display: none;
+    .btn-link:hover .password-icon,
+    .btn-link:focus .password-icon {
+      color: #0d6efd;
     }
   `],
     standalone: false
@@ -33,6 +32,7 @@ export class LoginComponent implements OnInit {
 
   user: any = {};
   systemLoginNotification: SystemNotificationDto;
+  showPassword: boolean = false;
 
   constructor(private _authService: AuthService,
               private notificationService: SystemNotificationService,
@@ -50,16 +50,11 @@ export class LoginComponent implements OnInit {
   }
 
   toggleVisibility() {
-      const inputPass = document.getElementById("input-password");
-      const eyeBtn = document.getElementById("password-icon");
-      const eyeBtnСross = document.getElementById("password-icon-crossed");
-
-      inputPass.setAttribute(
-         "type",
-         inputPass.getAttribute("type") === "password" ? 'text' : 'password'
-      );
-      eyeBtn.style.display = inputPass.getAttribute("type") === "password" ? 'block' : 'none';
-      eyeBtnСross.style.display =inputPass.getAttribute("type") === "password" ? 'none' : 'block';
+      this.showPassword = !this.showPassword;
+      const inputPass = document.getElementById("input-password") as HTMLInputElement;
+      if (inputPass) {
+        inputPass.type = this.showPassword ? 'text' : 'password';
+      }
   }
 
   getSystemNotificationForLoginPage() {

@@ -22,19 +22,23 @@
 <div [ngClass]="{'card card-block': true,
   'alert-danger': project.red,
   'alert-warning': project.yellow,
-  'alert-primary': project.blue
+  'alert-primary': project.blue,
+  'border-0': true
 }">
-  <h5>
-    {{project.title}} <span class="text-muted text-sm italic bold">{{project.termsMessage}}</span>
-  </h5>
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+    <h5 class="mb-0 flex-grow-1">{{project.title}}</h5>
+    @if (project.termsMessage) {
+      <div class="text-primary text-sm fw-bold flex-shrink-0">{{project.termsMessage}}</div>
+    }
+  </div>
 
-  <div class="text-sm">
+  <div class="text-sm mb-2">
     <span>Код объекта экспертизы: </span>
     <span class="italic">{{project.code?.code | orElse : 'не указан'}}</span>
   </div>
 
   @if (project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       @if (project.code?.code != '8.4') {
         <span>Наименование программы (подпрограммы): </span>
       }
@@ -46,42 +50,42 @@
   }
 
   @if (project.customer!=null) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Заказчик экспертизы: </span>
       <span class="italic">{{project.customer?.org?.name | orElse : 'организация не указана' }}</span>
     </div>
   }
 
   @if (project.subCustomer!=null) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Инициатор экспертизы: </span>
       <span class="italic">{{project.subCustomer?.org?.name | orElse : 'организация не указана' }}</span>
     </div>
   }
 
   @if (project.registerDate) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Дата регистрации: </span>
       <span class="italic">{{project.registerDate | mdate}}</span>
     </div>
   }
 
   @if (project.registrationNumber) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Регистрационный номер: </span>
       <span class="italic">{{project.registrationNumber}}</span>
     </div>
   }
 
   @if (project.executor) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Организация исполнитель: </span>
       <span class="italic">{{project.executor}}</span>
     </div>
   }
 
   @if (project.period?.start || project.period?.end) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Сроки реализации: </span>
       <span class="italic">
         {{project.period?.start | mdate | orElse: 'дд.мм.гггг'}} -
@@ -91,9 +95,9 @@
   }
 
   @if (project.financing.length) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Финансирование: </span>
-      <ul class="mb-0 ps-4">
+      <ul class="mb-0 ps-4 mt-1">
         @for (fin of project.financing; track fin) {
           <li class="italic">
             <span>{{fin.type | fundingType}} финансирование, </span>
@@ -107,11 +111,11 @@
   }
 
   @if (project.directions.length > 0) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>
         Приоритетное направление научных исследований и (или) научно-технической деятельности:
       </span>
-      <ul class="mb-0 ps-4">
+      <ul class="mb-0 ps-4 mt-1">
         @for (dir of displayedDirections; track dir) {
           <li>
             <span class="italic">{{dir.name}}</span>
@@ -131,11 +135,11 @@
   }
 
   @if (project.socialEconomicGoals.length > 0) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>
         Цель (приоритет) социально-экономического развития:
       </span>
-      <ul class="mb-0 ps-4">
+      <ul class="mb-0 ps-4 mt-1">
         @for (item of project.socialEconomicGoals; track item) {
           <li>
             <span class="italic">{{item.name}}</span>
@@ -146,70 +150,70 @@
   }
 
   @if (project.gkntChairman) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Зам. Председателя ГКНТ: </span>
       <span class="italic">{{project.gkntChairman | fullName}}</span>
     </div>
   }
 
   @if (project.gkntDepartment) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Подразделение ГКНТ: </span>
       <span class="italic">{{project.gkntDepartment.name}}</span>
     </div>
   }
 
   @if (project.gkntDepartmentChairman) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Начальник подразделения ГКНТ: </span>
       <span class="italic">{{project.gkntDepartmentChairman | fullName}}</span>
     </div>
   }
 
   @if (project.gkntWorker) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Ответственный сотрудник ГКНТ: </span>
       <span class="italic">{{project.gkntWorker | fullName}}</span>
     </div>
   }
 
   @if (project.returnReason) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Причина возврата: </span>
       <span class="italic">{{project.returnReason}}</span>
     </div>
   }
 
   @if (project.productName) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Название продукта: </span>
       <span class="italic">{{project.productName}}</span>
     </div>
   }
 
   @if (project.orgProduction) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Название организации(ий) : </span>
       <span class="italic">{{project.orgProduction}}</span>
     </div>
   }
 
   @if (project.highTechProduction) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Новые и высоки технологии:</span>
       <span class="italic">{{project.highTechProduction}}</span>
     </div>
   }
 
   @if (project.productionOnRB) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Обьём производства на территории РБ:</span>
       <span class="italic">{{project.productionOnRB}}</span>
     </div>
   }
 
   @if (project.exportAndImport) {
-    <div class="text-sm">
+    <div class="text-sm mb-2">
       <span>Общий объем экспорта и импорта:</span>
       <span class="italic">{{project.exportAndImport}}</span>
     </div>
@@ -217,7 +221,7 @@
 
   @if (!project.code?.code.startsWith('8.10') && !project.code?.code.startsWith('8.16')) {
     <div>
-      <div class="text-sm">
+      <div class="text-sm mb-2">
         <span>Ожидаемый результат объекта экспертизы: </span>
         @if (project.expectedResult && project.expectedResult.expectedResultType !== 'другое') {
           <span
@@ -228,11 +232,11 @@
           class="italic">{{ project.otherExpectedResult }}</span>
         }
       </div>
-      <div class="text-sm">
+      <div class="text-sm mb-2">
         <span>Описание ожидаемого результата экспертизы: </span>
         <span class="italic">{{ project.expectedResultDescription }}</span>
       </div>
-      <div class="text-sm">
+      <div class="text-sm mb-2">
         <span>Вид работ/Способ реализации объекта экспертизы: </span>
         @if (project.workType !== 'другое') {
           <span class="italic">{{ project.workType }}</span>
@@ -241,23 +245,23 @@
           <span class="italic">{{ project.otherWorkType }}</span>
         }
       </div>
-      <div class="text-sm">
+      <div class="text-sm mb-2">
         <span>Характер результата: </span>
         <span class="italic">{{ project.selectedResultSpecific }}</span>
       </div>
       @if (project.selectedResultSpecific === 'прикладной') {
         <div class="text-sm">
-          <div class="text-sm">
+          <div class="text-sm mb-2">
             <span>Результат подлежит коммерциализации: </span>
             <span>{{ project.resultCommercialization }}</span>
           </div>
           @if (project.resultCommercialization === 'Подлежит') {
-            <div class="text-sm">
+            <div class="text-sm mb-2">
               <span>Объект коммерциализации: </span>
               <span>{{ project.commercializationDescription }}</span>
               <br>
                 <span>Способ коммерциализации: </span>
-                <ul class="mb-0 ps-4">
+                <ul class="mb-0 ps-4 mt-1">
                   @for (item of project.commercializationMethods; track item) {
                     <li>
                       <span class="italic">{{item.name}}</span>
@@ -267,7 +271,7 @@
               </div>
             }
             @if (project.resultCommercialization === 'Не подлежит') {
-              <div class="text-sm">
+              <div class="text-sm mb-2">
                 <span>Характер результата - прикладной:  </span>
                 <span>{{ project.implementationResult }}</span>
                 <br>
@@ -278,7 +282,7 @@
                     <span>{{ project.implementationSpecifying }}</span>
                   </div>
                 }
-                <div class="text-sm">
+                <div class="text-sm mb-2">
                   <span>Технологический уклад: </span>
                   @if (project.technologicalOrder !== 'другое') {
                     <span class="italic">{{ project.technologicalOrder }}</span>
@@ -290,7 +294,7 @@
               </div>
             }
             @if (project.selectedResultSpecific === 'не предусмотрен') {
-              <div class="text-sm">
+              <div class="text-sm mb-2">
                 <span>Технологический уклад: </span>
                 @if (project.technologicalOrder !== 'другое') {
                   <span class="italic">{{ project.technologicalOrder }}</span>

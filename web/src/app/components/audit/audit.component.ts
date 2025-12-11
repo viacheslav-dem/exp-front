@@ -21,6 +21,39 @@ import {SearchField} from "@app/components/common-components/page-and-filter/mod
           background-color: white;
           margin-bottom: 0;
       }
+
+      thead th {
+          padding: 1rem 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-size: 0.75rem;
+          border-bottom: 2px solid #dee2e6;
+      }
+
+      tbody td {
+          padding: 1rem 0.75rem;
+          vertical-align: middle;
+          border-bottom: 1px solid #f0f0f0;
+      }
+
+      .audit-table-row {
+          transition: all 0.2s ease;
+      }
+
+      .audit-table-row:hover {
+          background-color: #f8f9fa !important;
+          transform: scale(1.01);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .cursor-pointer {
+          cursor: pointer;
+      }
+
+      .cursor-pointer:hover {
+          color: #0d6efd !important;
+      }
   `],
     standalone: false
 })

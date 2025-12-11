@@ -1,175 +1,191 @@
-<div class="card mx-3 pb-3 pt-3">
-  <div class="card-title row">
-    <div class="col">
-      <h5>Справочник экспертов</h5>
-    </div>
-    <div class="col">
-      <button class="btn btn-outline-primary no-focus filter-collapse float-right" type="button"
-        (click)="showFilter.set(!showFilter())">
-        @if (!showFilter()) {
-          <span>Показать фильтр</span>
-        } @else {
-          <span>Скрыть фильтр</span>
-        }
-      </button>
-    </div>
+<div class="container-fluid px-4 py-4">
+  <div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="card-title mb-0 fw-bold text-dark">Справочник экспертов</h4>
+        <button class="btn btn-outline-primary rounded-pill px-4 py-2 fw-medium" type="button"
+          (click)="showFilter.set(!showFilter())">
+          @if (!showFilter()) {
+            <i class="fas fa-filter me-2"></i>Показать фильтр
+          } @else {
+            <i class="fas fa-times me-2"></i>Скрыть фильтр
+          }
+        </button>
+      </div>
 
-  </div>
-  <!--FILTER-->
-  @if (showFilter()) {
-    <div>
-      <app-filter
-        [fieldClass]="'col-lg-3'" [filterClass]="'row'" [fields]="_searchFields"
-        (onFilterChanged)="onFilterChanged()">
-      </app-filter>
-    </div>
-  }
+      <!--FILTER-->
+      @if (showFilter()) {
+        <div class="card border border-2 border-info-subtle rounded-4 mb-4 bg-light bg-opacity-50">
+          <div class="card-body p-4">
+            <app-filter
+              [fieldClass]="'col-lg-3'" [filterClass]="'row g-3'" [fields]="_searchFields"
+              (onFilterChanged)="onFilterChanged()">
+            </app-filter>
+          </div>
+        </div>
+      }
 
-  <div class="mt-2" [loadingData]="_loading">
-    <div class="list-group">
-      @for (expert of experts(); track expert) {
-        <div class="list-group-item list-group-item-action">
-          <div class="row">
-            <div class="col-lg-3">
-              <div class="bold">{{expert|fullName}}</div>
-              <div class="text-sm italic text-muted">{{expert.personInfo | academicInfo}}</div>
-              <div class="text-sm italic">{{expert.email}}</div>
-              <div class="text-sm italic">{{expert.phones | phones}}</div>
-            </div>
-            <div class="col-lg-3 text-sm px-0">
-              @if (expert.areas.length > 0) {
-                <div>
-                  Области компетенции:&nbsp;<span class="italic">{{expert | areas}}</span>
-                </div>
-              }
-              @if (expert.personInfo.specializations) {
-                <div>
-                  Специализация:&nbsp;
-                  @for (spec of expert.personInfo.specializations; track spec) {
-                    <div
-                      class="italic">{{spec.name}}
+      <div [loadingData]="_loading">
+        <div class="list-group list-group-flush">
+          @for (expert of experts(); track expert) {
+            <div class="expert-card card border-0 shadow-sm rounded-4 mb-3">
+              <div class="card-body p-4">
+                <div class="row g-4">
+                  <div class="col-lg-3">
+                    <h6 class="fw-bold mb-2 text-dark">{{expert|fullName}}</h6>
+                    <div class="text-body-secondary small mb-2">
+                      <i class="fas fa-graduation-cap me-1"></i>{{expert.personInfo | academicInfo}}
                     </div>
-                  }
-                </div>
-              }
-              @if (expert.personInfo.specialities) {
-                <div>
-                  Специальность:&nbsp;
-                  @for (special of expert.personInfo.specialities; track special) {
-                    <div
-                      class="italic">{{special.name}}
+                    <div class="text-body-secondary small mb-2">
+                      <i class="fas fa-envelope me-1"></i>
+                      <span class="text-break">{{expert.email}}</span>
                     </div>
-                  }
+                    <div class="text-body-secondary small">
+                      <i class="fas fa-phone me-1"></i>{{expert.phones | phones}}
+                    </div>
+                  </div>
+                  <div class="col-lg-3 text-sm">
+                    @if (expert.areas.length > 0) {
+                      <div class="mb-3">
+                        <div class="fw-semibold small text-dark mb-1">Области компетенции:</div>
+                        <div class="text-body-secondary small text-break">
+                          {{expert | areas}}
+                        </div>
+                      </div>
+                    }
+                    @if (expert.personInfo.specializations) {
+                      <div class="mb-3">
+                        <div class="fw-semibold small text-dark mb-1">Специализация:</div>
+                        @for (spec of expert.personInfo.specializations; track spec) {
+                          <div class="text-body-secondary small mt-1 text-break">{{spec.name}}</div>
+                        }
+                      </div>
+                    }
+                    @if (expert.personInfo.specialities) {
+                      <div class="mb-3">
+                        <div class="fw-semibold small text-dark mb-1">Специальность:</div>
+                        @for (special of expert.personInfo.specialities; track special) {
+                          <div class="text-body-secondary small mt-1 text-break">{{special.name}}</div>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <div class="col-lg-3 text-sm">
+                    @if (expert.org?.name) {
+                      <div class="mb-3">
+                        <div class="fw-semibold small text-dark mb-1">Организация:</div>
+                        <div class="text-body-secondary small text-break">{{expert.org?.name}}</div>
+                      </div>
+                    }
+                    @if (expert.post) {
+                      <div class="mb-3">
+                        <div class="fw-semibold small text-dark mb-1">Должность:</div>
+                        <div class="text-body-secondary small text-break">{{expert.post}}</div>
+                      </div>
+                    }
+                  </div>
+                  <div class="col-lg-3 text-sm">
+                    <div class="d-flex flex-column gap-2">
+                      <button class="btn btn-link text-start p-0 text-primary text-decoration-none fw-medium" 
+                              (click)="showProjectsOnExpertExamination(expert)">
+                        <i class="fas fa-file-alt me-1"></i>Объектов на экспертизе: 
+                        <span class="fw-bold">{{expert.realTimeStats.projectsOnExamination}}</span>
+                      </button>
+                      <button class="btn btn-link text-start p-0 text-primary text-decoration-none fw-medium" 
+                              (click)="showProjectsOnExpertConfirmation(expert)">
+                        <i class="fas fa-clock me-1"></i>Ожидают подтверждения: 
+                        <span class="fw-bold">{{expert.realTimeStats.reviewsOnConfirmation}}</span>
+                      </button>
+                      <button class="btn btn-link text-start p-0 text-danger text-decoration-none fw-medium" 
+                              (click)="showProjectsExpertReviewsTermsViolation(expert)">
+                        <i class="fas fa-exclamation-triangle me-1"></i>Нарушены сроки: 
+                        <span class="fw-bold">{{expert.realTimeStats.reviewsTermsViolation.red}}</span>
+                      </button>
+                      <button class="btn btn-link text-start p-0 text-success text-decoration-none fw-medium" 
+                              (click)="showProjectsExpertReviewFinished(expert)">
+                        <i class="fas fa-check-circle me-1"></i>Завершено заключений: 
+                        <span class="fw-bold">
+                          {{expert.realTimeStats.acceptedProjects + expert.realTimeStats.rejectedProjects}}
+                        </span>
+                      </button>
+                      <div class="d-flex flex-wrap gap-3 mt-1">
+                        <div class="small text-body-secondary">
+                          <i class="fas fa-ban me-1"></i>Отказы эксперта: 
+                          <span class="fw-bold">{{expert.realTimeStats.rejectedReviewsByExpert}}</span>
+                        </div>
+                        <div class="small text-body-secondary">
+                          <i class="fas fa-ban me-1"></i>Отказы ГКНТ: 
+                          <span class="fw-bold">{{expert.realTimeStats.rejectedReviewsByGknt}}</span>
+                        </div>
+                      </div>
+                      @if (getCurrentRole()==Role.GKNT_CHAIRMAN) {
+                        <button class="btn btn-link text-start p-0 text-primary text-decoration-none fw-medium mt-2" 
+                                (click)="showExpertPayInfoDialog(expert)">
+                          <i class="fas fa-info-circle me-1"></i><span class="fw-bold">Подробная информация</span>
+                        </button>
+                      }
+                    </div>
+                  </div>
                 </div>
-              }
-            </div>
-            <div class="col-lg-3 text-sm pr-0">
-              @if (expert.org?.name) {
-                <div>
-                  Организация:&nbsp;<span class="italic">{{expert.org?.name}}</span>
+                <div class="row g-3 mt-3 pt-3 border-top" #chartContainer [attr.data-expert-id]="expert.id">
+                  <div class="col-xl-4 text-center">
+                    <div class="text-body-secondary small mb-2 fw-semibold">Подготовлено экспертных заключений за год</div>
+                    @if (isChartsLoaded(expert.id)) {
+                      <app-finished-reviews-sparkline-chart
+                      [stats]="expert.stats"></app-finished-reviews-sparkline-chart>
+                    } @else {
+                      <div style="height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <div class="spinner" style="margin: 0;">
+                          <div class="double-bounce1"></div>
+                          <div class="double-bounce2"></div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                  <div class="col-xl-4 text-center">
+                    <div class="text-body-secondary small mb-2 fw-semibold">Статистика работы эксперта за год</div>
+                    @if (isChartsLoaded(expert.id)) {
+                      <app-review-results-sparkline-chart [stats]="expert.stats"></app-review-results-sparkline-chart>
+                    } @else {
+                      <div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+                        <div class="spinner" style="margin: 0;">
+                          <div class="double-bounce1"></div>
+                          <div class="double-bounce2"></div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                  <div class="col-xl-4 text-center">
+                    <div class="text-body-secondary small mb-2 fw-semibold">Время подготовки заключения</div>
+                    @if (isChartsLoaded(expert.id)) {
+                      <app-reviews-violation-sparkline-chart
+                      [stats]="expert.stats"></app-reviews-violation-sparkline-chart>
+                    } @else {
+                      <div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+                        <div class="spinner" style="margin: 0;">
+                          <div class="double-bounce1"></div>
+                          <div class="double-bounce2"></div>
+                        </div>
+                      </div>
+                    }
+                  </div>
                 </div>
-              }
-              @if (expert.post) {
-                <div>
-                  Должность:&nbsp;<span class="italic">{{expert.post}}</span>
-                </div>
-              }
+              </div>
             </div>
-            <div class="col-lg-3 text-sm">
-              <div class="link" (click)="showProjectsOnExpertExamination(expert)">
-                Объектов на&nbsp;экспертизе:&nbsp;<span
-              class="bold">{{expert.realTimeStats.projectsOnExamination}}</span>
+          }
+          @if (_page.totalElements != null && _page.totalElements === 0 && experts().length == 0) {
+            <div class="alert alert-info fst-italic mb-0 rounded-4 shadow-sm border-0 p-3">
+              <i class="fas fa-info-circle me-2"></i>Эксперты не найдены
             </div>
-            <div class="link" (click)="showProjectsOnExpertConfirmation(expert)">
-              Ожидают подтверждения:&nbsp;<span
-            class="bold">{{expert.realTimeStats.reviewsOnConfirmation}}</span>
-          </div>
-          <div class="link" (click)="showProjectsExpertReviewsTermsViolation(expert)">
-            Нарушены сроки:&nbsp;<span
-          class="bold">{{expert.realTimeStats.reviewsTermsViolation.red}}</span>
+          }
         </div>
-        <div class="link" (click)="showProjectsExpertReviewFinished(expert)">
-          Завершено заключений:&nbsp;
-          <span class="bold">
-            {{expert.realTimeStats.acceptedProjects + expert.realTimeStats.rejectedProjects}}
-          </span>
+        <div class="mt-4">
+          <app-pagination [page]="_page" [pagination]="_pagination"
+          (onPageChanged)="onPageChanged($event)"></app-pagination>
         </div>
-        <div class="text-mini">
-          <div class="d-inline-block text-nowrap mr-2">
-            Отказы эксперта:&nbsp;
-            <span class="bold">
-              {{expert.realTimeStats.rejectedReviewsByExpert}}
-            </span>
-          </div>
-          <div class="d-inline-block text-nowrap">
-            Отказы ГКНТ:&nbsp;
-            <span class="bold">
-              {{expert.realTimeStats.rejectedReviewsByGknt}}
-            </span>
-          </div>
-        </div>
-        @if (getCurrentRole()==Role.GKNT_CHAIRMAN) {
-          <div class="link"
-            (click)="showExpertPayInfoDialog(expert)">
-            <span class="bold">Подробная информация</span>
-          </div>
-        }
-      </div>
-    </div>
-    <div class="row" #chartContainer [attr.data-expert-id]="expert.id">
-      <div class="col-xl-4 text-center">
-        <div class="text-sm text-muted pt-2">Подготовлено экспертных заключений за год</div>
-        @if (isChartsLoaded(expert.id)) {
-          <app-finished-reviews-sparkline-chart
-          [stats]="expert.stats"></app-finished-reviews-sparkline-chart>
-        } @else {
-          <div style="height: 60px; display: flex; align-items: center; justify-content: center;">
-            <div class="spinner" style="margin: 0;">
-              <div class="double-bounce1"></div>
-              <div class="double-bounce2"></div>
-            </div>
-          </div>
-        }
-      </div>
-      <div class="col-xl-4 text-center">
-        <div class="text-sm text-muted pt-2">Статистика работы эксперта за год</div>
-        @if (isChartsLoaded(expert.id)) {
-          <app-review-results-sparkline-chart [stats]="expert.stats"></app-review-results-sparkline-chart>
-        } @else {
-          <div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-            <div class="spinner" style="margin: 0;">
-              <div class="double-bounce1"></div>
-              <div class="double-bounce2"></div>
-            </div>
-          </div>
-        }
-      </div>
-      <div class="col-xl-4 text-center">
-        <div class="text-sm text-muted pt-2">Время подготовки заключения</div>
-        @if (isChartsLoaded(expert.id)) {
-          <app-reviews-violation-sparkline-chart
-          [stats]="expert.stats"></app-reviews-violation-sparkline-chart>
-        } @else {
-          <div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-            <div class="spinner" style="margin: 0;">
-              <div class="double-bounce1"></div>
-              <div class="double-bounce2"></div>
-            </div>
-          </div>
-        }
       </div>
     </div>
   </div>
-}
-        @if (_page.totalElements != null && _page.totalElements === 0 && experts().length == 0) {
-  <div class="alert alert-info italic mb-0">
-    Эксперты не найдены
-  </div>
-}
-</div>
-<app-pagination [page]="_page" [pagination]="_pagination"
-(onPageChanged)="onPageChanged($event)"></app-pagination>
-</div>
 </div>
 <app-modal #expertPayInfo [title]="'Список проектов'" [modalClasses]="'modal-xl'">
   <app-expert-pay-info [expert]="expertId()"></app-expert-pay-info>
