@@ -209,7 +209,11 @@ export abstract class FilterAndPages<T> implements OnInit {
 
   update() {
     this.prepareRequest();
-    this.setLoading(true);
+    // Откладываем изменение состояния загрузки на следующий тик,
+    // чтобы избежать ExpressionChangedAfterItHasBeenCheckedError
+    setTimeout(() => {
+      this.setLoading(true);
+    }, 0);
     this.loadPage();
   }
 

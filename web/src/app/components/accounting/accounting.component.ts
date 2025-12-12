@@ -23,7 +23,7 @@ import {SearchField} from "@app/components/common-components/page-and-filter/mod
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {Operation} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import dayjs from 'dayjs';
-const customParseFormat = require('dayjs/plugin/customParseFormat');
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 dayjs.extend(customParseFormat);
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";

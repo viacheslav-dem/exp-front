@@ -4,10 +4,10 @@
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
-    "start": "ng serve --aot --proxy-config proxy.conf.json --host 0.0.0.0",
+    "start": "ng serve --proxy-config proxy.conf.json --host 0.0.0.0",
     "start-simple": "ng serve --proxy-config proxy.conf.json --host 0.0.0.0 --port 4220",
-    "start-prod": "ng serve --aot --configuration production --proxy-config proxy.conf.json --host 0.0.0.0",
-    "build-prod": "ng build --aot --configuration production"
+    "start-prod": "ng serve --configuration production --proxy-config proxy.conf.json --host 0.0.0.0",
+    "build-prod": "ng build --configuration production"
   },
   "dependencies": {
     "@angular-slider/ngx-slider": "^20.0.0",
@@ -39,7 +39,7 @@
   "devDependencies": {
     "@angular-devkit/core": "21.0.2",
     "@angular/build": "^21.0.2",
-    "@angular/cli": "21.0.2",
+    "@angular/cli": "^21.0.2",
     "@angular/compiler-cli": "21.0.3",
     "@angular/language-service": "21.0.3",
     "@types/jasmine": "~3.6.0",

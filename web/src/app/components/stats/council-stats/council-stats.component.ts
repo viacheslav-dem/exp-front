@@ -2,7 +2,7 @@ import {Component, Injectable, Input, OnInit, ViewChild, ElementRef, AfterViewIn
 import {StatsService} from "@app/services/stats.service";
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
-const customParseFormat = require('dayjs/plugin/customParseFormat');
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {BsDatepickerConfig} from 'ngx-bootstrap/datepicker';
 import {CouncilStatsDto} from "@app/dto/CouncilStatsDto";
 import {CouncilPlainDto} from "@app/dto/CouncilPlainDto";
