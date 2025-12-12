@@ -61,9 +61,7 @@ export class ExpertReviewListComponent implements OnInit {
 
   automaticExpertSelection() {
     this._projectService.automaticExpertSelection(this.project.id).subscribe(res => {
-      console.log('automaticExpertSelection')
-      console.log(res)
-      console.log('------------------------')
+      this.expertReviews = this.expertReviews.concat(res)
     });
   }
 }

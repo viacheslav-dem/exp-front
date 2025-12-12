@@ -19,9 +19,12 @@
           *ngIf="expertReview.state == ExpertReviewState.ON_EXAMINATION && role == Role.BELISA_EDIT">
       <button class="btn-sm btn btn-secondary" (click)="rejectExpertByBelisa()">Отклонить</button>
     </span>
-    <span *ngIf="canReassignExpert()" class="float-right">
-      <button class="btn-sm btn btn-primary" (click)="reassignExpert()">Назначить повторно</button>
-    </span>
+
+<!--  После добавления ручного режима выбора эксперта раскомментировать    -->
+
+<!--    <span *ngIf="canReassignExpert()" class="float-right">-->
+<!--      <button class="btn-sm btn btn-primary" (click)="reassignExpert()">Назначить повторно</button>-->
+<!--    </span>-->
   </div>
   <div class="mb-2">{{expertReview.expert|fullName}}</div>
   <div *ngIf="expertReview.state == 'REJECTED'" class="italic text-sm">
