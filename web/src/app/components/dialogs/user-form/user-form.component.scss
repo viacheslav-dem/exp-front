@@ -57,14 +57,25 @@
   flex-wrap: nowrap;
   align-items: stretch;
   width: 100%;
+  position: relative;
   
   .form-control {
     flex: 1 1 auto;
     min-width: 0;
+    position: relative;
+    z-index: 1;
   }
   
   .dropdown {
     position: static;
+    flex-shrink: 0;
+    z-index: 2;
+    
+    // Увеличение z-index для dropdown меню в модальном окне
+    // Применяем только когда dropdown открыт (имеет класс .show)
+    .dropdown-menu.show {
+      z-index: 1070 !important;
+    }
     
     &.flex-grow-1 {
       flex: 1 1 auto;
@@ -85,9 +96,13 @@
     .dropdown-toggle {
       white-space: nowrap;
       transition: all 0.3s ease;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      position: relative;
       
       &:hover {
-        transform: translateY(-1px);
+        transform: none;
         box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
       }
     }
@@ -97,26 +112,49 @@
     flex: 0 0 auto;
     transition: all 0.3s ease;
     white-space: nowrap;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     
     &:hover {
-      transform: translateY(-1px);
+      transform: none;
       box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
     }
   }
   
   .btn-outline-danger {
     border-left: 0;
+    flex-shrink: 0;
   }
   
-  // Правильное скругление для input-group
+  // Правильное скругление и границы для input-group
   > .form-control:first-child {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+    border-right: 0;
+  }
+  
+  > .form-control:not(:first-child):not(:last-child) {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+  
+  > .dropdown {
+    flex-shrink: 0;
+    
+    .dropdown-toggle {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
   }
   
   > .dropdown:not(:first-child):not(:last-child) .dropdown-toggle {
     border-radius: 0;
     border-left: 0;
+    border-right: 0;
   }
   
   > .dropdown:first-child .dropdown-toggle {
@@ -124,16 +162,23 @@
     border-bottom-right-radius: 0;
   }
   
-  > .dropdown:last-child:not(:first-child) .dropdown-toggle {
+  > .dropdown:not(:first-child) .dropdown-toggle {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-left: 0;
+  }
+  
+  > .dropdown:not(:last-child) .dropdown-toggle {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 0;
   }
   
   > .btn-outline-danger:last-child {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-left: 0;
+    flex-shrink: 0;
   }
 }
 
@@ -165,4 +210,270 @@
 .form-control:focus:valid {
   border-color: #198754;
   box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+}
+
+// Стили для телефонов с dropdown сверху
+.phone-input-wrapper {
+  .dropdown {
+    display: inline-block;
+    
+    .dropdown-toggle {
+      white-space: nowrap;
+      min-width: auto;
+      width: auto;
+    }
+  }
+  
+  .input-group {
+    .form-control {
+      border-top-left-radius: 0.375rem;
+      border-bottom-left-radius: 0.375rem;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    
+    .btn-outline-danger {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-top-right-radius: 0.375rem;
+      border-bottom-right-radius: 0.375rem;
+      border-left: 0;
+    }
+  }
+}
+
+// Стили для ученой степени с dropdown сверху
+.degree-input-wrapper {
+  .input-group {
+    .dropdown {
+      flex-shrink: 0;
+      
+      .dropdown-toggle {
+        white-space: nowrap;
+        min-width: auto;
+        width: auto;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-right: 0;
+      }
+    }
+    
+    .btn-outline-danger {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left: 0;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Стили для ученого звания с dropdown сверху
+.academic-title-wrapper {
+  .dropdown {
+    display: inline-block;
+    
+    .dropdown-toggle {
+      white-space: nowrap;
+      min-width: auto;
+      width: auto;
+    }
+  }
+}
+
+// Стили для специальностей, специализаций и областей компетенции с ng-select
+.speciality-item-wrapper,
+.specialization-item-wrapper,
+.area-item-wrapper {
+  position: relative;
+  z-index: 1;
+  
+  // Увеличиваем z-index для открытого элемента, чтобы его dropdown не перекрывался следующими элементами
+  &:has(.ng-select.ng-select-opened) {
+    z-index: 10001;
+  }
+  
+  .input-group {
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    z-index: 1;
+    
+    ng-select {
+      &.form-control {
+        border: 1px solid #ced4da;
+        border-top-left-radius: 0.375rem;
+        border-bottom-left-radius: 0.375rem;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-right: 0;
+        padding: 0;
+        background: transparent;
+        min-width: 200px;
+        flex: 1 1 auto;
+        position: relative;
+        z-index: 1;
+      }
+      
+      .ng-select-container {
+        border: none !important;
+        min-height: 38px;
+        border-top-left-radius: 0.375rem;
+        border-bottom-left-radius: 0.375rem;
+      }
+      
+      &.ng-select-focused .ng-select-container {
+        border-color: #86b7fe !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+      }
+
+      // Центрирование кнопки очистки справа
+      .ng-clear-wrapper {
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 17px;
+        height: 17px;
+        cursor: pointer;
+        z-index: 10;
+      }
+      
+      .ng-arrow-wrapper {
+        right: 8px;
+      }
+    }
+    
+    .btn-outline-danger {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-top-right-radius: 0.375rem;
+      border-bottom-right-radius: 0.375rem;
+      border-left: 0;
+      flex-shrink: 0;
+      white-space: nowrap;
+      min-height: 38px;
+      height: 38px;
+    }
+  }
+}
+
+// Увеличение z-index для dropdown меню ng-select и Bootstrap dropdown
+// Bootstrap 5 modal имеет z-index 1055, backdrop - 1050
+// ngx-bootstrap может использовать другие значения, поэтому устанавливаем z-index 1070
+::ng-deep {
+  // Убираем overflow: hidden с модального окна для корректного отображения dropdown
+  .modal-body {
+    overflow: visible !important;
+  }
+  
+  .modal-content {
+    overflow: visible !important;
+  }
+  
+  .modal-dialog {
+    overflow: visible !important;
+  }
+  
+  // Глобальные стили для ng-select в модальном окне
+  // Применяем только когда ng-select открыт (ng-select-opened)
+  // Устанавливаем очень высокий z-index, чтобы dropdown был выше всех input полей и других элементов
+  .ng-select.ng-select-opened .ng-dropdown-panel {
+    z-index: 10000 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: absolute !important;
+  }
+  
+  // Увеличение z-index для всех ng-select (организация, специальности, специализации, области компетенции)
+  // Применяем только когда ng-select открыт
+  // Устанавливаем очень высокий z-index, чтобы dropdown был выше всех input полей и других элементов
+  .user-org-dropdown,
+  .speciality-item-wrapper,
+  .specialization-item-wrapper,
+  .area-item-wrapper {
+    position: relative;
+    overflow: visible !important;
+    
+    // Увеличиваем z-index для wrapper, когда внутри открыт ng-select
+    // Это гарантирует, что открытый dropdown не будет перекрыт следующими элементами
+    &:has(.ng-select.ng-select-opened) {
+      z-index: 10001 !important;
+    }
+    
+    .ng-select.ng-select-opened {
+      z-index: 10000 !important;
+      position: relative;
+      
+      .ng-dropdown-panel {
+        z-index: 10000 !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: absolute !important;
+      }
+    }
+    
+    .ng-select {
+      overflow: visible !important;
+    }
+  }
+  
+  // Увеличение z-index для Bootstrap dropdown (ученое звание, ученая степень и т.д.)
+  // Применяем только когда dropdown открыт (имеет класс .show)
+  .input-group .dropdown-menu.show,
+  .dropdown-menu.show {
+    z-index: 1070 !important;
+  }
+  
+  // Убеждаемся, что ng-select dropdown виден поверх модального окна и всех input полей
+  // Применяем только когда ng-select открыт
+  .modal.show {
+    .ng-select.ng-select-opened .ng-dropdown-panel {
+      z-index: 10000 !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      position: absolute !important;
+    }
+  }
+}
+
+// Стили для организации
+.user-org-dropdown {
+  width: 100%;
+  
+  ::ng-deep ng-select {
+    width: 100%;
+    min-width: 400px; // Увеличиваем ширину
+    
+    .ng-select-container {
+      font-size: 0.875rem !important; // Уменьшаем шрифт
+    }
+    
+    .ng-value-container {
+      font-size: 0.875rem !important; // Уменьшаем шрифт
+      
+      .ng-value {
+        font-size: 0.875rem !important;
+      }
+    }
+    
+    .ng-input {
+      font-size: 0.875rem !important; // Уменьшаем шрифт
+      
+      input {
+        font-size: 0.875rem !important;
+      }
+    }
+  }
+  
+  ::ng-deep .ng-dropdown-panel {
+    .ng-option {
+      font-size: 0.875rem !important; // Уменьшаем шрифт в выпадающем списке
+    }
+  }
 }

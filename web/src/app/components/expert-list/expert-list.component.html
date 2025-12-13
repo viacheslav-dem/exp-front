@@ -4,34 +4,34 @@
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="card-title mb-0 fw-bold text-dark">Справочник экспертов</h4>
         <button class="btn btn-outline-primary rounded-pill px-4 py-2 fw-medium" type="button"
-          (click)="showFilter.set(!showFilter())">
-          @if (!showFilter()) {
+        (click)="showFilter.set(!showFilter())">
+        @if (!showFilter()) {
             <i class="fas fa-filter me-2"></i>Показать фильтр
-          } @else {
+        } @else {
             <i class="fas fa-times me-2"></i>Скрыть фильтр
-          }
-        </button>
-      </div>
+        }
+      </button>
+    </div>
 
-      <!--FILTER-->
-      @if (showFilter()) {
+  <!--FILTER-->
+  @if (showFilter()) {
         <div class="card border border-2 border-info-subtle rounded-4 mb-4 bg-light bg-opacity-50">
           <div class="card-body p-4">
-            <app-filter
+      <app-filter
               [fieldClass]="'col-lg-3'" [filterClass]="'row g-3'" [fields]="_searchFields"
-              (onFilterChanged)="onFilterChanged()">
-            </app-filter>
+        (onFilterChanged)="onFilterChanged()">
+      </app-filter>
           </div>
-        </div>
-      }
+    </div>
+  }
 
       <div [loadingData]="_loading">
         <div class="list-group list-group-flush">
-          @for (expert of experts(); track expert) {
+      @for (expert of experts(); track expert) {
             <div class="expert-card card border-0 shadow-sm rounded-4 mb-3">
               <div class="card-body p-4">
                 <div class="row g-4">
-                  <div class="col-lg-3">
+            <div class="col-lg-3">
                     <h6 class="fw-bold mb-2 text-dark">{{expert|fullName}}</h6>
                     <div class="text-body-secondary small mb-2">
                       <i class="fas fa-graduation-cap me-1"></i>{{expert.personInfo | academicInfo}}
@@ -43,48 +43,48 @@
                     <div class="text-body-secondary small">
                       <i class="fas fa-phone me-1"></i>{{expert.phones | phones}}
                     </div>
-                  </div>
+            </div>
                   <div class="col-lg-3 text-sm">
-                    @if (expert.areas.length > 0) {
+              @if (expert.areas.length > 0) {
                       <div class="mb-3">
                         <div class="fw-semibold small text-dark mb-1">Области компетенции:</div>
                         <div class="text-body-secondary small text-break">
                           {{expert | areas}}
                         </div>
-                      </div>
-                    }
-                    @if (expert.personInfo.specializations) {
+                </div>
+              }
+              @if (expert.personInfo.specializations) {
                       <div class="mb-3">
                         <div class="fw-semibold small text-dark mb-1">Специализация:</div>
-                        @for (spec of expert.personInfo.specializations; track spec) {
+                  @for (spec of expert.personInfo.specializations; track spec) {
                           <div class="text-body-secondary small mt-1 text-break">{{spec.name}}</div>
-                        }
-                      </div>
-                    }
-                    @if (expert.personInfo.specialities) {
+                  }
+                </div>
+              }
+              @if (expert.personInfo.specialities) {
                       <div class="mb-3">
                         <div class="fw-semibold small text-dark mb-1">Специальность:</div>
-                        @for (special of expert.personInfo.specialities; track special) {
+                  @for (special of expert.personInfo.specialities; track special) {
                           <div class="text-body-secondary small mt-1 text-break">{{special.name}}</div>
-                        }
-                      </div>
-                    }
-                  </div>
+                  }
+                </div>
+              }
+            </div>
                   <div class="col-lg-3 text-sm">
-                    @if (expert.org?.name) {
+              @if (expert.org?.name) {
                       <div class="mb-3">
                         <div class="fw-semibold small text-dark mb-1">Организация:</div>
                         <div class="text-body-secondary small text-break">{{expert.org?.name}}</div>
-                      </div>
-                    }
-                    @if (expert.post) {
+                </div>
+              }
+              @if (expert.post) {
                       <div class="mb-3">
                         <div class="fw-semibold small text-dark mb-1">Должность:</div>
                         <div class="text-body-secondary small text-break">{{expert.post}}</div>
-                      </div>
-                    }
-                  </div>
-                  <div class="col-lg-3 text-sm">
+                </div>
+              }
+            </div>
+            <div class="col-lg-3 text-sm">
                     <div class="d-flex flex-column gap-2">
                       <button class="btn btn-link text-start p-0 text-primary text-decoration-none fw-medium" 
                               (click)="showProjectsOnExpertExamination(expert)">
@@ -105,87 +105,87 @@
                               (click)="showProjectsExpertReviewFinished(expert)">
                         <i class="fas fa-check-circle me-1"></i>Завершено заключений: 
                         <span class="fw-bold">
-                          {{expert.realTimeStats.acceptedProjects + expert.realTimeStats.rejectedProjects}}
-                        </span>
+            {{expert.realTimeStats.acceptedProjects + expert.realTimeStats.rejectedProjects}}
+          </span>
                       </button>
                       <div class="d-flex flex-wrap gap-3 mt-1">
                         <div class="small text-body-secondary">
                           <i class="fas fa-ban me-1"></i>Отказы эксперта: 
                           <span class="fw-bold">{{expert.realTimeStats.rejectedReviewsByExpert}}</span>
-                        </div>
+        </div>
                         <div class="small text-body-secondary">
                           <i class="fas fa-ban me-1"></i>Отказы ГКНТ: 
                           <span class="fw-bold">{{expert.realTimeStats.rejectedReviewsByGknt}}</span>
-                        </div>
-                      </div>
-                      @if (getCurrentRole()==Role.GKNT_CHAIRMAN) {
+          </div>
+        </div>
+        @if (getCurrentRole()==Role.GKNT_CHAIRMAN) {
                         <button class="btn btn-link text-start p-0 text-primary text-decoration-none fw-medium mt-2" 
-                                (click)="showExpertPayInfoDialog(expert)">
+            (click)="showExpertPayInfoDialog(expert)">
                           <i class="fas fa-info-circle me-1"></i><span class="fw-bold">Подробная информация</span>
                         </button>
-                      }
-                    </div>
-                  </div>
+        }
+      </div>
+    </div>
                 </div>
                 <div class="row g-3 mt-3 pt-3 border-top" #chartContainer [attr.data-expert-id]="expert.id">
-                  <div class="col-xl-4 text-center">
+      <div class="col-xl-4 text-center">
                     <div class="text-body-secondary small mb-2 fw-semibold">Подготовлено экспертных заключений за год</div>
-                    @if (isChartsLoaded(expert.id)) {
-                      <app-finished-reviews-sparkline-chart
-                      [stats]="expert.stats"></app-finished-reviews-sparkline-chart>
-                    } @else {
-                      <div style="height: 60px; display: flex; align-items: center; justify-content: center;">
-                        <div class="spinner" style="margin: 0;">
-                          <div class="double-bounce1"></div>
-                          <div class="double-bounce2"></div>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                  <div class="col-xl-4 text-center">
+        @if (isChartsLoaded(expert.id)) {
+          <app-finished-reviews-sparkline-chart
+          [stats]="expert.stats"></app-finished-reviews-sparkline-chart>
+        } @else {
+          <div style="height: 60px; display: flex; align-items: center; justify-content: center;">
+            <div class="spinner" style="margin: 0;">
+              <div class="double-bounce1"></div>
+              <div class="double-bounce2"></div>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="col-xl-4 text-center">
                     <div class="text-body-secondary small mb-2 fw-semibold">Статистика работы эксперта за год</div>
-                    @if (isChartsLoaded(expert.id)) {
-                      <app-review-results-sparkline-chart [stats]="expert.stats"></app-review-results-sparkline-chart>
-                    } @else {
-                      <div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-                        <div class="spinner" style="margin: 0;">
-                          <div class="double-bounce1"></div>
-                          <div class="double-bounce2"></div>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                  <div class="col-xl-4 text-center">
+        @if (isChartsLoaded(expert.id)) {
+          <app-review-results-sparkline-chart [stats]="expert.stats"></app-review-results-sparkline-chart>
+        } @else {
+          <div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+            <div class="spinner" style="margin: 0;">
+              <div class="double-bounce1"></div>
+              <div class="double-bounce2"></div>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="col-xl-4 text-center">
                     <div class="text-body-secondary small mb-2 fw-semibold">Время подготовки заключения</div>
-                    @if (isChartsLoaded(expert.id)) {
-                      <app-reviews-violation-sparkline-chart
-                      [stats]="expert.stats"></app-reviews-violation-sparkline-chart>
-                    } @else {
-                      <div style="height: 80px; display: flex; align-items: center; justify-content: center;">
-                        <div class="spinner" style="margin: 0;">
-                          <div class="double-bounce1"></div>
-                          <div class="double-bounce2"></div>
-                        </div>
-                      </div>
-                    }
+        @if (isChartsLoaded(expert.id)) {
+          <app-reviews-violation-sparkline-chart
+          [stats]="expert.stats"></app-reviews-violation-sparkline-chart>
+        } @else {
+          <div style="height: 80px; display: flex; align-items: center; justify-content: center;">
+            <div class="spinner" style="margin: 0;">
+              <div class="double-bounce1"></div>
+              <div class="double-bounce2"></div>
+            </div>
+          </div>
+        }
                   </div>
-                </div>
-              </div>
-            </div>
-          }
-          @if (_page.totalElements != null && _page.totalElements === 0 && experts().length == 0) {
-            <div class="alert alert-info fst-italic mb-0 rounded-4 shadow-sm border-0 p-3">
-              <i class="fas fa-info-circle me-2"></i>Эксперты не найдены
-            </div>
-          }
-        </div>
-        <div class="mt-4">
-          <app-pagination [page]="_page" [pagination]="_pagination"
-          (onPageChanged)="onPageChanged($event)"></app-pagination>
-        </div>
       </div>
     </div>
   </div>
+}
+        @if (_page.totalElements != null && _page.totalElements === 0 && experts().length == 0) {
+            <div class="alert alert-info fst-italic mb-0 rounded-4 shadow-sm border-0 p-3">
+              <i class="fas fa-info-circle me-2"></i>Эксперты не найдены
+  </div>
+}
+</div>
+        <div class="mt-4">
+<app-pagination [page]="_page" [pagination]="_pagination"
+(onPageChanged)="onPageChanged($event)"></app-pagination>
+        </div>
+      </div>
+    </div>
+</div>
 </div>
 <app-modal #expertPayInfo [title]="'Список проектов'" [modalClasses]="'modal-xl'">
   <app-expert-pay-info [expert]="expertId()"></app-expert-pay-info>

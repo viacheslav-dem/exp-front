@@ -25,6 +25,26 @@ import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
     .btn-link:focus .password-icon {
       color: #0d6efd;
     }
+    
+    // Улучшенные стили для формы логина
+    .card-login {
+      max-width: 420px;
+      width: 100%;
+    }
+    
+    .form-control {
+      transition: all 0.3s ease;
+      
+      &:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+      }
+    }
+    
+    .form-label {
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
   `],
     standalone: false
 })

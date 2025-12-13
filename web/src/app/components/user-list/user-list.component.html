@@ -1,18 +1,41 @@
 <div class="container-fluid px-4 py-4">
   <div class="row g-4">
+    <!-- Mobile Filter (above lg) - Collapsible -->
+    <div class="col-12 d-lg-none mb-3">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-transparent border-0 p-3">
+          <button class="btn btn-link text-decoration-none p-0 w-100 d-flex justify-content-between align-items-center filter-toggle-btn" 
+                  (click)="toggleFilter()"
+                  type="button">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-filter"></i>
+              <h5 class="mb-0 fw-bold fs-5">Фильтр</h5>
+            </div>
+            <fa-icon class="filter-chevron" [icon]="filterCollapsed ? 'chevron-down' : 'chevron-up'"></fa-icon>
+          </button>
+        </div>
+        <div class="collapse" [class.show]="!filterCollapsed">
+          <div class="card-body p-4">
+            <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <div class="col-lg-8">
       <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body p-4">
-          <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
             <h4 class="card-title mb-0 fw-bold text-dark">Пользователи</h4>
-            <button class="btn btn-primary rounded-pill px-4 py-2 fw-medium shadow-sm" (click)="showEditUserModal(null)">
-              <i class="fas fa-plus me-2"></i>Добавить нового пользователя
+            <button class="btn btn-primary rounded-pill px-3 px-md-4 py-2 fw-medium shadow-sm" (click)="showEditUserModal(null)">
+              <i class="fas fa-plus me-2"></i><span class="d-none d-sm-inline">Добавить нового пользователя</span><span class="d-sm-none">Добавить</span>
             </button>
           </div>
 
           <div [loadingData]="_loading">
             @if (users.length > 0) {
-              <div class="table-responsive table-wrapper">
+              <!-- Desktop Table View (lg and up) -->
+              <div class="table-responsive table-wrapper d-none d-lg-block">
                 <table class="table table-hover mb-0">
                   <thead class="table-light">
                     <tr>
@@ -91,6 +114,82 @@
                   </tbody>
                 </table>
               </div>
+
+              <!-- Mobile Card View (below lg) -->
+              <div class="d-lg-none">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="text-muted small">Сортировка:</span>
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" 
+                            class="btn btn-outline-primary" 
+                            [class.active]="sortOrder.property == 'person'"
+                            (click)="sortBy('person')">
+                      <fa-icon [icon]="sortOrder.property == 'person' ? SortClass[sortOrder.direction] : 'sort'" class="me-1"></fa-icon>
+                      ФИО
+                    </button>
+                    <button type="button" 
+                            class="btn btn-outline-primary" 
+                            [class.active]="sortOrder.property == 'email'"
+                            (click)="sortBy('email')">
+                      <fa-icon [icon]="sortOrder.property == 'email' ? SortClass[sortOrder.direction] : 'sort'" class="me-1"></fa-icon>
+                      Email
+                    </button>
+                  </div>
+                </div>
+                <div class="row g-3">
+                  @for (user of users; track user) {
+                    <div class="col-12">
+                      <div class="card user-card h-100 border-0 shadow-sm rounded-3"
+                           [class.alert-danger]="user.user?.blocked"
+                           [class.alert-dark]="user.user==null" 
+                           [class.alert-deleted]="user.deleted">
+                        <div class="card-body p-3">
+                          <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="flex-grow-1">
+                              <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="badge bg-light text-dark small">#{{user.id}}</span>
+                                <h6 class="mb-0 fw-bold user-card-name">{{user | fullName}}</h6>
+                              </div>
+                              <div class="text-body-secondary small mb-2">
+                                <i class="fas fa-envelope me-1"></i>
+                                <span class="user-card-email">{{user.email}}</span>
+                              </div>
+                            </div>
+                            <div class="d-flex gap-1">
+                              @if (!user.deleted) {
+                                <button class="btn btn-sm btn-link text-primary p-1" 
+                                        (click)="showReadUserModal(user)"
+                                        title="Просмотр информации">
+                                  <fa-icon icon="info-circle"></fa-icon>
+                                </button>
+                                <button class="btn btn-sm btn-link text-primary p-1" 
+                                        (click)="showEditUserModal(user)"
+                                        title="Редактировать">
+                                  <fa-icon icon="pencil-alt"></fa-icon>
+                                </button>
+                                <ng-container *ifRole="'ADMIN'">
+                                  <button class="btn btn-sm btn-link text-danger p-1" 
+                                          (click)="deletePerson(user)"
+                                          title="Удалить">
+                                    <fa-icon icon="trash-alt"></fa-icon>
+                                  </button>
+                                </ng-container>
+                              }
+                            </div>
+                          </div>
+                          <div class="d-flex flex-wrap gap-1">
+                            @for (role of user.roles; track role) {
+                              <span class="badge bg-secondary bg-opacity-10 text-dark rounded-pill px-2 py-1 small fw-normal">
+                                {{role | role}}
+                              </span>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
             }
             @if (users.length == 0) {
               <div class="alert alert-info fst-italic mb-0 rounded-4 shadow-sm border-0 p-3">
@@ -105,8 +204,8 @@
         </div>
       </div>
     </div>
-    <!--filter-->
-    <div class="col-lg-4">
+    <!-- Desktop Filter (lg and up) - Always visible -->
+    <div class="col-lg-4 d-none d-lg-block">
       <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body p-4">
           <div class="card-title mb-4">

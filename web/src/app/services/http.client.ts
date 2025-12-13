@@ -39,6 +39,20 @@ export class HttpClientSecure {
     if (options == null) options = {};
     if (options.observe == null)
       options.observe = 'body';
+    
+    // Преобразуем числовые параметры в строки для корректной передачи в query string
+    if (options.params && typeof options.params === 'object' && !(options.params instanceof HttpParams)) {
+      const paramsObj: any = {};
+      for (const key in options.params) {
+        if (options.params.hasOwnProperty(key)) {
+          const value = options.params[key];
+          // Преобразуем числа и другие примитивы в строки
+          paramsObj[key] = value != null ? String(value) : value;
+        }
+      }
+      options.params = paramsObj;
+    }
+    
     return options;
   }
 
@@ -84,6 +98,24 @@ export class HttpClientSecure {
 
   post<T>(url: string, body: any, options?: any): Observable<T> {
     let opts = this.buildHeaders(options);
+    
+    // Устанавливаем Content-Type для POST запросов с JSON телом
+    let headers: HttpHeaders;
+    if (opts.headers instanceof HttpHeaders) {
+      headers = opts.headers;
+    } else if (opts.headers && typeof opts.headers === 'object') {
+      headers = new HttpHeaders(opts.headers);
+    } else {
+      headers = new HttpHeaders();
+    }
+    
+    // Устанавливаем Content-Type только если он еще не установлен
+    if (!headers.has('Content-Type')) {
+      headers = headers.set('Content-Type', 'application/json');
+    }
+    
+    opts.headers = headers;
+    
     return this.http.post<T>(url, body == null ? "" : JSON.stringify(body), opts).pipe(
       tap(res => this.log('post', url, body, opts, res)),
       catchError(err => this.handleError(err)),);

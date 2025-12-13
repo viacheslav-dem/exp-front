@@ -8,31 +8,55 @@ import {PageRequest} from "@app/components/common-components/page-and-filter/mod
     templateUrl: './pagination.component.html',
     styles: [`
       .pagination-modern {
-        gap: 0.15rem;
+        gap: 0.1rem;
         flex-wrap: nowrap;
         font-size: 0.875rem;
+      }
+      
+      @media (min-width: 576px) {
+        .pagination-modern {
+          gap: 0.15rem;
+        }
       }
       
       .pagination-modern .page-link {
         border-radius: 0.375rem;
         border: 1px solid #dee2e6;
-        padding: 0.375rem 0.5rem;
+        padding: 0.25rem 0.375rem;
         color: #495057;
-        transition: all 0.2s ease;
+        background-color: #fff;
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
         font-weight: 500;
-        min-width: 2rem;
+        min-width: 1.75rem;
         text-align: center;
         white-space: nowrap;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.875rem;
+        font-size: 0.8125rem;
         line-height: 1.2;
+        text-decoration: none !important;
+        overflow: hidden;
+      }
+      
+      @media (min-width: 576px) {
+        .pagination-modern .page-link {
+          padding: 0.375rem 0.5rem;
+          min-width: 2rem;
+          font-size: 0.875rem;
+        }
       }
       
       .pagination-modern .page-link-nav {
         min-width: auto;
-        padding: 0.375rem 0.5rem;
+        padding: 0.25rem 0.375rem;
+      }
+      
+      @media (min-width: 576px) {
+        .pagination-modern .page-link-nav {
+          min-width: auto;
+          padding: 0.375rem 0.5rem;
+        }
       }
       
       @media (min-width: 768px) {
@@ -43,22 +67,33 @@ import {PageRequest} from "@app/components/common-components/page-and-filter/mod
       }
       
       .pagination-modern .page-link i {
-        font-size: 0.875rem;
+        font-size: 0.8125rem;
       }
       
-      .pagination-modern .page-link:hover:not(.disabled) {
+      @media (min-width: 576px) {
+        .pagination-modern .page-link i {
+          font-size: 0.875rem;
+        }
+      }
+      
+      .pagination-modern .page-link:hover:not(.disabled):not(.active) {
         background-color: #e9ecef;
         border-color: #0d6efd;
         color: #0d6efd;
-        box-shadow: 0 0.125rem 0.25rem rgba(13, 110, 253, 0.15);
+        text-decoration: none !important;
       }
       
       .pagination-modern .page-item.active .page-link {
         background-color: #0d6efd;
         border-color: #0d6efd;
         color: #fff;
-        box-shadow: 0 0.125rem 0.25rem rgba(13, 110, 253, 0.2);
         font-weight: 600;
+        text-decoration: none !important;
+      }
+      
+      .pagination-modern .page-item.active .page-link:hover {
+        background-color: #0b5ed7;
+        border-color: #0b5ed7;
       }
       
       .pagination-modern .page-item.disabled .page-link {
@@ -67,10 +102,13 @@ import {PageRequest} from "@app/components/common-components/page-and-filter/mod
         color: #6c757d;
         cursor: not-allowed;
         opacity: 0.6;
+        text-decoration: none !important;
       }
       
       .pagination-modern .page-item.disabled .page-link:hover {
-        box-shadow: none;
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #6c757d;
       }
       
       .pagination-modern .page-link.rounded-start {

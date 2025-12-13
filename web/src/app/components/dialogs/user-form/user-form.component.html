@@ -196,14 +196,12 @@
       <label class="form-label small">Телефоны</label>
 
                           @for (phone of _user.phones; track phone; let i = $index) {
-                            <div class="input-group mb-2">
-                              <input type="text" class="form-control" [(ngModel)]="phone.phone" title="Телефон"
-                                placeholder="+375 XX XXXXXXX">
-                              <div class="dropdown">
+                            <div class="phone-input-wrapper mb-3">
+                              <div class="dropdown mb-2">
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                   {{ (phone.type ? phone.type : "Выберите тип") | phoneType }}
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
+                                <ul class="dropdown-menu">
                                   @for (type of allPhoneTypes; track type) {
                                     <li>
                                       <button
@@ -216,7 +214,11 @@
                                   }
                                 </ul>
                               </div>
-                              <button type="button" class="btn btn-outline-danger" (click)="_user.phones.splice(i, 1)">&times;</button>
+                              <div class="input-group">
+                                <input type="text" class="form-control" [(ngModel)]="phone.phone" title="Телефон"
+                                  placeholder="+375 XX XXXXXXX">
+                                <button type="button" class="btn btn-outline-danger" (click)="_user.phones.splice(i, 1)">&times;</button>
+                              </div>
                             </div>
                           }
 
@@ -277,25 +279,27 @@
       <label for="degree" class="form-label small">Учёная степень</label>
                             @for (fd of _user.personInfo.fullDegrees; track fd; let i = $index) {
                               <div class="degree-entry mb-3">
-                                <div class="input-group mb-2">
-                                  <div class="dropdown flex-grow-1">
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                      {{ fd.degreeType | orElse: 'Выберите тип' | degreeType }}
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                      @for (type of allDegreeTypes; track type) {
-                                        <li>
-                                          <button
-                                            class="dropdown-item"
-                                            type="button"
-                                            (click)="fd.degreeType = type">
-                                            {{ type | degreeType }}
-                                          </button>
-                                        </li>
-                                      }
-                                    </ul>
+                                <div class="degree-input-wrapper mb-2">
+                                  <div class="input-group">
+                                    <div class="dropdown">
+                                      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        {{ fd.degreeType | orElse: 'Выберите тип' | degreeType }}
+                                      </button>
+                                      <ul class="dropdown-menu">
+                                        @for (type of allDegreeTypes; track type) {
+                                          <li>
+                                            <button
+                                              class="dropdown-item"
+                                              type="button"
+                                              (click)="fd.degreeType = type">
+                                              {{ type | degreeType }}
+                                            </button>
+                                          </li>
+                                        }
+                                      </ul>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-danger" (click)="_user.personInfo.fullDegrees.splice(i, 1)">&times;</button>
                                   </div>
-                                  <button type="button" class="btn btn-outline-danger" (click)="_user.personInfo.fullDegrees.splice(i, 1)">&times;</button>
                                 </div>
                                 @if (hasDegree(fd.degreeType)) {
                                   <div class="mb-2">
@@ -320,8 +324,8 @@
 
       <div class="mb-3">
         <label for="academicTitle" class="form-label small">Учёное звание</label>
-                            <div class="input-group">
-                              <div class="dropdown flex-grow-1">
+                            <div class="academic-title-wrapper">
+                              <div class="dropdown mb-2">
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                   {{ _user.personInfo.academicTitleType | orElse: 'Выберите тип' | academicTitleType }}
                                 </button>
@@ -342,99 +346,111 @@
       <div class="mb-3">
         <label class="form-label small">Специальности</label>
                             @for (speciality of _user.personInfo.specialities; track speciality; let i = $index) {
-                              <div class="input-group mb-2">
-                                <div class="dropdown flex-grow-1">
-                                  <button class="btn btn-outline-primary dropdown-toggle" title="Специальность" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{ speciality?.name }}
-                                  </button>
-                                  <ul class="dropdown-menu">
-                                    @for (specialityV of allSpecialities; track specialityV) {
-                                      <li>
-                                        <button class="dropdown-item" type="button"
-                                          (click)="_user.personInfo.specialities[i] = specialityV">
-                                          {{ specialityV.name }}
-                                        </button>
-                                      </li>
-                                    }
-                                  </ul>
+                              <div class="speciality-item-wrapper mb-2">
+                                <div class="input-group">
+                                  <ng-select
+                                    [items]="specialityItems"
+                                    bindLabel="name"
+                                    [typeahead]="specialitySearchInput$"
+                                    [(ngModel)]="_user.personInfo.specialities[i]"
+                                    [compareWith]="compareSpeciality"
+                                    placeholder="Выберите специальность"
+                                    [searchable]="true"
+                                    [clearable]="true"
+                                    [loading]="specialityLoading"
+                                    [typeToSearchText]="'Введите минимум 2 символа для поиска...'"
+                                    [notFoundText]="'Ничего не найдено'"
+                                    [minTermLength]="0"
+                                    (open)="onSpecialityOpen()"
+                                    (scrollToEnd)="loadMoreSpecialities()"
+                                    class="form-control">
+                                  </ng-select>
+                                  <button type="button" class="btn btn-outline-danger" 
+                                    (click)="_user.personInfo.specialities.splice(i, 1)"
+                                    title="Удалить специальность">&times;</button>
                                 </div>
-                                <button type="button" class="btn btn-outline-danger" (click)="_user.personInfo.specialities.splice(i, 1)">&times;</button>
                               </div>
                             }
 
                             <div>
-                              @if (allSpecialities && allSpecialities.length) {
-                                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 mt-2"
-                                  (click)="_user.personInfo.specialities.push(allSpecialities[0])">
-                                  <i class="fas fa-plus me-1"></i>Добавить специальность
-                                </button>
-                              }
+                              <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 mt-2"
+                                (click)="addSpeciality()">
+                                <i class="fas fa-plus me-1"></i>Добавить специальность
+                              </button>
                             </div>
                           </div>
 
       <div class="mb-3">
         <label class="form-label small">Специализации</label>
                             @for (specialization of _user.personInfo.specializations; track specialization; let i = $index) {
-                              <div class="input-group mb-2">
-                                <div class="dropdown flex-grow-1">
-                                  <button class="btn btn-outline-primary dropdown-toggle" title="Специализация" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{ specialization?.name }}
-                                  </button>
-                                  <ul class="dropdown-menu">
-                                    @for (specializationV of allSpecializations; track specializationV) {
-                                      <li>
-                                        <button class="dropdown-item" type="button"
-                                          (click)="_user.personInfo.specializations[i] = specializationV">
-                                          {{ specializationV.name }}
-                                        </button>
-                                      </li>
-                                    }
-                                  </ul>
+                              <div class="specialization-item-wrapper mb-2">
+                                <div class="input-group">
+                                  <ng-select
+                                    [items]="specializationItems"
+                                    bindLabel="name"
+                                    [typeahead]="specializationSearchInput$"
+                                    [(ngModel)]="_user.personInfo.specializations[i]"
+                                    [compareWith]="compareSpecialization"
+                                    placeholder="Выберите специализацию"
+                                    [searchable]="true"
+                                    [clearable]="true"
+                                    [loading]="specializationLoading"
+                                    [typeToSearchText]="'Введите минимум 2 символа для поиска...'"
+                                    [notFoundText]="'Ничего не найдено'"
+                                    [minTermLength]="0"
+                                    (open)="onSpecializationOpen()"
+                                    (scrollToEnd)="loadMoreSpecializations()"
+                                    class="form-control">
+                                  </ng-select>
+                                  <button type="button" class="btn btn-outline-danger" 
+                                    (click)="_user.personInfo.specializations.splice(i, 1)"
+                                    title="Удалить специализацию">&times;</button>
                                 </div>
-                                <button type="button" class="btn btn-outline-danger" (click)="_user.personInfo.specializations.splice(i, 1)">&times;</button>
                               </div>
                             }
 
                             <div>
-                              @if (allSpecializations && allSpecializations.length) {
-                                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 mt-2"
-                                  (click)="_user.personInfo.specializations.push(allSpecializations[0])">
-                                  <i class="fas fa-plus me-1"></i>Добавить специализацию
-                                </button>
-                              }
+                              <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 mt-2"
+                                (click)="addSpecialization()">
+                                <i class="fas fa-plus me-1"></i>Добавить специализацию
+                              </button>
                             </div>
                           </div>
 
       <div class="mb-3">
         <label class="form-label small">Области компетенции</label>
                             @for (area of _user.areas; track area; let i = $index) {
-                              <div class="input-group mb-2">
-                                <div class="dropdown flex-grow-1">
-                                  <button class="btn btn-outline-primary dropdown-toggle" title="Область компетенции" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{ area?.name }}
-                                  </button>
-                                  <ul class="dropdown-menu">
-                                    @for (areaV of allAreasOfCompetence; track areaV) {
-                                      <li>
-                                        <button class="dropdown-item" type="button"
-                                          (click)="_user.areas[i] = areaV">
-                                          {{ areaV.name }}
-                                        </button>
-                                      </li>
-                                    }
-                                  </ul>
+                              <div class="area-item-wrapper mb-2">
+                                <div class="input-group">
+                                  <ng-select
+                                    [items]="areaItems"
+                                    bindLabel="name"
+                                    [typeahead]="areaSearchInput$"
+                                    [(ngModel)]="_user.areas[i]"
+                                    [compareWith]="compareArea"
+                                    placeholder="Выберите область компетенции"
+                                    [searchable]="true"
+                                    [clearable]="true"
+                                    [loading]="areaLoading"
+                                    [typeToSearchText]="'Введите минимум 2 символа для поиска...'"
+                                    [notFoundText]="'Ничего не найдено'"
+                                    [minTermLength]="0"
+                                    (open)="onAreaOpen()"
+                                    (scrollToEnd)="loadMoreAreas()"
+                                    class="form-control">
+                                  </ng-select>
+                                  <button type="button" class="btn btn-outline-danger" 
+                                    (click)="_user.areas.splice(i, 1)"
+                                    title="Удалить область компетенции">&times;</button>
                                 </div>
-                                <button type="button" class="btn btn-outline-danger" (click)="_user.areas.splice(i, 1)">&times;</button>
                               </div>
                             }
 
                             <div>
-                              @if (allAreasOfCompetence && allAreasOfCompetence.length) {
-                                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 mt-2"
-                                  (click)="_user.areas.push(allAreasOfCompetence[0])">
-                                  <i class="fas fa-plus me-1"></i>Добавить область компетенции
-                                </button>
-                              }
+                              <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 mt-2"
+                                (click)="addArea()">
+                                <i class="fas fa-plus me-1"></i>Добавить область компетенции
+                              </button>
                             </div>
                           </div>
                         </div>

@@ -139,6 +139,96 @@ import {LastSignEnumPipe} from "@app/pipes/last-sign.pipe";
               padding: 0.75rem 0.5rem;
           }
       }
+
+      // Mobile card styles
+      .user-card {
+          transition: all 0.2s ease;
+      }
+
+      .user-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+      }
+
+      .user-card.alert-danger {
+          background-color: #f8d7da;
+          border-left: 3px solid #dc3545 !important;
+      }
+
+      .user-card.alert-dark {
+          background-color: #d1d3d4;
+      }
+
+      .user-card.alert-deleted {
+          text-decoration: line-through;
+          opacity: 0.6;
+      }
+
+      .user-card-name {
+          font-size: 0.9375rem;
+          word-break: break-word;
+      }
+
+      .user-card-email {
+          word-break: break-all;
+      }
+
+      .btn-group-sm .btn {
+          font-size: 0.75rem;
+          padding: 0.25rem 0.5rem;
+      }
+
+      // Mobile filter collapse animation
+      .collapse {
+          transition: height 0.35s ease;
+      }
+
+      .collapse.show {
+          display: block !important;
+      }
+
+      .filter-toggle-btn {
+          color: #212529;
+          transition: color 0.2s ease;
+          border: none;
+          background: transparent;
+      }
+
+      .filter-toggle-btn:hover {
+          color: #0d6efd !important;
+          background: transparent !important;
+          transform: none !important;
+      }
+
+      .filter-toggle-btn:focus {
+          box-shadow: none;
+          outline: none;
+      }
+
+      .filter-toggle-btn:active {
+          transform: none !important;
+      }
+
+      .filter-chevron {
+          transition: transform 0.3s ease;
+          font-size: 0.875rem;
+          color: inherit;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 1.25rem;
+          flex-shrink: 0;
+      }
+
+      .filter-toggle-btn:hover .filter-chevron {
+          transform: none;
+          color: inherit;
+      }
+
+      .filter-toggle-btn .filter-chevron svg {
+          width: 0.875rem;
+          height: 0.875rem;
+      }
   `],
     standalone: false
 })
@@ -150,6 +240,7 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
   selectedUser: PersonDto;
   sortOrder: SortOrder = new SortOrder('person', Direction.ASC);
   onPersonListChangedSubscription: Subscription;
+  filterCollapsed: boolean = true; // По умолчанию фильтр закрыт на маленьких экранах
 
   constructor(private toasty: GlobalToastyService,
               private _personService: PersonService,
@@ -265,6 +356,10 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
     }
     this.sortOrder.property = property;
     this.update();
+  }
+
+  toggleFilter() {
+    this.filterCollapsed = !this.filterCollapsed;
   }
 
 }

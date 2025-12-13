@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {getAllPhoneTypes} from "@app/pipes/phone-type.pipe";
 import {AutoActivatedRole, Role, RolePipe} from "@app/pipes/role.pipe";
 import {getAllBankAccountTypes} from "@app/pipes/bank-account-type.pipe";
@@ -22,6 +22,13 @@ import {getAllAcademicTitleTypes} from "@app/pipes/academic-title.pipe";
 import {FullDegreeDto} from "@app/dto/FullDegreeDto";
 import {SectionPipe} from "@app/pipes/section.pipe";
 import {SelectItem} from "@app/components/common-components/page-and-filter/model/SearchField";
+import {Subject, of} from "rxjs";
+import {debounceTime, distinctUntilChanged, switchMap} from "rxjs/operators";
+import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
+import {SearchPageRequest} from "@app/components/common-components/page-and-filter/model/SearchPageRequest";
+import {Pagination} from "@app/components/common-components/page-and-filter/model/Pagination";
+import {SortOrder, Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
+import {CatalogDto} from "@app/dto/CatalogDto";
 
 @Component({
     selector: 'app-user-form',
@@ -29,7 +36,7 @@ import {SelectItem} from "@app/components/common-components/page-and-filter/mode
     styleUrls: ['./user-form.component.scss'],
     standalone: false
 })
-export class UserFormComponent {
+export class UserFormComponent implements OnInit {
 
   SERVER_URL = SERVER_URL;
   AutoActivatedRole = AutoActivatedRole;
@@ -54,6 +61,30 @@ export class UserFormComponent {
   allScienceArea: any[] = [];
   allOrgs: SelectItem[] = [];
 
+  // Lazy loading для специальностей
+  specialityItems: CatalogDto[] = [];
+  specialityLoading: boolean = false;
+  specialitySearchInput$ = new Subject<string>();
+  specialityPage: number = 0;
+  specialityHasMore: boolean = true;
+  specialityCurrentSearch: string = '';
+
+  // Lazy loading для специализаций
+  specializationItems: CatalogDto[] = [];
+  specializationLoading: boolean = false;
+  specializationSearchInput$ = new Subject<string>();
+  specializationPage: number = 0;
+  specializationHasMore: boolean = true;
+  specializationCurrentSearch: string = '';
+
+  // Lazy loading для областей компетенции
+  areaItems: CatalogDto[] = [];
+  areaLoading: boolean = false;
+  areaSearchInput$ = new Subject<string>();
+  areaPage: number = 0;
+  areaHasMore: boolean = true;
+  areaCurrentSearch: string = '';
+
 
   @Output() onSave = new EventEmitter<PersonDto>();
   @Output() canceled = new EventEmitter();
@@ -65,14 +96,56 @@ export class UserFormComponent {
               private _personService: PersonService,
               private _dialogService: DialogService,
               private _sectionPipe: SectionPipe) {
+    // Подписка на поиск специальностей
+    this.specialitySearchInput$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((searchTerm: string) => {
+          this.specialityCurrentSearch = searchTerm || '';
+          this.specialityPage = 0;
+          this.specialityItems = [];
+          this.specialityHasMore = true;
+          return this.loadSpecialities(true);
+        })
+      )
+      .subscribe();
+
+    // Подписка на поиск специализаций
+    this.specializationSearchInput$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((searchTerm: string) => {
+          this.specializationCurrentSearch = searchTerm || '';
+          this.specializationPage = 0;
+          this.specializationItems = [];
+          this.specializationHasMore = true;
+          return this.loadSpecializations(true);
+        })
+      )
+      .subscribe();
+
+    // Подписка на поиск областей компетенции
+    this.areaSearchInput$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((searchTerm: string) => {
+          this.areaCurrentSearch = searchTerm || '';
+          this.areaPage = 0;
+          this.areaItems = [];
+          this.areaHasMore = true;
+          return this.loadAreas(true);
+        })
+      )
+      .subscribe();
   }
 
   ngOnInit() {
     this.allRoles = this._rolePipe.getAllNotAutoActivatedRoles();
     this.role = this._authService.getCurrRole();
-    this._dataService.getCatalog(Catalog.AREA_OF_COMPETENCE).subscribe(res => this.allAreasOfCompetence = res);
-    this._dataService.getCatalog(Catalog.SPECIALITY).subscribe(res => this.allSpecialities = res);
-    this._dataService.getCatalog(Catalog.SPECIALIZATION).subscribe(res => this.allSpecializations = res);
+    // Убрали загрузку всех областей компетенции, специальностей и специализаций - теперь lazy loading
     this._dataService.getCatalog(Catalog.SCIENCE_AREA).subscribe(res => this.allScienceArea = res);
     this._dataService.getOrgs().subscribe(res => {
       this.allOrgs = res.map((item, ind) => new SelectItem(item, item.name, item.id));
@@ -280,5 +353,173 @@ export class UserFormComponent {
       return singDate;
     }
     return this._user.personInfo.singDate;
+  }
+
+  // Методы для lazy loading специальностей
+  onSpecialityOpen() {
+    if (this.specialityItems.length === 0) {
+      this.loadSpecialities(true).subscribe();
+    }
+  }
+
+  loadSpecialities(reset: boolean = false): any {
+    if (this.specialityLoading || (!reset && !this.specialityHasMore)) {
+      return of([]);
+    }
+
+    this.specialityLoading = true;
+    const pageSize = 15;
+    const pagination = new Pagination(pageSize);
+    pagination.page = this.specialityPage + 1; // Pagination использует 1-based индексацию
+    
+    let filter = null;
+    if (this.specialityCurrentSearch && this.specialityCurrentSearch.trim().length > 0) {
+      filter = FilterBuilder.contains('name', this.specialityCurrentSearch.trim());
+    }
+
+    const request = new SearchPageRequest(pagination, filter, [new SortOrder('name', Direction.ASC)]);
+    
+    return this._dataService.getCatalogAdminPage<CatalogDto>(Catalog.SPECIALITY, request).pipe(
+      switchMap((page) => {
+        if (reset) {
+          this.specialityItems = page.content;
+        } else {
+          this.specialityItems = [...this.specialityItems, ...page.content];
+        }
+        this.specialityHasMore = page.page < page.totalPages - 1;
+        this.specialityPage++;
+        this.specialityLoading = false;
+        return of(this.specialityItems);
+      })
+    );
+  }
+
+  loadMoreSpecialities() {
+    if (!this.specialityLoading && this.specialityHasMore) {
+      this.loadSpecialities(false).subscribe();
+    }
+  }
+
+  compareSpeciality = (a: CatalogDto, b: CatalogDto): boolean => {
+    return a && b ? a.id === b.id : a === b;
+  }
+
+  addSpeciality() {
+    if (!this._user.personInfo.specialities) {
+      this._user.personInfo.specialities = [];
+    }
+    this._user.personInfo.specialities.push(null);
+  }
+
+  // Методы для lazy loading специализаций
+  onSpecializationOpen() {
+    if (this.specializationItems.length === 0) {
+      this.loadSpecializations(true).subscribe();
+    }
+  }
+
+  loadSpecializations(reset: boolean = false): any {
+    if (this.specializationLoading || (!reset && !this.specializationHasMore)) {
+      return of([]);
+    }
+
+    this.specializationLoading = true;
+    const pageSize = 15;
+    const pagination = new Pagination(pageSize);
+    pagination.page = this.specializationPage + 1; // Pagination использует 1-based индексацию
+    
+    let filter = null;
+    if (this.specializationCurrentSearch && this.specializationCurrentSearch.trim().length > 0) {
+      filter = FilterBuilder.contains('name', this.specializationCurrentSearch.trim());
+    }
+
+    const request = new SearchPageRequest(pagination, filter, [new SortOrder('name', Direction.ASC)]);
+    
+    return this._dataService.getCatalogAdminPage<CatalogDto>(Catalog.SPECIALIZATION, request).pipe(
+      switchMap((page) => {
+        if (reset) {
+          this.specializationItems = page.content;
+        } else {
+          this.specializationItems = [...this.specializationItems, ...page.content];
+        }
+        this.specializationHasMore = page.page < page.totalPages - 1;
+        this.specializationPage++;
+        this.specializationLoading = false;
+        return of(this.specializationItems);
+      })
+    );
+  }
+
+  loadMoreSpecializations() {
+    if (!this.specializationLoading && this.specializationHasMore) {
+      this.loadSpecializations(false).subscribe();
+    }
+  }
+
+  compareSpecialization = (a: CatalogDto, b: CatalogDto): boolean => {
+    return a && b ? a.id === b.id : a === b;
+  }
+
+  addSpecialization() {
+    if (!this._user.personInfo.specializations) {
+      this._user.personInfo.specializations = [];
+    }
+    this._user.personInfo.specializations.push(null);
+  }
+
+  // Методы для lazy loading областей компетенции
+  onAreaOpen() {
+    if (this.areaItems.length === 0) {
+      this.loadAreas(true).subscribe();
+    }
+  }
+
+  loadAreas(reset: boolean = false): any {
+    if (this.areaLoading || (!reset && !this.areaHasMore)) {
+      return of([]);
+    }
+
+    this.areaLoading = true;
+    const pageSize = 15;
+    const pagination = new Pagination(pageSize);
+    pagination.page = this.areaPage + 1; // Pagination использует 1-based индексацию
+    
+    let filter = null;
+    if (this.areaCurrentSearch && this.areaCurrentSearch.trim().length > 0) {
+      filter = FilterBuilder.contains('name', this.areaCurrentSearch.trim());
+    }
+
+    const request = new SearchPageRequest(pagination, filter, [new SortOrder('name', Direction.ASC)]);
+    
+    return this._dataService.getCatalogAdminPage<CatalogDto>(Catalog.AREA_OF_COMPETENCE, request).pipe(
+      switchMap((page) => {
+        if (reset) {
+          this.areaItems = page.content;
+        } else {
+          this.areaItems = [...this.areaItems, ...page.content];
+        }
+        this.areaHasMore = page.page < page.totalPages - 1;
+        this.areaPage++;
+        this.areaLoading = false;
+        return of(this.areaItems);
+      })
+    );
+  }
+
+  loadMoreAreas() {
+    if (!this.areaLoading && this.areaHasMore) {
+      this.loadAreas(false).subscribe();
+    }
+  }
+
+  compareArea = (a: CatalogDto, b: CatalogDto): boolean => {
+    return a && b ? a.id === b.id : a === b;
+  }
+
+  addArea() {
+    if (!this._user.areas) {
+      this._user.areas = [];
+    }
+    this._user.areas.push(null);
   }
 }

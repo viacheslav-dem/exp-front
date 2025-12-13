@@ -4,7 +4,7 @@ import { HttpErrorResponse, HttpHandler, HttpInterceptor, HttpRequest } from '@a
 import {StorageService} from "@app/services/storage.service";
 import {ROLE_HEADER, TOKEN_HEADER} from "@app/config";
 import {catchError, filter, switchMap, take} from "rxjs/operators";
-import {BehaviorSubject, throwError, EMPTY} from "rxjs";
+import {BehaviorSubject, throwError, EMPTY, race} from "rxjs";
 import {AuthService} from "@app/services/auth.service";
 import {UserCredentials} from "@app/dto/UserCredentials";
 import {Router} from "@angular/router";
@@ -14,6 +14,7 @@ export class AuthErrorInterceptor implements HttpInterceptor {
 
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+  private refreshErrorSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   constructor(
       private storage: StorageService,
@@ -22,6 +23,13 @@ export class AuthErrorInterceptor implements HttpInterceptor {
   ) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler) {
+    // Пропускаем запросы на обновление токена и логин, чтобы избежать рекурсии
+    // Проверяем как относительный, так и абсолютный URL
+    const url = req.url.toLowerCase();
+    if (url.includes('/refresh-token') || url.includes('/public/login') || url.endsWith('/login')) {
+      return next.handle(req);
+    }
+
     let headers = {};
     const authToken = this.storage.getAccessToken();
     if (authToken != null) {
@@ -60,6 +68,7 @@ export class AuthErrorInterceptor implements HttpInterceptor {
       console.log("Access token is expired.")
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
+      this.refreshErrorSubject.next(null);
 
       const refreshToken = this.storage.getRefreshToken();
 
@@ -83,23 +92,30 @@ export class AuthErrorInterceptor implements HttpInterceptor {
               this.isRefreshing = false;
               this.refreshTokenSubject.next(null);
               
-              if (error.status === 412) {
-                console.log("Invalid refresh token.")
+              // Уведомляем ожидающие запросы об ошибке
+              this.refreshErrorSubject.next(error);
+              
+              if (error.status === 412 || error.status === 401) {
+                console.log("Invalid or expired refresh token. Status:", error.status)
+                console.log("Refresh token was:", this.storage.getRefreshToken() ? "present" : "missing")
                 this.storage.resetCredentials();
-                this.router.navigateByUrl('/login');
                 this.storage.clear();
-                return EMPTY;
-              } else if (error.status === 401) {
-                // Refresh token невалиден или истек
-                console.log("Refresh token is invalid or expired.")
-                this.storage.resetCredentials();
-                this.router.navigateByUrl('/login');
-                this.storage.clear();
+                // Небольшая задержка перед навигацией, чтобы избежать проблем с обработкой ошибок
+                setTimeout(() => {
+                  this.router.navigateByUrl('/login');
+                }, 100);
                 return EMPTY;
               }
               
-              // Для других ошибок пробрасываем дальше
-              return throwError(error);
+              // Для других ошибок (500, сетевые и т.д.) тоже перенаправляем на login
+              // чтобы избежать зависания
+              console.log("Error refreshing token. Status:", error.status, "Error:", error)
+              this.storage.resetCredentials();
+              this.storage.clear();
+              setTimeout(() => {
+                this.router.navigateByUrl('/login');
+              }, 100);
+              return EMPTY;
             })
         );
       }
@@ -112,10 +128,21 @@ export class AuthErrorInterceptor implements HttpInterceptor {
     }
 
     // Если уже идет обновление токена, ждем его завершения
-    return this.refreshTokenSubject.pipe(
+    // Используем race между успешным обновлением и ошибкой
+    return race(
+      this.refreshTokenSubject.pipe(
         filter(token => token !== null),
         take(1),
         switchMap((token) => next.handle(this.addTokenHeader(request, token)))
+      ),
+      this.refreshErrorSubject.pipe(
+        filter(error => error !== null),
+        take(1),
+        switchMap((error) => {
+          // Если была ошибка обновления, пробрасываем её
+          return throwError(error);
+        })
+      )
     );
   }
 

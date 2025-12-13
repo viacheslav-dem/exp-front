@@ -47,14 +47,23 @@ export class GlobalToastyService {
   }
 
   err(status: number, message:string) {
-    if (this.active["err" + status]) {
+    const key = "err" + status;
+    if (this.active[key]) {
       return;
     }
+    // Устанавливаем флаг синхронно ДО показа toast, чтобы предотвратить дублирование
+    this.active[key] = true;
     const toastOptions: any = {
       title: "Ошибка #" + status,
       msg: message,
-      onAdd: () => this.active["err" + status] = true,
-      onRemove: () => this.active["err" + status] = false
+      onAdd: () => this.active[key] = true,
+      onRemove: () => {
+        // Очищаем флаг через небольшую задержку после удаления toast,
+        // чтобы предотвратить повторное появление при быстрых последовательных ошибках
+        setTimeout(() => {
+          this.active[key] = false;
+        }, 1000);
+      }
     };
     this.error(toastOptions);
   }
