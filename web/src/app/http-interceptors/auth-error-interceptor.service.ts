@@ -4,7 +4,7 @@ import { HttpErrorResponse, HttpHandler, HttpInterceptor, HttpRequest } from '@a
 import {StorageService} from "@app/services/storage.service";
 import {ROLE_HEADER, TOKEN_HEADER} from "@app/config";
 import {catchError, filter, switchMap, take} from "rxjs/operators";
-import {BehaviorSubject, throwError} from "rxjs";
+import {BehaviorSubject, throwError, EMPTY} from "rxjs";
 import {AuthService} from "@app/services/auth.service";
 import {UserCredentials} from "@app/dto/UserCredentials";
 import {Router} from "@angular/router";
@@ -63,35 +63,55 @@ export class AuthErrorInterceptor implements HttpInterceptor {
 
       const refreshToken = this.storage.getRefreshToken();
 
-      if (refreshToken)
+      if (refreshToken) {
         return this.authService.refreshToken(refreshToken)
             .pipe(
             switchMap((credentials: UserCredentials) => {
               this.isRefreshing = false;
 
               this.authService.updateCredentials(credentials);
-              // this.storage.setAccessToken(credentials.accessToken);
-              // this.refreshTokenSubject.next(credentials.refreshToken);
+              
+              // Устанавливаем новый токен в subject для ожидающих запросов
+              this.refreshTokenSubject.next(credentials.accessToken);
 
               console.log("Successful refresh of access token.")
-              window.location.reload();
-
+              
+              // Повторяем оригинальный запрос с новым токеном
               return next.handle(this.addTokenHeader(request, credentials.accessToken));
             }),
             catchError((error) => {
-              if (error.status == 412) {
+              this.isRefreshing = false;
+              this.refreshTokenSubject.next(null);
+              
+              if (error.status === 412) {
                 console.log("Invalid refresh token.")
-                this.isRefreshing = false;
-
                 this.storage.resetCredentials();
                 this.router.navigateByUrl('/login');
                 this.storage.clear();
+                return EMPTY;
+              } else if (error.status === 401) {
+                // Refresh token невалиден или истек
+                console.log("Refresh token is invalid or expired.")
+                this.storage.resetCredentials();
+                this.router.navigateByUrl('/login');
+                this.storage.clear();
+                return EMPTY;
               }
+              
+              // Для других ошибок пробрасываем дальше
               return throwError(error);
             })
         );
+      }
+      
+      // Если нет refresh token, перенаправляем на login
+      this.isRefreshing = false;
+      this.storage.resetCredentials();
+      this.router.navigateByUrl('/login');
+      return EMPTY;
     }
 
+    // Если уже идет обновление токена, ждем его завершения
     return this.refreshTokenSubject.pipe(
         filter(token => token !== null),
         take(1),

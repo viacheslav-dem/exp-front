@@ -139,33 +139,40 @@ export class ProjectInfoComponent implements OnInit {
   }
 
   loadProject(idDto: IdDto, group: string) {
-    this._projectService.getProject(idDto).subscribe(res => {
-      this.project = res;
-      if (group != null && group != 'null' && typeof group === 'string' && !group.includes('=>')) {
-        this._projectService.markViewed(this.project, group).subscribe();
-      }
-      this.initActionButtons();
-      this.showProjectDocuments();
-      if (this.role == Role.BUREAU_ASSESSOR) {
-        this.loadAnonymousExpertReviews();
-        this.loadSectionReports();
-        this.loadLifecycleGroup();
-      } else if (this.role == Role.SECTION_ASSESSOR) {
-        this.loadAnonymousExpertReviews();
-      } else if (this.role == Role.BUREAU_CHAIRMAN) {
-        this.loadLifecycleGroup();
-      } else if (this.role == Role.SECTION_CHAIRMAN) {
-        this.loadLifecycle();
-      } else if (anyMatch(this.role,
-        Role.GKNT_WORKER, Role.GKNT_CHAIRMAN, Role.GKNT_DEPARTMENT_CHAIRMAN,
-        Role.BELISA_READ, Role.BELISA_EDIT, Role.CUSTOMER)
-      ) {
-        this.loadLifecycleGroups();
-        if (this.role == Role.CUSTOMER) {
-          this.loadAnonymousExpertReviews();
+    this._projectService.getProject(idDto).subscribe({
+      next: (res) => {
+        this.project = res;
+        if (group != null && group != 'null' && typeof group === 'string' && !group.includes('=>')) {
+          this._projectService.markViewed(this.project, group).subscribe();
         }
-      } else if (this.role == Role.EXPERT) {
-        this.loadExpertReview();
+        this.initActionButtons();
+        this.showProjectDocuments();
+        if (this.role == Role.BUREAU_ASSESSOR) {
+          this.loadAnonymousExpertReviews();
+          this.loadSectionReports();
+          this.loadLifecycleGroup();
+        } else if (this.role == Role.SECTION_ASSESSOR) {
+          this.loadAnonymousExpertReviews();
+        } else if (this.role == Role.BUREAU_CHAIRMAN) {
+          this.loadLifecycleGroup();
+        } else if (this.role == Role.SECTION_CHAIRMAN) {
+          this.loadLifecycle();
+        } else if (anyMatch(this.role,
+          Role.GKNT_WORKER, Role.GKNT_CHAIRMAN, Role.GKNT_DEPARTMENT_CHAIRMAN,
+          Role.BELISA_READ, Role.BELISA_EDIT, Role.CUSTOMER)
+        ) {
+          this.loadLifecycleGroups();
+          if (this.role == Role.CUSTOMER) {
+            this.loadAnonymousExpertReviews();
+          }
+        } else if (this.role == Role.EXPERT) {
+          this.loadExpertReview();
+        }
+      },
+      error: (err) => {
+        // Error is already handled by HttpClientSecure.handleError which shows toast
+        // Just prevent it from propagating to global error handler
+        console.error('Error loading project:', err);
       }
     })
   }

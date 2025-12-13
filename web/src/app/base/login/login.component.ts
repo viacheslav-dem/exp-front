@@ -44,8 +44,15 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-      this._authService.login(this.user).subscribe(res => {
-          this._authService.loginWithCredentials(res);
+      this._authService.login(this.user).subscribe({
+          next: (res) => {
+              this._authService.loginWithCredentials(res);
+          },
+          error: (err) => {
+              // Ошибка уже обработана в HttpClientSecure.handleError() и показано toast-сообщение
+              // Здесь просто предотвращаем попадание ошибки в глобальный обработчик
+              console.error('Login error:', err);
+          }
       });
   }
 

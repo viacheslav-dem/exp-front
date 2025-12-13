@@ -59,14 +59,18 @@ export class HttpClientSecure {
       this.progress.hide();
     } else if (err.status == 403) {
       this.toasty.err(err.status, "Доступ запрещён.");
-    } else if (err.status > 404 && err.status < 500 && err.status != 412) {
-      this.toasty.err(err.status, "Ошибка в данных: " + err.error);
+    } else if (err.status == 400) {
+      const errorMessage = err.error && typeof err.error === 'string' ? err.error : 
+                          (err.error && err.error.message ? err.error.message : "Неверный запрос. Проверьте корректность данных.");
+      this.toasty.err(err.status, "Ошибка в данных: " + errorMessage);
+    } else if (err.status > 400 && err.status < 500 && err.status != 412 && err.status != 403) {
+      this.toasty.err(err.status, "Ошибка в данных: " + (err.error || "Неверный запрос"));
     } else if (err.status == 500) {
       this.toasty.err(err.status, "Ошибка на сервере. Пожалуйста, обратитесь к администратору.");
     } else if (err.status > 500) {
       this.toasty.err(err.status, "Сервер недоступен. Пожалуйста, попробуйте позже.");
     } else {
-      this.toasty.err(err.status, err.error);
+      this.toasty.err(err.status, err.error || "Произошла ошибка");
     }
     return observableThrowError(err);
   }
