@@ -1,86 +1,86 @@
 <div class="container-fluid px-4 py-4">
   <div class="row g-4">
-    <!--data-->
+  <!--data-->
     <div class="col-lg-8">
       <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body p-4">
           <h4 class="card-title mb-4 fw-bold text-dark">Аудит</h4>
-          <div [loadingData]="_loading">
-            @if (audit.length > 0) {
+      <div [loadingData]="_loading">
+        @if (audit.length > 0) {
               <div class="table-responsive">
                 <table class="table table-hover mb-0">
                   <thead class="table-light">
-                    <tr>
+              <tr>
                       <th class="selectable text-nowrap border-0 fw-semibold small text-muted cursor-pointer" (click)="sortBy('date')">
                         <span>Дата</span>
-                        @if (sort.property == 'date') {
+                  @if (sort.property == 'date') {
                           <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
                         } @else {
                           <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
-                        }
-                      </th>
+                  }
+                </th>
                       <th (click)="sortBy('person')" class="selectable border-0 fw-semibold small text-muted cursor-pointer" style="width: 25%;">
                         <span>Пользователь</span>
-                        @if (sort.property == 'person') {
+                  @if (sort.property == 'person') {
                           <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
                         } @else {
                           <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
-                        }
-                      </th>
+                  }
+                </th>
                       <th (click)="sortBy('type')" class="selectable border-0 fw-semibold small text-muted cursor-pointer" style="width: 20%;">
                         <span>Тип</span>
-                        @if (sort.property == 'type') {
+                  @if (sort.property == 'type') {
                           <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
                         } @else {
                           <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
-                        }
-                      </th>
+                  }
+                </th>
                       <th (click)="sortBy('message')" class="selectable border-0 fw-semibold small text-muted cursor-pointer" style="width: 35%;">
                         <span>Сообщение</span>
-                        @if (sort.property == 'message') {
+                  @if (sort.property == 'message') {
                           <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
                         } @else {
                           <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
-                        }
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (record of audit; track record) {
+                  }
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (record of audit; track record) {
                       <tr class="audit-table-row">
                         <td class="text-nowrap text-body-secondary small">{{record.date | date:'dd.MM.yyyy HH:mm'}}</td>
-                        @if (record.person) {
+                  @if (record.person) {
                           <td class="fw-medium">{{record.person | fullName}}</td>
-                        }
-                        @if (!record.person) {
+                  }
+                  @if (!record.person) {
                           <td class="text-body-secondary fst-italic">Неавторизованный пользователь</td>
-                        }
+                  }
                         <td>
                           <span class="badge bg-info bg-opacity-10 text-dark rounded-pill px-2 py-1 small">
                             {{record.type | auditType}}
                           </span>
                         </td>
                         <td class="text-body-secondary small">{{record.message | short:120}}</td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
+                </tr>
+              }
+            </tbody>
+          </table>
               </div>
-            }
-            @if (audit.length == 0) {
+        }
+        @if (audit.length == 0) {
               <div class="alert alert-info fst-italic mb-0 rounded-4 shadow-sm border-0 p-3">
                 <i class="fas fa-info-circle me-2"></i>Записи отсутствуют
               </div>
-            }
+        }
             <div class="mt-4">
-              <app-pagination [page]="_page" [pagination]="_pagination"
-              (onPageChanged)="onPageChanged($event)"></app-pagination>
+        <app-pagination [page]="_page" [pagination]="_pagination"
+        (onPageChanged)="onPageChanged($event)"></app-pagination>
             </div>
           </div>
-        </div>
       </div>
     </div>
-    <!--filter-->
+  </div>
+  <!--filter-->
     <div class="col-lg-4">
       <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body p-4">

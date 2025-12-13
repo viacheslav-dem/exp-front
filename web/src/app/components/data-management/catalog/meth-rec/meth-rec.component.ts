@@ -1,82 +1,41 @@
-import {Component} from "@angular/core";
-import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
-import {TemplateDocumentDto} from "@app/dto/TemplateDocumentDto";
-import {GlobalToastyService} from "@app/services/global-toasty.service";
-import {DocumentService} from "@app/services/document.service";
-import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
-import {Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
-import {TemplatesComponent} from "@app/components/data-management/templates/templates.component";
+import {Component, ViewChild} from "@angular/core";
 import {DocType} from "@app/components/common-components/file-uploader/doc-type";
 import {SERVER_URL} from "@app/config";
+import {SilentFileUploaderComponent} from "@app/components/common-components/file-uploader/silent-file-uploader/silent-file-uploader.component";
 
 @Component({
     selector: 'app-meth-rec',
     templateUrl: './meth-rec.component.html',
+    styleUrls: ['./meth-rec.component.scss'],
     standalone: false
 })
-export class MethRecComponent extends FilterAndPages<TemplateDocumentDto> {
+export class MethRecComponent {
 
     DocType = DocType;
     SERVER_URL = SERVER_URL;
+    isDragOver: boolean = false;
+    
+    @ViewChild(SilentFileUploaderComponent) fileUploader: SilentFileUploaderComponent;
 
-    templates: TemplateDocumentDto[];
-    selectedTemplate: TemplateDocumentDto;
-    editedTemplate: TemplateDocumentDto;
-
-    constructor(private _toasty: GlobalToastyService,
-                private _documentService: DocumentService) {
-        super();
+    onDragOver(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isDragOver = true;
     }
 
-    ngOnInit() {
-        this._searchFields = [
-            SearchField.contains('name').setPlaceholder('Поиск по наименованию...')
-                .setSortDirection(Direction.ASC).setSortable(true).setMultipleSorting(true),
-            SearchField.contains('description').setPlaceholder('Поиск по описанию...')
-                .setSortDirection(Direction.ASC).setSortable(true).setMultipleSorting(true),
-            SearchField.checkbox('disabled', 'Показывать неактивные'),
-        ];
-        this.enableFilterCache("templates");
+    onDragLeave(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isDragOver = false;
     }
 
-    loadPage() {
-        this._documentService.getTemplatesPage(this._searchRequest).subscribe(res => {
-            this.setLoading(false);
-            this._page = res;
-            this.templates = this._page.content;
-            // show tooltips
-        }, () => this.setLoading(false));
-    }
-
-    editTemplate(template: TemplateDocumentDto) {
-        if (this.selectedTemplate) {
-            this.selectedTemplate.isEdit = false;
+    onDrop(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isDragOver = false;
+        const files = event.dataTransfer && event.dataTransfer.files;
+        if (files && files.length && this.fileUploader) {
+            this.fileUploader.onFilesChosen(Array.from(files) as File[]);
         }
-        this.selectedTemplate = template;
-        this.editedTemplate = TemplatesComponent.copyTemplate(this.selectedTemplate);
-        this.selectedTemplate.isEdit = true;
-    }
-
-    cancelEditTemplate() {
-        this.selectedTemplate.isEdit = false;
-    }
-
-    saveEditedTemplate() {
-        this._documentService.saveTemplate(this.editedTemplate).subscribe(() => {
-            this._toasty.success("Сохранено.");
-            this.update();
-        });
-    }
-
-    downloadTemplate(template: TemplateDocumentDto) {
-        this._documentService.downloadTemplate(template.id).subscribe();
-    }
-
-    downloadTemplateXml(template: TemplateDocumentDto) {
-        this._documentService.downloadTemplateXml(template.id).subscribe();
-    }
-
-    static copyTemplate(template: TemplateDocumentDto) {
-        return Object.assign({}, template);
     }
 }

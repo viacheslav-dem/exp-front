@@ -6,11 +6,7 @@ import {TransitionDto} from "@app/dto/TransitionDto";
 @Component({
     selector: 'app-project-transition-history',
     templateUrl: './project-transition-history.component.html',
-    styles: [`
-      table {
-          font-size: 0.875rem;
-      }
-  `],
+    styleUrls: ['project-transition-history.component.scss'],
     standalone: false
 })
 export class ProjectTransitionHistoryComponent implements OnInit {

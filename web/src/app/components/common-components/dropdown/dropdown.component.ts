@@ -1,7 +1,7 @@
 import {Component, EventEmitter, forwardRef, HostListener, Output, input} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
-import {SubDirectionDto} from "@app/dto/SubDirectionDto";
+//import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 
 export const DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,

@@ -65,6 +65,7 @@ import {ReviewsViolationSparklineChart} from "@app/components/expert-list/review
 import {DataManagementModule} from "@app/components/data-management/data-management.module";
 import {SearchModule} from "@app/components/search/search.module";
 import {BrowserModule} from "@angular/platform-browser";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {CommonModule} from "@angular/common";
 import {SelectRoleComponent} from "@app/base/select-role/select-role.component";
 import {SettingsModule} from "@app/components/settings/settings.module";
@@ -167,6 +168,7 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         AppComponent
     ],
     imports: [BrowserModule,
+        BrowserAnimationsModule,
         RouterModule.forRoot(appRoutes),
         NgSelectModule,
         DialogModule.forRoot(),

@@ -61,4 +61,8 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
   hide() {
     this.searchPersonModal.hide();
   }
+
+  trackByExpert(index: number, expert: PersonExpertDto): any {
+    return expert?.id || index;
+  }
 }

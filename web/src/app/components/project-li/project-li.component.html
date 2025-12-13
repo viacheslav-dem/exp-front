@@ -47,8 +47,8 @@
             <i class="fas fa-calendar-alt me-2 text-primary"></i>
             <span class="fw-medium">Период:</span>
             <span class="ms-1">
-              {{project.period?.start | mdate | orElse: 'дд.мм.гггг'}} - 
-              {{project.period?.end | mdate | orElse: 'дд.мм.гггг'}}
+            {{project.period?.start | mdate | orElse: 'дд.мм.гггг'}} - 
+            {{project.period?.end | mdate | orElse: 'дд.мм.гггг'}}
             </span>
           </div>
           <div
@@ -56,7 +56,7 @@
             <div class="mt-1">
               <i class="fas fa-phone me-2 text-primary"></i>
               <span class="fw-medium">Контакты:</span>
-              @for (contact of belisaPersons; track contact) {
+              @for (contact of belisaPersons; track contact.id) {
                 <div class="ms-4 mt-1">
                   {{contact.personName.lastName}} {{contact.personName.firstName}} {{contact.personName.middleName}}
                   - {{contact.phones | phones: true | orElse: 'телефон не указан' }};
@@ -68,19 +68,23 @@
       </div>
       
       <!-- Номер проекта справа -->
-      <div class="text-end text-body-secondary small flex-shrink-0" style="min-width: 130px;">
+      <div class="text-end text-body-secondary small flex-shrink-0 project-numbers">
         <div class="mb-1">
-          <div class="fw-bold text-dark mb-1">№</div>
+          <div class="d-flex align-items-center gap-1 justify-content-end">
+            <div class="fw-bold text-dark">№</div>
           <div class="user-select-all fw-semibold fs-6" (click)="onNumberClick($event); $event.stopPropagation();">
             {{project.id}}
+            </div>
           </div>
         </div>
-        @for (number of project.councilReferences; track number) {
+        @for (number of project.councilReferences; track number.number + '-' + number.date) {
           @if (number!=null) {
             <div class="mb-1">
-              <div class="fw-bold text-dark mb-1">№</div>
-              <div class="user-select-all fw-semibold" (click)="onNumberClick($event); $event.stopPropagation();">
-                {{number.number}}
+              <div class="d-flex align-items-center gap-1">
+                <div class="fw-bold text-dark">№</div>
+                <div class="user-select-all fw-semibold" (click)="onNumberClick($event); $event.stopPropagation();">
+                  {{number.number}}
+                </div>
               </div>
               <div class="user-select-all small text-muted" (click)="onNumberClick($event); $event.stopPropagation();">
                 {{number.date | date:'dd.MM.yyyy HH:mm'}}

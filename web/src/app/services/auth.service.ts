@@ -94,7 +94,8 @@ export class AuthService implements OnInit {
   }
 
   refreshToken(refreshToken: string): Observable<UserCredentials> {
-
+    // Используем post напрямую, без postBlock, чтобы избежать показа progress indicator
+    // и чтобы ошибки обрабатывались в interceptor'е, а не в HttpClientSecure.handleError
     return this.http.post(`${SERVER_URL}/public/refresh-token`, {
       refreshToken: refreshToken
     });
@@ -106,9 +107,15 @@ export class AuthService implements OnInit {
   }
 
   logout() {
-      this.http.post(`${SERVER_URL}/public/logout`, null).subscribe(() => {
-     //   this.defaultRedirectUrl();
-        this.storage.resetCredentials();
+    // Очищаем токены сразу, чтобы предотвратить дальнейшие запросы с устаревшими токенами
+    this.storage.resetCredentials();
+    this.http.post(`${SERVER_URL}/public/logout`, null).subscribe({
+      next: () => {
+        // Успешный logout на сервере
+      },
+      error: () => {
+        // Даже если запрос не удался, токены уже очищены локально
+      }
     });
     this.router.navigateByUrl('/login');
   }

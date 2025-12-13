@@ -1,0 +1,39 @@
+.title {
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.password-icon {
+  color: #6c757d;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+}
+
+.btn-link:hover .password-icon,
+.btn-link:focus .password-icon {
+  color: #0d6efd;
+}
+
+.card-login {
+  max-width: 420px;
+  width: 100%;
+  position: relative;
+  z-index: 1001; // Выше progress overlay (z-index: 1000)
+}
+
+.form-control {
+  transition: all 0.3s ease;
+  
+  &:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  }
+}
+
+.form-label {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+

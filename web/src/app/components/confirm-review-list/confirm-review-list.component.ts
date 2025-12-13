@@ -20,11 +20,7 @@ import {PageRequest} from '@app/components/common-components/page-and-filter/mod
 @Component({
     selector: 'app-confirm-review-list',
     templateUrl: './confirm-review-list.component.html',
-    styles: [`
-    .chart {
-      margin: 0;
-    }
-  `],
+    styleUrls: ['confirm-review-list.component.scss'],
     standalone: false
 })
 export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExpertsDto> {
@@ -75,9 +71,14 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
       this.setLoading(false);
     }, () => this.setLoading(false))
 
-    window.scroll({
-      top: 0,
-      left: 0,
+    // Используем requestAnimationFrame для асинхронной прокрутки,
+    // чтобы избежать проблем с scroll-linked effects
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
     });
   }
 

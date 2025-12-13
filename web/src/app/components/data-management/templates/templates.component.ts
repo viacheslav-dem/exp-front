@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, ViewChild, ViewChildren, QueryList, AfterViewInit} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
@@ -7,13 +7,15 @@ import {DocumentService} from "@app/services/document.service";
 import {TemplateDocumentDto} from "@app/dto/TemplateDocumentDto";
 import {DocType} from "@app/components/common-components/file-uploader/doc-type";
 import {SERVER_URL} from "@app/config";
+import {SilentFileUploaderComponent} from "@app/components/common-components/file-uploader/silent-file-uploader/silent-file-uploader.component";
 
 @Component({
     selector: 'app-templates',
     templateUrl: './templates.component.html',
+    styleUrls: ['./templates.component.scss'],
     standalone: false
 })
-export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> {
+export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> implements AfterViewInit {
 
   DocType = DocType;
   SERVER_URL = SERVER_URL;
@@ -21,10 +23,50 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> {
   templates: TemplateDocumentDto[];
   selectedTemplate: TemplateDocumentDto;
   editedTemplate: TemplateDocumentDto;
+  
+  isDragOverDocx: number | null = null;
+  isDragOverXml: number | null = null;
+  
+  @ViewChildren(SilentFileUploaderComponent) fileUploaders: QueryList<SilentFileUploaderComponent>;
+  
+  private uploaderMap: Map<string, SilentFileUploaderComponent> = new Map();
 
   constructor(private _toasty: GlobalToastyService,
               private _documentService: DocumentService) {
     super();
+  }
+  
+  ngAfterViewInit() {
+    // Регистрируем загрузчики после инициализации представления
+    this.fileUploaders.changes.subscribe(() => {
+      this.updateUploaderMap();
+    });
+    this.updateUploaderMap();
+  }
+  
+  private updateUploaderMap() {
+    this.uploaderMap.clear();
+    if (!this.templates || !this.fileUploaders) {
+      return;
+    }
+    
+    // Сопоставляем загрузчики с шаблонами по URL
+    const uploaders = this.fileUploaders.toArray();
+    for (const template of this.templates) {
+      if (template.isEdit) {
+        const docxUrl = `${this.SERVER_URL}/document/template/source?id=${template.id}`;
+        const xmlUrl = `${this.SERVER_URL}/document/template-xml/source?id=${template.id}`;
+        
+        for (const uploader of uploaders) {
+          const uploaderUrl = uploader.getUrl();
+          if (uploaderUrl === docxUrl) {
+            this.uploaderMap.set(`${template.id}_docx`, uploader);
+          } else if (uploaderUrl === xmlUrl) {
+            this.uploaderMap.set(`${template.id}_xml`, uploader);
+          }
+        }
+      }
+    }
   }
 
   ngOnInit() {
@@ -43,6 +85,8 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> {
       this.setLoading(false);
       this._page = res;
       this.templates = this._page.content;
+      // Обновляем карту загрузчиков после загрузки данных
+      setTimeout(() => this.updateUploaderMap(), 0);
       // show tooltips
     }, () => this.setLoading(false));
   }
@@ -54,10 +98,14 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> {
     this.selectedTemplate = template;
     this.editedTemplate = TemplatesComponent.copyTemplate(this.selectedTemplate);
     this.selectedTemplate.isEdit = true;
+    // Обновляем карту загрузчиков после изменения состояния редактирования
+    setTimeout(() => this.updateUploaderMap(), 0);
   }
 
   cancelEditTemplate() {
     this.selectedTemplate.isEdit = false;
+    // Обновляем карту загрузчиков после отмены редактирования
+    setTimeout(() => this.updateUploaderMap(), 0);
   }
 
   saveEditedTemplate() {
@@ -77,5 +125,43 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> {
 
   static copyTemplate(template: TemplateDocumentDto) {
     return Object.assign({}, template);
+  }
+  
+  onDragOver(event: DragEvent, type: 'docx' | 'xml', template: TemplateDocumentDto) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (type === 'docx') {
+      this.isDragOverDocx = template.id;
+    } else {
+      this.isDragOverXml = template.id;
+    }
+  }
+
+  onDragLeave(event: DragEvent, type: 'docx' | 'xml') {
+    event.preventDefault();
+    event.stopPropagation();
+    if (type === 'docx') {
+      this.isDragOverDocx = null;
+    } else {
+      this.isDragOverXml = null;
+    }
+  }
+
+  onDrop(event: DragEvent, type: 'docx' | 'xml', template: TemplateDocumentDto) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (type === 'docx') {
+      this.isDragOverDocx = null;
+    } else {
+      this.isDragOverXml = null;
+    }
+    const files = event.dataTransfer && event.dataTransfer.files;
+    if (files && files.length) {
+      const key = `${template.id}_${type}`;
+      const uploader = this.uploaderMap.get(key);
+      if (uploader) {
+        uploader.onFilesChosen(Array.from(files) as File[]);
+      }
+    }
   }
 }

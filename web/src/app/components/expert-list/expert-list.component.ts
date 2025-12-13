@@ -1,4 +1,5 @@
 import {Component, ViewChild, ChangeDetectionStrategy, signal, ChangeDetectorRef, AfterViewInit, OnDestroy, ElementRef, QueryList, ViewChildren} from '@angular/core';
+import {Subscription} from 'rxjs';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {PersonService} from "@app/services/person.service";
 import {DialogService} from "@app/components/dialogs/dialog.service";
@@ -40,6 +41,7 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
   // Map для отслеживания загруженных графиков по ID эксперта
   chartsLoaded = signal<Set<number>>(new Set());
   private observer?: IntersectionObserver;
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private toasty: GlobalToastyService,
@@ -76,12 +78,14 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
       SearchField.multiSelect('areas', Catalog.AREA_OF_COMPETENCE).setSelectText('область компетенции').setSearchFilterEnabled(true),
     ];
     // Load orgs after fields are initialized
-    this._dataService.getOrgs().subscribe({
-      next: (orgs) => {
-        this.getSearchField('org').setItems(orgs);
-        this.cdr.markForCheck();
-      }
-    });
+    this.subscriptions.push(
+      this._dataService.getOrgs().subscribe({
+        next: (orgs) => {
+          this.getSearchField('org').setItems(orgs);
+          this.cdr.markForCheck();
+        }
+      })
+    );
     
     // Включаем кэш фильтров и загружаем начальные данные
     this.enableFilterCache("experts");
@@ -101,36 +105,42 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
   loadPage() {
     // Очищаем список экспертов при начале новой загрузки
     this.experts.set([]);
-    this._personService.searchExperts(this._searchRequest).subscribe({
-      next: (res) => {
-        this._page = res;
-        this.experts.set(res.content);
-        this.setLoading(false);
-        this.cdr.markForCheck();
-        // После обновления списка экспертов, обновляем observer
-        // Используем requestAnimationFrame для гарантии, что DOM обновлен
-        requestAnimationFrame(() => {
-          this.observeChartContainers();
-        });
-      },
-      error: () => {
-        this.setLoading(false);
-        this.cdr.markForCheck();
-      }
-    });
+    this.subscriptions.push(
+      this._personService.searchExperts(this._searchRequest).subscribe({
+        next: (res) => {
+          this._page = res;
+          this.experts.set(res.content);
+          this.setLoading(false);
+          this.cdr.markForCheck();
+          // После обновления списка экспертов, обновляем observer
+          // Используем requestAnimationFrame для гарантии, что DOM обновлен
+          requestAnimationFrame(() => {
+            this.observeChartContainers();
+          });
+        },
+        error: () => {
+          this.setLoading(false);
+          this.cdr.markForCheck();
+        }
+      })
+    );
   }
 
   ngAfterViewInit() {
     this.setupIntersectionObserver();
     // Подписываемся на изменения QueryList
-    this.chartContainers.changes.subscribe(() => {
-      this.observeChartContainers();
-    });
+    this.subscriptions.push(
+      this.chartContainers.changes.subscribe(() => {
+        this.observeChartContainers();
+      })
+    );
     // Первоначальная установка observer
     setTimeout(() => this.observeChartContainers(), 0);
   }
 
   ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions = [];
     if (this.observer) {
       this.observer.disconnect();
     }
@@ -178,6 +188,10 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
 
   getSortOrders() {
     return sortByName('personName.', Direction.ASC);
+  }
+
+  trackByExpert(index: number, expert: PersonExpertDto): any {
+    return expert?.id || index;
   }
 
   showProjectsOnExpertExamination(expert: PersonExpertDto) {

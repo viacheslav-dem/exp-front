@@ -1,4 +1,5 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild, input} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, input} from '@angular/core';
+import {Subscription} from 'rxjs';
 import {ProjectLifecycleState, ProjectLifecycleStateBadge} from "@app/pipes/lifecycle-state.pipe";
 import {Router} from "@angular/router";
 import {SearchSectionComponent} from "@app/components/search/search-section/search-section.component";
@@ -26,7 +27,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
     templateUrl: './lifecycle-group.component.html',
     standalone: false
 })
-export class LifecycleGroupComponent implements OnInit {
+export class LifecycleGroupComponent implements OnInit, OnDestroy {
 
   LifecycleGroupStateBadge = LifecycleGroupStateBadge;
   LifecycleGroupState = LifecycleGroupState;
@@ -37,15 +38,16 @@ export class LifecycleGroupComponent implements OnInit {
   transitionHistory: LifecycleGroupTransitionHistoryDto;
   lifecycleTransitionHistory: ProjectLifecycleTransitionHistoryDto;
   _lifecycle: ProjectLifecycleDto;
-  lifecycleRemark: ProjectLifecycleDto = new ProjectLifecycleDto;
-  groupRemark: LifecycleGroupDto = new LifecycleGroupDto;
+  lifecycleRemark: ProjectLifecycleDto = new ProjectLifecycleDto();
+  groupRemark: LifecycleGroupDto = new LifecycleGroupDto();
+  private subscriptions: Subscription[] = [];
 
   readonly role = input(undefined);
-  readonly projectInput = input<ProjectDto>(new ProjectDto());
+  readonly project = input<ProjectDto>(new ProjectDto());
   _project: ProjectDto;
 
-  get project(): ProjectDto {
-    return this._project ?? this.projectInput();
+  get projectValue(): ProjectDto {
+    return this._project ?? this.project();
   }
 
   @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
@@ -72,7 +74,7 @@ export class LifecycleGroupComponent implements OnInit {
   }
 
   ngOnInit() {
-    this._project = this.projectInput();
+    this._project = this.project();
   }
 
   @Input() set group(group) {
@@ -83,14 +85,18 @@ export class LifecycleGroupComponent implements OnInit {
 
   showTransitionHistoryModal() {
     this.transitionHistoryModal.show();
-    this._transitionHistoryService.getGroupHistory(this._group)
-      .subscribe(res => this.transitionHistory = res);
+    this.subscriptions.push(
+      this._transitionHistoryService.getGroupHistory(this._group)
+        .subscribe(res => this.transitionHistory = res)
+    );
   }
 
   showLifecycleTransitionHistoryModal(lifecycle) {
     this.lifecycleTransitionHistoryModal.show();
-    this._transitionHistoryService.getLifecycleHistory(lifecycle)
-      .subscribe(res => this.lifecycleTransitionHistory = res);
+    this.subscriptions.push(
+      this._transitionHistoryService.getLifecycleHistory(lifecycle)
+        .subscribe(res => this.lifecycleTransitionHistory = res)
+    );
   }
 
   changed() {
@@ -102,22 +108,21 @@ export class LifecycleGroupComponent implements OnInit {
   }
 
   canEditSections() {
-    return this._group && this._group.state == LifecycleGroupState.ON_CHECKING && this.role() == Role.BUREAU_CHAIRMAN;
+    return this._group && this._group.state === LifecycleGroupState.ON_CHECKING && this.role() === Role.BUREAU_CHAIRMAN;
   }
 
   canChangeSections(lifecycle?: ProjectLifecycleDto) {
-    return this._group.state == LifecycleGroupState.IN_PROCESSING && this.role() == Role.BUREAU_CHAIRMAN &&
-      (lifecycle.state == ProjectLifecycleState.ON_CHOOSING_MEETING || lifecycle.state == ProjectLifecycleState.READY_FOR_MEETING ||
-        lifecycle.state == ProjectLifecycleState.ON_EXPERT_EXAMINATION);
+    return this._group.state === LifecycleGroupState.IN_PROCESSING && this.role() === Role.BUREAU_CHAIRMAN &&
+      (lifecycle.state === ProjectLifecycleState.ON_CHOOSING_MEETING || lifecycle.state === ProjectLifecycleState.READY_FOR_MEETING ||
+        lifecycle.state === ProjectLifecycleState.ON_EXPERT_EXAMINATION);
   }
 
   canAnswerForSectionQuestion(lifecycle?: ProjectLifecycleDto) {
-      const project = this.project;
-      return this.role() == Role.CUSTOMER
+    const project = this.projectValue;
+    return this.role() === Role.CUSTOMER
       && project.isRescheduleSection
       && lifecycle.remarks.length > 0
       && project.canAddDocumentsForCustomerForSection;
-
   }
 
   answerForSectionRemark(lifecycle: ProjectLifecycleDto) {
@@ -126,8 +131,8 @@ export class LifecycleGroupComponent implements OnInit {
   }
 
   canAnswerForBureauQuestion(group?: LifecycleGroupDto) {
-    const project = this.project;
-    return this.role() == Role.CUSTOMER
+    const project = this.projectValue;
+    return this.role() === Role.CUSTOMER
       && project.isRescheduleBureau
       && group.remarks.length > 0
       && project.canAddDocumentsForCustomerForBureau;
@@ -140,129 +145,150 @@ export class LifecycleGroupComponent implements OnInit {
 
   saveRemarkResponseForSection(remarks: RemarkDto[]) {
     this.lifecycleRemark.remarks = remarks;
-    this._lifecycleService.saveAnswerForSectionRemarks(this.lifecycleRemark).subscribe();
+    this.subscriptions.push(
+      this._lifecycleService.saveAnswerForSectionRemarks(this.lifecycleRemark).subscribe()
+    );
   }
 
   saveRemarkResponseForBureau(remarks: RemarkDto[]) {
     this.groupRemark.remarks = remarks;
-    this._lifecycleGroupService.saveAnswerForBureauRemarks(this.groupRemark).subscribe();
+    this.subscriptions.push(
+      this._lifecycleGroupService.saveAnswerForBureauRemarks(this.groupRemark).subscribe()
+    );
   }
 
-  checkGroupRemarks(remarks: RemarkDto[]){
-    if(remarks==null){
+  checkGroupRemarks(remarks: RemarkDto[]) {
+    if (remarks === null || remarks === undefined) {
       return false;
     }
-    if (remarks.length){
+    if (remarks.length) {
       return true;
     }
- }
+    return false;
+  }
   replyForSectionRemark(remarks: RemarkDto[]) {
     this.lifecycleRemark.remarks = remarks;
     for (const remark of remarks) {
-      if (remark.answer == null || remark.answer.trim().length < 1) {
-        this._toasty.error("Все поля с ответами на замечания должны быть заполнены")
+      if (remark.answer === null || remark.answer.trim().length < 1) {
+        this._toasty.error("Все поля с ответами на замечания должны быть заполнены");
         return;
       }
     }
     this.remarkResponseForSection.hide();
-    this._dialogService.showConfirmDialog('Ответить на замечания по объекту экспертизы',
-      'Вы уверены, что хотите отправить ответы на замечания по объекту экспертизы ' + this.project.title + '?',
-      'Пожалуйста, проверьте список ответов и прикрепленных файлов, поскольку отменить действие будет невозможно')
-      .subscribe(() => {
-          this._lifecycleService.replyForSectionRemark(this.lifecycleRemark).subscribe(
-            value => {
-              this._project = value;
-              this._lifecycle = this.lifecycleRemark;
-              this.onReplyChanged.emit(this.project);
-            }
+    this.subscriptions.push(
+      this._dialogService.showConfirmDialog('Ответить на замечания по объекту экспертизы',
+        'Вы уверены, что хотите отправить ответы на замечания по объекту экспертизы ' + this.projectValue.title + '?',
+        'Пожалуйста, проверьте список ответов и прикрепленных файлов, поскольку отменить действие будет невозможно')
+        .subscribe(() => {
+          this.subscriptions.push(
+            this._lifecycleService.replyForSectionRemark(this.lifecycleRemark).subscribe(
+              value => {
+                this._project = value;
+                this._lifecycle = this.lifecycleRemark;
+                this.onReplyChanged.emit(this.projectValue);
+              }
+            )
           );
-        }
-      )
+        })
+    );
   }
 
   replyForBureauRemark(remarks: RemarkDto[]) {
     this.groupRemark.remarks = remarks;
     for (const remark of remarks) {
-      if (remark.answer == null || remark.answer.trim().length < 1) {
-        this._toasty.error("Все поля с ответами на замечания должны быть заполнены")
+      if (remark.answer === null || remark.answer.trim().length < 1) {
+        this._toasty.error("Все поля с ответами на замечания должны быть заполнены");
         return;
       }
     }
     this.remarkResponseForBureau.hide();
-    this._dialogService.showConfirmDialog('Ответить на замечания по объекту экспертизы',
-      'Вы уверены, что хотите отправить ответы на замечания по объекту экспертизы ' + this.project.title + '?',
-      'Пожалуйста, проверьте список ответов и прикрепленных файлов, поскольку отменить действие будет невозможно')
-      .subscribe(() => {
-          this._lifecycleGroupService.replyForBureauRemark(this.groupRemark).subscribe(
-            value => {
-              this._project = value;
-              this._group = this.groupRemark;
-              this.onReplyChanged.emit(this.project);
-            }
+    this.subscriptions.push(
+      this._dialogService.showConfirmDialog('Ответить на замечания по объекту экспертизы',
+        'Вы уверены, что хотите отправить ответы на замечания по объекту экспертизы ' + this.projectValue.title + '?',
+        'Пожалуйста, проверьте список ответов и прикрепленных файлов, поскольку отменить действие будет невозможно')
+        .subscribe(() => {
+          this.subscriptions.push(
+            this._lifecycleGroupService.replyForBureauRemark(this.groupRemark).subscribe(
+              value => {
+                this._project = value;
+                this._group = this.groupRemark;
+                this.onReplyChanged.emit(this.projectValue);
+              }
+            )
           );
-        }
-      )
+        })
+    );
   }
 
   deleteLifecycle(lifecycle: ProjectLifecycleDto) {
-    this._lifecycleService.deleteLifecycle(lifecycle).subscribe(() => {
-      this._toasty.success("Секция удалена.");
-      this._group.lifecycles = this._group.lifecycles.filter(lc => lc != lifecycle);
-      this.changed();
-    });
+    this.subscriptions.push(
+      this._lifecycleService.deleteLifecycle(lifecycle).subscribe(() => {
+        this._toasty.success("Секция удалена.");
+        this._group.lifecycles = this._group.lifecycles.filter(lc => lc !== lifecycle);
+        this.changed();
+      })
+    );
   }
 
   changeSection(lifecycle: ProjectLifecycleDto) {
-    this._dialogService.showConfirmDialog("Переназначение секции", `Вы уверены что хотите переназначить секцию?`,
-      "Отменить действие будет невозможно").subscribe(() => {
-      this._lifecycle = lifecycle;
-      this.changeSectionListComponent.show(this._group.council.id);
-    });
-
+    this.subscriptions.push(
+      this._dialogService.showConfirmDialog("Переназначение секции", `Вы уверены что хотите переназначить секцию?`,
+        "Отменить действие будет невозможно").subscribe(() => {
+        this._lifecycle = lifecycle;
+        this.changeSectionListComponent.show(this._group.council.id);
+      })
+    );
   }
 
   onChangeSection($event: SectionPlainDto) {
-    this._lifecycleGroupService.changeSection(this._lifecycle, this._group, $event.id).subscribe(value => {
+    this.subscriptions.push(
+      this._lifecycleGroupService.changeSection(this._lifecycle, this._group, $event.id).subscribe(value => {
         this._toasty.success("Секция переназначена.");
         this.changeSectionListComponent.hide();
         this.group = value;
-      }
-    )
+      })
+    );
   }
 
   canEditGroups() {
     const role = this.role();
-    const project = this.project;
-    return project.state == 'ON_CHECKING' && role == Role.GKNT_WORKER ||
-      project.state == 'ON_DEPARTMENT_SIGNING' && role == Role.GKNT_DEPARTMENT_CHAIRMAN;
+    const project = this.projectValue;
+    return (project.state === 'ON_CHECKING' && role === Role.GKNT_WORKER) ||
+      (project.state === 'ON_DEPARTMENT_SIGNING' && role === Role.GKNT_DEPARTMENT_CHAIRMAN);
   }
 
   deleteLifecycleGroup(group: LifecycleGroupDto) {
-    this._lifecycleGroupService.deleteLifecycleGroup(group).subscribe(() => {
-      this._toasty.success("ГЭС удалён.");
-      this.onDeleted.emit(group);
-    });
+    this.subscriptions.push(
+      this._lifecycleGroupService.deleteLifecycleGroup(group).subscribe(() => {
+        this._toasty.success("ГЭС удалён.");
+        this.onDeleted.emit(group);
+      })
+    );
   }
 
   onSelectedSection($event: SectionPlainDto) {
-    this._lifecycleGroupService.attachSection(this._group, $event.id).subscribe(res => {
-      this._group.lifecycles.push(res);
-      this._toasty.success("Секция прикреплена.");
-      this.searchSectionListComponent.hide();
-      this.changed();
-    });
+    this.subscriptions.push(
+      this._lifecycleGroupService.attachSection(this._group, $event.id).subscribe(res => {
+        this._group.lifecycles.push(res);
+        this._toasty.success("Секция прикреплена.");
+        this.searchSectionListComponent.hide();
+        this.changed();
+      })
+    );
   }
 
   canEditConclusion() {
-    return this._group.state == LifecycleGroupState.ON_CONCLUSION && this.role() == Role.BUREAU_CHAIRMAN;
+    return this._group.state === LifecycleGroupState.ON_CONCLUSION && this.role() === Role.BUREAU_CHAIRMAN;
   }
 
   generateConclusion(form) {
-    this._lifecycleGroupService.generateCouncilConclusion(this._group, form).subscribe(res => {
-      this.closeConclusionForm();
-      this._group.conclusion = res;
-      this.changed();
-    })
+    this.subscriptions.push(
+      this._lifecycleGroupService.generateCouncilConclusion(this._group, form).subscribe(res => {
+        this.closeConclusionForm();
+        this._group.conclusion = res;
+        this.changed();
+      })
+    );
   }
 
   deleteConclusion() {
@@ -274,17 +300,19 @@ export class LifecycleGroupComponent implements OnInit {
 
   canEditReferral() {
     const role = this.role();
-    const project = this.project;
-    return project.state == 'ON_CHECKING' && role == Role.GKNT_WORKER ||
-      project.state == 'ON_DEPARTMENT_SIGNING' && role == Role.GKNT_DEPARTMENT_CHAIRMAN;
+    const project = this.projectValue;
+    return (project.state === 'ON_CHECKING' && role === Role.GKNT_WORKER) ||
+      (project.state === 'ON_DEPARTMENT_SIGNING' && role === Role.GKNT_DEPARTMENT_CHAIRMAN);
   }
 
   generateReferral(form: any) {
-    this._lifecycleGroupService.generateReferral(this._group, form).subscribe(res => {
-      this.referralFormModal.hide();
-      this._group.referral = res;
-      this.changed();
-    });
+    this.subscriptions.push(
+      this._lifecycleGroupService.generateReferral(this._group, form).subscribe(res => {
+        this.referralFormModal.hide();
+        this._group.referral = res;
+        this.changed();
+      })
+    );
   }
 
   deleteReferral(_group: LifecycleGroupDto) {
@@ -295,7 +323,7 @@ export class LifecycleGroupComponent implements OnInit {
   }
 
   canEditLifecycleGroupDecision() {
-    return this.project.state == ProjectState.ON_DEPARTMENT_FINAL_SIGNING &&
+    return this.projectValue.state === ProjectState.ON_DEPARTMENT_FINAL_SIGNING &&
       anyMatch(this.role(), Role.GKNT_WORKER, Role.GKNT_DEPARTMENT_CHAIRMAN);
   }
 
@@ -312,10 +340,17 @@ export class LifecycleGroupComponent implements OnInit {
 
   generateLifecycleGroupDecisionDocument(form: any) {
     this.groupDecisionFormModal.hide();
-    this._lifecycleGroupService.generateLifecycleGroupDecisionDocument(this._group, form).subscribe(res => {
-      this._group.decisionDocument = res;
-      this.changed();
-    });
+    this.subscriptions.push(
+      this._lifecycleGroupService.generateLifecycleGroupDecisionDocument(this._group, form).subscribe(res => {
+        this._group.decisionDocument = res;
+        this.changed();
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions = [];
   }
 
   closeConclusionForm() {
@@ -325,5 +360,9 @@ export class LifecycleGroupComponent implements OnInit {
   showConclusionForm() {
     this.councilFormModal.show();
     this.conclusionForm.startAutoSave();
+  }
+
+  trackByLifecycle(index: number, lifecycle: ProjectLifecycleDto): any {
+    return lifecycle?.id || index;
   }
 }

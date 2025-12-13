@@ -1,8 +1,41 @@
-<h5 class="mb-3">Шаблоны документов</h5>
+<h5 class="mb-3">Методические рекомендации</h5>
 <div class="list-group">
-    <app-silent-file-uploader
-            [controlClass]="'width-auto custom-file-inline'" [typesAccept]="DocType.PDF.extension"
-            [url]="SERVER_URL + '/document/template/meth_rec'">
-    </app-silent-file-uploader>
-
+  <!-- Загрузка файла -->
+  <div class="list-group-item mb-3 border rounded shadow-sm bg-light">
+    <div class="meth-rec-grid">
+      <!-- Первая строка, первый столбец: Заголовок и описание -->
+      <div class="grid-item-header">
+        <h6 class="mb-1 fw-semibold">
+          <fa-icon icon="plus" class="me-2 text-primary"></fa-icon>
+          Загрузить файл методических рекомендаций
+        </h6>
+        <p class="text-muted small mb-0">
+          Загрузите PDF файл. При загрузке нового файла предыдущий будет заменен.
+        </p>
+      </div>
+      
+      <!-- Второй столбец: Зона drag and drop (объединяет обе строки) -->
+      <div class="grid-item-drop-zone file-drop-zone"
+           (dragover)="onDragOver($event)"
+           (dragleave)="onDragLeave($event)"
+           (drop)="onDrop($event)"
+           [class.drag-over]="isDragOver">
+        <!-- Элемент загрузки файла -->
+        <div class="grid-item-upload">
+          <app-silent-file-uploader
+                  [controlClass]="'width-auto custom-file-inline'" 
+                  [typesAccept]="DocType.PDF.extension"
+                  [url]="SERVER_URL + '/document/template/meth_rec'">
+          </app-silent-file-uploader>
+        </div>
+        
+        <!-- Надпись про drag and drop -->
+        <div class="grid-item-hint">
+          <div class="text-mini text-muted" style="font-size: 0.7rem;">
+            Перетащите файл сюда или выберите через диалог
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

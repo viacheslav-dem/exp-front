@@ -1,9 +1,9 @@
 @charset "UTF-8";
 @use "bootstrap" as *;
 // @use "bootstrap4-compat"; // Отключено для уменьшения размера - мигрируйте классы на BS5 (mr-* → me-*, ml-* → ms-*, etc.)
-@use "common";
-@use "list-group";
-@use "controls";
-@use "alert";
-@use "transition-history";
-@use "datepicker-fix";
+@use "./common";
+@use "./list-group";
+@use "./controls";
+@use "./alert";
+@use "./transition-history";
+@use "./datepicker-fix";

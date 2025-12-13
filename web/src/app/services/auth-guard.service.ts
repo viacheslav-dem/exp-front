@@ -11,11 +11,20 @@ export class AuthGuardService  {
   ) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    this.authService.defaultRedirectUrl();
+    // Сохраняем URL для редиректа после логина
+    if (state.url !== '/login') {
+      this.authService.defaultRedirectUrl();
+    }
+    
     if (this.authService.isLoggedIn()) {
       return true;
     }
-    this.router.navigateByUrl('/login');
+    
+    // Перенаправляем на login только если мы еще не на странице логина
+    // чтобы избежать бесконечных редиректов
+    if (state.url !== '/login') {
+      this.router.navigateByUrl('/login');
+    }
     return false;
   }
 }

@@ -14,7 +14,7 @@
         </span>
         <span class="text-sm">ГЭС {{_group.council | councilCodeAndName}}</span>
         <button class="btn btn-sm btn-right "
-                [ngClass]="_group.isAnswerReceived && project.isRescheduleBureau? 'btn-outline-success':'btn-outline-danger'"
+                [ngClass]="_group.isAnswerReceived && projectValue.isRescheduleBureau? 'btn-outline-success':'btn-outline-danger'"
                 (click)="answerForBureauRemark(_group)" *ngIf=checkGroupRemarks(_group.remarks)>Замечания
         </button>
         <span class="text-muted bold text-sm italic">{{_group.termsMessage}}</span>
@@ -92,7 +92,7 @@
 
   <!--SECTIONS-->
   <div *ngIf="_group.state != 'RETURNED_WITHOUT_EXPERTISE'">
-    <div *ngFor="let lifecycle of _group.lifecycles">
+    <div *ngFor="let lifecycle of _group.lifecycles; trackBy: trackByLifecycle">
       <div class="list-group-item" style="padding: 0.75rem 1rem">
         <button class="btn btn-outline-danger btn-sm btn-right"
                 (click)="deleteLifecycle(lifecycle)" *ngIf="canEditSections()">&times;
@@ -101,7 +101,7 @@
                 (click)="changeSection(lifecycle)" *ngIf="canChangeSections(lifecycle)">Переназначить
         </button>
         <button class="btn btn-sm btn-right "
-                [ngClass]="lifecycle.isAnswerReceived && project.isRescheduleSection? 'btn-outline-success':'btn-outline-danger'"
+                [ngClass]="lifecycle.isAnswerReceived && projectValue.isRescheduleSection? 'btn-outline-success':'btn-outline-danger'"
                 (click)="answerForSectionRemark(lifecycle)" *ngIf=checkGroupRemarks(lifecycle.remarks)>Замечания
         </button>
         <span class="selectable" [ngClass]="['badge', ProjectLifecycleStateBadge[lifecycle.state]]"
@@ -144,7 +144,7 @@
 
 <!--REFERRAL MODAL-->
 <app-modal #referralFormModal *ngIf="canEditReferral()" [title]="'Направление в ГЭС'">
-  <app-referral-form [project]="project" [council]="_group?.council"
+  <app-referral-form [project]="projectValue" [council]="_group?.council"
                      (onSave)="generateReferral($event)"
                      (onClose)="referralFormModal.hide()">
   </app-referral-form>
@@ -152,7 +152,7 @@
 
 <!--CONCLUSION MODAL-->
 <app-modal #councilFormModal *ngIf="_group && canEditConclusion()" [title]="'Заключение ГЭС'" (onClose)="closeConclusionForm()">
-  <app-council-conclusion-form [project]="project" [group]="_group"
+  <app-council-conclusion-form [project]="projectValue" [group]="_group"
                                [draftOwner]="_group"
                                [draftService]="_lifecycleGroupService"
                                (onSave)="generateConclusion($event)"
@@ -163,7 +163,7 @@
 <!--LETTER FOR CUSTOMER MODAL-->
 <app-modal #groupDecisionFormModal *ngIf="canEditLifecycleGroupDecision()"
            [title]="'Направление результатов экспертизы'">
-  <app-decision-document-form [project]="project" [council]="_group?.council" [needCauses]="false"
+  <app-decision-document-form [project]="projectValue" [council]="_group?.council" [needCauses]="false"
                               (onSave)="generateLifecycleGroupDecisionDocument($event)"
                               (onClose)="groupDecisionFormModal.hide()">
   </app-decision-document-form>
@@ -185,13 +185,13 @@
 <app-modal #remarkResponseForSection [title]="'Ответы на замечания секции'">
   <app-remark-response [remarks]="lifecycleRemark.remarks" (onSave)="saveRemarkResponseForSection($event)"
                        (onReply)="replyForSectionRemark($event)"
-                       [isExpired]="project.isSectionRemarksExpired"
+                       [isExpired]="projectValue.isSectionRemarksExpired"
                        [isEdit]="canAnswerForSectionQuestion(lifecycleRemark)"></app-remark-response>
 </app-modal>
 
 <app-modal #remarkResponseForBureau [title]="'Ответы на замечания бюро'">
   <app-remark-response [remarks]="groupRemark.remarks" (onSave)="saveRemarkResponseForBureau($event)"
                        (onReply)="replyForBureauRemark($event)"
-                       [isExpired]="project.isBureauRemarksExpired"
+                       [isExpired]="projectValue.isBureauRemarksExpired"
                        [isEdit]="canAnswerForBureauQuestion(_group)"></app-remark-response>
 </app-modal>

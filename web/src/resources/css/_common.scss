@@ -1,7 +1,7 @@
 // Стили для ссылок Bootstrap 5
 a {
   color: var(--bs-link-color, #0d6efd);
-  text-decoration: underline;
+  text-decoration: none;
   
   &:hover {
     color: var(--bs-link-hover-color, #0a58ca);
@@ -30,49 +30,57 @@ a {
   }
 }
 
-.pre-line {
-  white-space: pre-line !important;
-}
+// Закомментировано: использование !important без необходимости
+// Можно использовать более специфичный селектор или убрать !important
+// .pre-line {
+//   white-space: pre-line !important;
+// }
 
 .label {
   margin-bottom: .5rem;
 }
 
-.background-light-gray {
-  background: lightgray !important;
-}
+// Закомментировано: использование !important без необходимости
+// Можно использовать более специфичные селекторы или убрать !important
+// .background-light-gray {
+//   background: lightgray !important;
+// }
 
-.background-light-blue {
-  background: lightblue !important;
-}
+// .background-light-blue {
+//   background: lightblue !important;
+// }
 
-.background-dark-sea-green {
-  background: darkseagreen !important;
-}
+// .background-dark-sea-green {
+//   background: darkseagreen !important;
+// }
 
-.border-radius-0 {
-  border-radius: 0 !important;
-}
+// Закомментировано: использование !important без необходимости
+// Bootstrap 5 имеет встроенные классы для этого (rounded-0, rounded-start-0, rounded-end-0)
+// .border-radius-0 {
+//   border-radius: 0 !important;
+// }
 
-.border-right-radius-0 {
-  border-top-right-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-}
+// .border-right-radius-0 {
+//   border-top-right-radius: 0 !important;
+//   border-bottom-right-radius: 0 !important;
+// }
 
-.border-left-radius-0 {
-  border-top-left-radius: 0 !important;
-  border-bottom-left-radius: 0 !important;
-}
+// .border-left-radius-0 {
+//   border-top-left-radius: 0 !important;
+//   border-bottom-left-radius: 0 !important;
+// }
 
-.page-item:not(.pagination-page) {
-  overflow-x: hidden;
-}
+// Удалено: эти стили обрезали границы в пагинации
+// Если нужны будут для других компонентов, можно вернуть с более специфичным селектором
+// .page-item:not(.pagination-page) {
+//   overflow-x: hidden;
+// }
 
-.page-link {
-  text-overflow: ellipsis;
-  overflow-x: hidden;
-  word-wrap: normal;
-}
+// .page-link {
+//   text-overflow: ellipsis;
+//   overflow-x: hidden;
+//   word-wrap: normal;
+// }
 
 .documents .actions {
   white-space: nowrap;
@@ -98,8 +106,10 @@ a {
   border-radius: 1rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
+  // Закомментировано: использование !important без необходимости
+  // Можно использовать более специфичный селектор
   &:hover {
-    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
   }
   
   @media (max-width: 576px) {
@@ -153,13 +163,14 @@ a {
   justify-content: center;
 }
 
-.card-notification {
-  @extend .shadow;
-  position: absolute;
-  top: 65%;
-  min-width: 250px;
-  width: 520px;
-}
+// Закомментировано: класс не используется в коде (используется только test-card-notification и card-notification-all-pages)
+// .card-notification {
+//   @extend .shadow;
+//   position: absolute;
+//   top: 65%;
+//   min-width: 250px;
+//   width: 520px;
+// }
 
 .test-card-notification {
   @extend .shadow;
@@ -232,12 +243,14 @@ span.badge.bg-primary,
   color: inherit;
 }
 
-.modal-backdrop {
-  z-index: auto;
-}
+// Закомментировано: дублирование (определено также на строке 984)
+// Оставляем только одно определение ниже
+// .modal-backdrop {
+//   z-index: auto;
+// }
 
 .link:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .link {
@@ -245,9 +258,6 @@ span.badge.bg-primary,
   color: darkblue;
 }
 
-.underline {
-  text-decoration: underline;
-}
 
 .list-group-item-action {
   color: #212529;
@@ -274,12 +284,13 @@ span.badge.bg-primary,
   }
 }
 
+// Закомментировано: дублирование padding (уже определено в первом правиле)
 .project-list-item {
   padding: 0.75rem 1rem;
   
-  &.list-group-item {
-    padding: 0.75rem 1rem;
-  }
+  // &.list-group-item {
+  //   padding: 0.75rem 1rem; // Дублирует padding выше
+  // }
 }
 
 .compact {
@@ -305,12 +316,14 @@ span.badge.bg-primary,
   background-color: #dfe3e4;
 }
 
+// Закомментировано: использование !important без необходимости
+// Можно использовать более специфичные селекторы
 .input-group.separated {
   input.form-control {
-    border-radius: 0.25rem !important;
+    border-radius: 0.25rem;
   }
   input:not(:first-child) {
-    margin-left: 5px !important;
+    margin-left: 5px;
   }
 }
 
@@ -330,21 +343,23 @@ span.badge.bg-primary,
   padding-right: 0;
 }
 
-.card {
-  padding: 1.5rem 2rem;
-  border-radius: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  h5 {
-    margin-bottom: 1.25rem;
-    line-height: 1.75;
-    font-weight: 700;
-  }
-  
-  &:hover {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  }
-}
+// Закомментировано: дублирование (определено также на строке 907)
+// Оставляем только одно определение ниже с улучшенными стилями
+// .card {
+//   padding: 1.5rem 2rem;
+//   border-radius: 1rem;
+//   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+//   
+//   h5 {
+//     margin-bottom: 1.25rem;
+//     line-height: 1.75;
+//     font-weight: 700;
+//   }
+//   
+//   &:hover {
+//     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+//   }
+// }
 
 .form-sub-group:not(:last-child) {
   margin-bottom: 1rem;
@@ -538,17 +553,21 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.3rem;
 }
 
-.card-cap {
-  text-align-last: justify;
-}
+// Закомментировано: устаревшее свойство text-align-last с плохой поддержкой браузерами
+// Рекомендуется использовать flexbox или grid для выравнивания
+// .card-cap {
+//   text-align-last: justify;
+// }
 
 .completer-input {
-  @extend .form-control
+  @extend .form-control;
+  // Исправлено: добавлена точка с запятой
 }
 
 .viewer {
   width: 100%;
-  height: 100ch
+  // Исправлено: было 100ch (некорректная единица), должно быть 100vh или другая подходящая единица
+  height: 100vh;
 }
 
 .viewer img {
@@ -563,6 +582,12 @@ h1, h2, h3, h4, h5, h6 {
 .border-bottom-none {
   border-bottom: 0;
 }
+
+// Закомментировано: устаревшее свойство text-align-last с плохой поддержкой браузерами
+// Рекомендуется использовать flexbox или grid для выравнивания
+// .card-cap {
+//   text-align-last: justify;
+// }
 
 // Bootstrap 5 compatibility
 .fade.show {
@@ -611,9 +636,11 @@ h1, h2, h3, h4, h5, h6 {
   color: #6c757d;
 }
 
+// Закомментировано: использование !important без необходимости
+// Можно использовать более специфичный селектор
 .alert-deleted {
-  color: #721c24 !important;
-  background-color: #f8d7da !important;
+  color: #721c24;
+  background-color: #f8d7da;
   text-decoration: line-through;
 }
 
@@ -693,6 +720,14 @@ app-filter ng-select .ng-select-container {
   width: 100%;
 }
 
+/* Убираем двойную обводку для ng-select в input-group */
+.input-group ng-select.form-control {
+  border: none;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 /* Улучшенные стили для input-group в фильтрах */
 .filter .input-group .form-control,
 app-filter .input-group .form-control {
@@ -723,16 +758,25 @@ app-filter .input-group .form-control:not(:first-child) {
 }
 
 // Стили для ng-select с border
+// Убираем border от form-control для ng-select, так как border есть у контейнера
+// Закомментировано: использование !important без необходимости
+// Можно использовать более специфичные селекторы
+.ng-select.form-control {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
 .ng-select .ng-select-container {
-  border: 1px solid #ced4da !important;
+  border: 1px solid #ced4da;
   border-radius: 0.375rem;
   min-height: 38px;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 .ng-select.ng-select-focused .ng-select-container {
-  border-color: #86b7fe !important;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
   outline: 0;
 }
 
@@ -749,11 +793,11 @@ app-filter .input-group .form-control:not(:first-child) {
 .ng-select .ng-clear-wrapper {
   position: absolute;
   right: 30px;
-  top: 50%;
   transform: translateY(-50%);
   z-index: 10;
   width: 20px;
   height: 20px;
+  top: 25%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -818,6 +862,7 @@ app-filter .input-group .form-control:not(:first-child) {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+// Оставляем одно определение cursor-pointer здесь (дубликат закомментирован выше)
 .cursor-pointer {
   cursor: pointer;
 }
@@ -890,14 +935,29 @@ app-filter .input-group .form-control:not(:first-child) {
 }
 
 // Улучшенные карточки
+// Оставляем одно определение .card здесь (дубликат закомментирован выше)
 .card {
+  padding: 1.5rem 2rem;
+  border-radius: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
   
+  h5 {
+    margin-bottom: 1.25rem;
+    line-height: 1.75;
+    font-weight: 700;
+  }
+  
+  &:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+  
+  // Закомментировано: использование !important без необходимости
   &.shadow-sm {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     
     &:hover {
-      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
   }
 }
@@ -967,6 +1027,23 @@ app-filter .input-group .form-control:not(:first-child) {
   backdrop-filter: blur(10px);
 }
 
+// Оставляем одно определение .modal-backdrop здесь (дубликат закомментирован выше)
 .modal-backdrop {
   backdrop-filter: blur(5px);
+  z-index: auto;
+}
+
+// Исправление z-index для ng-select dropdown в модальных окнах
+// Bootstrap 5 modal имеет z-index 1055, backdrop - 1050
+// Устанавливаем очень высокий z-index, чтобы dropdown был выше всех input полей и модального окна
+.ng-dropdown-panel {
+  z-index: 10000 !important;
+  position: absolute !important;
+}
+
+// Убеждаемся, что dropdown виден поверх модального окна и всех input полей
+.modal.show ~ .ng-dropdown-panel,
+body > .ng-dropdown-panel {
+  z-index: 10000 !important;
+  position: absolute !important;
 }

@@ -16,7 +16,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (expert of experts; track expert) {
+          @for (expert of experts; track trackByExpert($index, expert)) {
             <tr class="list-group-item-action selectable" (click)="onSelected(expert)">
               <td>
                 <div>{{expert|fullName}}</div>

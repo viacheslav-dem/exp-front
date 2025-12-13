@@ -3,29 +3,12 @@ import {AuthService} from "@app/services/auth.service";
 import {SystemNotificationService} from "@app/services/system-notification.service";
 import {SystemNotificationDto} from "@app/dto/SystemNotificationDto";
 import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
+import {ProgressService} from "@app/components/common-components/progress/progress.service";
 
 @Component({
     selector: 'app-login',
     templateUrl: 'login.component.html',
-    styles: [`
-    .title {
-      text-transform: uppercase;
-      text-align: center;
-      font-size: 1.3rem;
-      font-weight: bold;
-    }
-
-    .password-icon {
-      color: #6c757d;
-      font-size: 1.1rem;
-      transition: color 0.3s ease;
-    }
-    
-    .btn-link:hover .password-icon,
-    .btn-link:focus .password-icon {
-      color: #0d6efd;
-    }
-  `],
+    styleUrls: ['login.component.scss'],
     standalone: false
 })
 export class LoginComponent implements OnInit {
@@ -36,10 +19,13 @@ export class LoginComponent implements OnInit {
 
   constructor(private _authService: AuthService,
               private notificationService: SystemNotificationService,
-              private safeHtmlPipe: SafeHtmlPipe) {
+              private safeHtmlPipe: SafeHtmlPipe,
+              private progressService: ProgressService) {
   }
 
   ngOnInit() {
+      // Убеждаемся, что progress indicator скрыт при загрузке страницы логина
+      this.progressService.hide();
       this.getSystemNotificationForLoginPage();
   }
 
@@ -65,14 +51,22 @@ export class LoginComponent implements OnInit {
   }
 
   getSystemNotificationForLoginPage() {
-
+      // Инициализируем уведомление с дефолтными значениями
       this.systemLoginNotification = new SystemNotificationDto();
       this.systemLoginNotification.name = "LOGIN_PAGE_NOTIFICATION";
+      this.systemLoginNotification.enabled = false; // По умолчанию отключено
 
-      this.notificationService.getNotification(this.systemLoginNotification).subscribe(
-          (response) => {
+      // Загружаем уведомление, но не блокируем форму при ошибках
+      this.notificationService.getNotification(this.systemLoginNotification).subscribe({
+          next: (response) => {
             this.systemLoginNotification = response;
-          });
+          },
+          error: (err) => {
+            // Игнорируем ошибки при загрузке уведомлений, чтобы не блокировать форму логина
+            // Уведомление остается с дефолтными значениями (enabled = false)
+            console.warn('Failed to load system notification:', err);
+          }
+      });
   }
 
   notificationToSafeHtml(notificationMessage: string) {

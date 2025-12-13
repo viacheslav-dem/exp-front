@@ -1,4 +1,5 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild, input} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, input} from '@angular/core';
+import {Subscription} from 'rxjs';
 import {ActivatedRoute} from "@angular/router";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {ProjectLifecycleStateBadge} from "@app/pipes/lifecycle-state.pipe";
@@ -15,7 +16,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
     templateUrl: './lifecycle-info.component.html',
     standalone: false
 })
-export class LifecycleInfoComponent implements OnInit {
+export class LifecycleInfoComponent implements OnInit, OnDestroy {
 
   ProjectLifecycleStateBadge = ProjectLifecycleStateBadge;
   LifecycleGroupState = LifecycleGroupState;
@@ -24,6 +25,7 @@ export class LifecycleInfoComponent implements OnInit {
 
   _lifecycle: any;
   transitionHistory: ProjectLifecycleTransitionHistoryDto;
+  private subscriptions: Subscription[] = [];
 
   readonly role = input<string>(undefined);
   readonly project = input<ProjectDto>(undefined);
@@ -46,8 +48,15 @@ export class LifecycleInfoComponent implements OnInit {
 
   showTransitionHistoryModal() {
     this.transitionHistoryModal.show();
-    this._transitionHistoryService.getLifecycleHistory(this._lifecycle)
-      .subscribe(res => this.transitionHistory = res);
+    this.subscriptions.push(
+      this._transitionHistoryService.getLifecycleHistory(this._lifecycle)
+        .subscribe(res => this.transitionHistory = res)
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions = [];
   }
 
   changed() {

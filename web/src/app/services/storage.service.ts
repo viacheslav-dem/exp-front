@@ -54,11 +54,13 @@ export class StorageService {
   }
 
   getRoles(): string[] {
-    return JSON.parse(localStorage.getItem(this.rolesPlace));
+    const roles = localStorage.getItem(this.rolesPlace);
+    return roles ? JSON.parse(roles) : null;
   }
 
   getRolesInfo(): RoleInfoDto[] {
-    return JSON.parse(localStorage.getItem(this.rolesInfo));
+    const rolesInfo = localStorage.getItem(this.rolesInfo);
+    return rolesInfo ? JSON.parse(rolesInfo) : null;
   }
 
   getUsername(): string {

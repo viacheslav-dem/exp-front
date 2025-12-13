@@ -6,11 +6,7 @@ import {TransitionDto} from "@app/dto/TransitionDto";
 @Component({
     selector: 'app-group-transition-history',
     templateUrl: './group-transition-history.component.html',
-    styles: [`
-      table {
-          font-size: 0.875rem;
-      }
-  `],
+    styleUrls: ['group-transition-history.component.scss'],
     standalone: false
 })
 export class GroupTransitionHistoryComponent implements OnInit {

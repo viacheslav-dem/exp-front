@@ -12,20 +12,7 @@ import {RoleInfoDto} from "@app/dto/RoleInfoDto";
 @Component({
     selector: 'app-loginoff',
     templateUrl: './loginoff.component.html',
-    styles: [`
-      .dropdown-menu {
-          width: 260px;
-      }
-
-      .link {
-          padding: 0.5rem 0;
-      }
-    
-    .not-link {
-        color: #212529;
-        text-decoration: none
-    }
-  `],
+    styleUrls: ['loginoff.component.scss'],
     standalone: false
 })
 export class LoginoffComponent implements OnInit, OnDestroy {

@@ -7,7 +7,10 @@ import {SERVER_URL} from "@app/config";
 @Injectable({ providedIn: 'root' })
 export class ErrorInterceptor implements HttpInterceptor {
 
-    ignoredURLs: Array<string> = [`${SERVER_URL}/system-notification/get`];
+    ignoredURLs: Array<string> = [
+        `${SERVER_URL}/system-notification/get`,
+        `${SERVER_URL}/get/meth_rec/`
+    ];
     ignoredHeaders = [];
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
@@ -15,11 +18,17 @@ export class ErrorInterceptor implements HttpInterceptor {
             .pipe(
                 catchError((err: HttpErrorResponse) => {
                     let isIgnoredUrl = false;
+                    // Проверяем как URL запроса, так и URL ошибки
+                    const urlToCheck = err.url || request.url;
                     this.ignoredURLs.forEach(ignoredURL=> {
-                        if (err.url.includes(ignoredURL)) {
+                        if (urlToCheck.includes(ignoredURL)) {
                             isIgnoredUrl = true;
                         }
                     });
+                    // Для игнорируемых URL при 404 возвращаем пустой результат вместо ошибки
+                    if (isIgnoredUrl && err.status === 404) {
+                        return of(null);
+                    }
                     if (isIgnoredUrl) return of(false);
 
                     throw err;

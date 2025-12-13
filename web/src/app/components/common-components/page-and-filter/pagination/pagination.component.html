@@ -7,20 +7,20 @@
            href=""
            [attr.aria-label]="'Перейти на ' + firstText()"
            (click)="$event.preventDefault(); pagination().page > 1 && pageChanged({ page: 1, itemsPerPage: pagination().itemsPerPage })">
-          <i class="fas fa-angle-double-left"></i>
+          <fa-icon icon="angle-double-left"></fa-icon>
           <span class="d-none d-md-inline ms-1">{{ firstText() }}</span>
         </a>
       </li>
-      <!-- Предыдущая -->
-      <li class="page-item" [class.disabled]="pagination().page <= 1">
+      <!-- Предыдущая - скрыта -->
+      <!-- <li class="page-item d-none d-md-flex" [class.disabled]="pagination().page <= 1">
         <a class="page-link page-link-nav" 
            href=""
            [attr.aria-label]="'Перейти на ' + previousText()"
            (click)="$event.preventDefault(); pagination().page > 1 && pageChanged({ page: pagination().page - 1, itemsPerPage: pagination().itemsPerPage })">
-          <i class="fas fa-angle-left"></i>
-          <span class="d-none d-md-inline ms-1">{{ previousText() }}</span>
+          <fa-icon icon="angle-left"></fa-icon>
+          <span class="ms-1">{{ previousText() }}</span>
         </a>
-      </li>
+      </li> -->
       <!-- Номера страниц -->
       @for (p of pages; track p) {
         <li class="page-item"
@@ -34,16 +34,16 @@
           </a>
         </li>
       }
-      <!-- Следующая -->
-      <li class="page-item" [class.disabled]="pagination().page >= page().totalPages">
+      <!-- Следующая - скрыта -->
+      <!-- <li class="page-item d-none d-md-flex" [class.disabled]="pagination().page >= page().totalPages">
         <a class="page-link page-link-nav" 
            href=""
            [attr.aria-label]="'Перейти на ' + nextText()"
            (click)="$event.preventDefault(); pagination().page < page().totalPages && pageChanged({ page: pagination().page + 1, itemsPerPage: pagination().itemsPerPage })">
-          <span class="d-none d-md-inline me-1">{{ nextText() }}</span>
-          <i class="fas fa-angle-right"></i>
+          <span class="me-1">{{ nextText() }}</span>
+          <fa-icon icon="angle-right"></fa-icon>
         </a>
-      </li>
+      </li> -->
       <!-- Последняя -->
       <li class="page-item" [class.disabled]="pagination().page >= page().totalPages">
         <a class="page-link page-link-nav rounded-end" 
@@ -51,7 +51,7 @@
            [attr.aria-label]="'Перейти на ' + lastText()"
            (click)="$event.preventDefault(); pagination().page < page().totalPages && pageChanged({ page: page().totalPages, itemsPerPage: pagination().itemsPerPage })">
           <span class="d-none d-md-inline me-1">{{ lastText() }}</span>
-          <i class="fas fa-angle-double-right"></i>
+          <fa-icon icon="angle-double-right"></fa-icon>
         </a>
       </li>
     </ul>

@@ -1,10 +1,11 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DialogService} from "@app/components/dialogs/dialog.service";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {DialogResult} from "@app/components/dialogs/dialog-result";
 import {DialogContainer, DialogType} from "@app/components/dialogs/dialog-container";
 import {UserFormComponent} from "@app/components/dialogs/user-form/user-form.component";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'app-dialogs',
@@ -12,13 +13,14 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
     styles: [],
     standalone: false
 })
-export class DialogComponent implements OnInit {
+export class DialogComponent implements OnInit, OnDestroy {
 
   DialogType = DialogType;
   dlg: DialogContainer<any>;
   data: any;
   title: string;
   titleMap = {};
+  private subscription: Subscription;
 
   @ViewChild('modalComponent', { static: false }) public modalComponent: ModalComponent;
   @ViewChild(UserFormComponent, { static: false }) userForm: UserFormComponent;
@@ -30,7 +32,7 @@ export class DialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.dialogService.onOpenDialog.subscribe(dlg => {
+    this.subscription = this.dialogService.onOpenDialog.subscribe(dlg => {
       if (this.dlg != null) {
         this.cancel(); // close current dialog
       }
@@ -42,6 +44,12 @@ export class DialogComponent implements OnInit {
         this.modalComponent.show();
       });
     });
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   save(entity?: any) {

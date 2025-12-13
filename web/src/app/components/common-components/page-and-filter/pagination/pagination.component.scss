@@ -1,0 +1,265 @@
+// Контейнер пагинации - убеждаемся, что не обрезает содержимое
+:host {
+  display: block;
+  overflow: visible !important;
+}
+
+// Переопределяем глобальные стили из _common.scss, которые обрезают границы
+.pagination-modern .page-item {
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  margin: 0;
+  position: relative;
+}
+
+// Современный стиль пагинации
+.pagination-modern {
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  overflow: visible !important; // Нужен для переопределения глобальных стилей
+  position: relative;
+}
+
+// На больших экранах сохраняем nowrap
+@media (min-width: 768px) {
+  .pagination-modern {
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+  }
+}
+
+// Базовые стили для всех кнопок пагинации
+.pagination-modern .page-link {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.375rem 0.625rem;
+  color: #495057;
+  background-color: #fff;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  font-weight: 500;
+  min-width: 2.25rem;
+  height: auto;
+  min-height: 2.25rem;
+  text-align: center;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  text-decoration: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 0;
+  outline: none;
+}
+
+// Hover эффект для обычных кнопок
+.pagination-modern .page-link:hover:not(.disabled):not(.active) {
+  background-color: #f8f9fa;
+  border-color: #0d6efd;
+  border-width: 1px;
+  border-style: solid;
+  color: #0d6efd;
+  text-decoration: none;
+  box-shadow: 0 2px 4px rgba(13, 110, 253, 0.15);
+  position: relative;
+  transform: none; // Убираем transform, чтобы не было обрезания
+}
+
+// Активная страница
+.pagination-modern .page-item.active .page-link {
+  background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+  border-color: #0d6efd;
+  border-width: 1px;
+  border-style: solid;
+  color: #fff;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+  position: relative;
+}
+
+.pagination-modern .page-item.active .page-link:hover {
+  background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+  border-color: #0a58ca;
+  border-width: 1px;
+  border-style: solid;
+  box-shadow: 0 2px 6px rgba(13, 110, 253, 0.3);
+}
+
+// Отключенные кнопки
+.pagination-modern .page-item.disabled .page-link {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+  color: #adb5bd;
+  cursor: not-allowed;
+  opacity: 0.5;
+  text-decoration: none;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.pagination-modern .page-item.disabled .page-link:hover {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+  color: #adb5bd;
+}
+
+// Кнопки навигации (Первая, Предыдущая, Следующая, Последняя)
+.pagination-modern .page-link-nav {
+  box-sizing: border-box;
+  min-width: 2.25rem;
+  padding: 0.375rem 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  font-weight: 500;
+  overflow: visible;
+}
+
+// Иконки в кнопках навигации (fa-icon компонент)
+.pagination-modern .page-link fa-icon {
+  font-size: 0.875rem;
+  transition: transform 0.2s ease;
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+// Hover эффект для иконок
+.pagination-modern .page-link:hover:not(.disabled):not(.active) fa-icon {
+  transform: scale(1.1);
+}
+
+// Стили для мобильных устройств
+@media (max-width: 767.98px) {
+  .pagination-modern {
+    gap: 0.25rem;
+  }
+
+  .pagination-modern .page-link {
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+  }
+
+  // Кнопки навигации на мобильных - только иконки, квадратные
+  .pagination-modern .page-link-nav {
+    min-width: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    justify-content: center;
+  }
+
+  // Иконки всегда видны на мобильных (fa-icon компонент)
+  .pagination-modern .page-link-nav fa-icon {
+    font-size: 1rem !important;
+    margin: 0 !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: auto !important;
+    height: auto !important;
+  }
+
+  // Специфичные стили для иконок в кнопках "Первая" и "Последняя"
+  .pagination-modern .page-link-nav.rounded-start fa-icon,
+  .pagination-modern .page-link-nav.rounded-end fa-icon {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-size: 1rem !important;
+  }
+
+  // Убираем только текст на мобильных (текст скрыт через d-none d-md-inline)
+  .pagination-modern .page-link-nav .ms-1,
+  .pagination-modern .page-link-nav .me-1 {
+    display: none;
+  }
+
+  // Уменьшаем тени на мобильных для лучшей производительности
+  .pagination-modern .page-link {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .pagination-modern .page-link:hover:not(.disabled):not(.active) {
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.15);
+  }
+
+  .pagination-modern .page-item.active .page-link {
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+  }
+}
+
+// Стили для планшетов
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .pagination-modern .page-link {
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.5rem 0.625rem;
+  }
+
+  .pagination-modern .page-link-nav {
+    min-width: 2.5rem;
+    padding: 0.5rem 0.625rem;
+  }
+}
+
+// Стили для десктопа
+@media (min-width: 768px) {
+  .pagination-modern .page-link {
+    box-sizing: border-box;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    height: auto;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .pagination-modern .page-link-nav {
+    box-sizing: border-box;
+    min-width: auto;
+    padding: 0.375rem 0.875rem;
+    min-width: 3rem;
+    min-height: 2.5rem;
+    height: auto;
+  }
+
+  .pagination-modern .page-link-nav fa-icon {
+    font-size: 0.875rem;
+  }
+}
+
+// Убираем скругления для первой и последней кнопки (если нужно)
+.pagination-modern .page-link.rounded-start {
+  border-top-left-radius: 0.5rem !important;
+  border-bottom-left-radius: 0.5rem !important;
+}
+
+.pagination-modern .page-link.rounded-end {
+  border-top-right-radius: 0.5rem !important;
+  border-bottom-right-radius: 0.5rem !important;
+}
+
+// Улучшенная анимация при клике
+.pagination-modern .page-link:active:not(.disabled):not(.active) {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-modern .page-item.active .page-link:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(13, 110, 253, 0.3);
+}

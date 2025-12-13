@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, ComponentFactoryResolver, ViewChild, ViewContainerRef, AfterViewInit} from '@angular/core';
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {DataService} from "@app/services/data.service";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
@@ -15,47 +15,17 @@ import {PropertyComponent} from "@app/components/settings/property.component";
 @Component({
     selector: 'app-settings',
     templateUrl: './settings.component.html',
-    styles: [`
-      .settings-item {
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        padding: 0.75rem 1rem;
-        border: 1px solid rgba(0, 0, 0, 0.08);
-        background-color: #ffffff;
-      }
-      
-      .settings-item:hover:not(.active):not(.disabled) {
-        background-color: #f8f9fa;
-        transform: translateX(4px);
-        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
-        border-color: rgba(13, 110, 253, 0.25);
-      }
-      
-      .settings-item.active {
-        background-color: #e7f1ff;
-        border-color: #0d6efd;
-        box-shadow: 0 0.25rem 0.5rem rgba(13, 110, 253, 0.2);
-      }
-      
-      .settings-item.disabled {
-        opacity: 0.6;
-        background-color: #f8f9fa;
-      }
-      
-      .settings-item:focus {
-        outline: 2px solid #0d6efd;
-        outline-offset: 2px;
-      }
-    `],
+    styleUrls: ['./settings.component.scss'],
     standalone: false
 })
-export class SettingsComponent extends FilterAndPages<PropertyDto> {
+export class SettingsComponent extends FilterAndPages<PropertyDto> implements AfterViewInit {
 
   properties: PropertyDto[] = [];
   selectedProperty: PropertyDto;
   editedProperty: PropertyPlainDto;
+  private _pendingPropertySelection: PropertyDto;
 
-  @ViewChild('propertyContainer', { read: ViewContainerRef, static: false }) propertyContainer: any;
+  @ViewChild('propertyContainer', { read: ViewContainerRef, static: false }) propertyContainer: ViewContainerRef;
   propertyComponent: PropertyComponent<any>;
 
   constructor(private _toasty: GlobalToastyService,
@@ -74,12 +44,27 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> {
     this.enableFilterCache("properties");
   }
 
+  ngAfterViewInit() {
+    // Если была отложенная выборка свойства, выполняем её после инициализации представления
+    if (this._pendingPropertySelection) {
+      this.selectProperty(this._pendingPropertySelection);
+      this._pendingPropertySelection = null;
+    }
+  }
+
   loadPage() {
     this._dataService.getPropertiesAdminPage(this._searchRequest).subscribe(res => {
       this.setLoading(false);
       this._page = res;
       this.properties = this._page.content;
-      this.selectProperty(this.properties[0])
+      if (this.properties && this.properties.length > 0) {
+        // Если propertyContainer еще не инициализирован, откладываем выборку
+        if (this.propertyContainer) {
+          this.selectProperty(this.properties[0]);
+        } else {
+          this._pendingPropertySelection = this.properties[0];
+        }
+      }
     }, () => this.setLoading(false));
   }
 
@@ -115,6 +100,9 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> {
   }
 
   updatePropertyComponent() {
+    if (!this.propertyContainer || !this.selectedProperty) {
+      return;
+    }
     while (this.propertyContainer.length > 0) {
       this.propertyContainer.get(0).destroy();
     }

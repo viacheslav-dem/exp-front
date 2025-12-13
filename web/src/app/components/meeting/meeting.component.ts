@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from "@angular/core";
+import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "@app/services/auth.service";
@@ -19,13 +19,14 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
 import {LifecycleService} from "@app/services/lifecycle.service";
 import {RemarksContainerDto} from "@app/dto/RemarksContainerDto";
 import {MeetingProtocolFormComponent} from "@app/components/document-form/meeting-protocol-form/meeting-protocol-form.component";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'app-meeting',
     templateUrl: 'meeting.component.html',
     standalone: false
 })
-export class MeetingComponent implements OnInit {
+export class MeetingComponent implements OnInit, OnDestroy {
 
   MeetingStateBadge = MeetingStateBadge;
   Role = Role;
@@ -34,6 +35,7 @@ export class MeetingComponent implements OnInit {
   agendas: AgendaDto[] = [];
   role: string;
   remarks: RemarksContainerDto = new RemarksContainerDto();
+  private subscriptions: Subscription[] = [];
 
   @ViewChild("protocolFormModal", { static: false }) protocolFormModal: ModalComponent;
   @ViewChild(MeetingFormComponent, { static: false }) createMeetingModal: MeetingFormComponent;
@@ -47,7 +49,7 @@ export class MeetingComponent implements OnInit {
               private _toasty: GlobalToastyService,
               private _authService: AuthService,
               private _agendaService: AgendaService,
-              public _meetingService: MeetingService,
+              private _meetingService: MeetingService,
               private _projectService: ProjectService,
               private _dialogService: DialogService,
               private router: Router,
@@ -56,14 +58,23 @@ export class MeetingComponent implements OnInit {
 
   ngOnInit() {
     this.role = this._authService.getCurrRole();
-    this._route.params.subscribe(params => this.loadMeeting(new IdDto(params['id'])));
+    this.subscriptions.push(
+      this._route.params.subscribe(params => this.loadMeeting(new IdDto(params['id'])))
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions = [];
   }
 
   loadMeeting(idDto: IdDto) {
-    this._meetingService.getMeeting(idDto).subscribe(res => {
-      this.meeting = res;
-      this.agendas = this.meeting.agendas;
-    });
+    this.subscriptions.push(
+      this._meetingService.getMeeting(idDto).subscribe(res => {
+        this.meeting = res;
+        this.agendas = this.meeting.agendas;
+      })
+    );
   }
 
   editMeeting() {
@@ -76,81 +87,98 @@ export class MeetingComponent implements OnInit {
   }
 
   saveAgendaDecisions() {
-    this._dialogService.showConfirmDialog(
-      'Завершить заседание?', this.meeting.description,
-      'Пожалуйста, проверьте данные протокола, поскольку изменить их будет уже невозможно.'
-    ).subscribe(() => {
-      this._meetingService.finishMeeting(this.meeting).subscribe(res => {
-        this.meeting = res;
-        this.agendas = this.meeting.agendas;
-        this._toasty.success("Заседание завершено.");
-        this.router.navigateByUrl('/meetings');
-      });
-    });
+    this.subscriptions.push(
+      this._dialogService.showConfirmDialog(
+        'Завершить заседание?', this.meeting.description,
+        'Пожалуйста, проверьте данные протокола, поскольку изменить их будет уже невозможно.'
+      ).subscribe(() => {
+        this.subscriptions.push(
+          this._meetingService.finishMeeting(this.meeting).subscribe(res => {
+            this.meeting = res;
+            this.agendas = this.meeting.agendas;
+            this._toasty.success("Заседание завершено.");
+            this.router.navigateByUrl('/meetings');
+          })
+        );
+      })
+    );
   }
 
   cancelAgendaDecisions() {
-    this._dialogService.showConfirmDialogWithFields(
-      [new ConfirmDialogField<string>('cancelReason', 'Причина отмены')],
-      'Отменить заседание?', 'Вы действительно хотите отменить заседание?',
-    ).subscribe((dlgResult: DialogResult<any>) => {
-      let reason = "";
-      if (dlgResult != null && dlgResult.value != null)
-        reason = dlgResult.value.cancelReason;
+    this.subscriptions.push(
+      this._dialogService.showConfirmDialogWithFields(
+        [new ConfirmDialogField<string>('cancelReason', 'Причина отмены')],
+        'Отменить заседание?', 'Вы действительно хотите отменить заседание?',
+      ).subscribe((dlgResult: DialogResult<any>) => {
+        let reason = "";
+        if (dlgResult != null && dlgResult.value != null) {
+          reason = dlgResult.value.cancelReason;
+        }
 
-      if (reason == null || reason == "")
-        throw "Необходимо указать причину отмены";
-      this._meetingService.cancelMeeting(this.meeting, reason).subscribe(res => {
-        this.meeting = res;
-        this.agendas = this.meeting.agendas;
-        this._toasty.success("Заседание отменено.");
-      });
-    });
+        if (reason === null || reason === "") {
+          throw "Необходимо указать причину отмены";
+        }
+        this.subscriptions.push(
+          this._meetingService.cancelMeeting(this.meeting, reason).subscribe(res => {
+            this.meeting = res;
+            this.agendas = this.meeting.agendas;
+            this._toasty.success("Заседание отменено.");
+          })
+        );
+      })
+    );
   }
 
   generateMeetingProtocol(form) {
-    this._meetingService.generateCouncilMeetingProtocol(this.meeting, form)
-      .subscribe(res => {
-        this.meeting.report = res[0];
-        this.meeting.paymentDocument = res[1];
-        this.closeProtocolForm();
-        this.loadMeeting(this.meeting);
-      });
+    this.subscriptions.push(
+      this._meetingService.generateCouncilMeetingProtocol(this.meeting, form)
+        .subscribe(res => {
+          this.meeting.report = res[0];
+          this.meeting.paymentDocument = res[1];
+          this.closeProtocolForm();
+          this.loadMeeting(this.meeting);
+        })
+    );
   }
 
   generateSectionRemark(project: ProjectCodePlainDto) {
-    let dto = new RemarksContainerDto();
+    const dto = new RemarksContainerDto();
     dto.project = project;
     dto.meeting = this.meeting;
-    this._meetingService.getRemarks(dto).subscribe(value =>
-      this.remarks = value
+    this.subscriptions.push(
+      this._meetingService.getRemarks(dto).subscribe(value =>
+        this.remarks = value
+      )
     );
     this.sectionRemarks.show();
   }
 
   generateBureauRemark(project: ProjectCodePlainDto) {
-    let dto = new RemarksContainerDto();
+    const dto = new RemarksContainerDto();
     dto.project = project;
     dto.meeting = this.meeting;
-    this._meetingService.getRemarks(dto).subscribe(value =>
-      this.remarks = value
+    this.subscriptions.push(
+      this._meetingService.getRemarks(dto).subscribe(value =>
+        this.remarks = value
+      )
     );
     this.bureauRemarks.show();
-
   }
 
   showCustomerAnswer(agenda: AgendaDto) {
-    let dto = new RemarksContainerDto();
+    const dto = new RemarksContainerDto();
     dto.project = agenda.project;
     dto.meeting = this.meeting;
-    this._meetingService.getRemarks(dto).subscribe(value =>
-      this.remarks = value
+    this.subscriptions.push(
+      this._meetingService.getRemarks(dto).subscribe(value =>
+        this.remarks = value
+      )
     );
-    if (this.role == Role.BUREAU_CHAIRMAN || this.role == Role.BUREAU_ASSESSOR) {
-      this.remarkResponseForBureau.show()
+    if (this.role === Role.BUREAU_CHAIRMAN || this.role === Role.BUREAU_ASSESSOR) {
+      this.remarkResponseForBureau.show();
     }
-    if (this.role == Role.SECTION_CHAIRMAN || this.role == Role.SECTION_ASSESSOR) {
-      this.remarkResponseForSection.show()
+    if (this.role === Role.SECTION_CHAIRMAN || this.role === Role.SECTION_ASSESSOR) {
+      this.remarkResponseForSection.show();
     }
   }
 
@@ -166,17 +194,23 @@ export class MeetingComponent implements OnInit {
   }
 
   loadComments(agenda: AgendaDto) {
-    this._agendaService.getCommentsByAgenda(agenda)
-      .subscribe(res => agenda.comments = res);
+    this.subscriptions.push(
+      this._agendaService.getCommentsByAgenda(agenda)
+        .subscribe(res => agenda.comments = res)
+    );
   }
 
   loadDocuments(agenda: AgendaDto) {
-    if (this.role == Role.BUREAU_CHAIRMAN) {
-      this._agendaService.getSectionReportsByBureauAssessor(agenda)
-        .subscribe(res => agenda.sectionProtocols = res)
+    if (this.role === Role.BUREAU_CHAIRMAN) {
+      this.subscriptions.push(
+        this._agendaService.getSectionReportsByBureauAssessor(agenda)
+          .subscribe(res => agenda.sectionProtocols = res)
+      );
     }
-    this._agendaService.getAgendaExpertReviews(agenda)
-      .subscribe(res => agenda.expertReviews = res)
+    this.subscriptions.push(
+      this._agendaService.getAgendaExpertReviews(agenda)
+        .subscribe(res => agenda.expertReviews = res)
+    );
   }
 
   loadAgendaData(agenda: AgendaDto) {
@@ -188,14 +222,17 @@ export class MeetingComponent implements OnInit {
   }
 
   saveSectionRemarks(remarks: RemarksContainerDto) {
-    this._meetingService.saveSectionRemarks(remarks).subscribe(value =>
-      this.sectionRemarks.hide());
-
+    this.subscriptions.push(
+      this._meetingService.saveSectionRemarks(remarks).subscribe(value =>
+        this.sectionRemarks.hide())
+    );
   }
 
   saveBureauRemarks(remarks: RemarksContainerDto) {
-    this._meetingService.saveBureauRemarks(remarks).subscribe(value =>
-      this.bureauRemarks.hide());
+    this.subscriptions.push(
+      this._meetingService.saveBureauRemarks(remarks).subscribe(value =>
+        this.bureauRemarks.hide())
+    );
   }
 
   showProtocolForm() {

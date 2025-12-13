@@ -6,11 +6,7 @@ import {ExpertTransitionHistoryDto} from "@app/dto/ExpertTransitionHistoryDto";
 @Component({
     selector: 'app-expert-transition-history',
     templateUrl: './expert-transition-history.component.html',
-    styles: [`
-      table {
-          font-size: 0.875rem;
-      }
-  `],
+    styleUrls: ['expert-transition-history.component.scss'],
     standalone: false
 })
 export class ExpertTransitionHistoryComponent implements OnInit {

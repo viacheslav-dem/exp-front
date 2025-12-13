@@ -1,9 +1,12 @@
 // Fix for ngx-bootstrap datepicker positioning issue
 // The datepicker container loses transform coordinates on re-open
+// Bootstrap 5 modal имеет z-index 1055, backdrop - 1050
+// Устанавливаем z-index выше модального окна, как у ng-select (10000)
 bs-daterangepicker-container,
 bs-datepicker-container {
-  // Ensure proper z-index
-  z-index: 1050 !important;
+  // Ensure proper z-index - выше модального окна Bootstrap 5 (z-index: 1055)
+  // Используем такой же высокий z-index как у ng-select для консистентности
+  z-index: 10000 !important;
   
   // When transform is missing (bug on re-open), the element stays at top:0 left:0
   // This is a fallback - not ideal but better than invisible calendar

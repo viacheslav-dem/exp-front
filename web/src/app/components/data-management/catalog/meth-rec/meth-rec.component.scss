@@ -1,0 +1,103 @@
+.meth-rec-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto;
+    gap: 1rem;
+    align-items: start;
+}
+
+.grid-item-header {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.grid-item-drop-zone {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 50%;
+    align-self: stretch;
+    padding: 1rem;
+    min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0.75rem;
+}
+
+.grid-item-upload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex-shrink: 0;
+    min-height: 38px;
+}
+
+.grid-item-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+    flex-shrink: 0;
+    padding-top: 0.25rem;
+}
+
+/* Убеждаемся, что элементы внутри загрузчика не перекрываются */
+::ng-deep .grid-item-upload app-silent-file-uploader {
+    width: 100%;
+    display: block;
+}
+
+::ng-deep .grid-item-upload app-silent-file-uploader .file-drop-zone {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: stretch;
+}
+
+::ng-deep .grid-item-upload app-silent-file-uploader app-choose-files {
+    width: 100%;
+    display: block;
+}
+
+::ng-deep .grid-item-upload app-silent-file-uploader .file-drop-zone > div:first-child {
+    width: 100%;
+}
+
+/* Скрываем надпись и границу внутри компонента загрузчика на этой странице */
+::ng-deep .grid-item-drop-zone app-silent-file-uploader .file-drop-zone {
+    border: none;
+    padding: 0;
+    background: transparent;
+}
+
+::ng-deep .grid-item-drop-zone app-silent-file-uploader .file-drop-zone .text-mini {
+    display: none;
+}
+
+/* Стили для зоны перетаскивания при наведении */
+.grid-item-drop-zone.drag-over {
+    border-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+@media (max-width: 768px) {
+    .meth-rec-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+    }
+    
+    .grid-item-header {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    
+    .grid-item-drop-zone {
+        grid-column: 1;
+        grid-row: 2;
+    }
+}
+

@@ -26,16 +26,27 @@ export class PhonesPipe implements PipeTransform {
     },
   };
 
-  transform(phones: PhoneDto[] = [], shortMark: boolean): any {
-    if (shortMark) {
-      return phones.map(phone => phone.phone)
-        .map(phone => phone.replace(/ /g, "\u00A0").replace(/-/g, "\u2011"))
-        .join(", ")
+    transform(phones: PhoneDto[] = [], shortMark: boolean = false): string {
+        if (!phones?.length) return '';
+
+        return phones
+            .map(phone => {
+                const formatted = phone.phone
+                    .replace(/ /g, "\u00A0")
+                    .replace(/-/g, "\u2011");
+
+                if (shortMark) {
+                    return formatted;
+                }
+
+                const type = PhonesPipe.phoneTypes[phone.type];
+                return type
+                    ? `${formatted}\u00A0(${type.shortName})`
+                    : formatted;
+            })
+            .join(", ");
     }
-    return phones.map(phone => phone.phone + "\u00A0(" + PhonesPipe.phoneTypes[phone.type].shortName + ")")
-      .map(phone => phone.replace(/ /g, "\u00A0").replace(/-/g, "\u2011"))
-      .join(", ");
-  }
+
 }
 
 export interface PhoneType {

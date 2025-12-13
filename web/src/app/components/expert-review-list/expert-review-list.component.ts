@@ -11,11 +11,7 @@ import {ProjectService} from "@app/services/project.service";
 @Component({
     selector: 'app-expert-review-list',
     templateUrl: './expert-review-list.component.html',
-    styles: [`
-      .review:not(:last-child) {
-          margin-bottom: 1rem;
-      }
-  `],
+    styleUrls: ['expert-review-list.component.scss'],
     standalone: false
 })
 export class ExpertReviewListComponent implements OnInit {

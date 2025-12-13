@@ -56,51 +56,71 @@
               <!--TEMPLATE FILES-->
               <div>
                 <div class="form-sub-group">
-                  <div class="row align-items-center">
-                    <div class="col-auto" style="width: 150px;">
+                  <div class="templates-grid">
+                    <div class="grid-item-label">
                       Шаблон в .docx:
                     </div>
-                    <div class="col-auto">
-                      <button class="btn btn-sm btn-outline-primary" (click)="downloadTemplate(template)">
-                        Скачать <fa-icon icon="arrow-down"></fa-icon>
-                      </button>
+                    <div class="grid-item-drop-zone file-drop-zone"
+                         (dragover)="onDragOver($event, 'docx', template)"
+                         (dragleave)="onDragLeave($event, 'docx')"
+                         (drop)="onDrop($event, 'docx', template)"
+                         [class.drag-over]="isDragOverDocx === template.id">
+                      <div class="grid-item-actions">
+                        <button class="btn btn-sm btn-outline-primary" (click)="downloadTemplate(template)">
+                          Скачать <fa-icon icon="arrow-down"></fa-icon>
+                        </button>
+                        <span class="mx-2">или</span>
+                      </div>
+                      <div class="grid-item-upload">
+                        <app-silent-file-uploader
+                          [controlClass]="'width-auto custom-file-inline'" 
+                          [typesAccept]="DocType.DOCX.extension"
+                          [url]="SERVER_URL + '/document/template/source?id=' + template.id">
+                        </app-silent-file-uploader>
+                      </div>
+                      <div class="grid-item-hint">
+                        <div class="text-mini text-muted" style="font-size: 0.7rem;">
+                          Перетащите файл сюда или выберите через диалог
+                        </div>
+                      </div>
                     </div>
-                    <div class="col-auto">
-                      <span class="mx-1">или</span>
+                  </div>
+                </div>
+                <div class="form-sub-group mt-2">
+                  <div class="templates-grid">
+                    <div class="grid-item-label">
+                      Xml-часть:
                     </div>
-                    <div class="col">
-                      <app-silent-file-uploader
-                        [controlClass]="'width-auto custom-file-inline'" [typesAccept]="DocType.DOCX.extension"
-                  [url]="SERVER_URL + '/document/template/source?id=' + template.id">
-                </app-silent-file-uploader>
+                    <div class="grid-item-drop-zone file-drop-zone"
+                         (dragover)="onDragOver($event, 'xml', template)"
+                         (dragleave)="onDragLeave($event, 'xml')"
+                         (drop)="onDrop($event, 'xml', template)"
+                         [class.drag-over]="isDragOverXml === template.id">
+                      <div class="grid-item-actions">
+                        <button class="btn btn-sm btn-outline-primary" (click)="downloadTemplateXml(template)">
+                          Скачать <fa-icon icon="arrow-down"></fa-icon>
+                        </button>
+                        <span class="mx-2">или</span>
+                      </div>
+                      <div class="grid-item-upload">
+                        <app-silent-file-uploader
+                          [controlClass]="'width-auto'" 
+                          [typesAccept]="DocType.XML.extension"
+                          [url]="SERVER_URL + '/document/template-xml/source?id=' + template.id">
+                        </app-silent-file-uploader>
+                      </div>
+                      <div class="grid-item-hint">
+                        <div class="text-mini text-muted" style="font-size: 0.7rem;">
+                          Перетащите файл сюда или выберите через диалог
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <div class="form-sub-group mt-2">
-            <div class="row align-items-center">
-              <div class="col-auto" style="width: 150px;">
-                Xml-часть:
-              </div>
-              <div class="col-auto">
-                <button class="btn btn-sm btn-outline-primary" (click)="downloadTemplateXml(template)">
-                  Скачать <fa-icon icon="arrow-down"></fa-icon>
-                </button>
-              </div>
-              <div class="col-auto">
-                <span class="mx-1">или</span>
-              </div>
-              <div class="col">
-                <app-silent-file-uploader
-                  [controlClass]="'width-auto'" [typesAccept]="DocType.XML.extension"
-                  [url]="SERVER_URL + '/document/template-xml/source?id=' + template.id">
-                </app-silent-file-uploader>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
-    </div>
-}
+    }
 
     @if (!templates || templates.length == 0) {
 <div>

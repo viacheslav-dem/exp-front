@@ -1,0 +1,79 @@
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+    align-items: start;
+}
+
+.settings-list-column {
+    grid-column: 1;
+}
+
+.settings-details-column {
+    grid-column: 2;
+}
+
+.list-group-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.list-group-item:hover:not(.active):not(.disabled) {
+    background-color: #f8f9fa;
+}
+
+// Используем более специфичный селектор для переопределения глобальных стилей
+// .border-bottom-none (из _common.scss) устанавливает border-bottom: 0
+// Более специфичный селектор переопределяет его без !important
+.settings-list-column .list-group-item.active {
+    background-color: #e7f1ff;
+    border-color: #0d6efd;
+    border-bottom-color: #0d6efd;
+    border-top-color: #0d6efd;
+    border-left-color: #0d6efd;
+    border-right-color: #0d6efd;
+    border-width: 1px;
+    border-bottom-width: 1px;
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+// Переопределяем .border-bottom-none для активного элемента
+// Специфичность: .settings-list-column .list-group-item.active.border-bottom-none > .border-bottom-none
+.settings-list-column .list-group-item.active.border-bottom-none {
+    border-bottom: 1px solid #0d6efd;
+}
+
+.settings-list-column .list-group-item.active .text-mini {
+    color: #0d6efd;
+}
+
+.settings-list-column .list-group-item.active .text-muted {
+    color: #5c9eff;
+}
+
+.list-group-item.disabled {
+    opacity: 0.6;
+}
+
+.list-group-item.disabled:hover {
+    background-color: inherit;
+}
+
+@media (max-width: 992px) {
+    .settings-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+    }
+    
+    .settings-list-column {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    
+    .settings-details-column {
+        grid-column: 1;
+        grid-row: 2;
+    }
+}
+

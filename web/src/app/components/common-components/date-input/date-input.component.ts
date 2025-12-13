@@ -24,7 +24,7 @@ export const DATE_INPUT_VALUE_ACCESSOR: any = {
            (ngModelChange)="onModelChange($event)"
            (bsValueChange)="onChange($event)"
            [placeholder]="placeholder()"
-           placement="bottom"
+           [placement]="placement()"
            [title]="title()"
            container="body">
   `,
@@ -37,7 +37,7 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
   readonly minDate = input<Date>(undefined);
   readonly maxDate = input<Date>(undefined);
   readonly dateFormat = input<string>('DD.MM.YYYY');
-  readonly placement = input<string>("bottom");
+  readonly placement = input<string>('bottom');
 
   dateValue: Date;
   @Output() onSelect: EventEmitter<number> = new EventEmitter<number>();
@@ -69,7 +69,10 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
     this.bsConfig = {
       dateInputFormat: dateFnsFormat,
       containerClass: 'theme-default',
-      showWeekNumbers: false
+      showWeekNumbers: false,
+      adaptivePosition: true,
+      isAnimated: false, // Отключаем анимации, чтобы избежать проблем с NG05105
+      returnFocusToInput: true
     };
   }
 

@@ -74,13 +74,13 @@
   }
   
   // Современный подход без Bootstrap JS
-  .dropdown-menu {
-    display: none;
-  }
+  //.dropdown-menu {
+   // display: none;
+  //}
   
-  &.show .dropdown-menu {
-    display: block;
-  }
+  //&.show .dropdown-menu {
+   // display: block;
+ // }
 }
 
 .btn-link-sm {

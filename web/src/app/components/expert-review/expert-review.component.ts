@@ -33,6 +33,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
 @Component({
     selector: 'app-expert-review',
     templateUrl: './expert-review.component.html',
+    styleUrls: ['expert-review.component.scss'],
     standalone: false
 })
 export class ExpertReviewComponent implements OnInit {

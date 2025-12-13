@@ -1,4 +1,4 @@
-import {Component, Input, input, OnDestroy, OnInit} from "@angular/core";
+import {Component, Input, OnDestroy, OnInit} from "@angular/core";
 import {StorageService} from "app/services/storage.service";
 import {SERVER_URL} from "app/config";
 import {DocumentDto} from "@app/dto/DocumentDto";
@@ -37,7 +37,7 @@ import {Subscription} from "rxjs";
 export class PdfViewerComponent implements OnInit, OnDestroy {
 
   pdfSrc: string | Uint8Array | ArrayBuffer;
-  readonly url = input<string>('document');
+  @Input() url: string = 'document';
   private subscription: Subscription;
 
   constructor(private _storage: StorageService,
@@ -78,8 +78,14 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   private loadPdf(doc: DocumentDto): void {
     this.cleanup();
     
+    if (!doc || !doc.id) {
+      console.error('Invalid document data:', doc);
+      this.pdfSrc = null;
+      return;
+    }
+    
     let filename = encodeURIComponent(doc.name + '.pdf');
-    let url = `${SERVER_URL}/${this.url()}?convert=true&id=${doc.id}&filename=${filename}`;
+    let url = `${SERVER_URL}/${this.url}?convert=true&id=${doc.id}&filename=${filename}`;
     
     // Загружаем PDF через HttpClient с авторизацией
     this.subscription = this._http.getBlock<Blob>(url, {

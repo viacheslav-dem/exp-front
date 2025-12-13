@@ -5,11 +5,7 @@ import {ProjectLifecycleTransitionHistoryDto} from "@app/dto/ProjectLifecycleTra
 @Component({
     selector: 'app-lifecycle-transition-history',
     templateUrl: './lifecycle-transition-history.component.html',
-    styles: [`
-      table {
-          font-size: 0.875rem;
-      }
-  `],
+    styleUrls: ['lifecycle-transition-history.component.scss'],
     standalone: false
 })
 export class LifecycleTransitionHistoryComponent implements OnInit {

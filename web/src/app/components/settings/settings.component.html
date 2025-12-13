@@ -1,121 +1,123 @@
-<div class="container-fluid px-4 py-4">
-  <h4 class="fw-bold mb-4 text-dark">Настройки</h4>
-  <div class="row g-4">
-    <!--SELECT PROPERTY PANEL-->
-    <div class="col-lg-4">
-      <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-body p-4">
-          <h5 class="card-title fw-bold mb-3 fs-5">Поиск</h5>
-          <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
-        </div>
-      </div>
-      <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-body p-0">
-          <div [loadingData]="_loading">
-            <ul class="list-group list-group-flush">
-              @for (property of properties; track property) {
-                <li class="list-group-item list-group-item-action settings-item rounded-3 mx-2 my-2"
-                  [class.disabled]="property.disabled" 
-                  [class.active]="property == selectedProperty"
-                  (click)="selectProperty(property)"
-                  role="button"
-                  tabindex="0"
-                  (keyup.enter)="selectProperty(property)">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-medium">{{property.description}}</span>
-                    @if (property.disabled) {
-                      <span class="badge bg-secondary bg-opacity-25 text-dark rounded-pill px-2 py-1 small">неактивная</span>
-                    }
-                  </div>
-                </li>
-              }
-            </ul>
-            <div class="p-3">
-              <app-pagination
-                [page]="_page" [pagination]="_pagination" [maxSize]="5"
-                (onPageChanged)="onPageChanged($event)">
-              </app-pagination>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+<h5 class="mb-3">Настройки</h5>
+<div class="settings-grid">
+  
+  <!-- Левая колонка: Список групп настроек -->
+  <div class="settings-list-column">
+    <div class="list-group">
+      <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
 
-    <div [loadingData]="_loading" class="col-lg-8">
-      <!--PROPERTY-->
-      @if (selectedProperty) {
-        <div class="card border-0 shadow-sm rounded-4">
-          <!--PROPERTY HEADER-->
-          <div class="card-header bg-info bg-opacity-10 border-0 rounded-top-4 p-4">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <div>
-                <span class="badge bg-info bg-opacity-25 text-dark rounded-pill px-2 py-1 small mb-2">группа настроек</span>
-                @if (selectedProperty.disabled) {
-                  <span class="badge bg-secondary bg-opacity-25 text-dark rounded-pill px-2 py-1 small ms-2">неактивная</span>
-                }
-              </div>
-              <span class="text-muted small fst-italic"
+      <div [loadingData]="_loading">
+        <!--PROPERTIES LIST-->
+        @for (property of properties; track property) {
+          <div class="list-group-item border-bottom-none" 
+               [class.disabled]="property.disabled"
+               [class.active]="property == selectedProperty"
+               (click)="selectProperty(property)"
+               style="cursor: pointer;">
+            <div class="text-mini font-weight-bold" style="height: 1.5rem">
+              группа настроек
+              @if (property.disabled) {
+                <span>(неактивная)</span>
+              }
+              <span class="italic text-sm text-muted float-right"
                 tooltip="Строковый идентификатор" placement="bottom">
-                {{selectedProperty.type | orElse: 'не указан'}}
+                {{property.type | orElse: 'не указан'}}
               </span>
             </div>
-            <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0 fw-bold">{{selectedProperty.description | orElse: 'Наименование отсутствует'}}</h5>
-              @if (!selectedProperty.isEdit) {
-                <button class="btn btn-sm btn-outline-primary rounded-pill" (click)="editProperty()" title="Редактировать">
-                  <i class="fas fa-cog me-1"></i>Редактировать
-                </button>
-              }
+            <div>
+              {{property.description | orElse: 'Наименование отсутствует'}}
             </div>
           </div>
-          <!--EDIT PROPERTY-->
-          @if (selectedProperty.isEdit) {
-            <div class="card-body p-4 border-top">
-              <div class="mb-3">
-                <app-checkbox [(ngModel)]="editedProperty.disabled">
-                  Неактивная (группа настроек больше не актуальна)
-                </app-checkbox>
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Наименование группы</label>
-                <input type="text" [(ngModel)]="editedProperty.description"
-                  placeholder="Наименование группы" class="form-control" title="Наименование группы">
-              </div>
-              <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary rounded-pill px-4" (click)="cancelEditProperty()">Отмена</button>
-                <button class="btn btn-primary rounded-pill px-4" (click)="saveEditedProperty()">
-                  <i class="fas fa-save me-2"></i>Сохранить
-                </button>
-              </div>
-            </div>
-          }
-        </div>
+        }
 
-        <!--PROPERTY VALUE-->
-        <div class="card border-0 shadow-sm rounded-4 mt-4">
-          <div class="card-body p-4">
-            <ng-template #propertyContainer></ng-template>
-            @if (selectedProperty && !propertyComponent) {
-              <div>
-                <div class="alert alert-light border border-2 rounded-4 mb-3">
-                  <div class="fst-italic mb-2">Полноценный просмотр и редактирование группы пока не поддерживается</div>
-                  <pre class="mb-0 p-3 bg-white rounded-3 border" style="font-family: Consolas, 'Courier New', monospace; font-size: 0.875rem;">{{selectedProperty.value | toJson}}</pre>
-                </div>
-              </div>
+        @if (!properties || properties.length == 0) {
+          <div>
+            <div class="italic list-group-item background-light-blue">
+              Настройки отсутствуют
+            </div>
+          </div>
+        }
+
+        <app-pagination
+          [page]="_page" [pagination]="_pagination"
+          (onPageChanged)="onPageChanged($event)">
+        </app-pagination>
+      </div>
+    </div>
+  </div>
+
+  <!-- Правая колонка: Детали выбранной группы -->
+  <div class="settings-details-column">
+    @if (selectedProperty) {
+      <div class="list-group">
+        <!--PROPERTY HEADER-->
+        <div class="list-group-item border-bottom-none mb-3 border rounded shadow-sm bg-light">
+          <div class="text-mini font-weight-bold mb-2" style="height: 1.5rem">
+            группа настроек
+            @if (selectedProperty.disabled) {
+              <span>(неактивная)</span>
+            }
+            <span class="italic text-sm text-muted float-right"
+              tooltip="Строковый идентификатор" placement="bottom">
+              {{selectedProperty.type | orElse: 'не указан'}}
+            </span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              {{selectedProperty.description | orElse: 'Наименование отсутствует'}}
+            </div>
+            @if (!selectedProperty.isEdit) {
+              <a class="btn btn-icon" (click)="editProperty()">
+                <fa-icon icon="cog" size="lg"></fa-icon>
+              </a>
             }
           </div>
         </div>
-      }
-
-      @if (!selectedProperty) {
-        <div class="card border-0 shadow-sm rounded-4">
-          <div class="card-body p-4">
-            <div class="alert alert-info fst-italic mb-0 rounded-4 shadow-sm border-0">
-              <i class="fas fa-info-circle me-2"></i>Настройки не найдены
+        
+        <!--EDIT PROPERTY-->
+        @if (selectedProperty.isEdit) {
+          <div class="list-group-item mb-3 border rounded shadow-sm bg-light">
+            <div class="form-sub-group">
+              <app-checkbox [(ngModel)]="editedProperty.disabled">
+                Неактивная (группа настроек больше не актуальна)
+              </app-checkbox>
+            </div>
+            <div class="form-sub-group">
+              <div>Наименование группы</div>
+              <input type="text" [(ngModel)]="editedProperty.description"
+                placeholder="Наименование группы" class="form-control" title="Наименование группы">
+            </div>
+            <div class="mt-1 form-group">
+              <button class="btn btn-secondary" (click)="cancelEditProperty()">Отмена</button>
+              <button class="btn btn-primary" (click)="saveEditedProperty()">Сохранить</button>
             </div>
           </div>
+        }
+        
+        <!--PROPERTY VALUE-->
+        @if (!selectedProperty.isEdit) {
+          <div class="list-group-item border rounded shadow-sm bg-light">
+            @if (!propertyComponent) {
+              <div>
+                <div class="form-sub-group">
+                  <div class="text-sm italic mb-2">Полноценный просмотр и редактирование группы пока не поддерживается</div>
+                  <pre class="p-3 bg-white border rounded" style="font-family: Consolas, 'Courier New', monospace; font-size: 0.875rem; white-space: pre-wrap; word-wrap: break-word;">{{selectedProperty.value | toJson}}</pre>
+                </div>
+              </div>
+            }
+            <!--PROPERTY CONTAINER (для динамической загрузки компонентов)-->
+            <ng-template #propertyContainer></ng-template>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="list-group">
+        <div class="list-group-item border rounded shadow-sm bg-light">
+          <div class="italic text-muted text-center py-4">
+            Выберите группу настроек для просмотра
+          </div>
         </div>
-      }
-    </div>
+      </div>
+    }
   </div>
 </div>

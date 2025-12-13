@@ -13,7 +13,7 @@ interface ToastItem {
     selector: 'app-global-toasts',
     template: `
     <div class="global-toasts position-fixed" style="bottom: 10px; right: 10px; z-index: 1060;">
-      @for (t of toasts; track t) {
+      @for (t of toasts; track t.id) {
         <div class="alert" [ngClass]="cssClass(t)" role="alert">
           @if (t.title) {
             <strong>{{ t.title }}</strong>
@@ -44,7 +44,12 @@ export class GlobalToastsComponent implements OnInit, OnDestroy {
         msg: data.msg
       };
       this.toasts.push(t);
-      setTimeout(() => this.remove(t.id), 5000);
+      // Разное время жизни для разных типов сообщений
+      // Ошибки показываются дольше, чтобы пользователь успел их прочитать
+      const timeout = t.type === 'error' ? 10000 :  // 10 секунд для ошибок
+                      t.type === 'warn' ? 7000 :     // 7 секунд для предупреждений
+                      5000;                          // 5 секунд для остальных
+      setTimeout(() => this.remove(t.id), timeout);
     });
   }
 

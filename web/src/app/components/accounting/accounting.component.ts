@@ -34,17 +34,7 @@ import {PeriodDto} from "@app/dto/PeriodDto";
 @Component({
     selector: 'app-accounting',
     templateUrl: './accounting.component.html',
-    styles: [`
-      table {
-          font-size: 0.875rem;
-          background-color: white;
-          margin-bottom: 0;
-      }
-
-      td, th {
-          padding: 0.75rem 0.5rem;
-      }
-  `],
+    styleUrls: ['accounting.component.scss'],
     standalone: false,
     changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -6,6 +6,68 @@
   <title>ИАС Единая Экспертиза</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="assets/lupa.png">
+  <style>
+    /* PHASE 2B: Critical CSS - Safe to inline rules */
+    
+    /* Body background and typography - SAFE: Independent styles */
+    body {
+      background-image: url("assets/background.png");
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+    
+    /* Typography - SAFE: Base styles, no Bootstrap dependency */
+    h1, h2, h3, h4, h5, h6 {
+      line-height: 1.5;
+      font-weight: 700;
+    }
+    
+    /* Spinner - SAFE: Custom component, no Bootstrap dependency */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      position: relative;
+      margin: 100px auto;
+    }
+    
+    .double-bounce1, .double-bounce2 {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: #3498DB;
+      opacity: 0.6;
+      position: absolute;
+      top: 0;
+      left: 0;
+      -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+      animation: sk-bounce 2.0s infinite ease-in-out;
+    }
+    
+    .double-bounce2 {
+      -webkit-animation-delay: -1.0s;
+      animation-delay: -1.0s;
+    }
+    
+    @-webkit-keyframes sk-bounce {
+      0%, 100% {
+        -webkit-transform: scale(0.0);
+      }
+      50% {
+        -webkit-transform: scale(1.0);
+      }
+    }
+    
+    @keyframes sk-bounce {
+      0%, 100% {
+        transform: scale(0.0);
+        -webkit-transform: scale(0.0);
+      }
+      50% {
+        transform: scale(1.0);
+        -webkit-transform: scale(1.0);
+      }
+    }
+  </style>
 </head>
 <body>
 <object width="0" height="0" id="oavcmx" type="application/x-avcmx-web-plugin">

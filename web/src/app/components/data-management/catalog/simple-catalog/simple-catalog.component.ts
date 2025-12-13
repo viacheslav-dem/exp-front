@@ -23,7 +23,7 @@ import {Direction} from "@app/components/common-components/page-and-filter/model
       </div>
   
       <!--ITEMS-->
-      @for (item of items; track item; let areaInd = $index) {
+      @for (item of items; track trackByItem($index, item); let areaInd = $index) {
         <div>
           <!--ITEM HEADER-->
           <div class="list-group-item" [class.disabled]="item.disabled">
@@ -137,5 +137,9 @@ export class SimpleCatalogComponent<T extends CatalogDto> extends CatalogTemplat
 
   create(): T {
     return <T>new CatalogDto();
+  }
+
+  trackByItem(index: number, item: T): any {
+    return item?.id || index;
   }
 }

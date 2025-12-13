@@ -31,19 +31,7 @@ export const BB_CONTROL_VALUE_ACCESSOR: any = {
           </label>
         </div>
         `,
-    styles: [`
-    .disabled {
-        pointer-events: none;
-    }
-    label:first-child {
-        border-bottom-right-radius: 0;
-        border-top-right-radius: 0;
-    }
-    label:last-child {
-        border-bottom-left-radius: 0;
-        border-top-left-radius: 0;
-    }
-  `],
+    styleUrls: ['boolean-button-v2.component.scss'],
     providers: [BB_CONTROL_VALUE_ACCESSOR],
     standalone: false
 })

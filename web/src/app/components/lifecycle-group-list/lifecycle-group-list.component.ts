@@ -1,4 +1,5 @@
-import {Component, EventEmitter, OnInit, Output, ViewChild, input} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, input} from '@angular/core';
+import {Subscription} from 'rxjs';
 import {PersonService} from "@app/services/person.service";
 import {Router} from "@angular/router";
 import {Role} from "@app/pipes/role.pipe";
@@ -11,20 +12,17 @@ import {ProjectDto} from "@app/dto/ProjectDto";
 @Component({
     selector: 'app-lifecycle-group-list',
     templateUrl: './lifecycle-group-list.component.html',
-    styles: [`
-      .lifecycle-group-item:not(:last-child) {
-          margin-bottom: 1rem;
-      }
-  `],
+    styleUrls: ['lifecycle-group-list.component.scss'],
     standalone: false
 })
-export class LifecycleGroupListComponent implements OnInit {
+export class LifecycleGroupListComponent implements OnInit, OnDestroy {
 
   Role = Role;
 
   readonly role = input(undefined);
   readonly groups = input<LifecycleGroupDto[]>([]);
   readonly project = input<ProjectDto>(new ProjectDto());
+  private subscriptions: Subscription[] = [];
 
   @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() onReplyChanged: EventEmitter<ProjectDto> = new EventEmitter<ProjectDto>();
@@ -50,16 +48,23 @@ export class LifecycleGroupListComponent implements OnInit {
   canEditGroups() {
     const project = this.project();
     const role = this.role();
-    return project.state == 'ON_CHECKING' && role == Role.GKNT_WORKER ||
-      project.state == 'ON_DEPARTMENT_SIGNING' && role == Role.GKNT_DEPARTMENT_CHAIRMAN;
+    return (project.state === 'ON_CHECKING' && role === Role.GKNT_WORKER) ||
+      (project.state === 'ON_DEPARTMENT_SIGNING' && role === Role.GKNT_DEPARTMENT_CHAIRMAN);
   }
 
   onSelectedCouncil($event) {
-    this._projectService.attachCouncil(this.project(), $event.id).subscribe(res => {
-      this.groups().push(res);
-      this.searchCouncilComponent.hide();
-      this.changed();
-    });
+    this.subscriptions.push(
+      this._projectService.attachCouncil(this.project(), $event.id).subscribe(res => {
+        this.groups().push(res);
+        this.searchCouncilComponent.hide();
+        this.changed();
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions = [];
   }
 
   deleteGroup(group) {

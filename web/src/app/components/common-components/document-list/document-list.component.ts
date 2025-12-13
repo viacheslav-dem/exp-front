@@ -1,27 +1,29 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild, input} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, input} from '@angular/core';
 import {FileEditorComponent} from "../file-editor/file-editor.component";
 import {DocumentService} from "@app/services/document.service";
 import {DocumentDto} from "@app/dto/DocumentDto";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {DialogService} from "@app/components/dialogs/dialog.service";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'app-document-list',
     templateUrl: './document-list.component.html',
     standalone: false
 })
-export class DocumentListComponent implements OnInit {
+export class DocumentListComponent implements OnInit, OnDestroy {
 
   _documents: any[];
   public selectedDocument: any;
-  readonly canDelete = input(false);
-  readonly canUpdate = input(false);
+  readonly canDelete = input<boolean>(false);
+  readonly canUpdate = input<boolean>(false);
   readonly url = input<string>('document');
   @Output() onUpdate: EventEmitter<DocumentDto> = new EventEmitter();
   @Output() onDelete: EventEmitter<any> = new EventEmitter();
   @ViewChild(FileEditorComponent) fileEditor: FileEditorComponent;
   @ViewChild("fileViewerModal") fileViewerModal: ModalComponent;
+  private subscriptions: Subscription[] = [];
 
   constructor(private _documentService: DocumentService,
               private _toasty: GlobalToastyService,
@@ -45,16 +47,18 @@ export class DocumentListComponent implements OnInit {
   }
 
   viewDocument(doc) {
-    this._documentService.checkPdfView(doc).subscribe(res => {
-      if (!res) {
-        this._toasty.warn("Формат файла не поддерживается для предпросмотра. " +
-          "Вместо этого, пожалуйста, скачайте его и откройте у себя на компьютере предустановленной программой");
-      } else {
-        this._dialogService.showPDFViewer("document", doc).subscribe();
-        // this.selectedDocument = doc;
-        // this.fileViewerModal.show();
-      }
-    });
+    this.subscriptions.push(
+      this._documentService.checkPdfView(doc).subscribe(res => {
+        if (!res) {
+          this._toasty.warn("Формат файла не поддерживается для предпросмотра. " +
+            "Вместо этого, пожалуйста, скачайте его и откройте у себя на компьютере предустановленной программой");
+        } else {
+          this.subscriptions.push(
+            this._dialogService.showPDFViewer("document", doc).subscribe()
+          );
+        }
+      })
+    );
   }
 
   editDocument(doc) {
@@ -71,7 +75,9 @@ export class DocumentListComponent implements OnInit {
   }
 
   downloadDocument(doc: DocumentDto) {
-    this._documentService.downloadDocument(doc, this.url()).subscribe();
+    this.subscriptions.push(
+      this._documentService.downloadDocument(doc, this.url()).subscribe()
+    );
   }
 
   deleteDocument(doc) {
@@ -79,6 +85,13 @@ export class DocumentListComponent implements OnInit {
   }
 
   downloadDocxDocument(doc: DocumentDto) {
-    this._documentService.downloadDocument(doc, this.url() + '/docx').subscribe();
+    this.subscriptions.push(
+      this._documentService.downloadDocument(doc, this.url() + '/docx').subscribe()
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions = [];
   }
 }

@@ -8,6 +8,10 @@ import {ruLocale} from 'ngx-bootstrap/locale';
 import {
   faAngleDown,
   faAngleUp,
+  faAngleLeft,
+  faAngleRight,
+  faAngleDoubleLeft,
+  faAngleDoubleRight,
   faArrowDown,
   faCalendar,
   faCheck,
@@ -35,7 +39,8 @@ import {
   faTimes,
   faTrashAlt,
   faUser,
-  faPlayCircle
+  faPlayCircle,
+  faFile
 } from '@fortawesome/free-solid-svg-icons';
 
 defineLocale('ru', ruLocale);
@@ -55,7 +60,8 @@ export class AppComponent {
       faInfo, faTrashAlt, faPencilAlt, faArrowDown, faEye, faEyeSlash, faCog, faTimes,
       faCheck, faPlus, faMinus, faCalendar, faCircle, faUser, faKey, faList, faInfoCircle, faPowerOff,
       faSortAlphaDown, faSortAlphaUp, faSortAmountDown, faSortAmountUp, faSort, faChevronUp, faChevronDown,
-      faAngleDown, faAngleUp, faExclamationTriangle, faFileWord, faPlayCircle
+      faAngleDown, faAngleUp, faAngleLeft, faAngleRight, faAngleDoubleLeft, faAngleDoubleRight,
+      faExclamationTriangle, faFileWord, faPlayCircle, faFile
     );
     //this.initCrypto();
   }

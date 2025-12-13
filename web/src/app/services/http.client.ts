@@ -39,6 +39,20 @@ export class HttpClientSecure {
     if (options == null) options = {};
     if (options.observe == null)
       options.observe = 'body';
+    
+    // Преобразуем числовые параметры в строки для корректной передачи в query string
+    if (options.params && typeof options.params === 'object' && !(options.params instanceof HttpParams)) {
+      const paramsObj: any = {};
+      for (const key in options.params) {
+        if (options.params.hasOwnProperty(key)) {
+          const value = options.params[key];
+          // Преобразуем числа и другие примитивы в строки
+          paramsObj[key] = value != null ? String(value) : value;
+        }
+      }
+      options.params = paramsObj;
+    }
+    
     return options;
   }
 
@@ -54,6 +68,17 @@ export class HttpClientSecure {
   }
 
   handleError(err: HttpErrorResponse) {
+    // Игнорируем ошибки для определенных URL (например, когда отсутствие ресурса - нормальная ситуация)
+    const ignoredUrls = [
+      '/get/meth_rec',
+      '/system-notification/get'
+    ];
+    const shouldIgnore = err.url && ignoredUrls.some(url => err.url.includes(url));
+    if (shouldIgnore && err.status === 404) {
+      // Не показываем ошибку для игнорируемых URL при 404
+      return observableThrowError(err);
+    }
+    
     if (err.status == 412) {
       this.toasty.err(err.status, "Время сессии истекло. Пожалуйста, повторите вход.");
       this.progress.hide();
@@ -64,7 +89,17 @@ export class HttpClientSecure {
                           (err.error && err.error.message ? err.error.message : "Неверный запрос. Проверьте корректность данных.");
       this.toasty.err(err.status, "Ошибка в данных: " + errorMessage);
     } else if (err.status > 400 && err.status < 500 && err.status != 412 && err.status != 403) {
-      this.toasty.err(err.status, "Ошибка в данных: " + (err.error || "Неверный запрос"));
+      let errorMessage = "Неверный запрос";
+      if (err.error) {
+        if (typeof err.error === 'string') {
+          errorMessage = err.error;
+        } else if (err.error.message) {
+          errorMessage = err.error.message;
+        } else if (typeof err.error === 'object') {
+          errorMessage = JSON.stringify(err.error);
+        }
+      }
+      this.toasty.err(err.status, "Ошибка в данных: " + errorMessage);
     } else if (err.status == 500) {
       this.toasty.err(err.status, "Ошибка на сервере. Пожалуйста, обратитесь к администратору.");
     } else if (err.status > 500) {
@@ -79,14 +114,49 @@ export class HttpClientSecure {
     let opts = this.buildHeaders(options);
     return this.http.get<T>(url, opts).pipe(
       tap(res => this.log('get', url, null, opts, res)),
-      catchError(err => this.handleError(err)),);
+      catchError(err => {
+        // Игнорируем 404 для определенных URL перед обработкой ошибки
+        const ignoredUrls = ['/get/meth_rec', '/system-notification/get'];
+        if (err.status === 404 && err.url && ignoredUrls.some(ignoredUrl => err.url.includes(ignoredUrl))) {
+          // Не обрабатываем ошибку, просто пробрасываем дальше
+          return observableThrowError(err);
+        }
+        return this.handleError(err);
+      }));
   }
 
   post<T>(url: string, body: any, options?: any): Observable<T> {
     let opts = this.buildHeaders(options);
+    
+    // Устанавливаем Content-Type для POST запросов с JSON телом
+    let headers: HttpHeaders;
+    if (opts.headers instanceof HttpHeaders) {
+      headers = opts.headers;
+    } else if (opts.headers && typeof opts.headers === 'object') {
+      headers = new HttpHeaders(opts.headers);
+    } else {
+      headers = new HttpHeaders();
+    }
+    
+    // Устанавливаем Content-Type только если он еще не установлен
+    if (!headers.has('Content-Type')) {
+      headers = headers.set('Content-Type', 'application/json');
+    }
+    
+    opts.headers = headers;
+    
+    // Не обрабатываем ошибки для запросов на refresh-token, чтобы они обрабатывались в interceptor'е
+    const isRefreshTokenRequest = url.toLowerCase().includes('/refresh-token');
+    
     return this.http.post<T>(url, body == null ? "" : JSON.stringify(body), opts).pipe(
       tap(res => this.log('post', url, body, opts, res)),
-      catchError(err => this.handleError(err)),);
+      catchError(err => {
+        // Для refresh-token запросов не обрабатываем ошибки здесь, чтобы они обрабатывались в interceptor'е
+        if (isRefreshTokenRequest) {
+          return observableThrowError(err);
+        }
+        return this.handleError(err);
+      }),);
   }
 
   put<T>(url: string, body: any, options?: any): Observable<T> {

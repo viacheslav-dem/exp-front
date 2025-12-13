@@ -1,12 +1,14 @@
-<div class="file-drop-zone"
+<div class="file-drop-zone d-flex flex-column"
      (dragover)="onDragOver($event)"
      (dragleave)="onDragLeave($event)"
      (drop)="onDrop($event)"
      [class.drag-over]="isDragOver">
-  <app-choose-files
-    [typesAccept]="typesAccept()"
-    (onFilesChosen)="onFilesChosen($event)"
-    [controlClass]="controlClass()">
-  </app-choose-files>
-  <div class="small text-muted mt-1">Перетащите файл сюда или выберите через диалог</div>
+  <div class="flex-shrink-0">
+    <app-choose-files
+      [typesAccept]="typesAccept()"
+      (onFilesChosen)="onFilesChosen($event)"
+      [controlClass]="controlClass()">
+    </app-choose-files>
+  </div>
+  <div class="text-mini text-muted mt-1 flex-shrink-0" style="font-size: 0.7rem;">Перетащите файл сюда или выберите через диалог</div>
 </div>

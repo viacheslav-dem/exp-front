@@ -1,4 +1,4 @@
-import {Component, ChangeDetectionStrategy, signal, ChangeDetectorRef} from '@angular/core';
+import {Component, ChangeDetectionStrategy, OnDestroy, signal, ChangeDetectorRef} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "@app/services/auth.service";
 import {Role} from "@app/pipes/role.pipe";
@@ -19,6 +19,7 @@ import {economicSignificanceOptions} from "@app/components/document-form/documen
 import {resourcesSufficiencyOptions} from "@app/components/document-form/document-blocks/resources-sufficiency-block.component";
 import {competenceSufficiencyOptions} from "@app/components/document-form/document-blocks/competence-sufficiency-block.component";
 import {PageRequest} from "@app/components/common-components/page-and-filter/model/PageRequest";
+import {Subscription} from "rxjs";
 
 @Component({
     selector: 'app-project-list',
@@ -26,14 +27,16 @@ import {PageRequest} from "@app/components/common-components/page-and-filter/mod
     standalone: false,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
+export class ProjectListComponent extends FilterAndPages<ProjectLiDto> implements OnDestroy {
 
     Role = Role; // enum for template
     projects = signal<ProjectLiDto[]>([]);
     role = signal<string>('');
     groups = signal<GroupStateDto[]>([]);
     showGroup = signal<boolean>(false);
+    showFilter = signal<boolean>(false); // Для скрытия фильтров на мобильных
     selectedGroup = signal<string | null>(null);
+    private subscriptions: Subscription[] = [];
 
     constructor(private _projectService: ProjectService,
                 private _authService: AuthService,
@@ -48,7 +51,7 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
     ngOnInit() {
         this.role.set(this._authService.getCurrRole());
 
-        let states = [
+        const states = [
             {name: 'Черновик', value: [ProjectState.ROUGH]},
             {name: 'Новый', value: [ProjectState.NEW]},
             {name: 'В подразделении ГКНТ', value: [ProjectState.ON_CHECKING]},
@@ -73,7 +76,7 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
                 .setPlaceholder('Поиск по номеру объекта...'),
 
         ];
-        if (this.role() == Role.BUREAU_CHAIRMAN) {
+        if (this.role() === Role.BUREAU_CHAIRMAN) {
             this._searchFields.push(SearchField.startsWith('councilReferences.id.orderNumber')
                 // .setSortable(true)
                 .setTitle('Номер объекта внутри ГЭС')
@@ -118,75 +121,86 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
             SearchField.multiSelect('expertReviews.competenceSufficiency', competenceSufficiencyOptions).setTitle('Достаточность компетенции')
               .setPlaceholder('Выбрать достаточность компетенции'),
         ]);
-        this._dataService.getOrgs().subscribe({
-            next: (orgs) => {
-                this.getSearchField('customer.org').setItems(orgs);
-                this.cdr.markForCheck();
-            }
-        });
-        this._dataService.getCouncils().subscribe({
-            next: (councils) => {
-                this.getSearchField('groups.council').setItems(councils);
-                this.cdr.markForCheck();
-            }
-        });
-        this.enableFilterCache("project-list");
-        this._projectService.getGroups(this._authService.getCurrRole()).subscribe({
-            next: (res) => {
-                this.groups.set(res);
-                this.cdr.markForCheck();
-            }
-        });
-
-        // Подписка на изменения query-параметров (включая первую загрузку)
-        this._route.queryParams.subscribe({
-            next: (params) => {
-                const pageParam = params['page'];
-                const pageFromRoute = pageParam != null ? parseInt(pageParam, 10) : NaN;
-
-                if (!isNaN(pageFromRoute) && pageFromRoute > 0) {
-                    // pagination.page используется пагинатором (1-based)
-                    this._pagination.page = pageFromRoute;
-                    // paging.page уходит на бэкенд (0-based)
-                    this._searchRequest.paging.page = pageFromRoute - 1;
-                } else {
-                    // если параметр отсутствует или некорректен — считаем, что страница 1
-                    this._pagination.page = 1;
-                    this._searchRequest.paging.page = 0;
+        this.subscriptions.push(
+            this._dataService.getOrgs().subscribe({
+                next: (orgs) => {
+                    this.getSearchField('customer.org').setItems(orgs);
+                    this.cdr.markForCheck();
                 }
+            }),
+            this._dataService.getCouncils().subscribe({
+                next: (councils) => {
+                    this.getSearchField('groups.council').setItems(councils);
+                    this.cdr.markForCheck();
+                }
+            }),
+            this._projectService.getGroups(this._authService.getCurrRole()).subscribe({
+                next: (res) => {
+                    this.groups.set(res);
+                    this.cdr.markForCheck();
+                }
+            }),
+            // Подписка на изменения query-параметров (включая первую загрузку)
+            this._route.queryParams.subscribe({
+                next: (params) => {
+                    const pageParam = params['page'];
+                    const pageFromRoute = pageParam != null ? parseInt(pageParam, 10) : NaN;
 
-                this.update();
-            }
-        });
+                    if (!isNaN(pageFromRoute) && pageFromRoute > 0) {
+                        // pagination.page используется пагинатором (1-based)
+                        this._pagination.page = pageFromRoute;
+                        // paging.page уходит на бэкенд (0-based)
+                        this._searchRequest.paging.page = pageFromRoute - 1;
+                    } else {
+                        // если параметр отсутствует или некорректен — считаем, что страница 1
+                        this._pagination.page = 1;
+                        this._searchRequest.paging.page = 0;
+                    }
+
+                    this.update();
+                }
+            })
+        );
+        this.enableFilterCache("project-list");
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+        this.subscriptions = [];
     }
 
     loadPage() {
         this._searchRequest.group = this.selectedGroup();
-        this._projectService.getPage(this._searchRequest).subscribe({
-            next: (res) => {
-                this._page = res;
-                this.projects.set(res.content);
-                this._projectService.getGroups(this._authService.getCurrRole()).subscribe({
-                    next: (groupsRes) => {
-                        this.groups.set(groupsRes);
-                        this.cdr.markForCheck();
-                    }
-                });
-                this.setLoading(false);
-                this.cdr.markForCheck();
-            },
-            error: () => {
-                this.setLoading(false);
-                this.cdr.markForCheck();
-            }
-        });
+        this.subscriptions.push(
+            this._projectService.getPage(this._searchRequest).subscribe({
+                next: (res) => {
+                    this._page = res;
+                    this.projects.set(res.content);
+                    this.subscriptions.push(
+                        this._projectService.getGroups(this._authService.getCurrRole()).subscribe({
+                            next: (groupsRes) => {
+                                this.groups.set(groupsRes);
+                                this.cdr.markForCheck();
+                            }
+                        })
+                    );
+                    this.setLoading(false);
+                    this.cdr.markForCheck();
+                },
+                error: () => {
+                    this.setLoading(false);
+                    this.cdr.markForCheck();
+                }
+            })
+        );
     }
 
     selectGroup(id: string) {
-        if (this.selectedGroup() == id)
+        if (this.selectedGroup() === id) {
             this.selectedGroup.set(null);
-        else
+        } else {
             this.selectedGroup.set(id);
+        }
         this.loadPage();
     }
 
