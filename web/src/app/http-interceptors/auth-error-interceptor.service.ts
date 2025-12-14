@@ -12,6 +12,12 @@ import {Router} from "@angular/router";
 @Injectable()
 export class AuthErrorInterceptor implements HttpInterceptor {
 
+  /**
+   * We mark requests that were already retried after token refresh
+   * to avoid infinite refresh loops (e.g. when 403 is caused by real permission issues).
+   */
+  private static readonly RETRY_HEADER = 'X-Auth-Refresh-Retry';
+
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   private refreshErrorSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
@@ -43,29 +49,51 @@ export class AuthErrorInterceptor implements HttpInterceptor {
     const authReq = req.clone({ setHeaders: headers });
     return next.handle(authReq).pipe(catchError(error => {
       if (error instanceof HttpErrorResponse && !authReq.url.includes('/login')) {
-        if (error.status === 401){
-          return this.handle401Error(authReq, next);
-        }
-        if (error.status === 403){
-          this.handle403Error();
+        // Some backends respond with 403 for expired/invalid access tokens.
+        // Try refreshing on both 401 and 403.
+        if (error.status === 401 || error.status === 403) {
+          return this.handleAuthError(authReq, next, error.status);
         }
       }
       return throwError(error);
     }));
   }
 
-  private handle403Error() {
+  private handleAuthError(request: HttpRequest<any>, next: HttpHandler, status: number) {
+    const alreadyRetried = request.headers.get(AuthErrorInterceptor.RETRY_HEADER) === '1';
+
+    // If we've already retried this request after refresh:
+    // - on 401: session is effectively invalid -> go to login
+    // - on 403: likely real "forbidden" -> don't logout, just propagate the error
+    if (alreadyRetried) {
+      if (status === 401) {
+        return this.logoutToLogin();
+      }
+      return throwError(() => new HttpErrorResponse({
+        error: (request as any).error,
+        headers: request.headers,
+        status,
+        statusText: 'Forbidden',
+        url: request.url
+      }));
+    }
+
+    return this.handle401Error(request, next);
+  }
+
+  private logoutToLogin() {
     this.isRefreshing = false;
     this.storage.resetCredentials();
-    this.router.navigateByUrl('/login');
     this.storage.clear();
+    this.router.navigateByUrl('/login');
+    return EMPTY;
   }
 
 
   private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
     if (!this.isRefreshing) {
 
-      console.log("Access token is expired.")
+      console.log("Access token is expired or invalid.")
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
       this.refreshErrorSubject.next(null);
@@ -86,7 +114,7 @@ export class AuthErrorInterceptor implements HttpInterceptor {
               console.log("Successful refresh of access token.")
               
               // Повторяем оригинальный запрос с новым токеном
-              return next.handle(this.addTokenHeader(request, credentials.accessToken));
+              return next.handle(this.addTokenHeader(request, credentials.accessToken, true));
             }),
             catchError((error) => {
               this.isRefreshing = false;
@@ -98,33 +126,20 @@ export class AuthErrorInterceptor implements HttpInterceptor {
               if (error.status === 412 || error.status === 401) {
                 console.log("Invalid or expired refresh token. Status:", error.status)
                 console.log("Refresh token was:", this.storage.getRefreshToken() ? "present" : "missing")
-                this.storage.resetCredentials();
-                this.storage.clear();
-                // Небольшая задержка перед навигацией, чтобы избежать проблем с обработкой ошибок
-                setTimeout(() => {
-                  this.router.navigateByUrl('/login');
-                }, 100);
-                return EMPTY;
+                return this.logoutToLogin();
               }
               
               // Для других ошибок (500, сетевые и т.д.) тоже перенаправляем на login
               // чтобы избежать зависания
               console.log("Error refreshing token. Status:", error.status, "Error:", error)
-              this.storage.resetCredentials();
-              this.storage.clear();
-              setTimeout(() => {
-                this.router.navigateByUrl('/login');
-              }, 100);
-              return EMPTY;
+              return this.logoutToLogin();
             })
         );
       }
       
       // Если нет refresh token, перенаправляем на login
       this.isRefreshing = false;
-      this.storage.resetCredentials();
-      this.router.navigateByUrl('/login');
-      return EMPTY;
+      return this.logoutToLogin();
     }
 
     // Если уже идет обновление токена, ждем его завершения
@@ -133,7 +148,7 @@ export class AuthErrorInterceptor implements HttpInterceptor {
       this.refreshTokenSubject.pipe(
         filter(token => token !== null),
         take(1),
-        switchMap((token) => next.handle(this.addTokenHeader(request, token)))
+        switchMap((token) => next.handle(this.addTokenHeader(request, token, true)))
       ),
       this.refreshErrorSubject.pipe(
         filter(error => error !== null),
@@ -146,7 +161,11 @@ export class AuthErrorInterceptor implements HttpInterceptor {
     );
   }
 
-  private addTokenHeader(request: HttpRequest<any>, token: string) {
-    return request.clone({ headers: request.headers.set(TOKEN_HEADER, token) });
+  private addTokenHeader(request: HttpRequest<any>, token: string, markRetried = false) {
+    let headers = request.headers.set(TOKEN_HEADER, token);
+    if (markRetried) {
+      headers = headers.set(AuthErrorInterceptor.RETRY_HEADER, '1');
+    }
+    return request.clone({ headers });
   }
 }
