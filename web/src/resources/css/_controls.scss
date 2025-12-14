@@ -73,11 +73,17 @@
     text-align: left;
   }
   
-  // Современный подход без Bootstrap JS
+  // Dropdown menu visibility:
+  // - Bootstrap 5 JS toggles `.show` on `.dropdown-menu`
+  // - legacy code might toggle `.show` on the `.dropdown` container
   .dropdown-menu {
     display: none;
   }
-  
+
+  .dropdown-menu.show {
+    display: block;
+  }
+
   &.show .dropdown-menu {
     display: block;
   }
