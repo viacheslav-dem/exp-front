@@ -1,4 +1,0 @@
-<jboss-web>
-    <context-root>/</context-root>
-    <virtual-host>default-host</virtual-host>
-</jboss-web>
