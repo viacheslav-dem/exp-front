@@ -9,4 +9,14 @@
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
   }
+  
+  // Исправление z-index для выпадающих списков в форме проекта
+  // Чтобы они не перекрывались следующей карточкой
+  &.show .dropdown-menu {
+    z-index: 10000 !important;
+  }
+  
+  .dropdown-menu.show {
+    z-index: 10000 !important;
+  }
 }

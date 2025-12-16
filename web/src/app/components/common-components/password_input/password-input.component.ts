@@ -1,8 +1,9 @@
-import {Component, forwardRef, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, forwardRef, input} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "app/components/common-components/control-component";
 import * as _ from "lodash";
 import {PasswordDto} from "@app/dto/PasswordDto";
+import {environment} from "../../../../environments/environment";
 export const PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
   useExisting: forwardRef(() => PasswordInputComponent),
@@ -128,7 +129,9 @@ export const PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR: any = {
         background-color: #f8d7da;
       }
     `],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.passwordInput ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class PasswordInputComponent extends ControlComponent<PasswordDto> {
 

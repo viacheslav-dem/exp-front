@@ -13,7 +13,7 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
       @if (!isEdit) {
         <div class="col-12">
           <h4 class="pull-left">Типы событий аудита</h4>
-          <a class="btn btn-icon float-right" (click)="edit()">
+          <a class="btn btn-icon btn-right" (click)="edit()">
             <fa-icon icon="cog" size="lg"></fa-icon>
           </a>
         </div>

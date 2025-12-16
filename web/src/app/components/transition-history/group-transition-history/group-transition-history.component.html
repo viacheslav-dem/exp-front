@@ -4,7 +4,7 @@
     <div class="underline dots-overflow">{{_history.name}}</div>
     @if (_history.transitions.length > 0) {
       <table class="">
-        @for (transition of _history.transitions; track transition) {
+        @for (transition of _history.transitions; track ((transition?.date ?? 0) + '|' + (transition?.newState ?? '') + '|' + (transition?.role ?? '') + '|' + (transition?.person?.id ?? '') + '|' + $index)) {
           <tr>
             <td width="20px" class="pr-2"><fa-icon icon="arrow-down"></fa-icon></td>
             <td class="italic py-2 dots-overflow" style="min-width: 150px">
@@ -22,7 +22,7 @@
           </tr>
           @if (showLifecycleHistories(transition)) {
             <tr>
-              @for (lifecycleHistory of _history.lifecycleHistories; track lifecycleHistory) {
+              @for (lifecycleHistory of _history.lifecycleHistories; track (lifecycleHistory?.entityId ?? lifecycleHistory?.name ?? $index)) {
                 <td colspan="2" class="align-top pt-2">
                   <app-lifecycle-transition-history [history]="lifecycleHistory"></app-lifecycle-transition-history>
                 </td>

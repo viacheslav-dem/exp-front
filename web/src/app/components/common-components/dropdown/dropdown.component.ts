@@ -1,6 +1,7 @@
-import {Component, EventEmitter, forwardRef, HostListener, Output, input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, forwardRef, HostListener, Output, input} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
+import {environment} from "../../../../environments/environment";
 //import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 
 export const DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
@@ -40,7 +41,9 @@ export const DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     </div>
     `,
     providers: [DROPDOWN_CONTROL_VALUE_ACCESSOR],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.dropdown ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class DropdownComponent<T> extends ControlComponent<T> {
 
@@ -54,17 +57,26 @@ export class DropdownComponent<T> extends ControlComponent<T> {
 
   isOpen: boolean = false;
 
+  constructor(private cdr: ChangeDetectorRef) {
+    super();
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (!target.closest('.dropdown')) {
-      this.isOpen = false;
+      if (this.isOpen) {
+        this.isOpen = false;
+        // Важно для OnPush/zoneless: событие document:click приходит извне
+        this.cdr.markForCheck();
+      }
     }
   }
 
   toggleDropdown() {
     if (!this.disabled()) {
       this.isOpen = !this.isOpen;
+      this.cdr.markForCheck();
     }
   }
 
@@ -72,6 +84,7 @@ export class DropdownComponent<T> extends ControlComponent<T> {
     this.value = option;
     this.onSelected.emit(option);
     this.isOpen = false;
+    this.cdr.markForCheck();
   }
 
   resetAvailable() {

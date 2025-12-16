@@ -5,7 +5,7 @@
         <div>
           <h5 class="card-title">
             Оповещение
-            <button class="btn btn-sm btn-primary float-right" (click)="postMessage(message)">
+            <button class="btn btn-sm btn-primary btn-right" (click)="postMessage(message)">
               Отправить оповещение
             </button>
           </h5>
@@ -13,7 +13,7 @@
       }
       @if (isSending) {
         <div>
-          <h5 class="card-title float-right">
+          <h5 class="card-title float-end">
             Идёт рассылка
           </h5>
           <button class="btn btn-danger float-left" #button (click)="cancelNotification()" type="reset" [disabled]="disabled">Отмена рассылки</button>

@@ -36,7 +36,7 @@ import {CryptoModule} from "@app/crypto/crypto.module";
 import {DocumentFormModule} from "@app/components/document-form/document-form.module";
 import {BasicProjectInfoComponent} from "@app/components/basic-project-info/basic-project-info.component";
 import {SearchCouncilComponent} from "@app/components/search/search-council/search-council.component";
-import {ExpertReviewComponent} from "@app/components/expert-review/expert-review.component";
+import {ExpertReviewModule} from "@app/components/expert-review/expert-review.module";
 import {LifecycleGroupComponent} from "@app/components/lifecycle-group/lifecycle-group.component";
 import {LifecycleGroupListComponent} from "@app/components/lifecycle-group-list/lifecycle-group-list.component";
 import {LifecycleService} from "@app/services/lifecycle.service";
@@ -52,11 +52,8 @@ import {AgendaChatComponent} from "@app/components/agenda-chat/agenda-chat.compo
 import {CommentListComponent} from "@app/components/comment-list/comment-list.component";
 import {AccountingService} from "@app/services/accounting.service";
 import {AccountingComponent} from "@app/components/accounting/accounting.component";
-import {ProjectTransitionHistoryComponent} from "@app/components/transition-history/project-transition-history/project-transition-history.component";
 import {TransitionHistoryService} from "@app/services/transition-history.service";
-import {GroupTransitionHistoryComponent} from "@app/components/transition-history/group-transition-history/group-transition-history.component";
-import {LifecycleTransitionHistoryComponent} from "@app/components/transition-history/lifecycle-transition-history/lifecycle-transition-history.component";
-import {ExpertTransitionHistoryComponent} from "@app/components/transition-history/expert-transition-history/expert-transition-history.component";
+import {TransitionHistoryModule} from "@app/components/transition-history/transition-history.module";
 import {StatsService} from "@app/services/stats.service";
 import {ExpertListComponent} from "@app/components/expert-list/expert-list.component";
 import {FinishedReviewsSparklineChart} from "@app/components/expert-list/finished-reviews.sparkline.chart";
@@ -131,7 +128,6 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         LoginoffComponent,
         AgendaChatComponent,
         DecisionTagComponent,
-        ExpertReviewComponent,
         SearchCouncilComponent,
         MenuComponent,
         ConfirmReviewListComponent,
@@ -141,17 +137,12 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         BasicProjectInfoComponent,
         ProjectLiComponent,
         AccountingComponent,
-        ProjectTransitionHistoryComponent,
-        GroupTransitionHistoryComponent,
-        LifecycleTransitionHistoryComponent,
-        ExpertTransitionHistoryComponent,
         ExpertListComponent,
         FinishedReviewsSparklineChart,
         ReviewResultsSparklineChart,
         ReviewsViolationSparklineChart,
         SelectRoleComponent,
         MeetingFormComponent,
-        ExpertReviewListComponent,
         ProjectListFilteredComponent,
         SessionsComponent,
         ProjectCopyComponent,
@@ -173,6 +164,9 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         NgSelectModule,
         DialogModule.forRoot(),
         CommonComponentsModule,
+        ExpertReviewListComponent,
+        ExpertReviewModule,
+        TransitionHistoryModule,
         CryptoModule,
         DocumentFormModule,
         SearchModule,

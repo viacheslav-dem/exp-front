@@ -11,7 +11,7 @@
 }
 <!--ACTIONS-->
 <div class="mb-3">
-  @for (meta of buttons(); track meta) {
+  @for (meta of buttons(); track (meta.title ?? $index)) {
     <button [ngClass]="meta.styleClass" class="me-2" (click)="meta.onclick()">
       {{meta.title}}
     </button>
@@ -98,7 +98,7 @@
     <div class="text-sm mb-2">
       <span>Финансирование: </span>
       <ul class="mb-0 ps-4 mt-1">
-        @for (fin of project.financing; track fin) {
+        @for (fin of project.financing; track (fin.type + '|' + (fin.source?.id ?? '') + '|' + fin.value + '|' + (fin.comment ?? ''))) {
           <li class="italic">
             <span>{{fin.type | fundingType}} финансирование, </span>
             <span>{{fin.comment ? fin.comment + ' - ' : ''}}</span>
@@ -116,12 +116,12 @@
         Приоритетное направление научных исследований и (или) научно-технической деятельности:
       </span>
       <ul class="mb-0 ps-4 mt-1">
-        @for (dir of displayedDirections; track dir) {
+        @for (dir of displayedDirections; track (dir.id ?? $index)) {
           <li>
             <span class="italic">{{dir.name}}</span>
             @if (dir.subDirectionDtos.length != 0) {
               <ul>
-                @for (subDir of dir.subDirectionDtos; track subDir) {
+                @for (subDir of dir.subDirectionDtos; track (subDir.id ?? $index)) {
                   <li>
                     {{subDir.directionName}}
                   </li>
@@ -140,7 +140,7 @@
         Цель (приоритет) социально-экономического развития:
       </span>
       <ul class="mb-0 ps-4 mt-1">
-        @for (item of project.socialEconomicGoals; track item) {
+        @for (item of project.socialEconomicGoals; track (item.id ?? $index)) {
           <li>
             <span class="italic">{{item.name}}</span>
           </li>
@@ -262,7 +262,7 @@
               <br>
                 <span>Способ коммерциализации: </span>
                 <ul class="mb-0 ps-4 mt-1">
-                  @for (item of project.commercializationMethods; track item) {
+                  @for (item of project.commercializationMethods; track (item.id ?? $index)) {
                     <li>
                       <span class="italic">{{item.name}}</span>
                     </li>

@@ -1,19 +1,25 @@
 import { debounceTime } from 'rxjs/operators';
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {ProgressService} from "./progress.service";
 import {Subscription} from "rxjs";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-progress',
     templateUrl: './progress.component.html',
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.progress ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class ProgressComponent implements OnInit, OnDestroy {
 
   public loading: boolean = false;
   private subscriptions: Subscription[] = [];
 
-  constructor(private _progress: ProgressService) {
+  constructor(
+    private _progress: ProgressService,
+    private cdr: ChangeDetectorRef
+  ) {
   }
 
   ngOnInit() {
@@ -24,9 +30,12 @@ export class ProgressComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this._progress.showObservable.pipe(debounceTime(0)).subscribe(() => {
         this.loading = true;
+        // Важно для OnPush/zoneless: событие пришло из observable
+        this.cdr.markForCheck();
       }),
       this._progress.hideObservable.pipe(debounceTime(0)).subscribe(() => {
         this.loading = false;
+        this.cdr.markForCheck();
       })
     );
   }

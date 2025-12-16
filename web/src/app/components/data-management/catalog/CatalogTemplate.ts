@@ -51,7 +51,14 @@ export abstract class CatalogTemplate<T extends CatalogDto> extends FilterAndPag
   }
 
   cancelEditItem() {
-    this.selectedItem.isEdit = false;
+    if (this.selectedItem) {
+      const item = this.selectedItem;
+      item.isEdit = false;
+      // Очищаем selectedItem после обновления представления
+      setTimeout(() => {
+        this.selectedItem = null;
+      }, 0);
+    }
   }
 
   saveEditedItem() {

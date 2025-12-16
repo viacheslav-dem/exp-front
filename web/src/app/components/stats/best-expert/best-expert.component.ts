@@ -1,29 +1,32 @@
-import { Component, ChangeDetectionStrategy, signal, ChangeDetectorRef } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import {PersonDto} from "@app/dto/PersonDto";
-import {DegreeTypePipe} from "@app/pipes/degree.pipe";
+import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { catchError, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { PersonDto } from "@app/dto/PersonDto";
+import { DegreeTypePipe } from "@app/pipes/degree.pipe";
+import { CustomPipesModule } from "@app/pipes/custom-pipes.module";
 
 @Component({
     selector: 'app-best-expert',
     templateUrl: './best-expert.component.html',
     styleUrls: ['./best-expert.component.css'],
     styles: [],
-    standalone: false,
-    changeDetection: ChangeDetectionStrategy.OnPush
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, FormsModule, CustomPipesModule]
 })
 export class BestExpertComponent {
 
-    private _startDate = signal<string>('');
-    private _endDate = signal<string>('');
-    expertsList = signal<Array<PersonDto>>([]);
-    loading = signal<boolean>(false);
+    private readonly http = inject(HttpClient);
+    readonly _degreeTypePipe = inject(DegreeTypePipe);
 
-    constructor(
-        private http: HttpClient,
-        public _degreeTypePipe: DegreeTypePipe,
-        private cdr: ChangeDetectorRef
-    ) {
-    }
+    private readonly _startDate = signal<string>('');
+    private readonly _endDate = signal<string>('');
+    readonly expertsList = signal<PersonDto[]>([]);
+    readonly loading = signal<boolean>(false);
 
     get startDate(): string {
         return this._startDate();
@@ -52,11 +55,14 @@ export class BestExpertComponent {
 
         console.log('Отправка с датами:', startDateValue, endDateValue);
         const url = '/examination-api/stats/best-expert';
+        const params = new HttpParams()
+            .set('startDate', startDateValue)
+            .set('endDate', endDateValue);
 
         this.loading.set(true);
 
-        this.http.post<any[]>(url, {}, { params: { startDate: startDateValue, endDate: endDateValue } }).subscribe({
-            next: (response) => {
+        this.http.post<PersonDto[]>(url, {}, { params }).pipe(
+            tap((response: PersonDto[]) => {
                 console.log('Получен ответ:', response);
                 this.loading.set(false);
                 if (Array.isArray(response)) {
@@ -65,15 +71,18 @@ export class BestExpertComponent {
                     console.error('Неожиданный формат ответа');
                     this.expertsList.set([]);
                 }
-                this.cdr.markForCheck();
-            },
-            error: (error) => {
+            }),
+            catchError((error) => {
                 this.loading.set(false);
                 console.error('Ошибка при получении данных', error);
                 this.expertsList.set([]);
-                this.cdr.markForCheck();
-            }
-        });
+                return of([]);
+            }),
+            takeUntilDestroyed()
+        ).subscribe();
     }
 
+    trackByExpert(_index: number, expert: PersonDto): number | string {
+        return expert.id ?? _index;
+    }
 }

@@ -1,16 +1,19 @@
-import {Component, EventEmitter, OnInit, Output, input, PLATFORM_ID, Inject, OnDestroy} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Inject, OnDestroy, OnInit, Output, PLATFORM_ID, input} from '@angular/core';
 import {Page} from "app/components/common-components/page-and-filter/model/Page";
 import {Pagination} from "app/components/common-components/page-and-filter/model/Pagination";
 import {PageRequest} from "@app/components/common-components/page-and-filter/model/PageRequest";
 import {isPlatformBrowser} from "@angular/common";
 import {fromEvent, Subscription} from "rxjs";
 import {debounceTime} from "rxjs/operators";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-pagination',
     templateUrl: './pagination.component.html',
     styleUrls: ['pagination.component.scss'],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.pagination ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class PaginationComponent implements OnInit, OnDestroy {
 
@@ -26,7 +29,10 @@ export class PaginationComponent implements OnInit, OnDestroy {
   private isMobile = false;
   private resizeSubscription?: Subscription;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     const pagination = this.pagination();
@@ -53,7 +59,12 @@ export class PaginationComponent implements OnInit, OnDestroy {
   private checkMobile(): void {
     if (isPlatformBrowser(this.platformId)) {
       // Проверяем ширину экрана (breakpoint lg в Bootstrap = 992px)
-      this.isMobile = window.innerWidth < 992;
+      const nextIsMobile = window.innerWidth < 992;
+      if (nextIsMobile !== this.isMobile) {
+        this.isMobile = nextIsMobile;
+        // Важно для OnPush/zoneless: событие resize приходит извне, поэтому явно просим обновить шаблон
+        this.cdr.markForCheck();
+      }
     }
   }
 

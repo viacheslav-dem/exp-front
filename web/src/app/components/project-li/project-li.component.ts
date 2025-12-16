@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, input} from '@angular/core';
 import {ProjectStateBadge} from "@app/pipes/project-state.pipe";
 import {ProjectService} from "@app/services/project.service";
 import {ProjectLiDto} from "@app/dto/ProjectLiDto";
@@ -11,7 +11,9 @@ import {environment} from "../../../environments/environment";
     selector: 'app-project-li',
     templateUrl: './project-li.component.html',
     styleUrls: ['project-li.component.scss'],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.projectLi ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class ProjectLiComponent implements OnInit {
 
@@ -27,7 +29,8 @@ export class ProjectLiComponent implements OnInit {
   public readonly group = input<string>(null);
 
   constructor(private _projectService: ProjectService,
-              private _authService: AuthService,) {
+              private _authService: AuthService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -57,6 +60,9 @@ export class ProjectLiComponent implements OnInit {
   }
 
   getBelisaContacts(project: ProjectLiDto) {
-    this._projectService.getBelisaContacts(project).subscribe(res => this.belisaPersons = res);
+    this._projectService.getBelisaContacts(project).subscribe(res => {
+      this.belisaPersons = res;
+      this.cdr?.markForCheck?.();
+    });
   }
 }

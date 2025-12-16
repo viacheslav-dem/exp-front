@@ -54,7 +54,7 @@
             <!--SHOW COUNCIL-->
             @if (!selectedCouncil.isEdit) {
               <div>
-                <a class="float-right btn btn-icon" (click)="editCouncil()">
+                <a class="btn btn-icon btn-right" (click)="editCouncil()">
                   <fa-icon icon="cog" size="lg"></fa-icon>
                 </a>
                 <span>Курирующие сотрудники БелИСА:</span>
@@ -191,7 +191,7 @@
                 <!--SHOW BUREAU-->
                 @if (!selectedBureau.isEdit) {
                   <div>
-                    <a class="float-right btn btn-icon" (click)="editBureau()">
+                    <a class="btn btn-icon btn-right" (click)="editBureau()">
                       <fa-icon icon="cog" size="lg"></fa-icon>
                     </a>
                     <div>Председатель:
@@ -295,7 +295,7 @@
                 <!--SHOW SECTION-->
                 @if (!section.isEdit) {
                   <div>
-                    <a class="float-right btn btn-icon" (click)="editSection(section)">
+                    <a class="btn btn-icon btn-right" (click)="editSection(section)">
                       <fa-icon icon="cog" size="lg"></fa-icon>
                     </a>
                     <div>Руководитель секции:

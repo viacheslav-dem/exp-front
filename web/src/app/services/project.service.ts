@@ -195,7 +195,9 @@ export class ProjectService extends HasStateService {
   }
 
   markViewed(idDto: IdDto, idGroup: string): Observable<ProjectDto> {
-    return this._http.postBlock(`${this.url}/mark-viewed/${idDto.id}`, {idGroup: idGroup});
+    // Бэкенд ожидает group как строку в body (см. совместимость со старой реализацией в web/bin/src)
+    // HttpClientSecure сам сериализует значение через JSON.stringify, поэтому строка уйдет как JSON-string.
+    return this._http.postBlock(`${this.url}/mark-viewed/${idDto.id}`, idGroup);
   }
 
   getTheSameProjectsByTitle(title: string): Observable<ProjectDto[]> {

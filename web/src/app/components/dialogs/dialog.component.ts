@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DialogService} from "@app/components/dialogs/dialog.service";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {DialogResult} from "@app/components/dialogs/dialog-result";
@@ -6,12 +6,15 @@ import {DialogContainer, DialogType} from "@app/components/dialogs/dialog-contai
 import {UserFormComponent} from "@app/components/dialogs/user-form/user-form.component";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {Subscription} from "rxjs";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-dialogs',
     templateUrl: './dialog.component.html',
     styles: [],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.dialogs ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class DialogComponent implements OnInit, OnDestroy {
 
@@ -25,7 +28,11 @@ export class DialogComponent implements OnInit, OnDestroy {
   @ViewChild('modalComponent', { static: false }) public modalComponent: ModalComponent;
   @ViewChild(UserFormComponent, { static: false }) userForm: UserFormComponent;
 
-  constructor(private dialogService: DialogService, private toastService: GlobalToastyService) {
+  constructor(
+    private dialogService: DialogService,
+    private toastService: GlobalToastyService,
+    private cdr: ChangeDetectorRef
+  ) {
     this.titleMap[DialogType.USER] = 'Редактирование пользователя';
     this.titleMap[DialogType.PASSWORD] = 'Смена пароля';
     this.titleMap[DialogType.CONFIRM] = 'Подтверждение действия';
@@ -42,6 +49,8 @@ export class DialogComponent implements OnInit, OnDestroy {
         this.data = dlg.data;
         this.title = dlg.data.title ? dlg.data.title : this.titleMap[this.dlg.type];
         this.modalComponent.show();
+        // Важно для OnPush/zoneless: обновление пришло из подписки + открытие модалки
+        this.cdr.markForCheck();
       });
     });
   }
@@ -82,5 +91,6 @@ export class DialogComponent implements OnInit, OnDestroy {
     this.modalComponent.hide();
     this.dlg.callback.complete();
     this.dlg = null;
+    this.cdr.markForCheck();
   }
 }

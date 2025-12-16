@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, input} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, input} from "@angular/core";
 import {
   CheckboxField,
   MultiCheck,
@@ -10,6 +10,7 @@ import {
 import {Direction, switchDirection} from "app/components/common-components/page-and-filter/model/SortOrder";
 import {Filter} from "app/components/common-components/page-and-filter/model/Filter";
 import {DataService} from "@app/services/data.service";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-filter',
@@ -72,7 +73,9 @@ import {DataService} from "@app/services/data.service";
         box-shadow: 0 0.25rem 0.5rem rgba(108, 117, 125, 0.2);
       }
     `],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.filter ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class FilterComponent implements OnInit {
 
@@ -83,7 +86,10 @@ export class FilterComponent implements OnInit {
   readonly filterClass = input<string>('');
   @Output() onFilterChanged = new EventEmitter<Filter<any>[]>();
 
-  constructor(private dataService: DataService) {
+  constructor(
+    private dataService: DataService,
+    private cdr: ChangeDetectorRef
+  ) {
   }
 
   ngOnInit() {
@@ -96,7 +102,11 @@ export class FilterComponent implements OnInit {
     this._fields = fields;
     this._fields.forEach(field => {
       if ((field.type == SearchFieldType.MULTI_SELECT) && field.catalog != null)
-        this.dataService.getCatalog(field.catalog).subscribe(items => (<MultiSelectField>field).setItems(items));
+        this.dataService.getCatalog(field.catalog).subscribe(items => {
+          (<MultiSelectField>field).setItems(items);
+          // Важно для OnPush/zoneless: обновление пришло асинхронно
+          this.cdr.markForCheck();
+        });
     });
   }
 

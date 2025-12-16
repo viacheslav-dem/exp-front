@@ -1,5 +1,6 @@
-import {Component, OnDestroy, OnInit} from "@angular/core";
-import {Subscription} from "rxjs";
+import {Component, ChangeDetectionStrategy, inject, signal, computed} from "@angular/core";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {CommonModule} from "@angular/common";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 
 interface ToastItem {
@@ -9,11 +10,19 @@ interface ToastItem {
   msg?: string;
 }
 
+interface ToastPayload {
+  type?: 'success' | 'error' | 'warn' | 'info';
+  data?: {
+    title?: string;
+    msg?: string;
+  };
+}
+
 @Component({
     selector: 'app-global-toasts',
     template: `
     <div class="global-toasts position-fixed" style="bottom: 10px; right: 10px; z-index: 1060;">
-      @for (t of toasts; track t.id) {
+      @for (t of toasts(); track t.id) {
         <div class="alert" [ngClass]="cssClass(t)" role="alert">
           @if (t.title) {
             <strong>{{ t.title }}</strong>
@@ -25,25 +34,33 @@ interface ToastItem {
       }
     </div>
     `,
-    standalone: false
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule]
 })
-export class GlobalToastsComponent implements OnInit, OnDestroy {
-  toasts: ToastItem[] = [];
-  private sub: Subscription;
+export class GlobalToastsComponent {
+  private readonly globalToasty = inject(GlobalToastyService);
   private idCounter = 0;
+  
+  private readonly _toasts = signal<ToastItem[]>([]);
+  readonly toasts = this._toasts.asReadonly();
 
-  constructor(private globalToasty: GlobalToastyService) {}
-
-  ngOnInit(): void {
-    this.sub = this.globalToasty.globalToastyHandled.subscribe((value: any) => {
-      const data = value && value.data ? value.data : {};
+  constructor() {
+    this.globalToasty.globalToastyHandled.pipe(
+      takeUntilDestroyed()
+    ).subscribe((value: ToastPayload) => {
+      const data = value?.data ?? {};
+      const toastType: 'success' | 'error' | 'warn' | 'info' = (value?.type || 'info') as 'success' | 'error' | 'warn' | 'info';
+      
       const t: ToastItem = {
         id: ++this.idCounter,
-        type: (value.type || 'info') as any,
+        type: toastType,
         title: data.title,
         msg: data.msg
       };
-      this.toasts.push(t);
+      
+      this._toasts.update(toasts => [...toasts, t]);
+      
       // Разное время жизни для разных типов сообщений
       // Ошибки показываются дольше, чтобы пользователь успел их прочитать
       const timeout = t.type === 'error' ? 10000 :  // 10 секунд для ошибок
@@ -53,17 +70,11 @@ export class GlobalToastsComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    if (this.sub) {
-      this.sub.unsubscribe();
-    }
-  }
-
   remove(id: number) {
-    this.toasts = this.toasts.filter(t => t.id !== id);
+    this._toasts.update(toasts => toasts.filter(t => t.id !== id));
   }
 
-  cssClass(t: ToastItem) {
+  cssClass(t: ToastItem): string {
     switch (t.type) {
       case 'success':
         return 'alert alert-success';

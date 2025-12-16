@@ -8,90 +8,118 @@ import {Direction} from "@app/components/common-components/page-and-filter/model
 
 @Component({
     selector: 'app-simple-catalog',
-    template: `<h5 class="mb-3">{{headerValue}}</h5>
-  <div class="list-group">
-  
+    template: `<div class="simple-catalog">
+  <!-- Заголовок с кнопкой добавления -->
+  <div class="catalog-header">
+    <h2 class="catalog-title">{{headerValue}}</h2>
+    <button type="button" class="btn-add" (click)="addItem()">
+      <fa-icon icon="plus" class="btn-add-icon"></fa-icon>
+      <span>{{addLabelValue}}</span>
+    </button>
+  </div>
+
+  <!-- Фильтр -->
+  <div class="catalog-filter">
     <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
-  
-    <div [loadingData]="_loading">
-  
-      <!--ADD ITEM-->
-      <div (click)="addItem()">
-        <div class="list-group-item selectable link background-dark-sea-green">
-          {{addLabelValue}}
-        </div>
-      </div>
-  
-      <!--ITEMS-->
-      @for (item of items; track trackByItem($index, item); let areaInd = $index) {
-        <div>
-          <!--ITEM HEADER-->
-          <div class="list-group-item" [class.disabled]="item.disabled">
-            <div class="text-mini font-weight-bold">
-              {{itemLabelValue}}
-              @if (item.id == 0) {
-                <span>(не сохранено)</span>
-              }
-              @if (item.disabled) {
-                <span>(неактивная запись)</span>
-              }
-            </div>
-            <div class="row">
-              <div class="col-11">{{item.name | orElse: 'наименование отсутствует'}}</div>
-              <div class="col-1 text-end">
-                @if (!item.isEdit) {
-                  <a class="btn btn-icon" (click)="editItem(item)">
-                    <fa-icon icon="cog" size="lg"></fa-icon>
-                  </a>
-                }
+  </div>
+
+  <!-- Контент -->
+  <div [loadingData]="_loading" class="catalog-content">
+    @if (items && items.length > 0) {
+      <div class="catalog-items">
+        @for (item of items; track trackByItem($index, item); let areaInd = $index) {
+          <div class="catalog-item" 
+               [class.item-disabled]="item.disabled" 
+               [class.item-editing]="item.isEdit"
+               (click)="!item.isEdit && editItem(item)"
+               [style.cursor]="item.isEdit ? 'default' : 'pointer'">
+            @if (!item.isEdit) {
+              <div class="item-content">
+                <div class="item-main">
+                  <div class="item-header">
+                    <span class="item-label">{{itemLabelValue}}</span>
+                    @if (item.id == 0) {
+                      <span class="badge badge-warning">
+                        не сохранено
+                      </span>
+                    }
+                    @if (item.disabled) {
+                      <span class="badge badge-secondary">
+                        неактивная запись
+                      </span>
+                    }
+                  </div>
+                  <div class="item-name">{{item.name | orElse: 'наименование отсутствует'}}</div>
+                </div>
+                <button type="button" 
+                        class="btn-edit" 
+                        (click)="editItem(item); $event.stopPropagation()" 
+                        title="Редактировать">
+                  <fa-icon icon="cog"></fa-icon>
+                </button>
               </div>
-            </div>
-            <!--EDIT ITEM-->
+            }
+
             @if (item.isEdit) {
-              <div class="mt-05">
+              <div class="item-edit-form">
                 @if (item.id != 0) {
-                  <div class="form-sub-group">
+                  <div class="form-group-checkbox">
                     <app-checkbox [(ngModel)]="editedItem.disabled">
                       Неактивная запись (более не актуальна)
                     </app-checkbox>
                   </div>
                 }
+
                 <div class="form-group">
-                  <div>Наименование</div>
-                  <input type="text" [(ngModel)]="editedItem.name"
-                    placeholder="наименование" class="form-control" title="Наименование">
-                  </div>
-                  <div class="mt-1">
-                    <button class="btn btn-secondary" (click)="cancelEditItem()">Отмена</button>
-                    <button class="btn btn-primary" (click)="saveEditedItem()">Сохранить</button>
-                    @if (selectedItem.id == 0) {
-                      <button class="btn btn-danger" (click)="deleteItem(areaInd)">
-                        Удалить
-                      </button>
-                    }
-                  </div>
+                  <label class="form-label">Наименование</label>
+                  <textarea
+                    [(ngModel)]="editedItem.name"
+                    placeholder="Введите наименование"
+                    class="form-textarea"
+                    title="Наименование"
+                    rows="3"
+                    autofocus
+                  ></textarea>
                 </div>
-              }
-            </div>
+
+                <div class="form-actions" (click)="$event.stopPropagation()">
+                  <button type="button" class="btn btn-cancel" (click)="cancelEditItem(); $event.stopPropagation()">
+                    Отмена
+                  </button>
+                  <button type="button" class="btn btn-save" (click)="saveEditedItem()">
+                    Сохранить
+                  </button>
+                  @if (selectedItem && selectedItem.id == 0) {
+                    <button type="button" class="btn btn-delete" (click)="deleteItem(areaInd)">
+                      <fa-icon icon="trash-alt" class="btn-icon"></fa-icon>
+                      Удалить
+                    </button>
+                  }
+                </div>
+              </div>
+            }
           </div>
         }
-  
-        @if (!items || items.length == 0) {
-          <div>
-            <div class="italic list-group-item background-light-blue">
-              {{noItemsLabelValue}}
-            </div>
-          </div>
-        }
-  
+      </div>
+
+      <!-- Пагинация -->
+      <div class="catalog-pagination">
         <app-pagination
           [page]="_page" [pagination]="_pagination"
           (onPageChanged)="onPageChanged($event)">
         </app-pagination>
       </div>
-    </div>
-  `,
-    styles: [],
+    } @else if (!_loading) {
+      <div class="catalog-empty">
+        <div class="empty-state">
+          <fa-icon icon="list" class="empty-icon"></fa-icon>
+          <p class="empty-text">{{noItemsLabelValue}}</p>
+        </div>
+      </div>
+    }
+  </div>
+</div>`,
+    styleUrls: ['./simple-catalog.component.scss'],
     standalone: false
 })
 export class SimpleCatalogComponent<T extends CatalogDto> extends CatalogTemplate<T> {
@@ -128,11 +156,18 @@ export class SimpleCatalogComponent<T extends CatalogDto> extends CatalogTemplat
   }
 
   ngOnInit() {
+    super.ngOnInit();
     this._searchFields = [
       SearchField.contains('name').setSortDirection(Direction.ASC)
         .setPlaceholder('Поиск по наименованию...').setSortable(true),
       SearchField.checkbox('disabled', 'Показывать неактивные'),
     ];
+    // Инициализируем items как пустой массив, чтобы избежать ошибок при первом рендере
+    if (!this.items) {
+      this.items = [];
+    }
+    // Загружаем данные после инициализации
+    this.update();
   }
 
   create(): T {

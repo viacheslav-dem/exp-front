@@ -1,8 +1,8 @@
 <app-modal #searchModal [title]="'Поиск эксперта'" [modalClasses]="'modal-xl'">
   <!--FILTER-->
   <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
-  <div [loadingData]="_loading" class="mt-3">
-    @if (experts.length > 0) {
+  <div [loadingData]="_loading" class="mt-3" style="min-height: 300px; position: relative;">
+    @if (!_loading && experts.length > 0) {
       <table class="table table-responsive mb-0">
         <thead>
           <tr>
@@ -16,7 +16,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (expert of experts; track trackByExpert($index, expert)) {
+          @for (expert of experts; track expert?.id || $index) {
             <tr class="list-group-item-action selectable" (click)="onSelected(expert)">
               <td>
                 <div>{{expert|fullName}}</div>
@@ -33,7 +33,7 @@
                 @if (expert.personInfo.specializations) {
                   <div>
                     Специализация:&nbsp;
-                    @for (spec of expert.personInfo.specializations; track spec) {
+                    @for (spec of expert.personInfo.specializations; track spec?.id || $index) {
                       <div
                         class="italic">{{spec.name}}
                       </div>
@@ -43,7 +43,7 @@
                 @if (expert.personInfo.specialities) {
                   <div>
                     Специальность:&nbsp;
-                    @for (special of expert.personInfo.specialities; track special) {
+                    @for (special of expert.personInfo.specialities; track special?.id || $index) {
                       <div
                         class="italic">{{special.name}}
                       </div>
@@ -82,7 +82,7 @@
   </tbody>
 </table>
 }
-@if (experts.length == 0) {
+@if (!_loading && experts.length == 0 && _page.totalElements !== null) {
   <div class="alert alert-info italic mb-0">
     Эксперты не найдены
   </div>

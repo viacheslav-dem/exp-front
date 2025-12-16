@@ -1,4 +1,5 @@
-<div class="card card-block compact" *ngIf="_project">
+@if (_project) {
+<div class="card card-block compact">
     <div class="form-group">
         <label class="form-group-label">Наименование объекта экспертизы</label>
         <textarea rows="2" class="form-control" placeholder="Название объекта экспертизы"
@@ -12,48 +13,61 @@
                     data-toggle="dropdown">{{ _project.code ? _project.code.code : "Выберите код" }}
             </button>
             <ul class="dropdown-menu scrollable-menu">
-                <li *ngFor="let code of codes" class="dropdown-item" (click)="selectCode(code)">
-                    <span class="font-weight-bold">{{ code.code }}</span>{{
-                        !code.name || code.name == '' ? '' : ' - ' +
-                            code.name
-                    }}
-                </li>
-                <li *ngIf="codes.length == 0" disabled class="dropdown-item disabled">
-                    Нет данных
-                </li>
+                @for (code of codes; track code.id) {
+                    <li class="dropdown-item" (click)="selectCode(code)">
+                        <span class="font-weight-bold">{{ code.code }}</span>{{
+                            !code.name || code.name == '' ? '' : ' - ' +
+                                code.name
+                        }}
+                    </li>
+                }
+                @if (codes.length == 0) {
+                    <li disabled class="dropdown-item disabled">
+                        Нет данных
+                    </li>
+                }
             </ul>
         </div>
-        <div class="hint" *ngIf="this._project.code && this._project.code.description">
-            <p class="font-italic">
-                <b>Подсказка.</b>
-                {{this._project.code.description}}
-            </p>
-
-        </div>
+        @if (this._project.code && this._project.code.description) {
+            <div class="hint">
+                <p class="font-italic">
+                    <b>Подсказка.</b>
+                    {{this._project.code.description}}
+                </p>
+            </div>
+        }
     </div>
 
-    <div class="form-group"
-         *ngIf="_project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || _project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'">
-        <label class="form-group-label" *ngIf="_project.code?.code != '8.4'">Наименование программы
-            (подпрограммы)</label>
-        <label class="form-group-label" *ngIf="_project.code?.code == '8.4'">Наименование двусторонней
-            научно-технической программы с </label>
-        <textarea *ngIf="_project.code?.code != '8.4'" rows="2" class="form-control"
-                  placeholder="Наименование программы (подпрограммы)"
-                  [(ngModel)]="_project.program"></textarea>
-        <textarea *ngIf="_project.code?.code == '8.4'" rows="2" class="form-control" placeholder="Название страны"
-                  [(ngModel)]="_project.program"></textarea>
-        <div class="hint">
-            <p class="font-italic">
-                <b>Подсказка.</b>
-                Заполняется при наличии программы (подпрограммы). Для объектов государственной экспертизы, указанных в
-                подпункте 8.4 пункта 8 Положения
-                указывается название страны. При отсутствии программы (подпрограммы) указывается «Выполнение в рамках
-                программы (подпрограммы) не предусмотрено».
-            </p>
-
+    @if (_project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || _project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
+        <div class="form-group">
+            @if (_project.code?.code != '8.4') {
+                <label class="form-group-label">Наименование программы
+                    (подпрограммы)</label>
+            }
+            @if (_project.code?.code == '8.4') {
+                <label class="form-group-label">Наименование двусторонней
+                    научно-технической программы с </label>
+            }
+            @if (_project.code?.code != '8.4') {
+                <textarea rows="2" class="form-control"
+                          placeholder="Наименование программы (подпрограммы)"
+                          [(ngModel)]="_project.program"></textarea>
+            }
+            @if (_project.code?.code == '8.4') {
+                <textarea rows="2" class="form-control" placeholder="Название страны"
+                          [(ngModel)]="_project.program"></textarea>
+            }
+            <div class="hint">
+                <p class="font-italic">
+                    <b>Подсказка.</b>
+                    Заполняется при наличии программы (подпрограммы). Для объектов государственной экспертизы, указанных в
+                    подпункте 8.4 пункта 8 Положения
+                    указывается название страны. При отсутствии программы (подпрограммы) указывается «Выполнение в рамках
+                    программы (подпрограммы) не предусмотрено».
+                </p>
+            </div>
         </div>
-    </div>
+    }
 
     <div class="form-group">
         <label class="form-group-label">Заказчик экспертизы (данные из Вашего профиля)</label>
@@ -80,15 +94,15 @@
             </p>
         </div>
     </div>
-    <div *ngIf="!_project.code?.code.startsWith('8.10')">
-        <div *ngIf="!_project.code?.code.startsWith('8.16')">
+    @if (!_project.code?.code.startsWith('8.10')) {
+        @if (!_project.code?.code.startsWith('8.16')) {
             <div class="form-group">
                 <label class="form-group-label">Сроки выполнения проекта</label>
                 <div class="input-group">
                     <app-date-period class="form-control" [(ngModel)]="_project.period"></app-date-period>
                 </div>
             </div>
-            <div *ngIf="_project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'" class="form-group">
+            @if (_project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
                 <div class="form-group">
                     <label class="form-group-label">Cрок выполнения НИОК(Т)Р</label>
                     <div class="input-group">
@@ -111,7 +125,7 @@
                         Указывается квартал и год.
                     </p>
                 </div>
-            </div>
+            }
             <div class="form-group">
                 <label class="form-group-label">Финансирование</label>
                 <div class="form-sub-group">
@@ -127,18 +141,24 @@
                 </div>
 
                 <div class="form-sub-group italic">
-                    <ul *ngIf="_project.financing.length != 0">
-                        <li *ngFor="let financing of _project.financing; let i = index">
-                            <span>{{ financing.type | fundingType }} финансирование, </span>
-                            <span>{{ financing.comment ? financing.comment + ' - ' : '' }}</span>
-                            <span>{{ financing.source.name }}: </span>
-                            <span>{{ financing.value }} {{ _project.currency?.name || 'руб.' }}</span>
-                            <a class="btn btn-icon btn-icon-sm" (click)="_project.financing.splice(i, 1)">
-                                <fa-icon icon="minus"></fa-icon>
-                            </a>
-                        </li>
-                    </ul>
-                    <div *ngIf="_project.financing.length == 0" class="italic">финансирование не указано</div>
+                    @if (_project.financing.length != 0) {
+                        <ul>
+                            @for (financing of _project.financing; track $index) {
+                                <li>
+                                    <span>{{ financing.type | fundingType }} финансирование, </span>
+                                    <span>{{ financing.comment ? financing.comment + ' - ' : '' }}</span>
+                                    <span>{{ financing.source.name }}: </span>
+                                    <span>{{ financing.value }} {{ _project.currency?.name || 'руб.' }}</span>
+                                    <a class="btn btn-icon btn-icon-sm" (click)="_project.financing.splice(i, 1)">
+                                        <fa-icon icon="minus"></fa-icon>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    @if (_project.financing.length == 0) {
+                        <div class="italic">финансирование не указано</div>
+                    }
                 </div>
                 <div class="row">
                     <div class="col-sm-2 pr-0">
@@ -168,23 +188,29 @@
                 <label class="form-group-label">Приоритетное направление научных исследований и (или) научно-технической
                     деятельности</label>
                 <div class="form-sub-group italic">
-                    <div *ngIf="directions.length != 0">
-                        <div *ngFor="let dir of displayDirection(); let i = index">
-                            {{ dir.name }}
-                            <a class="btn btn-icon btn-icon-sm" (click)="deleteDirection(dir, i)">
-                                <fa-icon icon="minus"></fa-icon>
-                            </a>
-                            <br>
-                            <ul>
-                                <li *ngFor="let subDir of dir.subDirectionDtos; let j = index">
-                                    {{ subDir.directionName }}
-                                    <a class="btn btn-icon btn-icon-sm" (click)="display(dir, j, i)">
+                    @if (directions.length != 0) {
+                        <div>
+                            @for (dir of displayDirection(); track dir.id; let i = $index) {
+                                <div>
+                                    {{ dir.name }}
+                                    <a class="btn btn-icon btn-icon-sm" (click)="deleteDirection(dir, i)">
                                         <fa-icon icon="minus"></fa-icon>
                                     </a>
-                                </li>
-                            </ul>
+                                    <br>
+                                    <ul>
+                                        @for (subDir of dir.subDirectionDtos; track subDir.id; let j = $index) {
+                                            <li>
+                                                {{ subDir.directionName }}
+                                                <a class="btn btn-icon btn-icon-sm" (click)="display(dir, j, i)">
+                                                    <fa-icon icon="minus"></fa-icon>
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
                         </div>
-                    </div>
+                    }
                     <!--        <ul *ngIf="direction.length != 0">-->
                     <!--          <li *ngFor="let dir of direction; let i = index">-->
                     <!--            {{dir.name}} <br>-->
@@ -194,7 +220,9 @@
                     <!--            </a>-->
                     <!--          </li>-->
                     <!--        </ul>-->
-                    <div *ngIf="_project.directions.length == 0">направления не указаны</div>
+                    @if (_project.directions.length == 0) {
+                        <div>направления не указаны</div>
+                    }
                 </div>
                 <div class="row">
                     <div class="col-10 pr-2">
@@ -207,7 +235,8 @@
                         </button>
                     </div>
                 </div>
-                <div class="row  m-1" *ngIf="newDirection">
+                @if (newDirection) {
+                    <div class="row  m-1">
                     <app-dropdown [(ngModel)]="subDirection" [notSelected]="'Ничего не выбрано'"
                                   [options]="getSubDirectionName()"
                                   [resetEnabled]="true" [optionToString]="optionToString"></app-dropdown>
@@ -224,39 +253,15 @@
                     <!--              </li>-->
                     <!--            </ul>-->
                     <!--          </div>-->
-                </div>
+                    </div>
+                }
             </div>
 
 
-<!--            <div *ngIf="canAddSocialEconomicGoals()" class="form-group">-->
-<!--                <label class="form-group-label">Цель (приоритет) социально-экономического развития</label>-->
-<!--                <div class="form-sub-group italic">-->
-<!--                    <ul *ngIf="_project.socialEconomicGoals.length != 0">-->
-<!--                        <li *ngFor="let socialEconomicGoal of _project.socialEconomicGoals; let i = index">-->
-<!--                            {{ socialEconomicGoal.name }}-->
-<!--                            <a class="btn btn-icon btn-icon-sm" (click)="_project.socialEconomicGoals.splice(i, 1)">-->
-<!--                                <fa-icon icon="minus"></fa-icon>-->
-<!--                            </a>-->
-<!--                        </li>-->
-<!--                    </ul>-->
-<!--                    <div *ngIf="_project.socialEconomicGoals.length == 0">цели (приоритеты) не указаны</div>-->
-<!--                </div>-->
-<!--                <div class="row">-->
-<!--                    <div class="col-10 pr-2">-->
-<!--                        <app-select-catalog [catalog]="Catalog.SOCIAL_ECONOMIC_GOAL"-->
-<!--                                            [(ngModel)]="newSocialEconomicGoal"></app-select-catalog>-->
-<!--                    </div>-->
-<!--                    <div class="col-2 pl-2">-->
-<!--                        <button class="btn btn-primary w-100" [disabled]="!newSocialEconomicGoal"-->
-<!--                                (click)="addSocialEconomicGoal()">-->
-<!--                            Добавить-->
-<!--                        </button>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-        </div>
-    </div>
-    <div *ngIf="_project.code?.code.startsWith('8.16')">
+<!-- comment -->
+        }
+    }
+    @if (_project.code?.code.startsWith('8.16')) {
         <div class="form-group">
             <label class="form-group-label">Сроки реализации</label>
             <div class="input-group">
@@ -305,12 +310,12 @@
                           [(ngModel)]="_project.exportAndImport" title="Сумма в бел.руб"></textarea>
             </div>
         </div>
+    }
+
     </div>
-</div>
-
-
-<div class="card card-block mt-2">
-    <div class="form-group" *ngIf="!_project.code?.code.startsWith('8.10') && !_project.code?.code.startsWith('8.16')">
+    <div class="card card-block mt-2">
+        @if (!_project.code?.code.startsWith('8.10') && !_project.code?.code.startsWith('8.16')) {
+        <div class="form-group">
         <!--   Ожидаемый результат экспертизы   -->
         <div class="form-sub-group">
             <label class="form-group-label">Ожидаемый результат объекта экспертизы</label>
@@ -321,20 +326,24 @@
                             data-toggle="dropdown">{{ _project.expectedResult ? _project.expectedResult.expectedResultType : "Выберите вид ожидаемого результата" }}
                     </button>
                     <ul class="dropdown-menu scrollable-menu">
-                        <li *ngFor="let result of expectedResultList" class="dropdown-item"
-                            (click)="selectExpectedResult(result)">
-                            <span>{{ result.expectedResultType }}</span>
-                        </li>
-                        <li *ngIf="expectedResultList.length == 0" disabled class="dropdown-item disabled">
-                            Нет данных
-                        </li>
+                        @for (result of expectedResultList; track result.id) {
+                            <li class="dropdown-item"
+                                (click)="selectExpectedResult(result)">
+                                <span>{{ result.expectedResultType }}</span>
+                            </li>
+                        }
+                        @if (expectedResultList.length == 0) {
+                            <li disabled class="dropdown-item disabled">
+                                Нет данных
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
 
 
-            <div class="form-sub-group"
-                 *ngIf="_project.expectedResult && _project.expectedResult.expectedResultType == 'другое'">
+            @if (_project.expectedResult && _project.expectedResult.expectedResultType == 'другое') {
+                <div class="form-sub-group">
                 <p class="font-italic">
                     <b>Подсказка.</b>
                     Введите вид ожидаемого результата: Создание новой продукции; Создание усовершенствованной продукции;
@@ -343,15 +352,18 @@
                 </p>
                 <textarea class="form-control" rows="2" placeholder="Введите вид ожидаемого результата"
                           [(ngModel)]="_project.otherExpectedResult"></textarea>
-            </div>
-            <p class="font-italic" *ngIf="_project.expectedResult">
+                </div>
+            }
+            @if (_project.expectedResult) {
+                <p class="font-italic">
                 <b>Подсказка.</b>
                 <!--  Пока что фиксированная подсказка, возможно потом добавится динамическая для каждого выбранного элемента -->
                 <!-- {{ _project.expectedResult.description }}-->
                 Введите описание ожидаемого результата: «Вид ожидаемого результата», будет получен с использованием
                 метода(-ов) научных исследований, (отечественной, зарубежной) технологии, новшества (указывается
                 наименование метода(-ов) научных исследований, (отечественной, зарубежной) технологии, новшества).
-            </p>
+                </p>
+            }
             <div class="form-sub-group">
             <textarea class="form-control" rows="2" placeholder="Описание ожидаемого результата"
                       [(ngModel)]="_project.expectedResultDescription"></textarea>
@@ -367,19 +379,25 @@
                         data-toggle="dropdown">{{ _project.workType ? _project.workType : 'Выберите вид работ' }}
                 </button>
                 <ul class="dropdown-menu scrollable-menu">
-                    <li *ngFor="let typeOfWork of outputTypeOfWorkList" class="dropdown-item"
-                        (click)="selectTypeOfWork(typeOfWork.description)">
-                        <span>{{ typeOfWork.description }}</span>
-                    </li>
-                    <li *ngIf="outputTypeOfWorkList.length == 0" disabled class="dropdown-item disabled">
-                        Нет данных
-                    </li>
+                    @for (typeOfWork of outputTypeOfWorkList; track typeOfWork?.id || typeOfWork?.description || $index) {
+                        <li class="dropdown-item"
+                            (click)="selectTypeOfWork(typeOfWork.description)">
+                            <span>{{ typeOfWork.description }}</span>
+                        </li>
+                    }
+                    @if (outputTypeOfWorkList.length == 0) {
+                        <li disabled class="dropdown-item disabled">
+                            Нет данных
+                        </li>
+                    }
                 </ul>
             </div>
-            <div class="form-sub-group mt-2" *ngIf="_project.workType === 'другое'">
+            @if (_project.workType === 'другое') {
+                <div class="form-sub-group mt-2">
                 <textarea class="form-control" rows="2" placeholder="Введите вид работ"
                           [(ngModel)]="_project.otherWorkType"></textarea>
-            </div>
+                </div>
+            }
         </div>
 
         <!--     Характер результата   -->
@@ -391,19 +409,25 @@
                         data-toggle="dropdown">{{ _project.selectedResultSpecific ? _project.selectedResultSpecific : "Выберите характер результата" }}
                 </button>
                 <ul class="dropdown-menu scrollable-menu">
-                    <li *ngFor="let typeOfWork of resultSpecificList" class="dropdown-item"
-                        (click)="selectResultSpecific(typeOfWork)">
-                        <span>{{ typeOfWork }}</span>
-                    </li>
-                    <li *ngIf="resultSpecificList.length == 0" disabled class="dropdown-item disabled">
-                        Нет данных
-                    </li>
+                    @for (typeOfWork of resultSpecificList; track typeOfWork || $index) {
+                        <li class="dropdown-item"
+                            (click)="selectResultSpecific(typeOfWork)">
+                            <span>{{ typeOfWork }}</span>
+                        </li>
+                    }
+                    @if (resultSpecificList.length == 0) {
+                        <li disabled class="dropdown-item disabled">
+                            Нет данных
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
+        </div>
+    }
 
-        <div class="form-sub-group"
-             *ngIf="_project.selectedResultSpecific && _project.selectedResultSpecific === 'прикладной'">
+    @if (_project.selectedResultSpecific && _project.selectedResultSpecific === 'прикладной') {
+            <div class="form-sub-group">
             <!--     Результат подлежит коммерциализации   -->
             <div class="form-sub-group">
                 <label class="form-group-label">Результат подлежит коммерциализации по Указу Президента Республики
@@ -424,21 +448,26 @@
             </div>
 
             <!--   Коммерциализация результата   -->
-            <div class="form-sub-group" *ngIf="this._project.resultCommercialization === 'Подлежит'">
+            @if (this._project.resultCommercialization === 'Подлежит') {
+                <div class="form-sub-group">
                 <label class="form-group-label">Коммерциализация результата</label>
                 <div class="form-sub-group">
                 <textarea class="form-control mb-2" rows="2" placeholder="Описание объекта коммерциализации"
                           [(ngModel)]="_project.commercializationDescription"></textarea>
 
                     <div class="form-sub-group italic">
-                        <ul *ngIf="_project.commercializationMethods.length != 0">
-                            <li *ngFor="let method of _project.commercializationMethods; let i = index">
-                                <span>{{ method.name }}: </span>
-                                <a class="btn btn-icon btn-icon-sm" (click)="_project.commercializationMethods.splice(i, 1)">
-                                    <fa-icon icon="minus"></fa-icon>
-                                </a>
-                            </li>
-                        </ul>
+                        @if (_project.commercializationMethods.length != 0) {
+                            <ul>
+                                @for (method of _project.commercializationMethods; track method.id; let i = $index) {
+                                    <li>
+                                        <span>{{ method.name }}: </span>
+                                        <a class="btn btn-icon btn-icon-sm" (click)="_project.commercializationMethods.splice(i, 1)">
+                                            <fa-icon icon="minus"></fa-icon>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        }
                     </div>
 
                     <div class="row">
@@ -451,10 +480,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
+                </div>
+            }
 
             <!--   Внедрение результата   -->
-            <div class="form-sub-group" *ngIf="this._project.resultCommercialization  === 'Не подлежит'">
+            @if (this._project.resultCommercialization  === 'Не подлежит') {
+                <div class="form-sub-group">
                 <label class="form-group-label">Внедрение результата</label>
                 <div class="form-sub-group">
                     <div class="dropdown">
@@ -462,14 +493,18 @@
                                 data-toggle="dropdown">{{ _project.implementationResult ? _project.implementationResult : "Выберите характер результата - прикладной" }}
                         </button>
                         <ul class="dropdown-menu scrollable-menu">
-                            <li *ngFor="let selectedElement of choiceOfResultCharacterAppliedList" class="dropdown-item"
-                                (click)="selectChoiceOfResultCharacterAppliedResult(selectedElement)">
-                                <span>{{ selectedElement }}</span>
-                            </li>
-                            <li *ngIf="choiceOfResultCharacterAppliedList.length == 0" disabled
-                                class="dropdown-item disabled">
-                                Нет данных
-                            </li>
+                            @for (selectedElement of choiceOfResultCharacterAppliedList; track selectedElement || $index) {
+                                <li class="dropdown-item"
+                                    (click)="selectChoiceOfResultCharacterAppliedResult(selectedElement)">
+                                    <span>{{ selectedElement }}</span>
+                                </li>
+                            }
+                            @if (choiceOfResultCharacterAppliedList.length == 0) {
+                                <li disabled
+                                    class="dropdown-item disabled">
+                                    Нет данных
+                                </li>
+                            }
                         </ul>
                     </div>
                     <textarea class="form-control mb-2 mt-2" rows="2" placeholder="Описание объекта внедрения"
@@ -477,11 +512,14 @@
                     <textarea class="form-control mb-2" rows="2" placeholder="Указание способа внедрения"
                               [(ngModel)]="_project.implementationSpecifying"></textarea>
                 </div>
-            </div>
+                </div>
+            }
         </div>
+    }
 
-        <!--    Технологический уклад   -->
-        <div class="form-sub-group" *ngIf="showTechnologyType || this._project.technologicalOrder">
+    <!--    Технологический уклад   -->
+    @if (showTechnologyType || this._project.technologicalOrder) {
+            <div class="form-sub-group">
             <label class="form-group-label">Технологический уклад</label>
             <div class="form-sub-group">
                 <div class="dropdown">
@@ -489,24 +527,31 @@
                             data-toggle="dropdown">{{ _project.technologicalOrder ? _project.technologicalOrder : "Выберите технологический уклад" }}
                     </button>
                     <ul class="dropdown-menu scrollable-menu">
-                        <li *ngFor="let technologyType of technologyTypeList" class="dropdown-item"
-                            (click)="selectTechnologyType(technologyType)">
-                            <span>{{ technologyType }}</span>
-                        </li>
-                        <li *ngIf="technologyTypeList.length == 0" disabled class="dropdown-item disabled">
-                            Нет данных
-                        </li>
+                        @for (technologyType of technologyTypeList; track technologyType || $index) {
+                            <li class="dropdown-item"
+                                (click)="selectTechnologyType(technologyType)">
+                                <span>{{ technologyType }}</span>
+                            </li>
+                        }
+                        @if (technologyTypeList.length == 0) {
+                            <li disabled class="dropdown-item disabled">
+                                Нет данных
+                            </li>
+                        }
                     </ul>
                 </div>
-                <textarea *ngIf="isAnotherTechnologyType" class="form-control mb-2 mt-2" rows="2"
-                          placeholder="Введите технологический уклад"
-                          [(ngModel)]="_project.otherTechnologicalOrder"></textarea>
+                @if (isAnotherTechnologyType) {
+                    <textarea class="form-control mb-2 mt-2" rows="2"
+                              placeholder="Введите технологический уклад"
+                              [(ngModel)]="_project.otherTechnologicalOrder"></textarea>
+                }
             </div>
-        </div>
-    </div>
+            </div>
+        }
 
     <div class="text-xs-center mt-2">
         <button class="btn btn-primary btn-sm mr-1" (click)="onSave()">Сохранить</button>
         <button class="btn btn-secondary btn-sm" (click)="onCancel()">Отмена</button>
     </div>
-</div>
+    </div>
+}

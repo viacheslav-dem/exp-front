@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, ViewChild, input} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Output, ViewChild, input} from "@angular/core";
 import {AuthService} from "app/services/auth.service";
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {ModalComponent} from "app/components/common-components/modal/modal.component";
@@ -6,11 +6,14 @@ import {UploadHelper} from "app/components/common-components/file-uploader/uploa
 import {removeFileSuffix} from "app/support/utils";
 import {IdDto} from "@app/dto/IdDto";
 import { HttpBackend } from "@angular/common/http";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-document-uploader',
     templateUrl: 'document-uploader.component.html',
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.documentUploader ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class DocumentUploaderComponent extends UploadHelper {
 
@@ -27,7 +30,8 @@ export class DocumentUploaderComponent extends UploadHelper {
 
   constructor(private _toasty: GlobalToastyService,
               protected _authService: AuthService,
-              httpBackend: HttpBackend) {
+              httpBackend: HttpBackend,
+              private cdr: ChangeDetectorRef) {
     super(_authService, httpBackend);
   }
 
@@ -35,18 +39,21 @@ export class DocumentUploaderComponent extends UploadHelper {
     event.preventDefault();
     event.stopPropagation();
     this.isDragOver = true;
+    this.cdr.markForCheck();
   }
 
   onDragLeave(event: DragEvent) {
     event.preventDefault();
     event.stopPropagation();
     this.isDragOver = false;
+    this.cdr.markForCheck();
   }
 
   onDrop(event: DragEvent) {
     event.preventDefault();
     event.stopPropagation();
     this.isDragOver = false;
+    this.cdr.markForCheck();
     const files = event.dataTransfer && event.dataTransfer.files;
     if (files && files.length) {
       this.onFilesChosen(Array.from(files) as File[]);
@@ -59,6 +66,8 @@ export class DocumentUploaderComponent extends UploadHelper {
       this.fileLoaderModal.hide();
       this._toasty.success("Файл успешно загружен.");
       this.saved.next(JSON.parse(response));
+      // callbacks загрузчика могут приходить вне angular zone/из стороннего кода
+      this.cdr.markForCheck();
     };
     this.onError = (item: any, response: string, status: number) => {
       this.fileLoaderModal.hide();
@@ -66,6 +75,7 @@ export class DocumentUploaderComponent extends UploadHelper {
         response = 'Загрузка была прервана. Возможно, Ваш файл превышает разрешённый размер в 10 Мб';
       }
       this._toasty.err(status, response);
+      this.cdr.markForCheck();
     };
   }
 
@@ -76,12 +86,14 @@ export class DocumentUploaderComponent extends UploadHelper {
       this.fileDescription = null;
       this.progressValue = 0;
       this.fileLoaderModal.show();
+      this.cdr.markForCheck();
       this.onError = (item: any, response: string, status: number) => {
         if (this.file.size.valueOf() > 10*1024*1024) {
           response = 'Загрузка была прервана. Возможно, Ваш файл превышает разрешённый размер в 10 Мб';
         }
         this.fileLoaderModal.hide();
         this._toasty.err(status, response);
+        this.cdr.markForCheck();
       };
     }
   }

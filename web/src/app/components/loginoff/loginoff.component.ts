@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {AuthService} from "@app/services/auth.service";
 import {Router} from "@angular/router";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
@@ -8,12 +8,15 @@ import {PersonDto} from "@app/dto/PersonDto";
 import {Subscription} from "rxjs";
 import {StorageService} from "@app/services/storage.service";
 import {RoleInfoDto} from "@app/dto/RoleInfoDto";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-loginoff',
     templateUrl: './loginoff.component.html',
     styleUrls: ['loginoff.component.scss'],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.loginoff ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class LoginoffComponent implements OnInit, OnDestroy {
   public roles: string[] = [];
@@ -27,7 +30,8 @@ export class LoginoffComponent implements OnInit, OnDestroy {
               private _personService: PersonService,
               private toasty: GlobalToastyService,
               private dialogService: DialogService,
-              private _storageService: StorageService) {
+              private _storageService: StorageService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -47,6 +51,8 @@ export class LoginoffComponent implements OnInit, OnDestroy {
   update(person: PersonDto) {
     this.user = person;
     this.roles = person.roles;
+    // Важно для OnPush/zoneless: обновление пришло асинхронно через сервис
+    this.cdr.markForCheck();
   }
 
   toLogout() {

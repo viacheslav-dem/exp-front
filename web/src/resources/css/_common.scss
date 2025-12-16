@@ -407,11 +407,6 @@ span.badge.bg-primary,
   font-weight: bold;
 }
 
-.project-form .card {
-  width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
 
 .text-sm {
   font-size: 0.875rem;
@@ -967,6 +962,7 @@ app-filter .input-group .form-control:not(:first-child) {
   backdrop-filter: blur(10px);
   border: none;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  z-index: 1050; // Выше карточек, но ниже модальных окон
   
   .dropdown-item {
     transition: all 0.2s ease;
@@ -976,6 +972,76 @@ app-filter .input-group .form-control:not(:first-child) {
     &:hover {
       background-color: #e7f1ff;
       transform: translateX(4px);
+    }
+  }
+}
+
+// Исправление z-index для выпадающих списков в форме проекта
+// Чтобы они не перекрывались следующей карточкой
+// Используем очень высокий z-index, как у ng-select, чтобы гарантировать отображение поверх всех карточек
+.card-block {
+  .dropdown,
+  app-dropdown .dropdown {
+    position: relative; // Обеспечивает правильное позиционирование dropdown-menu
+    
+    &.show .dropdown-menu,
+    .show .dropdown-menu {
+      z-index: 10000 !important;
+      position: absolute;
+    }
+  }
+  
+  .dropdown-menu.show,
+  app-dropdown .dropdown-menu.show {
+    z-index: 10000 !important;
+    position: absolute;
+  }
+}
+
+
+// Также применяем для всех карточек с card-block, чтобы гарантировать работу
+.card-block {
+  // Убеждаемся, что выпадающие списки не обрезаются
+  .card:first-child {
+    overflow: visible;
+  }
+}
+
+// Стили для формы проекта (app-project-form)
+// Убираем backdrop-filter для карточек в форме проекта, так как он создает stacking context
+// который мешает dropdown-menu отображаться поверх следующей карточки
+app-project-form {
+  .card {
+    overflow: visible !important;
+    backdrop-filter: none !important;
+    isolation: auto;
+  }
+  
+  .card-block {
+    overflow: visible;
+    isolation: auto;
+    
+    .dropdown.show .dropdown-menu,
+    app-dropdown .dropdown.show .dropdown-menu {
+      z-index: 10000 !important;
+      position: absolute !important;
+    }
+    
+    .dropdown-menu.show {
+      z-index: 10000 !important;
+      position: absolute !important;
+    }
+    
+    app-dropdown {
+      .dropdown.show .dropdown-menu {
+        z-index: 10000 !important;
+        position: absolute !important;
+      }
+      
+      .dropdown-menu.show {
+        z-index: 10000 !important;
+        position: absolute !important;
+      }
     }
   }
 }
@@ -1029,7 +1095,7 @@ app-filter .input-group .form-control:not(:first-child) {
 
 // Оставляем одно определение .modal-backdrop здесь (дубликат закомментирован выше)
 .modal-backdrop {
-  backdrop-filter: blur(5px);
+ // backdrop-filter: blur(5px);
   z-index: auto;
 }
 

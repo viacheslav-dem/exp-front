@@ -3,10 +3,10 @@
 }
 @if (comments() && comments().length) {
   <div style="overflow-y: auto;max-height: 600px" class="card card-block">
-    @for (c of comments(); track c) {
+    @for (c of comments(); track c.id) {
       <div class="mb-05 text-sm">
         <span class="text-sm text-primary">{{c.person|fullName}}</span>
-        <span class="text-sm text-muted float-right">{{c.createdDate | formatDate}}</span>
+        <span class="text-sm text-muted float-end">{{c.createdDate | formatDate}}</span>
         <br>
           {{c.text}}
         </div>

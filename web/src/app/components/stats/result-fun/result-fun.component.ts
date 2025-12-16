@@ -1,193 +1,168 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, ChangeDetectionStrategy, inject, signal, computed} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {CommonModule} from '@angular/common';
+import {Subject, switchMap, catchError, of} from 'rxjs';
+import {tap} from 'rxjs/operators';
 import dayjs from 'dayjs';
 import {StatsService} from "@app/services/stats.service";
 import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO";
-import {EMPTY, Subscription, throwError} from "rxjs";
-import {GlobalToastyService} from "@app/services/global-toasty.service";
-import {CouncilStatsV2ResponseDTO} from "@app/dto/response/CouncilStatsV2ResponseDTO";
+import {HttpErrorResponse} from "@angular/common/http";
 
 @Component({
     selector: 'app-result-fun',
     templateUrl: './result-fun.component.html',
     styles: [],
-    standalone: false
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule]
 })
-export class ResultFunComponent implements OnInit, OnDestroy {
+export class ResultFunComponent {
 
-  public months: string[] = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-  public mouth: string = this.months[0];
-  public years: number[] = new Array<number>();
-  public year: number = this.years[0];
-  public isButtonDisabled = false;
-  public isButtonMonthDisabled = true;
-  public councilStatsResponseDTOs: Array<CouncilStatsResponseDTO> = new Array<CouncilStatsResponseDTO>();
-  public resultCouncilStatsResponseDTO: CouncilStatsResponseDTO = new CouncilStatsResponseDTO();
+  readonly months: readonly string[] = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+  
+  private readonly statsService = inject(StatsService);
+  private readonly refreshTrigger$ = new Subject<void>();
 
-  // public councilStatsV2ResponseDTOs: Array<CouncilStatsV2ResponseDTO> = new Array<CouncilStatsResponseDTO>();
-  // public resultCouncilStatsV2ResponseDTO: CouncilStatsV2ResponseDTO = new CouncilStatsResponseDTO();
-
-  private subscription: Subscription;
-  public check: boolean = true;
-  public monthAndYear: number = 1;
-
-  constructor(private statsService: StatsService,
-              private toasty: GlobalToastyService) { }
-
-  ngOnInit() {
+  private readonly _monthIndex = signal<number>(new Date().getMonth());
+  
+  private readonly _year = signal<number>(new Date().getFullYear());
+  
+  private readonly _isButtonMonthDisabled = signal<boolean>(true);
+  private readonly _monthAndYear = signal<number>(1);
+  
+  readonly years = signal<number[]>((() => {
     const currentDate = new Date();
-    for (let i = 2020, j = 0; i <= currentDate.getFullYear(); i++, j++){
-      this.years[j] = i;
+    const years: number[] = [];
+    for (let i = 2020; i <= currentDate.getFullYear(); i++) {
+      years.push(i);
     }
-    this.mouth = this.months[currentDate.getMonth()];
-    this.year = currentDate.getFullYear();
-    this.updateResFun()
+    return years;
+  })());
+
+  readonly monthIndex = this._monthIndex.asReadonly();
+  readonly year = this._year.asReadonly();
+  readonly isButtonMonthDisabled = this._isButtonMonthDisabled.asReadonly();
+  readonly monthAndYear = this._monthAndYear.asReadonly();
+  
+  readonly mouth = computed(() => this.months[this._monthIndex()]);
+  
+  private readonly _isButtonDisabled = signal<boolean>(false);
+  readonly isButtonDisabled = this._isButtonDisabled.asReadonly();
+
+  readonly councilStatsResponseDTOs = signal<CouncilStatsResponseDTO[]>([]);
+  readonly resultCouncilStatsResponseDTO = signal<CouncilStatsResponseDTO>(new CouncilStatsResponseDTO());
+
+  constructor() {
+    // Инициализация данных при загрузке
+    this.updateResFun();
+    
+    // Подписка на обновления с автоматической отпиской
+    this.refreshTrigger$.pipe(
+      switchMap(() => {
+        if (this._isButtonMonthDisabled()) {
+          return this.loadMonthData();
+        } else {
+          return this.loadYearData();
+        }
+      }),
+      takeUntilDestroyed()
+    ).subscribe();
   }
 
   updateResFun() {
-    if(this.isButtonMonthDisabled){
-      this.getResFunMonth();
-    } else {
-      this.getResFunYear();
-    }
-    this.isButtonDisabled = false;
+    this.refreshTrigger$.next();
   }
 
   updateResFunMonth(i: number) {
-    this.isButtonDisabled = true;
-    this.mouth = this.months[i];
+    this._monthIndex.set(i);
+    this._isButtonDisabled.set(true);
+    this.refreshTrigger$.next();
   }
 
   updateResFunYear(y: number) {
-    this.isButtonDisabled = true;
-    this.year = y;
+    this._year.set(y);
+    this._isButtonDisabled.set(true);
+    this.refreshTrigger$.next();
   }
 
-  ngOnDestroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
+  onMonthAndYearChange(value: number) {
+    if (value === 1 && !this._isButtonMonthDisabled()) {
+      this._monthAndYear.set(1);
+      this._isButtonMonthDisabled.set(true);
+      this._isButtonDisabled.set(true);
+    } else if (value === 2 && this._isButtonMonthDisabled()) {
+      this._monthAndYear.set(2);
+      this._isButtonMonthDisabled.set(false);
+      this._isButtonDisabled.set(true);
     }
+    this.refreshTrigger$.next();
   }
 
-  onMonthAndYearChange(number: number) {
-    if(number == 1 && !this.isButtonMonthDisabled){
-      this.monthAndYear = 1;
-      this.isButtonMonthDisabled = true;
-      this.isButtonDisabled = true;
-    } else if (number == 2 && this.isButtonMonthDisabled)  {
-      this.monthAndYear = 2;
-      this.isButtonMonthDisabled = false;
-      this.isButtonDisabled = true;
-    }
-  }
-
-  // private getResFunMonth() {
-  //   let date = new Date(this.year, this.months.indexOf(this.mouth), 1);
-  //   let dateToExclusive = moment(date).valueOf();
-  //   this.subscription = this.statsService.getResFunMonth(dateToExclusive).subscribe(
-  //       res => {
-  //         this.councilStatsResponseDTOs = res;
-  //         this.resultCouncilStatsResponseDTO.projectsReceived =
-  //             this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.projectsReceived,0);
-  //         this.resultCouncilStatsResponseDTO.projectsOverdue =
-  //             this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.projectsOverdue,0);
-  //         this.resultCouncilStatsResponseDTO.finishedProjects =
-  //             this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.finishedProjects,0);
-  //         this.resultCouncilStatsResponseDTO.projectsNotFinished =
-  //             this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.projectsNotFinished,0);
-  //         this.resultCouncilStatsResponseDTO.overdueDaysProject =
-  //             this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.overdueDaysProject,0);
-  //       },
-  //       err => {
-  //         this.showStatus500(err);
-  //       }
-  //   );
-  // }
-  //
-  // private getResFunYear() {
-  //   let date = new Date(this.year, 0, 1);
-  //
-  //   let dateFrom = moment(date).valueOf();
-  //   let dateTo = moment(date).add(1, 'year').valueOf();
-  //   this.subscription = this.statsService.getResFunYear(dateFrom, dateTo).subscribe(
-  //       res => {
-  //         this.councilStatsResponseDTOs = res;
-  //         this.resultCouncilStatsResponseDTO.projectsReceived =
-  //             this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.projectsReceived,0);
-  //         this.resultCouncilStatsResponseDTO.projectsOverdue =
-  //             this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.projectsOverdue,0);
-  //         this.resultCouncilStatsResponseDTO.finishedProjects =
-  //             this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.finishedProjects,0);
-  //         this.resultCouncilStatsResponseDTO.projectsNotFinished =
-  //             this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.projectsNotFinished,0);
-  //         this.resultCouncilStatsResponseDTO.overdueDaysProject =
-  //             this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.overdueDaysProject,0);
-  //       },
-  //       err => {
-  //           this.showStatus500(err);
-  //       }
-  //   );
-  // }
-
-  private getResFunMonth() {
-    let date = new Date(this.year, this.months.indexOf(this.mouth), 1);
-    let dateToExclusive = dayjs(date).valueOf();
-    this.subscription = this.statsService.getResFunMonth(dateToExclusive).subscribe(
-        res => {
-          this.councilStatsResponseDTOs = res;
-          this.resultCouncilStatsResponseDTO.projectsReceived =
-              this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.projectsReceived,0);
-          this.resultCouncilStatsResponseDTO.projectsOverdue =
-              this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.projectsOverdue,0);
-          this.resultCouncilStatsResponseDTO.finishedProjects =
-              this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.finishedProjects,0);
-          this.resultCouncilStatsResponseDTO.projectsNotFinished =
-              this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.projectsNotFinished,0);
-          this.resultCouncilStatsResponseDTO.overdueDaysProject =
-              this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.overdueDaysProject,0);
-        },
-        err => {
-          this.showStatus500(err);
-        }
-    );
-  }
-
-  private getResFunYear() {
-    let date = new Date(this.year, 0, 1);
-
-    let dateFrom = dayjs(date).valueOf();
-    let dateTo = dayjs(date).add(1, 'year').valueOf();
-    this.subscription = this.statsService.getResFunYear(dateFrom, dateTo).subscribe(
-        res => {
-          this.councilStatsResponseDTOs = res;
-          this.resultCouncilStatsResponseDTO.projectsReceived =
-              this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.projectsReceived,0);
-          this.resultCouncilStatsResponseDTO.projectsOverdue =
-              this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.projectsOverdue,0);
-          this.resultCouncilStatsResponseDTO.finishedProjects =
-              this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.finishedProjects,0);
-          this.resultCouncilStatsResponseDTO.projectsNotFinished =
-              this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.projectsNotFinished,0);
-          this.resultCouncilStatsResponseDTO.overdueDaysProject =
-              this.councilStatsResponseDTOs.reduce((acc, obj) => acc+obj.overdueDaysProject,0);
-        },
-        err => {
-          this.showStatus500(err);
-        }
-    );
-  }
-
-  private showStatus500(err: any){
-    if(err.status == 500){
-      this.councilStatsResponseDTOs.forEach(cs => {
-        cs.projectsReceived = 0;
-        cs.finishedProjects = 0;
-        cs.projectsNotFinished = 0;
-        cs.projectsOverdue = 0;
+  private loadMonthData() {
+    const date = new Date(this._year(), this._monthIndex(), 1);
+    const dateToExclusive = dayjs(date).valueOf();
+    
+    return this.statsService.getResFunMonth(dateToExclusive).pipe(
+      tap((res: CouncilStatsResponseDTO[]) => {
+        this.councilStatsResponseDTOs.set(res);
+        this.updateResultStats(res);
+        this._isButtonDisabled.set(false);
+      }),
+      catchError((err: HttpErrorResponse) => {
+        this.showStatus500(err);
+        this._isButtonDisabled.set(false);
+        return of([]);
       })
-      this.resultCouncilStatsResponseDTO.projectsReceived = 0;
-      this.resultCouncilStatsResponseDTO.finishedProjects = 0;
-      this.resultCouncilStatsResponseDTO.projectsNotFinished = 0;
-      this.resultCouncilStatsResponseDTO.projectsOverdue = 0;
+    );
+  }
+
+  private loadYearData() {
+    const date = new Date(this._year(), 0, 1);
+    const dateFrom = dayjs(date).valueOf();
+    const dateTo = dayjs(date).add(1, 'year').valueOf();
+    
+    return this.statsService.getResFunYear(dateFrom, dateTo).pipe(
+      tap((res: CouncilStatsResponseDTO[]) => {
+        this.councilStatsResponseDTOs.set(res);
+        this.updateResultStats(res);
+        this._isButtonDisabled.set(false);
+      }),
+      catchError((err: HttpErrorResponse) => {
+        this.showStatus500(err);
+        this._isButtonDisabled.set(false);
+        return of([]);
+      })
+    );
+  }
+
+  private updateResultStats(stats: CouncilStatsResponseDTO[]) {
+    const result = new CouncilStatsResponseDTO();
+    result.projectsReceived = stats.reduce((acc, obj) => acc + (obj.projectsReceived ?? 0), 0);
+    result.projectsOverdue = stats.reduce((acc, obj) => acc + (obj.projectsOverdue ?? 0), 0);
+    result.finishedProjects = stats.reduce((acc, obj) => acc + (obj.finishedProjects ?? 0), 0);
+    result.projectsNotFinished = stats.reduce((acc, obj) => acc + (obj.projectsNotFinished ?? 0), 0);
+    result.overdueDaysProject = stats.reduce((acc, obj) => acc + (obj.overdueDaysProject ?? 0), 0);
+    this.resultCouncilStatsResponseDTO.set(result);
+  }
+
+  private showStatus500(err: HttpErrorResponse) {
+    if (err.status === 500) {
+      this.councilStatsResponseDTOs.update(stats => {
+        stats.forEach(cs => {
+          cs.projectsReceived = 0;
+          cs.finishedProjects = 0;
+          cs.projectsNotFinished = 0;
+          cs.projectsOverdue = 0;
+        });
+        return stats;
+      });
+      
+      const emptyResult = new CouncilStatsResponseDTO();
+      emptyResult.projectsReceived = 0;
+      emptyResult.finishedProjects = 0;
+      emptyResult.projectsNotFinished = 0;
+      emptyResult.projectsOverdue = 0;
+      this.resultCouncilStatsResponseDTO.set(emptyResult);
     }
   }
 }

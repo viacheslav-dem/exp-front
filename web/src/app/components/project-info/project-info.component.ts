@@ -716,6 +716,17 @@ export class ProjectInfoComponent implements OnInit {
     return this.lifecycleGroups.filter(group => group.state != LifecycleGroupState.RETURNED_WITHOUT_EXPERTISE);
   }
 
+  onExpertReviewsChanged(reviews: ExpertReviewDto[]) {
+    if (!this.project) {
+      return;
+    }
+    // Обновляем список экспертных оценок в проекте
+    // Создаем новый объект для триггера change detection
+    this.project = { ...this.project, expertReviews: reviews };
+    // Инициализируем кнопки действий
+    this.initActionButtons();
+  }
+
   initActionButtons(review?: ExpertReviewDto) {
     if (!this.project)
       return;

@@ -65,6 +65,7 @@ import {PdfViewerModule} from "ng2-pdf-viewer";
     NgSelectModule,
     NgxSliderModule,
     PdfViewerModule,
+    GlobalToastsComponent,
   ],
   exports: [
     CommonModule,
@@ -152,8 +153,7 @@ import {PdfViewerModule} from "ng2-pdf-viewer";
     NumberInputDirective,
     BankAccountInputDirective,
     MethRecPdfComponent,
-    HighchartComponent,
-    GlobalToastsComponent
+    HighchartComponent
   ]
 })
 export class CommonComponentsModule {

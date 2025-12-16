@@ -1,12 +1,15 @@
-import {Component, OnInit, signal, OnDestroy, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, signal, OnDestroy, input} from '@angular/core';
 import {Router, NavigationEnd} from '@angular/router';
 import {filter, Subscription} from 'rxjs';
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-menu',
     templateUrl: './menu.component.html',
     styleUrls: ['menu.component.scss'],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.menu ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class MenuComponent implements OnInit, OnDestroy {
 
@@ -19,6 +22,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   private openDropdowns = new Set<MenuItem>();
 
   private routerSubscription?: Subscription;
+  private readonly documentClickHandler = (event: MouseEvent) => this.handleDocumentClick(event);
 
   constructor(private router: Router) {
   }
@@ -33,14 +37,15 @@ export class MenuComponent implements OnInit, OnDestroy {
       });
     
     // Закрываем меню при клике вне его области
-    document.addEventListener('click', this.handleDocumentClick.bind(this));
+    // Важно: используем стабильную ссылку на handler, иначе removeEventListener не сработает
+    document.addEventListener('click', this.documentClickHandler);
   }
 
   ngOnDestroy() {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
-    document.removeEventListener('click', this.handleDocumentClick.bind(this));
+    document.removeEventListener('click', this.documentClickHandler);
   }
 
   private handleDocumentClick(event: MouseEvent) {

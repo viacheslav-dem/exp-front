@@ -1,10 +1,13 @@
-import {Component, OnInit, ViewChild, Output, EventEmitter, OnDestroy, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, input} from '@angular/core';
 import {ModalDirective, ModalOptions} from "ngx-bootstrap/modal";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-modal',
     templateUrl: './modal.component.html',
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.modal ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class ModalComponent implements OnInit, OnDestroy {
 

@@ -30,7 +30,9 @@ import {StatsRoutingModule} from './stats-routing.module';
     imports: [
         CommonComponentsModule,
         SearchModule,
-        StatsRoutingModule
+        StatsRoutingModule,
+        BestExpertComponent,
+        ResultFunComponent
     ],
     declarations: [
         ViolationChart,
@@ -48,9 +50,7 @@ import {StatsRoutingModule} from './stats-routing.module';
         GkntConsiderationViolationChart,
         CouncilStatsComponent,
         CouncilResultsChart,
-        CouncilProjectsChart,
-        BestExpertComponent,
-        ResultFunComponent
+        CouncilProjectsChart
     ]
 })
 export class StatsModule {

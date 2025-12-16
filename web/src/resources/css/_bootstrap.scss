@@ -1,6 +1,5 @@
 
 // Core variables and mixins
-//@import "custom";
 // Bootstrap 5 использует цветовую палитру вместо $brand-primary
 // Определяем кастомные цвета для Bootstrap 5 с более глубокими оттенками
 $primary: #0d6efd !default; // blue-600 → blue-700 (более глубокий)
@@ -12,12 +11,11 @@ $nav-pills-link-active-color: #495057 !default;
 $primary-hover: #0b5ed7 !default; // blue-700
 $success-hover: #157347 !default; // green-600
 
-// Note: Bootstrap 5 modules still use @import internally, so we keep @import here
-// Once Bootstrap migrates to @use, we'll update this file
-// 
-// WARNING: Deprecation warnings about @import for Bootstrap modules are expected
-// and cannot be fixed until Bootstrap itself migrates to @use/@forward.
-// These warnings are safe to ignore and will not affect functionality.
+// ВАЖНО: Bootstrap 5 не поддерживает @use полностью, так как внутри использует @import
+// Использование @use с Bootstrap 5 приводит к ошибкам компиляции из-за изоляции модулей
+// Полная поддержка @use запланирована в Bootstrap 6.0
+// До тех пор необходимо использовать @import для модулей Bootstrap
+// Предупреждения о deprecation @import безопасны и не влияют на функциональность
 @import "../../../node_modules/bootstrap/scss/functions";
 @import "../../../node_modules/bootstrap/scss/variables";
 @import "../../../node_modules/bootstrap/scss/variables-dark";

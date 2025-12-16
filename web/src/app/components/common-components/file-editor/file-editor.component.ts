@@ -1,12 +1,15 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {ModalDirective} from "ngx-bootstrap/modal";
 import {DocumentDto} from "@app/dto/DocumentDto";
 import * as _ from "lodash";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-file-editor',
     templateUrl: './file-editor.component.html',
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.fileEditor ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class FileEditorComponent implements OnInit {
 
@@ -15,7 +18,7 @@ export class FileEditorComponent implements OnInit {
 
   @ViewChild('fileEditorModal') public fileEditorModal: ModalDirective;
 
-  constructor() {
+  constructor(private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -24,6 +27,8 @@ export class FileEditorComponent implements OnInit {
   @Input() set document(doc) {
     if (doc) {
       this.doc = _.cloneDeep(doc);
+      // Важно для OnPush/zoneless: обновление внутреннего состояния при входном параметре
+      this.cdr.markForCheck();
     }
   }
 

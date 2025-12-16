@@ -19,7 +19,7 @@
               @if (property.disabled) {
                 <span>(неактивная)</span>
               }
-              <span class="italic text-sm text-muted float-right"
+              <span class="italic text-sm text-muted float-end"
                 tooltip="Строковый идентификатор" placement="bottom">
                 {{property.type | orElse: 'не указан'}}
               </span>
@@ -57,8 +57,8 @@
             @if (selectedProperty.disabled) {
               <span>(неактивная)</span>
             }
-            <span class="italic text-sm text-muted float-right"
-              tooltip="Строковый идентификатор" placement="bottom">
+            <span class="italic text-sm text-muted float-end"
+                tooltip="Строковый идентификатор" placement="bottom">
               {{selectedProperty.type | orElse: 'не указан'}}
             </span>
           </div>

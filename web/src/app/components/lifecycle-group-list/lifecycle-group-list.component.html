@@ -18,7 +18,7 @@
   </div>
 }
 <div>
-  @for (group of groups(); track group) {
+  @for (group of groups(); track (group.id ?? $index)) {
     <div class="lifecycle-group-item">
       <app-lifecycle-group
         [group]="group" [project]="project()" (onDeleted)="deleteGroup($event)"

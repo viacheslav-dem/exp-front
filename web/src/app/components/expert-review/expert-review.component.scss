@@ -26,8 +26,8 @@
     overflow-wrap: break-word;
   }
 
-  // Исправляем float-right элементы
-  .card.card-block .float-right {
+  // Исправляем float-end элементы (Bootstrap 5)
+  .card.card-block .float-end {
     float: none !important;
     display: block;
     width: 100%;
@@ -35,13 +35,13 @@
     margin-bottom: 0.5rem;
   }
 
-  .card.card-block .float-right .btn {
+  .card.card-block .float-end .btn {
     width: 100%;
     margin-bottom: 0.25rem;
     margin-right: 0 !important;
   }
 
-  .card.card-block .float-right .btn:last-child {
+  .card.card-block .float-end .btn:last-child {
     margin-bottom: 0;
   }
 

@@ -1,9 +1,10 @@
-import {Component, Input, OnDestroy, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from "@angular/core";
 import {StorageService} from "app/services/storage.service";
 import {SERVER_URL} from "app/config";
 import {DocumentDto} from "@app/dto/DocumentDto";
 import {HttpClientSecure} from "@app/services/http.client";
 import {Subscription} from "rxjs";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-pdf-viewer',
@@ -22,6 +23,8 @@ import {Subscription} from "rxjs";
         }
         `,
     standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: environment.features.onPush.pdfViewer ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default,
     styles: [`
         .pdf-viewer-container {
             width: 100%;
@@ -41,28 +44,38 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
 
   constructor(private _storage: StorageService,
-              private _http: HttpClientSecure) {
+              private _http: HttpClientSecure,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
-    // Настройка worker для PDF.js (ng2-pdf-viewer использует pdfjs-dist)
+    // Настройка worker для PDF.js
+    // ng2-pdf-viewer загружает pdfjs-dist, но мы можем настроить worker заранее
     if (typeof window !== 'undefined') {
-      import('pdfjs-dist').then((pdfjsLib) => {
+      // Пытаемся настроить worker через глобальный объект
+      const setupWorker = () => {
         try {
-          // Используем локальный worker файл
-          pdfjsLib.GlobalWorkerOptions.workerSrc = './assets/pdf.worker.min.mjs';
-        } catch (e) {
-          // Если не удалось установить, используем CDN
-          console.warn('Could not set local PDF.js worker, using CDN:', e);
-          try {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-          } catch (e2) {
-            console.error('Could not set PDF.js worker:', e2);
+          // Проверяем различные возможные пути к pdfjs-dist
+          const pdfjs = (window as any)['pdfjs-dist'] 
+            || (window as any)['pdfjs-dist/build/pdf']
+            || (window as any).pdfjsLib;
+          
+          if (pdfjs && pdfjs.GlobalWorkerOptions) {
+            pdfjs.GlobalWorkerOptions.workerSrc = './assets/pdfjs/build/pdf.worker.js';
+            return true;
           }
+        } catch (e) {
+          // Игнорируем ошибку
         }
-      }).catch((err) => {
-        console.warn('Could not load pdfjs-dist:', err);
-      });
+        return false;
+      };
+      
+      // Пытаемся настроить сразу
+      if (!setupWorker()) {
+        // Если не получилось, пробуем позже (ng2-pdf-viewer может еще не загрузить pdfjs-dist)
+        setTimeout(setupWorker, 100);
+        setTimeout(setupWorker, 500);
+      }
     }
   }
 
@@ -72,6 +85,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
     } else {
       this.cleanup();
       this.pdfSrc = null;
+      this.cdr.markForCheck();
     }
   }
 
@@ -81,6 +95,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
     if (!doc || !doc.id) {
       console.error('Invalid document data:', doc);
       this.pdfSrc = null;
+      this.cdr.markForCheck();
       return;
     }
     
@@ -95,11 +110,14 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
         // Конвертируем Blob в ArrayBuffer для ng2-pdf-viewer
         blob.arrayBuffer().then(buffer => {
           this.pdfSrc = new Uint8Array(buffer);
+          // Promise-resolve может происходить вне зоны
+          this.cdr.markForCheck();
         });
       },
       (error) => {
         console.error('Error loading PDF:', error);
         this.pdfSrc = null;
+        this.cdr.markForCheck();
       }
     );
   }

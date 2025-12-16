@@ -28,7 +28,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (expert of expertsList(); track expert) {
+        @for (expert of expertsList(); track trackByExpert($index, expert)) {
           <tr>
             <td>
               <div>{{ expert|fullName }}</div>

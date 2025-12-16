@@ -77,7 +77,7 @@
             </div>
           </div>
         </div>
-        @for (number of project.councilReferences; track number.number + '-' + number.date) {
+        @for (number of project.councilReferences; track number?.number ?? $index) {
           @if (number!=null) {
             <div class="mb-1">
               <div class="d-flex align-items-center gap-1">
