@@ -56,7 +56,7 @@
               @if (expert.personInfo.specializations) {
                       <div class="mb-3">
                         <div class="fw-semibold small text-dark mb-1">Специализация:</div>
-                  @for (spec of expert.personInfo.specializations; track spec) {
+                  @for (spec of expert.personInfo.specializations; track (spec.id || spec.name)) {
                           <div class="text-body-secondary small mt-1 text-break">{{spec.name}}</div>
                   }
                 </div>
@@ -64,7 +64,7 @@
               @if (expert.personInfo.specialities) {
                       <div class="mb-3">
                         <div class="fw-semibold small text-dark mb-1">Специальность:</div>
-                  @for (special of expert.personInfo.specialities; track special) {
+                  @for (special of expert.personInfo.specialities; track (special.id || special.name)) {
                           <div class="text-body-secondary small mt-1 text-break">{{special.name}}</div>
                   }
                 </div>

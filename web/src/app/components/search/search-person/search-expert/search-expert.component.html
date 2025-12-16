@@ -33,7 +33,7 @@
                 @if (expert.personInfo.specializations) {
                   <div>
                     Специализация:&nbsp;
-                    @for (spec of expert.personInfo.specializations; track spec) {
+                    @for (spec of expert.personInfo.specializations; track (spec.id || spec.name)) {
                       <div
                         class="italic">{{spec.name}}
                       </div>
@@ -43,7 +43,7 @@
                 @if (expert.personInfo.specialities) {
                   <div>
                     Специальность:&nbsp;
-                    @for (special of expert.personInfo.specialities; track special) {
+                    @for (special of expert.personInfo.specialities; track (special.id || special.name)) {
                       <div
                         class="italic">{{special.name}}
                       </div>

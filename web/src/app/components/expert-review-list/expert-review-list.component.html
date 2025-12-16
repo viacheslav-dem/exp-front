@@ -17,7 +17,7 @@
     </div>
   </div>
 }
-@for (expertReview of expertReviews(); track expertReview) {
+@for (expertReview of expertReviews(); track (expertReview.id || $index)) {
   <div class="review">
     <app-expert-review [role]="role()" [project]="project()" [review]="expertReview"></app-expert-review>
   </div>
