@@ -54,4 +54,10 @@ export class ExpertReviewListComponent implements OnInit {
       })
     });
   }
+
+  automaticExpertSelection() {
+    this._projectService.automaticExpertSelection(this.project.id).subscribe(res => {
+      this.expertReviews = this.expertReviews.concat(res)
+    });
+  }
 }

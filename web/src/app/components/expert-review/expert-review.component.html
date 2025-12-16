@@ -1,148 +1,123 @@
 
-@if (expertReview && project()) {
-  <div class="card card-block" style="padding: 0.75rem 1rem 1rem;"
-    [ngClass]="{'alert-danger': expertReview.red,'alert-warning': expertReview.yellow,'alert-primary': expertReview.blue}">
-    <div>
-      <span (click)="showTransitionHistoryModal()" class="selectable" [ngClass]="['badge', expertReview.badge]">
-        {{expertReview.state | reviewState}}
-      </span>
-      <span class="text-muted text-sm bold italic"> {{expertReview.termsMessage}}</span>
-      @if (expertReview.state == ExpertReviewState.ON_EXPERT_CONFIRMATION && role() == Role.BELISA_EDIT) {
-        <span class="float-right"
-          >
-          <button class="btn-sm btn btn-primary mr-1" (click)="acceptExpertByBelisa()">Подтвердить</button>
-          <button class="btn-sm btn btn-secondary" (click)="rejectExpertByBelisa()">Отклонить</button>
-        </span>
-      }
-      @if (expertReview.state == ExpertReviewState.ON_GKNT_CONFIRMATION && role() == Role.BELISA_EDIT) {
-        <span class="float-right"
-          >
-          <button class="btn-sm btn btn-secondary" (click)="rejectExpertByBelisa()">Отклонить</button>
-        </span>
-      }
-      @if (expertReview.state == ExpertReviewState.ON_EXAMINATION && role() == Role.BELISA_EDIT) {
-        <span class="float-right"
-          >
-          <button class="btn-sm btn btn-secondary" (click)="rejectExpertByBelisa()">Отклонить</button>
-        </span>
-      }
-      @if (canReassignExpert()) {
-        <span class="float-right">
-          <button class="btn-sm btn btn-primary" (click)="reassignExpert()">Назначить повторно</button>
-        </span>
-      }
+<div *ngIf="expertReview && project" class="card card-block" style="padding: 0.75rem 1rem 1rem;"
+     [ngClass]="{'alert-danger': expertReview.red,'alert-warning': expertReview.yellow,'alert-primary': expertReview.blue}">
+  <div>
+    <span (click)="showTransitionHistoryModal()" class="selectable" [ngClass]="['badge', expertReview.badge]">
+      {{expertReview.state | reviewState}}
+    </span>
+    <span class="text-muted text-sm bold italic"> {{expertReview.termsMessage}}</span>
+    <span class="float-right"
+          *ngIf="expertReview.state == ExpertReviewState.ON_EXPERT_CONFIRMATION && role == Role.BELISA_EDIT">
+      <button class="btn-sm btn btn-primary mr-1" (click)="acceptExpertByBelisa()">Подтвердить</button>
+      <button class="btn-sm btn btn-secondary" (click)="rejectExpertByBelisa()">Отклонить</button>
+    </span>
+    <span class="float-right"
+          *ngIf="expertReview.state == ExpertReviewState.ON_GKNT_CONFIRMATION && role == Role.BELISA_EDIT">
+      <button class="btn-sm btn btn-secondary" (click)="rejectExpertByBelisa()">Отклонить</button>
+    </span>
+    <span class="float-right"
+          *ngIf="expertReview.state == ExpertReviewState.ON_EXAMINATION && role == Role.BELISA_EDIT">
+      <button class="btn-sm btn btn-secondary" (click)="rejectExpertByBelisa()">Отклонить</button>
+    </span>
+    <span *ngIf="canReassignExpert()" class="float-right">
+      <button class="btn-sm btn btn-primary" (click)="reassignExpert()">Назначить повторно</button>
+    </span>
+  </div>
+  <div class="mb-2">{{expertReview.expert|fullName}}</div>
+  <div *ngIf="expertReview.state == 'REJECTED'" class="italic text-sm">
+    <b>Причина отказа:</b> {{expertReview.rejectionReason | orElse: 'не указана'}}
+  </div>
+
+  <ng-container *ngIf="expertReview.state != 'REJECTED'">
+    <div class="mb-1">
+      <div class="text-muted text-sm d-inline-block">
+        <span>Экспертное заключение</span>
+      </div>
+        <button *ngIf="canRollbackExpertReview()"
+                class="btn btn-sm btn-primary btn-right-sm ml-05"
+                (click)="rollbackExpertReview()">
+          Отправить заключение на доработку
+        </button>
+      <button *ngIf="canBelisaFinishExamination()"
+              class="btn btn-sm btn-primary btn-right-sm ml-05"
+              (click)="finishExpertExaminationByBelisa()">
+        Завершить
+      </button>
+      <button *ngIf="canEditReviewDocument()" class="btn btn-sm btn-primary btn-right-sm"
+              (click)="showReviewFormModal()">
+        Создать
+      </button>
     </div>
-    <div class="mb-2">{{expertReview.expert|fullName}}</div>
-    @if (expertReview.state == 'REJECTED') {
-      <div class="italic text-sm">
-        <b>Причина отказа:</b> {{expertReview.rejectionReason | orElse: 'не указана'}}
-      </div>
-    }
-    @if (expertReview.state != 'REJECTED') {
-      <div class="mb-1">
-        <div class="text-muted text-sm d-inline-block">
-          <span>Экспертное заключение</span>
-        </div>
-        @if (canRollbackExpertReview()) {
-          <button
-            class="btn btn-sm btn-primary btn-right-sm ml-05"
-            (click)="rollbackExpertReview()">
-            Отправить заключение на доработку
-          </button>
-        }
-        @if (canBelisaFinishExamination()) {
-          <button
-            class="btn btn-sm btn-primary btn-right-sm ml-05"
-            (click)="finishExpertExaminationByBelisa()">
-            Завершить
-          </button>
-        }
-        @if (canEditReviewDocument()) {
-          <button class="btn btn-sm btn-primary btn-right-sm"
-            (click)="showReviewFormModal()">
-            Создать
-          </button>
-        }
-      </div>
-      @if (expertReview.expectedState && canEditReviewDocument()) {
-        <div
-          class="text-sm italic">
-          Предварительный результат: <span [ngClass]="['badge', expertReview.expectedBadge]">{{expertReview.expectedState | reviewState}}</span>
-        </div>
-      }
-      <app-document-list
+    <div *ngIf="expertReview.expectedState && canEditReviewDocument()"
+         class="text-sm italic">
+      Предварительный результат: <span [ngClass]="['badge', expertReview.expectedBadge]">{{expertReview.expectedState | reviewState}}</span>
+    </div>
+    <app-document-list
         [documents]="canEditReviewDocument() || expertReview.state != ExpertReviewState.ON_EXAMINATION ? expertReview.documents : []"
         [canDelete]="canEditReviewDocument()" (onDelete)="deleteReviewDocument($event)">
+    </app-document-list>
+
+    <div *ngIf="canReadReviewScan()">
+      <div class="mt-2 mb-1 text-muted text-sm d-inline-block">
+        <span>Подтверждающий документ от эксперта</span>
+      </div>
+      <app-document-uploader
+          *ngIf="canEditReviewScan()" (saved)="reviewScanLoaded($event)"
+          [url]="SERVER_URL + '/review/attach-scan/' + expertReview.id" [idDto]="expertReview"
+          [typesAccept]="[DocType.DOCX.extension, DocType.DOC.extension, DocType.PDF.extension]">
+      </app-document-uploader>
+      <app-document-list
+          [documents]="expertReview.reviewScan"
+          [canDelete]="canEditReviewScan()" (onDelete)="deleteReviewScan()">
       </app-document-list>
-      @if (canReadReviewScan()) {
-        <div>
-          <div class="mt-2 mb-1 text-muted text-sm d-inline-block">
-            <span>Подтверждающий документ от эксперта</span>
-          </div>
-          @if (canEditReviewScan()) {
-            <app-document-uploader
-              (saved)="reviewScanLoaded($event)"
-              [url]="SERVER_URL + '/review/attach-scan/' + expertReview.id" [idDto]="expertReview"
-              [typesAccept]="[DocType.DOCX.extension, DocType.DOC.extension, DocType.PDF.extension]">
-            </app-document-uploader>
-          }
-          <app-document-list
-            [documents]="expertReview.reviewScan"
-            [canDelete]="canEditReviewScan()" (onDelete)="deleteReviewScan()">
-          </app-document-list>
-        </div>
-      }
+    </div>
+
     <div *ifRole="[
       Role.EXPERT, Role.GKNT_WORKER, Role.GKNT_CHAIRMAN,
       Role.GKNT_DEPARTMENT_CHAIRMAN, Role.BELISA_READ, Role.BELISA_EDIT
     ]">
-        @if (expertReview.accounting?.contract) {
-          <div>
-            <div class="mt-2 mb-1">
-              <div class="text-muted text-sm d-inline-block">
-                <span>Договор между экспертом и ГКНТ</span>
-              </div>
-              <button *ifRole="[Role.EXPERT, Role.BELISA_EDIT, Role.GKNT_DEPARTMENT_CHAIRMAN]"
-                class="btn btn-sm btn-primary btn-right-sm"
-                (click)="refreshContract()">
-                Пересоздать документ
-              </button>
-            </div>
-            <app-document-list
-              [documents]="expertReview.accounting.contract">
-            </app-document-list>
+      <div *ngIf="expertReview.accounting?.contract">
+        <div class="mt-2 mb-1">
+          <div class="text-muted text-sm d-inline-block">
+            <span>Договор между экспертом и ГКНТ</span>
           </div>
-        }
-        @if (expertReview.accounting?.act) {
-          <div>
-            <div class="mt-2 mb-1">
-              <div class="text-muted text-sm d-inline-block">
-                <span>Акт приёмки-сдачи работ</span>
-              </div>
-              <button *ifRole="[Role.EXPERT, Role.BELISA_EDIT, Role.GKNT_DEPARTMENT_CHAIRMAN]"
-                class="btn btn-sm btn-primary btn-right-sm"
-                (click)="refreshAct()">
-                Пересоздать документ
-              </button>
-            </div>
-            <app-document-list
-              [documents]="expertReview.accounting.act">
-            </app-document-list>
-          </div>
-        }
+          <button *ifRole="[Role.EXPERT, Role.BELISA_EDIT, Role.GKNT_DEPARTMENT_CHAIRMAN]"
+                  class="btn btn-sm btn-primary btn-right-sm"
+                  (click)="refreshContract()">
+            Пересоздать документ
+          </button>
+        </div>
+        <app-document-list
+            [documents]="expertReview.accounting.contract">
+        </app-document-list>
       </div>
-    }
-  </div>
-}
+      <div *ngIf="expertReview.accounting?.act">
+        <div class="mt-2 mb-1">
+          <div class="text-muted text-sm d-inline-block">
+            <span>Акт приёмки-сдачи работ</span>
+          </div>
+          <button *ifRole="[Role.EXPERT, Role.BELISA_EDIT, Role.GKNT_DEPARTMENT_CHAIRMAN]"
+                  class="btn btn-sm btn-primary btn-right-sm"
+                  (click)="refreshAct()">
+            Пересоздать документ
+          </button>
+        </div>
+        <app-document-list
+            [documents]="expertReview.accounting.act">
+        </app-document-list>
+      </div>
+    </div>
+  </ng-container>
+</div>
 
 <!--REVIEW FORM-->
 <app-modal #reviewFormModal [title]="'Заключение эксперта'" [closePermission]="false" (onClose)="closeForm()">
   <app-expert-review-form [formRenderer]="formRenderer"
-    [project]="project()"
-    [draftService]="_reviewService"
-    [draftOwner]="expertReview"
-    (onSave)="generateReviewDocument($event)"
-    (onClose)="closeModal()">
+                          [project]="project"
+                          [draftService]="_reviewService"
+                          [draftOwner]="expertReview"
+                          (onSave)="generateReviewDocument($event)"
+                          (onClose)="closeModal()">
   </app-expert-review-form>
 </app-modal>
 
