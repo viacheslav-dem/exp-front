@@ -87,4 +87,39 @@ export class StorageService {
     sessionStorage.clear();
     localStorage.clear();
   }
+
+  /**
+   * Проверяет, что access-токен существует и ещё не истёк (с запасом leewaySeconds).
+   * Это предотвращает "залипание" протухшего токена в UI.
+   */
+  isAccessTokenValidNow(leewaySeconds: number = 30): boolean {
+    const jwt = this.getRawJwtFromAuthorizationHeader(this.getAccessToken());
+    if (!jwt) return false;
+
+    const payload = this.decodeJwtPayload(jwt);
+    const exp = payload?.exp; // стандартно exp в секундах
+    if (typeof exp !== 'number') return false;
+
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    return exp > (nowSeconds + leewaySeconds);
+  }
+
+  private getRawJwtFromAuthorizationHeader(value: string | null): string | null {
+    if (!value) return null;
+    // У вас access хранится как "Bearer <jwt>"
+    return value.startsWith('Bearer ') ? value.substring(7) : value;
+  }
+
+  private decodeJwtPayload(token: string): any | null {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+      return JSON.parse(atob(padded));
+    } catch {
+      return null;
+    }
+  }
 }

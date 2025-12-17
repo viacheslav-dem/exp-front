@@ -34,7 +34,8 @@ export class AuthService implements OnInit {
   }
 
   isLoggedIn(): boolean {
-    return !!this.storage.getAccessToken();
+    // Проверяем не только наличие токена, но и что он ещё не истёк (от "залипания" протухшего access)
+    return this.storage.isAccessTokenValidNow();
   }
 
   inRole(roles: string[] | string): boolean {
@@ -107,9 +108,12 @@ export class AuthService implements OnInit {
   }
 
   logout() {
+    // Получаем refreshToken ДО очистки, чтобы сервер мог удалить только текущую сессию
+    const refreshToken = this.storage.getRefreshToken();
     // Очищаем токены сразу, чтобы предотвратить дальнейшие запросы с устаревшими токенами
     this.storage.resetCredentials();
-    this.http.post(`${SERVER_URL}/public/logout`, null).subscribe({
+    // Отправляем refreshToken на сервер для удаления только этой сессии (мультисессии)
+    this.http.post(`${SERVER_URL}/public/logout`, { refreshToken }).subscribe({
       next: () => {
         // Успешный logout на сервере
       },
@@ -135,9 +139,11 @@ export class AuthService implements OnInit {
 
   updateCredentials(credentials: UserCredentials) {
     let username = credentials.personName.lastName + ' ' + credentials.personName.firstName + ' ' + credentials.personName.middleName;
+    // Если refreshToken не пришёл (null) — сохраняем существующий (для /info/groups который теперь не выдаёт refresh)
+    const refreshToken = credentials.refreshToken ?? this.storage.getRefreshToken();
     this.storage.saveCredentials(
         credentials.accessToken,
-        credentials.refreshToken,
+        refreshToken,
         credentials.roles,
         credentials.id,
         username,
