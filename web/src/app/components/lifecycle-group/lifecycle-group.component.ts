@@ -41,6 +41,8 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   lifecycleRemark: ProjectLifecycleDto = new ProjectLifecycleDto();
   groupRemark: LifecycleGroupDto = new LifecycleGroupDto();
   private subscriptions: Subscription[] = [];
+  
+  isCreatingReferral = false;
 
   readonly role = input(undefined);
   readonly project = input<ProjectDto>(new ProjectDto());
@@ -306,11 +308,19 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   }
 
   generateReferral(form: any) {
+    this.isCreatingReferral = true;
     this.subscriptions.push(
-      this._lifecycleGroupService.generateReferral(this._group, form).subscribe(res => {
-        this.referralFormModal.hide();
-        this._group.referral = res;
-        this.changed();
+      this._lifecycleGroupService.generateReferral(this._group, form).subscribe({
+        next: (res) => {
+          this.isCreatingReferral = false;
+          this.referralFormModal.hide();
+          this._group.referral = res;
+          this.changed();
+        },
+        error: (err) => {
+          this.isCreatingReferral = false;
+          this._toasty.error('Ошибка при создании документа');
+        }
       })
     );
   }

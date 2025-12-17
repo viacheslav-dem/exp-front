@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewContainerRef} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewContainerRef} from '@angular/core';
 import {Catalog, DataService} from "@app/services/data.service";
 import {CatalogDto} from "@app/dto/CatalogDto";
 import {PeriodDto} from "@app/dto/PeriodDto";
@@ -10,6 +10,12 @@ import {FundingTypePipe, getAllFundingType} from "@app/pipes/funding-type.pipe";
 import {DirectionDto} from "@app/dto/DirectionDto";
 import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
+import {Subject, of, Subscription} from 'rxjs';
+import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
+import {SearchPageRequest} from "@app/components/common-components/page-and-filter/model/SearchPageRequest";
+import {Pagination} from "@app/components/common-components/page-and-filter/model/Pagination";
+import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
+import {SortOrder, Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
 
 
 @Component({
@@ -18,7 +24,7 @@ import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
     styleUrls: ['project-form.component.scss'],
     standalone: false
 })
-export class ProjectFormComponent implements OnInit {
+export class ProjectFormComponent implements OnInit, OnDestroy {
 
     @Input() optionToString: Function;
 
@@ -55,6 +61,15 @@ export class ProjectFormComponent implements OnInit {
     commercializationMethods: CatalogDto[] = [];
     selectedCommercializationMethod: CatalogDto;
 
+    // Специализация проекта - lazy loading
+    specializationItemsMap: Map<number, CatalogDto[]> = new Map();
+    specializationLoadingMap: Map<number, boolean> = new Map();
+    specializationSearchInputMap: Map<number, Subject<string>> = new Map();
+    specializationPageMap: Map<number, number> = new Map();
+    specializationHasMoreMap: Map<number, boolean> = new Map();
+    specializationCurrentSearchMap: Map<number, string> = new Map();
+    private subscriptions: Subscription[] = [];
+
     constructor(private viewContainerRef: ViewContainerRef,
                 private _dataService: DataService,
                 private _personService: PersonService,
@@ -78,8 +93,43 @@ export class ProjectFormComponent implements OnInit {
     @Input() set project(project: ProjectDto) {
         if (!project) project = new ProjectDto();
         if (!project.period) project.period = new PeriodDto();
+        if (!project.projectSpecialization) project.projectSpecialization = [];
+        
+        // Если специализации пустые, добавляем один пустой элемент по умолчанию
+        if (project.projectSpecialization.length === 0) {
+            project.projectSpecialization.push(null);
+        }
+        
         this._project = project;
         this.directions = this.dispDir();
+        
+        // Инициализируем данные для специализаций
+        this.initSpecializationMaps();
+    }
+
+    private initSpecializationMaps() {
+        // Очищаем старые данные
+        this.specializationSearchInputMap.forEach(subject => subject.complete());
+        this.specializationItemsMap.clear();
+        this.specializationSearchInputMap.clear();
+        this.specializationPageMap.clear();
+        this.specializationHasMoreMap.clear();
+        this.specializationCurrentSearchMap.clear();
+        this.specializationLoadingMap.clear();
+        
+        // Инициализируем данные для каждой существующей специализации
+        if (this._project.projectSpecialization) {
+            this._project.projectSpecialization.forEach((specialization, index) => {
+                if (specialization != null) {
+                    this.specializationItemsMap.set(index, [specialization] as CatalogDto[]);
+                } else {
+                    this.specializationItemsMap.set(index, []);
+                }
+                this.specializationPageMap.set(index, 0);
+                this.specializationHasMoreMap.set(index, true);
+                this.specializationCurrentSearchMap.set(index, '');
+            });
+        }
     }
 
     private dispDir() {
@@ -234,6 +284,12 @@ export class ProjectFormComponent implements OnInit {
         if (!this._project.code) {
             throw 'Пожалуйста, выберите код объекта экспертизы.';
         }
+        const validSpecializations = this._project.projectSpecialization?.filter(s => s != null) || [];
+        if (validSpecializations.length === 0) {
+            throw 'Пожалуйста, выберите хотя бы один код специализации.';
+        }
+        // Удаляем пустые специализации перед сохранением
+        this._project.projectSpecialization = validSpecializations;
         if (isEmptyOrNull(this._project.executor)) {
             throw 'Пожалуйста, укажите исполнителей и соисполнителей объекта экспертизы.';
         }
@@ -478,6 +534,155 @@ export class ProjectFormComponent implements OnInit {
     selectTechnologyType(technologyType) {
         this._project.technologicalOrder = technologyType;
         this.isAnotherTechnologyType = this._project.technologicalOrder === 'другое';
+    }
+
+    // Методы работы со специализацией - lazy loading как в user-form
+    ngOnDestroy() {
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+        this.subscriptions = [];
+        this.specializationSearchInputMap.forEach(subject => subject.complete());
+        this.specializationItemsMap.clear();
+        this.specializationSearchInputMap.clear();
+        this.specializationPageMap.clear();
+        this.specializationHasMoreMap.clear();
+        this.specializationCurrentSearchMap.clear();
+        this.specializationLoadingMap.clear();
+    }
+
+    getSpecializationItems(index: number): CatalogDto[] {
+        if (!this.specializationItemsMap.has(index)) {
+            this.specializationItemsMap.set(index, []);
+        }
+        return this.specializationItemsMap.get(index);
+    }
+
+    getSpecializationSearchInput$(index: number): Subject<string> {
+        if (!this.specializationSearchInputMap.has(index)) {
+            const subject = new Subject<string>();
+            this.specializationSearchInputMap.set(index, subject);
+            subject.pipe(
+                debounceTime(500),
+                distinctUntilChanged(),
+                switchMap((searchTerm: string) => {
+                    const trimmedTerm = (searchTerm || '').trim();
+                    this.specializationCurrentSearchMap.set(index, trimmedTerm);
+                    
+                    if (trimmedTerm.length > 0 && trimmedTerm.length < 2) {
+                        const existingSelected = this._project?.projectSpecialization?.[index] 
+                            ? [this._project.projectSpecialization[index]].filter(s => s != null) as CatalogDto[] 
+                            : [];
+                        this.specializationItemsMap.set(index, [...existingSelected]);
+                        this.specializationHasMoreMap.set(index, true);
+                        return of([]);
+                    }
+                    
+                    this.specializationPageMap.set(index, 0);
+                    const existingSelected = this._project?.projectSpecialization?.[index] 
+                        ? [this._project.projectSpecialization[index]].filter(s => s != null) as CatalogDto[] 
+                        : [];
+                    this.specializationItemsMap.set(index, [...existingSelected]);
+                    this.specializationHasMoreMap.set(index, true);
+                    return this.loadSpecializations(true, index);
+                })
+            ).subscribe();
+        }
+        return this.specializationSearchInputMap.get(index);
+    }
+
+    onSpecializationOpen(index: number) {
+        const items = this.getSpecializationItems(index);
+        const page = this.specializationPageMap.get(index) || 0;
+        const loading = this.specializationLoadingMap.get(index) || false;
+        
+        if (items.length === 0 || (page === 0 && !loading)) {
+            this.specializationPageMap.set(index, 0);
+            this.specializationHasMoreMap.set(index, true);
+            this.loadSpecializations(true, index).subscribe();
+        }
+    }
+
+    loadSpecializations(reset: boolean = false, index: number): any {
+        const loading = this.specializationLoadingMap.get(index) || false;
+        const hasMore = this.specializationHasMoreMap.get(index) !== false;
+        
+        if (loading || (!reset && !hasMore)) {
+            return of([]);
+        }
+
+        this.specializationLoadingMap.set(index, true);
+        const pageSize = 50;
+        const pagination = new Pagination(pageSize);
+        
+        if (reset) {
+            this.specializationPageMap.set(index, 0);
+        }
+        const currentPage = this.specializationPageMap.get(index) || 0;
+        pagination.page = currentPage + 1;
+        
+        let filter = null;
+        const currentSearch = this.specializationCurrentSearchMap.get(index) || '';
+        if (currentSearch && currentSearch.trim().length > 0) {
+            filter = FilterBuilder.contains('name', currentSearch.trim());
+        }
+
+        const request = new SearchPageRequest(pagination, filter, [new SortOrder('name', Direction.ASC)]);
+        
+        return this._dataService.getCatalogAdminPage<CatalogDto>(Catalog.SPECIALIZATION, request).pipe(
+            switchMap((page) => {
+                const items = this.getSpecializationItems(index);
+                if (reset) {
+                    const existingIds = new Set(items.map(item => item.id));
+                    const newItems = page.content.filter(item => !existingIds.has(item.id));
+                    this.specializationItemsMap.set(index, [...items, ...newItems]);
+                } else {
+                    this.specializationItemsMap.set(index, [...items, ...page.content]);
+                }
+                this.specializationHasMoreMap.set(index, page.page < page.totalPages);
+                this.specializationPageMap.set(index, currentPage + 1);
+                this.specializationLoadingMap.set(index, false);
+                return of(this.specializationItemsMap.get(index));
+            })
+        );
+    }
+
+    loadMoreSpecializations(index: number) {
+        const loading = this.specializationLoadingMap.get(index) || false;
+        const hasMore = this.specializationHasMoreMap.get(index) !== false;
+        
+        if (!loading && hasMore) {
+            this.loadSpecializations(false, index).subscribe();
+        }
+    }
+
+    isSpecializationLoading(index: number): boolean {
+        return this.specializationLoadingMap.get(index) || false;
+    }
+
+    compareSpecialization = (a: CatalogDto, b: CatalogDto): boolean => {
+        return a && b ? a.id === b.id : a === b;
+    }
+
+    trackBySpecialization(specialization: CatalogDto): any {
+        return specialization?.id || specialization?.name || null;
+    }
+
+    addSpecialization() {
+        if (!this._project.projectSpecialization) {
+            this._project.projectSpecialization = [];
+        }
+        if (this._project.projectSpecialization.length >= 10) {
+            throw 'Количество выбранных кодов специализации не может быть больше 10';
+        }
+        this._project.projectSpecialization.push(null);
+        const newIndex = this._project.projectSpecialization.length - 1;
+        this.specializationItemsMap.set(newIndex, []);
+        this.specializationPageMap.set(newIndex, 0);
+        this.specializationHasMoreMap.set(newIndex, true);
+        this.specializationCurrentSearchMap.set(newIndex, '');
+    }
+
+    removeSpecialization(index: number) {
+        this._project.projectSpecialization.splice(index, 1);
     }
 }
 

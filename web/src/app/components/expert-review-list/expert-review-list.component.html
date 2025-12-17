@@ -4,9 +4,14 @@
   @if (canChooseExperts()) {
     @if (isAutomaticSelectionMode()) {
       <button class="btn btn-sm btn-primary btn-right"
-              [disabled]="isAutomaticSelectionDisabled()"
+              [disabled]="isAutomaticSelectionDisabled() || isAutomaticSelectionLoading()"
               (click)="automaticExpertSelection()">
-        Автоматический выбор эксперта
+        @if (isAutomaticSelectionLoading()) {
+          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          Выбор эксперта...
+        } @else {
+          Автоматический выбор эксперта
+        }
       </button>
     } @else {
       <button class="btn btn-sm btn-primary btn-right"

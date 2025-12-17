@@ -579,7 +579,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
     }
 
     this.specialityLoadingMap.set(index, true);
-    const pageSize = 15;
+    const pageSize = 50;
     const pagination = new Pagination(pageSize);
     
     if (reset) {
@@ -668,7 +668,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
     }
 
     this.specializationLoadingMap.set(index, true);
-    const pageSize = 15;
+    const pageSize = 50;
     const pagination = new Pagination(pageSize);
     
     if (reset) {
@@ -757,7 +757,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
     }
 
     this.areaLoadingMap.set(index, true);
-    const pageSize = 15;
+    const pageSize = 50;
     const pagination = new Pagination(pageSize);
     
     if (reset) {

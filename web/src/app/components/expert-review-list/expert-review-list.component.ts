@@ -45,6 +45,9 @@ export class ExpertReviewListComponent {
   private readonly _personPipe = inject(PersonFullNamePipe);
   private readonly _destroyRef = inject(DestroyRef);
 
+  // Состояние загрузки для автоматического выбора эксперта
+  isAutomaticSelectionLoading = signal(false);
+
   // Предыдущее состояние списка для отслеживания изменений
   // Убрали _previousRejectedIds, так как отклонение обрабатывается бэкендом
   private _previousExpiredIds = new Set<number>();
@@ -123,14 +126,18 @@ export class ExpertReviewListComponent {
       return;
     }
 
+    this.isAutomaticSelectionLoading.set(true);
+
     // Оригинальная логика из коммита 82eafcb от 12.12.2025: просто добавляем результат к списку
     this._projectService.automaticExpertSelection(project.id).pipe(
       tap((res: ExpertReviewDto[]) => {
+        this.isAutomaticSelectionLoading.set(false);
         const currentReviews = this.expertReviews();
         const updatedReviews = [...currentReviews, ...res];
         this.onChanged.emit(updatedReviews);
       }),
       catchError((error) => {
+        this.isAutomaticSelectionLoading.set(false);
         // Извлекаем сообщение об ошибке из ответа сервера
         let errorMessage = "Ошибка при автоматическом выборе экспертов";
         

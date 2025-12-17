@@ -37,6 +37,19 @@
     <span class="italic">{{project.code?.code | orElse : 'не указан'}}</span>
   </div>
 
+  @if (project.projectSpecialization && project.projectSpecialization.length > 0) {
+    <div class="text-sm mb-2">
+      <span>Коды специализации: </span>
+      <ul class="mb-0 ps-4 mt-1">
+        @for (spec of project.projectSpecialization; track spec.id) {
+          <li>
+            <span class="italic">{{spec.code}} - {{spec.name}}</span>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
   @if (project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
     <div class="text-sm mb-2">
       @if (project.code?.code != '8.4') {

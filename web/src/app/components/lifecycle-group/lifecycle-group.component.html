@@ -174,6 +174,7 @@
 @if (canEditReferral()) {
   <app-modal #referralFormModal [title]="'Направление в ГЭС'">
   <app-referral-form [project]="projectValue" [council]="_group?.council"
+                     [loading]="isCreatingReferral"
                      (onSave)="generateReferral($event)"
                      (onClose)="referralFormModal.hide()">
   </app-referral-form>
