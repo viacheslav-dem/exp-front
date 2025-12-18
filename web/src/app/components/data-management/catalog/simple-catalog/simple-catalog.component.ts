@@ -1,10 +1,11 @@
-import {Component, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {CatalogTemplate} from "@app/components/data-management/catalog/CatalogTemplate";
 import {CatalogDto} from "@app/dto/CatalogDto";
 import {DataService} from "@app/services/data.service";
 import {Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-simple-catalog',
@@ -120,7 +121,11 @@ import {Direction} from "@app/components/common-components/page-and-filter/model
   </div>
 </div>`,
     styleUrls: ['./simple-catalog.component.scss'],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class SimpleCatalogComponent<T extends CatalogDto> extends CatalogTemplate<T> {
 

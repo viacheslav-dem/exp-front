@@ -1,6 +1,7 @@
-import {Component, forwardRef, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, forwardRef, input} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
+import {environment} from "../../../../environments/environment";
 
 export const BB_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR,
@@ -33,7 +34,10 @@ export const BB_CONTROL_VALUE_ACCESSOR: any = {
         `,
     styleUrls: ['boolean-button-v2.component.scss'],
     providers: [BB_CONTROL_VALUE_ACCESSOR],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class BooleanButtonV2Component extends ControlComponent<boolean> {
 

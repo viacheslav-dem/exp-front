@@ -30,7 +30,7 @@
         @if (documents.length == 0) {
           <div class="italic mb-1">Отсутствуют</div>
         }
-        @for (document of documents; track document; let i = $index) {
+        @for (document of documents; track trackText(document); let i = $index) {
           <div class="input-group btn-group input-group-sm mb-2">
             <input [(ngModel)]="document.text" type="text" class="form-control"
               placeholder="документ {{i + 1}}"

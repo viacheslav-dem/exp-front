@@ -131,7 +131,9 @@ export const PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     `],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.passwordInput ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class PasswordInputComponent extends ControlComponent<PasswordDto> {
 

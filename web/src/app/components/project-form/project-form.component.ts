@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewContainerRef} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewContainerRef} from '@angular/core';
 import {Catalog, DataService} from "@app/services/data.service";
 import {CatalogDto} from "@app/dto/CatalogDto";
 import {PeriodDto} from "@app/dto/PeriodDto";
@@ -16,13 +16,15 @@ import {SearchPageRequest} from "@app/components/common-components/page-and-filt
 import {Pagination} from "@app/components/common-components/page-and-filter/model/Pagination";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import {SortOrder, Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
+import {environment} from "../../../environments/environment";
 
 
 @Component({
     selector: 'app-project-form',
     templateUrl: 'project-form.component.html',
     styleUrls: ['project-form.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class ProjectFormComponent implements OnInit, OnDestroy {
 
@@ -73,7 +75,8 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     constructor(private viewContainerRef: ViewContainerRef,
                 private _dataService: DataService,
                 private _personService: PersonService,
-                private _fundingPipe: FundingTypePipe) {
+                private _fundingPipe: FundingTypePipe,
+                private cdr: ChangeDetectorRef) {
         this.fundingToString = finance => _fundingPipe.transform(finance);
     }
 
@@ -81,12 +84,15 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         this.getProjectCodes();
         this._personService.getCurrentPerson().subscribe(res => {
             this.customer = res;
+            this.cdr?.markForCheck?.();
         });
         this._dataService.getExpectedResult().subscribe((res => {
             this.expectedResultList = res;
+            this.cdr?.markForCheck?.();
         }))
         this._dataService.getCommercializationMethods().subscribe((res => {
             this.commercializationMethods = res;
+            this.cdr?.markForCheck?.();
         }))
     }
 
@@ -105,6 +111,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         
         // Инициализируем данные для специализаций
         this.initSpecializationMaps();
+        this.cdr?.markForCheck?.();
     }
 
     private initSpecializationMaps() {
@@ -160,7 +167,10 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     }
 
     getProjectCodes() {
-        this._dataService.getCatalog(Catalog.PROJECT_CODE).subscribe(res => this.codes = res)
+        this._dataService.getCatalog(Catalog.PROJECT_CODE).subscribe(res => {
+            this.codes = res;
+            this.cdr?.markForCheck?.();
+        });
     }
 
     selectCode(code) {
@@ -352,6 +362,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
       this.newDirection = null;
       this.subDirection = null;
       flagDirection = false;
+      this.cdr?.markForCheck?.();
     // }
   }
 
@@ -381,6 +392,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         }
         this._project.financing.push(this.funding);
         this.funding = new FundingDto();
+        this.cdr?.markForCheck?.();
     }
 
     // select(option: SubDirectionDto) {
@@ -402,12 +414,14 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     if(dir.subDirectionDtos.length == 0){
       this.directions.splice(indexDir, 1);
     }
+    this.cdr?.markForCheck?.();
     return dir.subDirectionDtos;
   }
 
   deleteDirection(dir: DirectionDto, i: number) {
       dir.subDirectionDtos = [];
       this.directions.splice(i, 1);
+      this.cdr?.markForCheck?.();
   }
 
     clearAppliedFields() {
@@ -472,6 +486,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
             this.disableResultSpecificButton = false;
             this._project.selectedResultSpecific = '';
         }
+        this.cdr?.markForCheck?.();
     }
 
     selectTypeOfWork(typeOfWork) {
@@ -496,6 +511,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                 this.selectResultSpecific('');
             }
         }
+        this.cdr?.markForCheck?.();
     }
 
     selectResultSpecific(resultSpecific) {
@@ -503,6 +519,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         if (this._project.selectedResultSpecific !== ResultSpecificEnum.APPLIED) {
             this.clearCommerceFields();
         }
+        this.cdr?.markForCheck?.();
     }
 
     isCommerce(flag: boolean) {
@@ -517,6 +534,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
             this._project.commercializationMethods = [];
             this._project.commercializationDescription = '';
         }
+        this.cdr?.markForCheck?.();
     }
 
     selectCommerceResult() {
@@ -525,15 +543,18 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         }
         this._project.commercializationMethods.push(this.selectedCommercializationMethod);
         this.selectedCommercializationMethod = null;
+        this.cdr?.markForCheck?.();
     }
 
     selectChoiceOfResultCharacterAppliedResult(selectedElement) {
         this._project.implementationResult = selectedElement;
+        this.cdr?.markForCheck?.();
     }
 
     selectTechnologyType(technologyType) {
         this._project.technologicalOrder = technologyType;
         this.isAnotherTechnologyType = this._project.technologicalOrder === 'другое';
+        this.cdr?.markForCheck?.();
     }
 
     // Методы работы со специализацией - lazy loading как в user-form
@@ -573,6 +594,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                             : [];
                         this.specializationItemsMap.set(index, [...existingSelected]);
                         this.specializationHasMoreMap.set(index, true);
+                        this.cdr?.markForCheck?.();
                         return of([]);
                     }
                     
@@ -584,7 +606,9 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                     this.specializationHasMoreMap.set(index, true);
                     return this.loadSpecializations(true, index);
                 })
-            ).subscribe();
+            ).subscribe(() => {
+                this.cdr?.markForCheck?.();
+            });
         }
         return this.specializationSearchInputMap.get(index);
     }
@@ -597,7 +621,9 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         if (items.length === 0 || (page === 0 && !loading)) {
             this.specializationPageMap.set(index, 0);
             this.specializationHasMoreMap.set(index, true);
-            this.loadSpecializations(true, index).subscribe();
+            this.loadSpecializations(true, index).subscribe(() => {
+                this.cdr?.markForCheck?.();
+            });
         }
     }
 
@@ -640,6 +666,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                 this.specializationHasMoreMap.set(index, page.page < page.totalPages);
                 this.specializationPageMap.set(index, currentPage + 1);
                 this.specializationLoadingMap.set(index, false);
+                this.cdr?.markForCheck?.();
                 return of(this.specializationItemsMap.get(index));
             })
         );
@@ -650,7 +677,9 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         const hasMore = this.specializationHasMoreMap.get(index) !== false;
         
         if (!loading && hasMore) {
-            this.loadSpecializations(false, index).subscribe();
+            this.loadSpecializations(false, index).subscribe(() => {
+                this.cdr?.markForCheck?.();
+            });
         }
     }
 
@@ -662,8 +691,10 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         return a && b ? a.id === b.id : a === b;
     }
 
-    trackBySpecialization(specialization: CatalogDto): any {
-        return specialization?.id || specialization?.name || null;
+    trackBySpecialization(index: number, specialization: CatalogDto | null): any {
+        // Важно: при нескольких пустых (null) элементах ключи должны быть уникальными,
+        // иначе Angular выбросит NG0955 (duplicated keys).
+        return specialization?.id ?? specialization?.name ?? index;
     }
 
     addSpecialization() {
@@ -679,10 +710,12 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         this.specializationPageMap.set(newIndex, 0);
         this.specializationHasMoreMap.set(newIndex, true);
         this.specializationCurrentSearchMap.set(newIndex, '');
+        this.cdr?.markForCheck?.();
     }
 
     removeSpecialization(index: number) {
         this._project.projectSpecialization.splice(index, 1);
+        this.cdr?.markForCheck?.();
     }
 }
 

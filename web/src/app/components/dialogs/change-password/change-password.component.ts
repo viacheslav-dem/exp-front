@@ -1,8 +1,9 @@
-import {Component, EventEmitter, OnInit, Output, input} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, input, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {PasswordDto} from "@app/dto/PasswordDto";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {StorageService} from "@app/services/storage.service";
 import {AuthService} from "@app/services/auth.service";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-change-password',
@@ -29,7 +30,11 @@ import {AuthService} from "@app/services/auth.service";
         padding: 0.5rem;
       }
     `],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dialogs)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class ChangePasswordComponent implements OnInit {
 
@@ -39,7 +44,8 @@ export class ChangePasswordComponent implements OnInit {
 
   constructor(private _authService: AuthService,
               private _storage: StorageService,
-              private toasty: GlobalToastyService,) {
+              private toasty: GlobalToastyService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -53,11 +59,13 @@ export class ChangePasswordComponent implements OnInit {
       this.toasty.success('Пароль успешно изменён.');
       this.password = new PasswordDto();
       this.onSave.next(this.userId());
+      this.cdr?.markForCheck?.();
     });
   }
 
   cancel() {
     this.password = new PasswordDto();
     this.canceled.next(this.userId());
+    this.cdr?.markForCheck?.();
   }
 }

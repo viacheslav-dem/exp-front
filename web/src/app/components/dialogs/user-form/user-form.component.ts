@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {getAllPhoneTypes} from "@app/pipes/phone-type.pipe";
 import {AutoActivatedRole, Role, RolePipe} from "@app/pipes/role.pipe";
 import {getAllBankAccountTypes} from "@app/pipes/bank-account-type.pipe";
@@ -29,25 +29,40 @@ import {SearchPageRequest} from "@app/components/common-components/page-and-filt
 import {Pagination} from "@app/components/common-components/page-and-filter/model/Pagination";
 import {SortOrder, Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
 import {CatalogDto} from "@app/dto/CatalogDto";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-user-form',
     templateUrl: './user-form.component.html',
     styleUrls: ['./user-form.component.scss'],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dialogs)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class UserFormComponent implements OnInit, OnDestroy {
+  
+  constructor(private _personService: PersonService,
+              private _dataService: DataService,
+              private _authService: AuthService,
+              private toasty: GlobalToastyService,
+              private _dialogService: DialogService,
+              private _rolePipe: RolePipe,
+              private _sectionPipe: SectionPipe,
+              protected cdr: ChangeDetectorRef) {
+  }
 
-  SERVER_URL = SERVER_URL;
-  AutoActivatedRole = AutoActivatedRole;
-  Role = Role;
+  readonly SERVER_URL = SERVER_URL;
+  readonly AutoActivatedRole = AutoActivatedRole;
+  readonly Role = Role;
   role: string;
   _user: PersonDto;
   _originalUser: PersonDto;
   _userSelectedOrg: SelectItem = null;
   photo: string = 'assets/abstract_profile.jpg';
   current: boolean = false;
-  Catalog = Catalog;
+  readonly Catalog = Catalog;
   scienceAreaToString = (area) => area.nameInGen;
 
   allRoles: string[] = [];
@@ -124,6 +139,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
             const existingSelected = this._user?.personInfo?.specialities?.[index] ? [this._user.personInfo.specialities[index]].filter(s => s != null) as CatalogDto[] : [];
             this.specialityItemsMap.set(index, [...existingSelected]);
             this.specialityHasMoreMap.set(index, true);
+            this.cdr?.markForCheck?.();
             return of([]);
           }
           
@@ -133,7 +149,9 @@ export class UserFormComponent implements OnInit, OnDestroy {
           this.specialityHasMoreMap.set(index, true);
           return this.loadSpecialities(true, index);
         })
-      ).subscribe();
+      ).subscribe(() => {
+        this.cdr?.markForCheck?.();
+      });
     }
     return this.specialitySearchInputMap.get(index);
   }
@@ -156,6 +174,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
             const existingSelected = this._user?.personInfo?.specializations?.[index] ? [this._user.personInfo.specializations[index]].filter(s => s != null) as CatalogDto[] : [];
             this.specializationItemsMap.set(index, [...existingSelected]);
             this.specializationHasMoreMap.set(index, true);
+            this.cdr?.markForCheck?.();
             return of([]);
           }
           
@@ -165,7 +184,9 @@ export class UserFormComponent implements OnInit, OnDestroy {
           this.specializationHasMoreMap.set(index, true);
           return this.loadSpecializations(true, index);
         })
-      ).subscribe();
+      ).subscribe(() => {
+        this.cdr?.markForCheck?.();
+      });
     }
     return this.specializationSearchInputMap.get(index);
   }
@@ -188,6 +209,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
             const existingSelected = this._user?.areas?.[index] ? [this._user.areas[index]].filter(a => a != null) as CatalogDto[] : [];
             this.areaItemsMap.set(index, [...existingSelected]);
             this.areaHasMoreMap.set(index, true);
+            this.cdr?.markForCheck?.();
             return of([]);
           }
           
@@ -197,7 +219,9 @@ export class UserFormComponent implements OnInit, OnDestroy {
           this.areaHasMoreMap.set(index, true);
           return this.loadAreas(true, index);
         })
-      ).subscribe();
+      ).subscribe(() => {
+        this.cdr?.markForCheck?.();
+      });
     }
     return this.areaSearchInputMap.get(index);
   }
@@ -206,24 +230,18 @@ export class UserFormComponent implements OnInit, OnDestroy {
   @Output() onSave = new EventEmitter<PersonDto>();
   @Output() canceled = new EventEmitter();
 
-  constructor(private _dataService: DataService,
-              private toasty: GlobalToastyService,
-              private _authService: AuthService,
-              private _rolePipe: RolePipe,
-              private _personService: PersonService,
-              private _dialogService: DialogService,
-              private _sectionPipe: SectionPipe) {
-    // Подписки теперь создаются динамически в методах getSpecialitySearchInput$, getSpecializationSearchInput$, getAreaSearchInput$
-  }
-
   ngOnInit() {
     this.allRoles = this._rolePipe.getAllNotAutoActivatedRoles();
     this.role = this._authService.getCurrRole();
     // Убрали загрузку всех областей компетенции, специальностей и специализаций - теперь lazy loading
     this.subscriptions.push(
-      this._dataService.getCatalog(Catalog.SCIENCE_AREA).subscribe(res => this.allScienceArea = res),
+      this._dataService.getCatalog(Catalog.SCIENCE_AREA).subscribe(res => {
+        this.allScienceArea = res;
+        this.cdr?.markForCheck?.();
+      }),
       this._dataService.getOrgs().subscribe(res => {
         this.allOrgs = res.map((item, ind) => new SelectItem(item, item.name, item.id));
+        this.cdr?.markForCheck?.();
       })
     );
   }
@@ -360,6 +378,8 @@ export class UserFormComponent implements OnInit, OnDestroy {
         this.areaCurrentSearchMap.set(index, '');
       });
     }
+    
+    this.cdr?.markForCheck?.();
   };
 
   isExpert() {
@@ -425,6 +445,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
       'Система сгенерирует и установит новый пароль и вышлет его на почту пользователя.').subscribe(() => {
       this._authService.resetPassword(this._user.id).subscribe(() => {
         this.toasty.success('Новый пароль установлен. Он выслан на почту пользователя, если она верно указана в профиле.');
+        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -434,11 +455,13 @@ export class UserFormComponent implements OnInit, OnDestroy {
       this._authService.unblockUser(this._user.id).subscribe(usr => {
         this.toasty.success('Учетная запись разблокирована.');
         this._user.user.blocked = usr.blocked;
+        this.cdr?.markForCheck?.();
       });
     else
       this._authService.blockUser(this._user.id).subscribe(usr => {
         this.toasty.success('Учетная запись заблокирована.');
         this._user.user.blocked = usr.blocked;
+        this.cdr?.markForCheck?.();
       });
   }
 
@@ -485,10 +508,15 @@ export class UserFormComponent implements OnInit, OnDestroy {
           } else {
             this.photo = 'assets/abstract_profile.jpg';
           }
+          this.cdr?.markForCheck?.();
         },
-        () => this.photo = 'assets/abstract_profile.jpg');
+        () => {
+          this.photo = 'assets/abstract_profile.jpg';
+          this.cdr?.markForCheck?.();
+        });
     } else {
       this.photo = 'assets/abstract_profile.jpg';
+      this.cdr?.markForCheck?.();
     }
   }
 
@@ -566,7 +594,9 @@ export class UserFormComponent implements OnInit, OnDestroy {
     if (items.length === 0 || (page === 0 && !loading)) {
       this.specialityPageMap.set(index, 0);
       this.specialityHasMoreMap.set(index, true);
-      this.loadSpecialities(true, index).subscribe();
+      this.loadSpecialities(true, index).subscribe(() => {
+        this.cdr?.markForCheck?.();
+      });
     }
   }
 
@@ -610,6 +640,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
         this.specialityHasMoreMap.set(index, page.page < page.totalPages);
         this.specialityPageMap.set(index, currentPage + 1);
         this.specialityLoadingMap.set(index, false);
+        this.cdr?.markForCheck?.();
         return of(this.specialityItemsMap.get(index));
       })
     );
@@ -620,7 +651,9 @@ export class UserFormComponent implements OnInit, OnDestroy {
     const hasMore = this.specialityHasMoreMap.get(index) !== false;
     
     if (!loading && hasMore) {
-      this.loadSpecialities(false, index).subscribe();
+      this.loadSpecialities(false, index).subscribe(() => {
+        this.cdr?.markForCheck?.();
+      });
     }
   }
   
@@ -643,6 +676,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
     this.specialityPageMap.set(newIndex, 0);
     this.specialityHasMoreMap.set(newIndex, true);
     this.specialityCurrentSearchMap.set(newIndex, '');
+    this.cdr?.markForCheck?.();
   }
 
   // Методы для lazy loading специализаций
@@ -655,7 +689,9 @@ export class UserFormComponent implements OnInit, OnDestroy {
     if (items.length === 0 || (page === 0 && !loading)) {
       this.specializationPageMap.set(index, 0);
       this.specializationHasMoreMap.set(index, true);
-      this.loadSpecializations(true, index).subscribe();
+      this.loadSpecializations(true, index).subscribe(() => {
+        this.cdr?.markForCheck?.();
+      });
     }
   }
 
@@ -699,6 +735,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
         this.specializationHasMoreMap.set(index, page.page < page.totalPages);
         this.specializationPageMap.set(index, currentPage + 1);
         this.specializationLoadingMap.set(index, false);
+        this.cdr?.markForCheck?.();
         return of(this.specializationItemsMap.get(index));
       })
     );
@@ -709,7 +746,9 @@ export class UserFormComponent implements OnInit, OnDestroy {
     const hasMore = this.specializationHasMoreMap.get(index) !== false;
     
     if (!loading && hasMore) {
-      this.loadSpecializations(false, index).subscribe();
+      this.loadSpecializations(false, index).subscribe(() => {
+        this.cdr?.markForCheck?.();
+      });
     }
   }
   
@@ -732,6 +771,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
     this.specializationPageMap.set(newIndex, 0);
     this.specializationHasMoreMap.set(newIndex, true);
     this.specializationCurrentSearchMap.set(newIndex, '');
+    this.cdr?.markForCheck?.();
   }
 
   // Методы для lazy loading областей компетенции
@@ -744,7 +784,9 @@ export class UserFormComponent implements OnInit, OnDestroy {
     if (items.length === 0 || (page === 0 && !loading)) {
       this.areaPageMap.set(index, 0);
       this.areaHasMoreMap.set(index, true);
-      this.loadAreas(true, index).subscribe();
+      this.loadAreas(true, index).subscribe(() => {
+        this.cdr?.markForCheck?.();
+      });
     }
   }
 
@@ -788,6 +830,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
         this.areaHasMoreMap.set(index, page.page < page.totalPages);
         this.areaPageMap.set(index, currentPage + 1);
         this.areaLoadingMap.set(index, false);
+        this.cdr?.markForCheck?.();
         return of(this.areaItemsMap.get(index));
       })
     );
@@ -798,7 +841,9 @@ export class UserFormComponent implements OnInit, OnDestroy {
     const hasMore = this.areaHasMoreMap.get(index) !== false;
     
     if (!loading && hasMore) {
-      this.loadAreas(false, index).subscribe();
+      this.loadAreas(false, index).subscribe(() => {
+        this.cdr?.markForCheck?.();
+      });
     }
   }
   
@@ -821,5 +866,6 @@ export class UserFormComponent implements OnInit, OnDestroy {
     this.areaPageMap.set(newIndex, 0);
     this.areaHasMoreMap.set(newIndex, true);
     this.areaCurrentSearchMap.set(newIndex, '');
+    this.cdr?.markForCheck?.();
   }
 }

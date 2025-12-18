@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, Input, Type, ViewChild, ViewContainerRef, input} from "@angular/core";
+import {Component, ComponentFactoryResolver, Input, Type, ViewChild, ViewContainerRef, input, ChangeDetectionStrategy, ChangeDetectorRef} from "@angular/core";
 import {MeetingDto} from "@app/dto/MeetingDto";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {Role} from "@app/pipes/role.pipe";
@@ -12,6 +12,8 @@ import dayjs from 'dayjs';
 import {RemarksContainerDto} from "@app/dto/RemarksContainerDto";
 import {MeetingProtocolNewFormContent} from "@app/components/document-form/meeting-protocol-form/MeetingProtocolNewFormContent";
 import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form/agenda-new-form.service";
+import {createTrackKeyStore} from "@app/support/utils";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-meeting-protocol-form',
@@ -31,7 +33,11 @@ import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form
           margin-bottom: 0.5rem;
       }
   `],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.meetings)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNewFormContent> {
 
@@ -48,8 +54,20 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
   constructor(private _personService: PersonService,
               private _meetingService: MeetingService,
               private _agendaFormResolver: AgendaFormResolver,
-              private resolver: ComponentFactoryResolver) {
+              private resolver: ComponentFactoryResolver,
+              private cdr: ChangeDetectorRef) {
     super();
+  }
+
+  private readonly _trackKey = createTrackKeyStore<object>('meeting-protocol-invited:');
+
+  trackInvited(person: { name: string }): string {
+    return this._trackKey(person);
+  }
+
+  addInvited(): void {
+    this.invited.push({ name: '' });
+    this.cdr?.markForCheck?.();
   }
 
   ngOnInit() {
@@ -57,6 +75,7 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
     this._personService.getCurrentPerson().subscribe(res => {
       this.currentPerson = res;
       this._form.chairman = this._form.chairman || this.currentPerson;
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -71,8 +90,10 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
       sortPersonsByName(res);
       this.assessors = res;
       this.assessors.forEach(ass => ass.isChecked = this._form.participants.some(selected => selected.id == ass.id));
+      this.cdr?.markForCheck?.();
     });
     this.prepareAgendaForms();
+    this.cdr?.markForCheck?.();
   }
 
   prepareAgendaForms() {
@@ -101,6 +122,7 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
           } else if (!this._form.projectsById[agenda.project.id]) {
             component._form.customerReplies = true;
           }
+          this.cdr?.markForCheck?.();
         });
       }
     })
@@ -153,9 +175,7 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
     this._form.invited = this._form.invited || [];
     this._form.projectsById = this._form.projectsById || {};
     this._form.chairman = this._form.chairman || this.currentPerson;
-    this.invited = this._form.invited.map(name => {
-      return {name: name};
-    });
+    this.invited = this._form.invited.map(name => ({ name }));
     this._meeting.agendas.map(agenda => agenda.project.id).forEach(projectId => {
       if (this.agendaComponents[projectId]) {
         this.agendaComponents[projectId].setForm(this._form.projectsById[projectId]);

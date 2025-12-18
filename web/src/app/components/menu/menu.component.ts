@@ -9,7 +9,9 @@ import {environment} from "../../../environments/environment";
     styleUrls: ['menu.component.scss'],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.menu ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class MenuComponent implements OnInit, OnDestroy {
 

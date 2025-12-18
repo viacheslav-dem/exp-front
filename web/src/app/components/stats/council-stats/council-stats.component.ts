@@ -1,4 +1,4 @@
-import {Component, Injectable, Input, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Injectable, Input, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/core";
 import {StatsService} from "@app/services/stats.service";
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
@@ -17,11 +17,13 @@ import {DialogService} from "@app/components/dialogs/dialog.service";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO";
 import {FormControl} from "@angular/forms";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-council-stats',
     templateUrl: './council-stats.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 @Injectable({ providedIn: 'root' })
 export class CouncilStatsComponent implements OnInit, AfterViewInit {
@@ -58,6 +60,7 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
               private councilService: DataService,
               private authService: AuthService,
               private dialogService: DialogService,
+              private cdr: ChangeDetectorRef,
               private toasty: GlobalToastyService,
               private councilPipe: CouncilPipe) {
     dayjs.extend(customParseFormat);
@@ -72,6 +75,7 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
       if (this._council == null) {
         this.council = this.allCouncils[0];
       }
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -79,6 +83,7 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
     // Обновляем отображение после инициализации
     requestAnimationFrame(() => {
       this.updateInputDisplay();
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -100,12 +105,16 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
   update() {
     let dateToExclusive = dayjs(this.dateTo).add(1, 'month').valueOf();
     if (this.role == Role.BUREAU_CHAIRMAN) {
-      this.statsService.getCouncilStatsForBureauChairman(this.dateFrom, dateToExclusive).subscribe(res => this.stats = res);
+      this.statsService.getCouncilStatsForBureauChairman(this.dateFrom, dateToExclusive).subscribe(res => {
+        this.stats = res;
+        this.cdr?.markForCheck?.();
+      });
     } else if (this._council) {
       // this.statsService.getCouncilStats(this._council, this.dateFrom, dateToExclusive).subscribe(res => {
       //   this.stats = res
       this.statsService.getCouncilStats(this._council, this.dateFrom, dateToExclusive).subscribe(res => {
-        this.statsV2 = res
+        this.statsV2 = res;
+        this.cdr?.markForCheck?.();
       });
     }
   }
@@ -121,6 +130,7 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
           const formatted = dayjs(date).locale('ru').format('MM.YYYY');
           this.dateToInput.nativeElement.value = formatted;
         }
+        this.cdr?.markForCheck?.();
       });
     }
   }
@@ -135,6 +145,7 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
         if (this.dateFromInput?.nativeElement) {
           const formatted = dayjs(date).locale('ru').format('MM.YYYY');
           this.dateFromInput.nativeElement.value = formatted;
+          this.cdr?.markForCheck?.();
         }
       });
     }

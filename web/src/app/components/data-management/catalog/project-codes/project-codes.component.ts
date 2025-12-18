@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/core';
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {Catalog, DataService} from "app/services/data.service";
 import {IdNameDto} from "app/dto/IdNameDto";
@@ -7,11 +7,16 @@ import {SearchField} from "app/components/common-components/page-and-filter/mode
 import {Direction} from "app/components/common-components/page-and-filter/model/SortOrder";
 import {CatalogTemplate} from "app/components/data-management/catalog/CatalogTemplate";
 import {TariffRateDto} from "@app/dto/TariffRateDto";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-project-codes',
     templateUrl: './project-codes.component.html',
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class ProjectCodesComponent extends CatalogTemplate<ProjectCodeDto> {
 
@@ -19,14 +24,21 @@ export class ProjectCodesComponent extends CatalogTemplate<ProjectCodeDto> {
   rates:TariffRateDto[] = []
 
   constructor(public _toasty: GlobalToastyService,
-              public _dataService: DataService) {
+              public _dataService: DataService,
+              private cdr: ChangeDetectorRef) {
     super(_toasty, _dataService);
     this._type = Catalog.PROJECT_CODE;
   }
 
   ngOnInit() {
-    this._dataService.getCatalog(Catalog.GKNT_DEPARTMENT).subscribe(res => this.gkntDepartments = res);
-    this._dataService.getCatalog(Catalog.TARIFF).subscribe(res => this.rates = <TariffRateDto[]>res);
+    this._dataService.getCatalog(Catalog.GKNT_DEPARTMENT).subscribe(res => {
+      this.gkntDepartments = res;
+      this.cdr.markForCheck();
+    });
+    this._dataService.getCatalog(Catalog.TARIFF).subscribe(res => {
+      this.rates = <TariffRateDto[]>res;
+      this.cdr.markForCheck();
+    });
     this._searchFields = [
       SearchField.contains('name').setPlaceholder('Поиск по описанию...').setSortable(true),
       SearchField.startsWith('code').setPlaceholder('Поиск по коду...')

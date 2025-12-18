@@ -1,10 +1,12 @@
-import {Component, EventEmitter, Output, input} from "@angular/core";
+import {ChangeDetectionStrategy, Component, EventEmitter, Output, input} from "@angular/core";
 import {RemarkDto} from "@app/dto/RemarkDto";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-remark-response',
     templateUrl: './remark-response.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 
 export class RemarkResponseComponent {

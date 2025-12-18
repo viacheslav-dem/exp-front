@@ -1,4 +1,4 @@
-import {Component, ViewChild, ViewChildren, QueryList, AfterViewInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, ViewChildren, QueryList, AfterViewInit} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
@@ -8,12 +8,14 @@ import {TemplateDocumentDto} from "@app/dto/TemplateDocumentDto";
 import {DocType} from "@app/components/common-components/file-uploader/doc-type";
 import {SERVER_URL} from "@app/config";
 import {SilentFileUploaderComponent} from "@app/components/common-components/file-uploader/silent-file-uploader/silent-file-uploader.component";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-templates',
     templateUrl: './templates.component.html',
     styleUrls: ['./templates.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dataManagement) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> implements AfterViewInit {
 
@@ -32,7 +34,8 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> impl
   private uploaderMap: Map<string, SilentFileUploaderComponent> = new Map();
 
   constructor(private _toasty: GlobalToastyService,
-              private _documentService: DocumentService) {
+              private _documentService: DocumentService,
+              private cdr: ChangeDetectorRef) {
     super();
   }
   
@@ -78,6 +81,13 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> impl
       SearchField.checkbox('disabled', 'Показывать неактивные'),
     ];
     this.enableFilterCache("templates");
+    // Если нет сохранённого состояния фильтров, загружаем данные явно
+    setTimeout(() => {
+      const hasCachedFilters = localStorage.getItem('filter_cache_templates');
+      if (!hasCachedFilters) {
+        this.update();
+      }
+    }, 100);
   }
 
   loadPage() {
@@ -86,9 +96,15 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> impl
       this._page = res;
       this.templates = this._page.content;
       // Обновляем карту загрузчиков после загрузки данных
-      setTimeout(() => this.updateUploaderMap(), 0);
+      setTimeout(() => {
+        this.updateUploaderMap();
+        this.cdr?.markForCheck?.();
+      }, 0);
       // show tooltips
-    }, () => this.setLoading(false));
+    }, () => {
+      this.setLoading(false);
+      this.cdr?.markForCheck?.();
+    });
   }
 
   editTemplate(template: TemplateDocumentDto) {

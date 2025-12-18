@@ -131,7 +131,7 @@
 <!--REVIEW FORM-->
 <app-modal #reviewFormModal [title]="'Заключение эксперта'" [closePermission]="false" (onClose)="closeForm()">
   <app-expert-review-form [formRenderer]="formRenderer"
-                          [project]="project"
+                          [project]="project()"
                           [draftService]="_reviewService"
                           [draftOwner]="expertReview"
                           (onSave)="generateReviewDocument($event)"

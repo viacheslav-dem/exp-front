@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, Type, ViewChild, input} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output, Type, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef} from "@angular/core";
 import {ExpertReviewState, ExpertReviewStateBadge} from "@app/pipes/review-state.pipe";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
@@ -29,12 +29,17 @@ import {PeriodDto} from "@app/dto/PeriodDto";
 import dayjs from 'dayjs';
 import {AccountingPlainDto} from "@app/dto/AccountingPlainDto";
 import {TemplateType} from "@app/components/document-form/form-model/TemplateType";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-expert-review',
     templateUrl: './expert-review.component.html',
     styleUrls: ['expert-review.component.scss'],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class ExpertReviewComponent implements OnInit {
 
@@ -48,7 +53,9 @@ export class ExpertReviewComponent implements OnInit {
     transitionHistory: ExpertTransitionHistoryDto;
 
     readonly role = input<string>(undefined);
-    readonly project = input<any>({});
+    // Важно: дефолт не должен быть {}, иначе `project()` truthy и шаблон/логика могут пойти по ветке,
+    // где ожидается полноценно загруженный ProjectDto (с `code.expertReviewType`).
+    readonly project = input<any>(undefined);
 
     formRenderer: Type<ExpertReviewForm<any>>;
 
@@ -66,7 +73,8 @@ export class ExpertReviewComponent implements OnInit {
                 private _dialogService: DialogService,
                 private _personPipe: PersonFullNamePipe,
                 private toastService: GlobalToastyService,
-                private _dataService: DataService) {
+                private _dataService: DataService,
+                private cdr: ChangeDetectorRef) {
     }
 
     ngOnInit(): void {
@@ -83,7 +91,10 @@ export class ExpertReviewComponent implements OnInit {
     showTransitionHistoryModal() {
         this.transitionHistoryModal.show();
         this._transitionHistoryService.getExpertHistory(this.expertReview)
-            .subscribe(res => this.transitionHistory = res);
+            .subscribe(res => {
+                this.transitionHistory = res;
+                this.cdr?.markForCheck?.();
+            });
     }
 
     changed() {
@@ -91,7 +102,10 @@ export class ExpertReviewComponent implements OnInit {
     }
 
     showReviewFormModal() {
-        this.formRenderer = this._formResolver.getFormRenderer(this.project().code.expertReviewType);
+        const expertReviewType = this.project()?.code?.expertReviewType;
+        this.formRenderer = expertReviewType
+          ? this._formResolver.getFormRenderer(expertReviewType)
+          : null;
         if (!this.formRenderer) {
             this._toasty.warn("Не найдено подходящей формы экспертного заключения. Будет сегенерирован документ по умолчанию.");
             this.generateReviewDocument({});
@@ -139,6 +153,7 @@ export class ExpertReviewComponent implements OnInit {
             ).subscribe(res => {
                 this.expertReview.accounting = <AccountingPlainDto>res;
                 this._toasty.success("Документ успешно обновлён.");
+                this.cdr?.markForCheck?.();
             });
         });
     }

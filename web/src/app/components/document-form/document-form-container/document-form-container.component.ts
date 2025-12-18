@@ -1,11 +1,16 @@
-import {Component, ComponentFactoryResolver, Input, Type, ViewChild, ViewContainerRef} from "@angular/core";
+import {Component, ComponentFactoryResolver, Input, Type, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef} from "@angular/core";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {FormContent} from "@app/components/document-form/form-model/FormContent";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-document-form',
     templateUrl: 'document-form-container.component.html',
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class DocumentFormContainerComponent<Form extends FormContent> extends DocumentForm<Form> {
 
@@ -13,7 +18,8 @@ export class DocumentFormContainerComponent<Form extends FormContent> extends Do
   formComponent: DocumentForm<Form>;
   @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
 
-  constructor(private resolver: ComponentFactoryResolver) {
+  constructor(private resolver: ComponentFactoryResolver,
+              protected cdr: ChangeDetectorRef) {
     super();
   }
 
@@ -43,6 +49,7 @@ export class DocumentFormContainerComponent<Form extends FormContent> extends Do
       } else {
         this.formComponent.setForm(this._form);
       }
+      this.cdr?.markForCheck?.();
     }
   }
 
@@ -54,10 +61,11 @@ export class DocumentFormContainerComponent<Form extends FormContent> extends Do
     this.formComponent.validate();
   }
 
-  setForm(form: Form) {
+  override setForm(form: Form) {
     super.setForm(form)
     if (this.formComponent) {
       this.formComponent.setForm(this._form);
     }
+    this.cdr?.markForCheck?.();
   }
 }

@@ -1,6 +1,7 @@
 import {timer as observableTimer} from 'rxjs';
-import {Component, ElementRef, Input} from "@angular/core";
+import {Component, ElementRef, Input, ChangeDetectionStrategy} from "@angular/core";
 import {Chart, ChartBuilder} from "./highchart.builder";
+import {environment} from "../../../environments/environment";
 
 /**
  * Created by belous.dmitri on 28.10.2016.
@@ -83,7 +84,11 @@ Highcharts.wrap(Highcharts.Chart.prototype, 'getContainer', function (proceed) {
 @Component({
     selector: "highchart",
     template: '<div (mouseleave)="onMouseLeave()" (mouseenter)="onMouseEnter()"></div>',
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class HighchartComponent {
 

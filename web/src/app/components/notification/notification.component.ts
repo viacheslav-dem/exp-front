@@ -1,4 +1,4 @@
-import {Component, OnDestroy, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, ViewChild} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {PersonService} from "@app/services/person.service";
 import {Catalog, DataService} from "@app/services/data.service";
@@ -23,6 +23,7 @@ import {LastSignEnumPipe} from "@app/pipes/last-sign.pipe";
 import {HttpClientSecure} from "@app/services/http.client";
 import {SERVER_URL} from "@app/config";
 import {ProgressService} from "@app/components/common-components/progress/progress.service";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-notification',
@@ -38,7 +39,8 @@ import {ProgressService} from "@app/components/common-components/progress/progre
           padding: 0.75rem 0.5rem;
       }
   `],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class NotificationComponent extends FilterAndPages<PersonDto> implements OnDestroy {
 
@@ -63,7 +65,8 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
                 private _lastSignPipe: LastSignEnumPipe,
                 private _http: HttpClientSecure,
                 private _progress: ProgressService,
-                private _degreeTypePipe: DegreeTypePipe) {
+                private _degreeTypePipe: DegreeTypePipe,
+                private cdr: ChangeDetectorRef) {
       super(10);
     }
 
@@ -92,22 +95,30 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
     ];
     this._dataService.getCatalog(Catalog.AREA_OF_COMPETENCE).subscribe((areas: IdNameDto[]) => {
       this.getSearchField('areas').setItems(areas);
+      this.cdr?.markForCheck?.();
     });
     this._dataService.getCatalog(Catalog.SPECIALITY).subscribe((speciality: IdNameDto[]) => {
       this.getSearchField('personInfo.specialities').setItems(speciality);
+      this.cdr?.markForCheck?.();
     });
     this._dataService.getCatalog(Catalog.SPECIALIZATION).subscribe((specialization: IdNameDto[]) => {
       this.getSearchField('personInfo.specializations').setItems(specialization);
+      this.cdr?.markForCheck?.();
     });
     this._dataService.getCatalog(Catalog.SCIENCE_AREA).subscribe((scienceArea: IdNameDto[]) => {
       this.getSearchField('personInfo.fullDegrees.scienceArea').setItems(scienceArea);
+      this.cdr?.markForCheck?.();
     });
     this._dataService.getOrgs().subscribe(orgs => {
       this.getSearchField('org').setItems(orgs);
+      this.cdr?.markForCheck?.();
     });
     this.onPersonListChangedSubscription = this._personService.onPersonListChanged.subscribe(() => this.update());
     this.enableFilterCache("users");
-    this.getIsSendingCheck().subscribe(res => {this.isSending = res})
+    this.getIsSendingCheck().subscribe(res => {
+      this.isSending = res;
+      this.cdr?.markForCheck?.();
+    })
   }
 
   ngOnDestroy(): void {
@@ -121,7 +132,11 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
       this._page = res;
       this.users = res.content;
       this.setLoading(false);
-    }, () => this.setLoading(false));
+      this.cdr?.markForCheck?.();
+    }, () => {
+      this.setLoading(false);
+      this.cdr?.markForCheck?.();
+    });
   }
 
   showEditUserModal(user: PersonDto) {
@@ -140,6 +155,7 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
   showReadUserModal(user: PersonDto){
     this.selectedUser = user;
     this.showUserInfo.show();
+    this.cdr?.markForCheck?.();
   }
 
   deletePerson(user: PersonDto) {
@@ -150,6 +166,7 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
             () => {
               this.toasty.success("Пользователь успешно удален");
               user.deleted = true;
+              this.cdr?.markForCheck?.();
             }
         )
     )
@@ -184,7 +201,9 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
             searchRequest:    this._searchRequest
           };
           this._progress.hide();
-          return this._http.post(`${this.url}/persons/notification/send`, messageRequest).subscribe();
+          return this._http.post(`${this.url}/persons/notification/send`, messageRequest).subscribe(() => {
+            this.cdr?.markForCheck?.();
+          });
         } else {
           this.toasty.error("Идёт формирование писем")
           return this._progress.hide();
@@ -193,12 +212,15 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
     }, 720);
     this.isSending = true;
     this.setDisabled();
+    this.cdr?.markForCheck?.();
   }
   getIsSendingCheck(): Observable<boolean> {
     return this._http.getBlock(`${this.url}/persons/notification/check`)
   }
   cancelNotification() {
-    this._http.get(`${this.url}/persons/notification/cancel`).subscribe();
+    this._http.get(`${this.url}/persons/notification/cancel`).subscribe(() => {
+      this.cdr?.markForCheck?.();
+    });
     return this.isSending = false;
   }
   setDisabled() {
@@ -207,6 +229,7 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
     setTimeout(() => {
       this.disabled = false;
       console.log(this.disabled)
+      this.cdr?.markForCheck?.();
     }, 10000);
   }
 }

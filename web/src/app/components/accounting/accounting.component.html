@@ -120,7 +120,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (record of accounting(); track record) {
+        @for (record of accounting(); track record.id) {
           <tr class="list-group-item-action"
             [ngClass]="{'alert-danger': record.red,'alert-warning': record.yellow,'alert-primary': record.blue}">
             <td class="text-nowrap">
@@ -140,7 +140,7 @@
           <td class="text-nowrap">
             <div>
               К оплате:
-              <span class="italic">{{record.paySum | number: 2 | orElse: 'не начислено'}}</span>
+              <span class="italic">{{formatNumber(record.paySum, 2) | orElse: 'не начислено'}}</span>
             </div>
             <!--            <div>-->
             <!--              Пенс. страхование:-->

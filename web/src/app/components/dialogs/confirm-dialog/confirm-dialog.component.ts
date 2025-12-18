@@ -1,5 +1,6 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, EventEmitter, Output, input, ChangeDetectionStrategy} from '@angular/core';
 import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/ConfirmDialogField";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-confirm-dialog',
@@ -19,7 +20,11 @@ import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/Confirm
       </div>
     </div>
     `,
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dialogs)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class ConfirmDialogComponent {
 

@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, Input, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, ComponentFactoryResolver, Input, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {SearchPersonByRolesComponent} from "@app/components/search/search-person/search-person-by-role.component";
 import {Role} from "@app/pipes/role.pipe";
@@ -14,6 +14,8 @@ import {AgendaNewFormContent} from "@app/components/document-form/meeting-protoc
 import {isEmptyOrNull} from "@app/support/utils";
 import {Text} from "@app/components/document-form/form-model/Text";
 import {CouncilConclusionFormResolver} from "@app/components/document-form/council-conclusion-form/council-conclusion-form-resolver.service";
+import {createTrackKeyStore} from "@app/support/utils";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-council-conclusion-form',
@@ -33,7 +35,11 @@ import {CouncilConclusionFormResolver} from "@app/components/document-form/counc
           margin-bottom: 0.5rem;
       }
   `],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class CouncilConclusionFormContainerComponent extends DocumentForm<CouncilConclusionFormContent> {
 
@@ -50,8 +56,15 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
 
   constructor(private _personService: PersonService,
               private resolver: ComponentFactoryResolver,
-              private _formTypeResolver: CouncilConclusionFormResolver) {
+              private _formTypeResolver: CouncilConclusionFormResolver,
+              private cdr: ChangeDetectorRef) {
     super();
+  }
+
+  private readonly _trackKey = createTrackKeyStore<object>('council-conclusion-doc:');
+
+  trackText(doc: Text): string {
+    return this._trackKey(doc);
   }
 
   ngOnInit() {
@@ -70,6 +83,7 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   set project(project: ProjectDto) {
     this._project = project;
     this.updateFormComponent(this._formTypeResolver.getFormRenderer(this._project.code.code));
+    this.cdr?.markForCheck?.();
   }
 
   get group() {
@@ -83,6 +97,7 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     if (this.formComponent) {
       this.formComponent.group = this._group;
     }
+    this.cdr?.markForCheck?.();
   }
 
   updateFormComponent(_formRenderer) {
@@ -99,6 +114,7 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     this.formComponent.project = this.project;
     this.formComponent.group = this.group;
     this.formComponent.setForm(this._form.projectProtocol);
+    this.cdr?.markForCheck?.();
   }
 
   validate() {

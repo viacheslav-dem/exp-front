@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    @for (org of orgs; track org; let orgInd = $index) {
+    @for (org of orgs; track trackOrg(org); let orgInd = $index) {
       <div>
         <!--ORG HEADER-->
         <div class="list-group-item list-group-item-action selectable"

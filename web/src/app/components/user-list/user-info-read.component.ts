@@ -1,6 +1,7 @@
-import {Component, Input} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input} from "@angular/core";
 import {PersonDto} from "@app/dto/PersonDto";
 import {UserFormComponent} from "@app/components/dialogs/user-form/user-form.component";
+import {environment} from "../../../environments/environment";
 
 
 @Component({
@@ -17,7 +18,8 @@ import {UserFormComponent} from "@app/components/dialogs/user-form/user-form.com
       }
     `
     ],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 
 
@@ -25,11 +27,10 @@ export class UserInfoReadComponent extends UserFormComponent {
   _user: PersonDto;
   photo: string = 'assets/abstract_profile.jpg';
 
-
   @Input() set user(user: PersonDto) {
     if (user) {
       this._user = this.prepareUser(user);
-
+      this.cdr?.markForCheck?.();
     }
   }
 

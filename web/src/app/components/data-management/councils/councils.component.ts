@@ -1,6 +1,6 @@
-import {Component, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {GlobalToastyService} from "app/services/global-toasty.service";
-import {compareByField, sortPersonsByName} from "app/support/utils";
+import {compareByField, createTrackKeyStore, sortPersonsByName} from "app/support/utils";
 import {Catalog, DataService} from "@app/services/data.service";
 import {BureauDto} from "@app/dto/BureauDto";
 import {CouncilDto} from "@app/dto/CouncilDto";
@@ -17,16 +17,40 @@ import {PersonPlainDto} from "@app/dto/PersonPlainDto";
 import {Filter} from "@app/components/common-components/page-and-filter/model/Filter";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import {SearchPersonComponent} from "@app/components/search/search-person/search-person.component";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-councils',
     templateUrl: './councils.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dataManagement) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   Catalog = Catalog;
 
   allSectionTypes: string[] = getAllSectionTypes();
+
+  private readonly _trackKey = createTrackKeyStore<object>('councils:');
+
+  /**
+   * Стабильный track-ключ для councils:
+   * - id с бэка
+   * - иначе clientId/trackKey из WeakMap (без мутации объекта)
+   *
+   * Вынесено в TS, чтобы не ломать строгую типизацию шаблонов.
+   */
+  trackCouncil(council: CouncilDto): number | string {
+    return council.id || this._trackKey(council);
+  }
+
+  /**
+   * Стабильный track-ключ для sections:
+   * - id с бэка
+   * - иначе clientId/trackKey из WeakMap (без мутации объекта)
+   */
+  trackSection(section: SectionDto): number | string {
+    return section.id || this._trackKey(section);
+  }
 
   councils: CouncilDto[];
   selectedCouncil: CouncilDto;
@@ -46,12 +70,16 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   constructor(private _toasty: GlobalToastyService,
               private _dataService: DataService,
               private _sectionTypePipe: SectionTypePipe,
-              private _councilPipe: CouncilPipe) {
+              private _councilPipe: CouncilPipe,
+              private cdr: ChangeDetectorRef) {
     super();
   }
 
   ngOnInit() {
-    this._dataService.getBelisa().subscribe(res => this.belisa = res);
+    this._dataService.getBelisa().subscribe(res => {
+      this.belisa = res;
+      this.cdr?.markForCheck?.();
+    });
     this._searchFields = [
       SearchField.contains('name').setPlaceholder('Поиск по наименованию...').setSortable(true),
       SearchField.equals('code').setPlaceholder('Поиск по коду...')
@@ -62,6 +90,13 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
       SearchField.checkbox('disabled', 'Показывать неактивные'),
     ];
     this.enableFilterCache("councils");
+    // Если нет сохранённого состояния фильтров, загружаем данные явно
+    setTimeout(() => {
+      const hasCachedFilters = localStorage.getItem('filter_cache_councils');
+      if (!hasCachedFilters) {
+        this.update();
+      }
+    }, 100);
   }
 
   loadPage() {
@@ -70,8 +105,12 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
       this._page = res;
       this.councils = this._page.content;
       this.councils.forEach(council => CouncilsComponent.sortCouncilData(council));
-      this.selectCouncil(this.councils[0])
-    }, () => this.setLoading(false));
+      this.selectCouncil(this.councils[0]);
+      this.cdr?.markForCheck?.();
+    }, () => {
+      this.setLoading(false);
+      this.cdr?.markForCheck?.();
+    });
   }
 
   councilToString(council: CouncilDto) {
@@ -129,6 +168,7 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
       this.selectedCouncil.isExpanded = true;
       CouncilsComponent.sortCouncils(this.councils);
       CouncilsComponent.sortCouncilData(this.selectedCouncil);
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -193,6 +233,7 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
       this.selectedCouncil.bureau = this.selectedBureau = res;
       this.selectedBureau.isExpanded = true;
       sortPersonsByName(this.selectedBureau.assessors);
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -250,11 +291,13 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
       this.selectedCouncil.sections[sectionInd] = section;
       section.isExpanded = true;
       sortPersonsByName(section.assessors);
+      this.cdr?.markForCheck?.();
     });
   }
 
   deleteSection(sectionInd) {
     this.selectedCouncil.sections.splice(sectionInd, 1);
+    this.cdr?.markForCheck?.();
     // if (this.editedSection.id != 0) {
     //   this._dataService.deleteSection(this.editedSection.id).subscribe();
     // }

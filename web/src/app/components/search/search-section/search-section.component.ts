@@ -1,12 +1,14 @@
-import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {ModalDirective} from "ngx-bootstrap/modal";
 import {DataService} from "app/services/data.service";
 import {SectionPlainDto} from "@app/dto/SectionPlainDto";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-search-section',
     templateUrl: './search-section.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.search) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class SearchSectionComponent implements OnInit {
 
@@ -14,7 +16,8 @@ export class SearchSectionComponent implements OnInit {
   @Output() selected = new EventEmitter<SectionPlainDto>();
   @ViewChild('searchModal', { static: false }) public searchModal: ModalDirective;
 
-  constructor(private _dataService: DataService) {
+  constructor(private _dataService: DataService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -25,16 +28,21 @@ export class SearchSectionComponent implements OnInit {
   }
 
   loadData(councilId) {
-    this._dataService.getSections(councilId).subscribe(res => this.data = res)
+    this._dataService.getSections(councilId).subscribe(res => {
+      this.data = res;
+      this.cdr?.markForCheck?.();
+    });
   }
 
   show(councilId) {
     this.data = [];
     this.loadData(councilId);
     this.searchModal.show();
+    this.cdr?.markForCheck?.();
   }
 
   hide() {
     this.searchModal.hide();
+    this.cdr?.markForCheck?.();
   }
 }

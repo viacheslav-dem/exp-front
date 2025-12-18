@@ -1,11 +1,13 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {SearchPersonComponent} from "app/components/search/search-person/search-person.component";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-search-person-by-roles',
     templateUrl: './search-person.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.search) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class SearchPersonByRolesComponent extends SearchPersonComponent {
 
@@ -22,6 +24,7 @@ export class SearchPersonByRolesComponent extends SearchPersonComponent {
     }
     this._roles = roles;
     this.update();
+    this.cdr?.markForCheck?.();
   }
 
   getFilters() {

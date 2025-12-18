@@ -1,4 +1,4 @@
-import {Component} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from "@angular/core";
 import {AuditService} from "@app/services/audit.service";
 import {AuditTypePipe, getAllAuditTypes} from "@app/pipes/audit-type.pipe";
 import {
@@ -11,6 +11,7 @@ import {
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {AuditRecordDto} from "@app/dto/AuditRecordDto";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-audit',
@@ -55,7 +56,8 @@ import {SearchField} from "@app/components/common-components/page-and-filter/mod
           color: #0d6efd !important;
       }
   `],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class AuditComponent extends FilterAndPages<AuditRecordDto> {
 
@@ -66,7 +68,8 @@ export class AuditComponent extends FilterAndPages<AuditRecordDto> {
   allTypes: string[] = getAllAuditTypes();
 
   constructor(private _service: AuditService,
-              private _auditTypePipe: AuditTypePipe) {
+              private _auditTypePipe: AuditTypePipe,
+              private cdr: ChangeDetectorRef) {
     super(15);
   }
 
@@ -78,6 +81,13 @@ export class AuditComponent extends FilterAndPages<AuditRecordDto> {
         .setSelectText('Выбрать тип').setCheckAllEnabled(true).setTitle('Тип записи'),
     ];
     this.enableFilterCache("audit");
+    // Если нет сохранённого состояния фильтров, загружаем данные явно
+    setTimeout(() => {
+      const hasCachedFilters = localStorage.getItem('filter_cache_audit');
+      if (!hasCachedFilters) {
+        this.update();
+      }
+    }, 100);
   }
 
   loadPage() {
@@ -85,7 +95,11 @@ export class AuditComponent extends FilterAndPages<AuditRecordDto> {
       this._page = res;
       this.audit = res.content;
       this.setLoading(false);
-    }, () => this.setLoading(false));
+      this.cdr?.markForCheck?.();
+    }, () => {
+      this.setLoading(false);
+      this.cdr?.markForCheck?.();
+    });
   }
 
   sortBy(property: string) {

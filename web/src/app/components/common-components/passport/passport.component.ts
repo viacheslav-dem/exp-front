@@ -1,7 +1,8 @@
-import {Component, forwardRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, forwardRef} from '@angular/core';
 import {ControlComponent} from "app/components/common-components/control-component";
 import {PassportDto} from "app/dto/PassportDto";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
+import {environment} from "../../../../environments/environment";
 
 export const PASSPORT_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -39,7 +40,10 @@ export const PASSPORT_CONTROL_VALUE_ACCESSOR: any = {
             }
     `,
     providers: [PASSPORT_CONTROL_VALUE_ACCESSOR],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class PassportComponent extends ControlComponent<PassportDto> {
 

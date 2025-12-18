@@ -1,5 +1,45 @@
 import * as _ from "lodash";
 
+/**
+ * Создаёт хранилище стабильных clientId/trackKey для объектов БЕЗ мутации самих объектов.
+ *
+ * Зачем:
+ * - для trackBy/@for track при id=0 (несохранённые элементы) или когда у модели нет id
+ * - чтобы избежать NG0956 и лишних пересозданий DOM
+ *
+ * Почему WeakMap:
+ * - не требует добавлять runtime-поля в DTO
+ * - не протекает памятью (объект ушёл из графа — ключ исчез)
+ *
+ * Ограничение:
+ * - если вы пересоздаёте элементы (новые объектные ссылки), им будет назначен новый ключ
+ *   (обычно это нормально; если нет — держите стабильный ключ на уровне данных/модели).
+ */
+export function createTrackKeyStore<T extends object>(prefix: string = 'tmp:') {
+  const store = new WeakMap<object, string>();
+
+  const uuid = (): string => {
+    // modern browsers
+    const g: any = globalThis as any;
+    if (g?.crypto?.randomUUID) {
+      return g.crypto.randomUUID();
+    }
+    // fallback: достаточно уникально для UI-ключей, без длинных хэшей
+    const r = Math.random().toString(16).slice(2);
+    const t = Date.now().toString(16);
+    return `${t}-${r}`;
+  };
+
+  return (obj: T): string => {
+    let key = store.get(obj);
+    if (!key) {
+      key = `${prefix}${uuid()}`;
+      store.set(obj, key);
+    }
+    return key;
+  };
+}
+
 export function sortPersonsByName(persons: any[]) {
   persons.sort((p1, p2) => {
     if (p1.personName.lastName == p2.personName.lastName) {

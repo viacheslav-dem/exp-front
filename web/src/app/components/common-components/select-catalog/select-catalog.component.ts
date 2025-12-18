@@ -23,7 +23,9 @@ export const CATALOG_CONTROL_VALUE_ACCESSOR: any = {
     providers: [CATALOG_CONTROL_VALUE_ACCESSOR],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.selectCatalog ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class SelectCatalogComponent extends ControlComponent<CatalogDto> implements OnInit, OnDestroy {
 
@@ -37,7 +39,7 @@ export class SelectCatalogComponent extends ControlComponent<CatalogDto> impleme
 
   constructor(
     private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private _cdr: ChangeDetectorRef
   ) {
     super();
   }
@@ -46,7 +48,7 @@ export class SelectCatalogComponent extends ControlComponent<CatalogDto> impleme
     this.subscription = this.dataService.getCatalog<CatalogDto>(this.catalog()).subscribe(res => {
       this.options = res;
       // Важно для OnPush/zoneless: данные пришли асинхронно
-      this.cdr.markForCheck();
+      this._cdr.markForCheck();
     });
   }
 

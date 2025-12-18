@@ -1,4 +1,4 @@
-import {Component} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from "@angular/core";
 import {RealTimeStatsDto} from "@app/dto/RealTimeStatsDto";
 import {StatsService} from "@app/services/stats.service";
 import {ProjectService} from "@app/services/project.service";
@@ -8,12 +8,14 @@ import {Router} from "@angular/router";
 import {AccountingService} from "@app/services/accounting.service";
 import {AccountingState} from "@app/pipes/accounting.pipe";
 import {ExpertReviewState} from "@app/pipes/review-state.pipe";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-real-time-stats',
     templateUrl: './real-time-stats.component.html',
     styleUrls: ['./real-time-stats.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class RealTimeStatsComponent {
 
@@ -22,7 +24,8 @@ export class RealTimeStatsComponent {
   constructor(private _statsService: StatsService,
               private _projectService: ProjectService,
               private _accountingService: AccountingService,
-              private _router: Router) {
+              private _router: Router,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
@@ -30,7 +33,10 @@ export class RealTimeStatsComponent {
   }
 
   update() {
-    this._statsService.getRealTimeStats().subscribe(res => this.realTimeStats = res);
+    this._statsService.getRealTimeStats().subscribe(res => {
+      this.realTimeStats = res;
+      this.cdr?.markForCheck?.();
+    });
   }
 
   showGkntProjects() {

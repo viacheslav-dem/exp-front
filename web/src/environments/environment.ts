@@ -7,27 +7,26 @@ export const environment = {
   production: false,
   features: {
     onPush: {
-      // Включаем в dev для обкатки. Для безопасного rollout в prod держим false (см. environment.prod.ts).
-      menu: true,
-      projectLi: true,
-      pagination: true,
-      filter: true,
-      loginoff: true,
-      dialogs: true,
-      modal: true,
-      progress: true,
-      fileEditor: true,
-      documentUploader: true,
-      dropdown: true,
-      selectCatalog: true,
-      dateInput: true,
-      datePeriod: true,
-      checkbox: true,
-      documentList: true,
-      pdfViewer: true,
-      timeInput: true,
-      numberRange: true,
-      passwordInput: true
+      // Групповые флаги: не раздуваем environment 200+ ключами.
+      // Dev: включено для обкатки. Prod: включать постепенно по группам (см. environment.prod.ts).
+      enabled: true,
+      groups: {
+        coreShell: true,
+        dialogs: true,
+        listsAndFilters: true,
+        commonControls: true,
+        fileAndPdf: true,
+        catalogsAdmin: true,
+        projectFlow: true,
+        listsAndInfo: true,
+        projectDetail: true,
+        meetings: true,
+        search: true,
+        dataManagement: true,
+        stats: true,
+        settings: true,
+        history: true
+      }
     }
   }
 };

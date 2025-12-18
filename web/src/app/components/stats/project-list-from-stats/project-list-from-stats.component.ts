@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, ViewChild} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Output, ViewChild} from "@angular/core";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {
     Direction,
@@ -12,12 +12,14 @@ import {ProjectDto} from "@app/dto/ProjectDto";
 import {Router} from "@angular/router";
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
+import {environment} from "../../../../environments/environment";
 
 
 @Component({
     selector: 'project-list-from-stats',
     templateUrl: 'project-list-from-stats.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
 
@@ -37,7 +39,8 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
     @ViewChild('searchModal', { static: false }) searchProjectModal: ModalComponent;
 
     constructor(protected service: ProjectService,
-                private router: Router) {
+                private router: Router,
+                private cdr: ChangeDetectorRef) {
         super();
         this._searchFields = [SearchField.startsWith('title').setPlaceholder('Поиск по наименованию объекта экспертизы...')];
     }
@@ -62,9 +65,14 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
                 this.countProjects = res.totalElements;
 
                 this.setLoading(false);
-            }, () => this.setLoading(false));
+                this.cdr?.markForCheck?.();
+            }, () => {
+                this.setLoading(false);
+                this.cdr?.markForCheck?.();
+            });
             this.period = dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY');
             this.searchProjectModal.show();
+            this.cdr?.markForCheck?.();
         }
     }
 

@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {ExpertReviewAndExpertDto} from "@app/dto/ExpertReviewAndExpertDto";
@@ -16,12 +16,14 @@ import {ModalComponent} from "@app/components/common-components/modal/modal.comp
 import {ChartService} from "@app/services/chart.service";
 import {ActivatedRoute, Router} from '@angular/router';
 import {PageRequest} from '@app/components/common-components/page-and-filter/model/PageRequest';
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-confirm-review-list',
     templateUrl: './confirm-review-list.component.html',
     styleUrls: ['confirm-review-list.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExpertsDto> {
 
@@ -39,6 +41,7 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
     private _chartService: ChartService,
     private _route: ActivatedRoute,
     private _router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     super();
   }
@@ -68,6 +71,7 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
     this._projectService.getConfirmReviewPage(this._searchRequest).subscribe(res => {
       this._page = res;
       this.projects = res.content;
+      this.cdr?.markForCheck?.();
       this.setLoading(false);
     }, () => this.setLoading(false))
 
@@ -89,6 +93,7 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
       this._reviewService.acceptExpert(review).subscribe(res => {
         review.state = res.state;
         this._toasty.success("Подтвержден.");
+        this.loadPage();
       });
     });
   }

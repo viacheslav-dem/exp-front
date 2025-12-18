@@ -1,4 +1,4 @@
-import {Component, ViewChild, input} from '@angular/core';
+import {Component, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {Role} from "@app/pipes/role.pipe";
@@ -7,6 +7,7 @@ import {PersonPlainDto} from "@app/dto/PersonPlainDto";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import {ReferralFormContent} from "@app/components/document-form/form-model/ReferralFormContent";
 import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-referral-form',
@@ -60,7 +61,11 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
           color: #666;
       }
   `],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class ReferralFormComponent extends DocumentForm<ReferralFormContent> {
 
@@ -74,10 +79,15 @@ export class ReferralFormComponent extends DocumentForm<ReferralFormContent> {
 
   @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
 
+  constructor(private cdr: ChangeDetectorRef) {
+    super();
+  }
+
   ngOnInit() {
     super.ngOnInit();
     this.searchPersonFilter = FilterBuilder.equals('gkntDepartment', this.project().gkntDepartment);
     this._form.gkntDepartmentChairman = this.project().gkntDepartmentChairman;
+    this.cdr?.markForCheck?.();
   }
 
   createNewForm(): ReferralFormContent {
@@ -91,6 +101,7 @@ export class ReferralFormComponent extends DocumentForm<ReferralFormContent> {
   selectPerson(person: PersonPlainDto) {
     this._form.gkntDepartmentChairman = person;
     this.searchPersonModal.hide();
+    this.cdr?.markForCheck?.();
   }
 
   is8_6() {

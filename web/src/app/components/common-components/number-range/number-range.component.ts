@@ -24,7 +24,9 @@ export const NUMBER_RANGE_FILTER_CONTROL_VALUE_ACCESSOR: any = {
     providers: [NUMBER_RANGE_FILTER_CONTROL_VALUE_ACCESSOR],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.numberRange ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class NumberRangeComponent extends ControlComponent<DoubleRange> {
 

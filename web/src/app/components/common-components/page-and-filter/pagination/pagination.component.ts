@@ -13,7 +13,9 @@ import {environment} from "../../../../../environments/environment";
     styleUrls: ['pagination.component.scss'],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.pagination ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.listsAndFilters)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class PaginationComponent implements OnInit, OnDestroy {
 

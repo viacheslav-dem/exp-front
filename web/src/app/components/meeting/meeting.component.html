@@ -59,7 +59,7 @@
       }
     </div>
     <div class="list-group">
-      @for (agenda of agendas; track agenda) {
+      @for (agenda of agendas; track agenda.id) {
         <div class="list-group-item">
           <div>
             <app-decision-tag [decision]="agenda.decision"></app-decision-tag>

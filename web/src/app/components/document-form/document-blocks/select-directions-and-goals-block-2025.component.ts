@@ -17,7 +17,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
             научно-технической и инновационной деятельности в Республике Беларусь,
             которым объект экспертизы <b>соответствует</b>:
           </label>
-          @for (direction of _allDirections; track direction) {
+          @for (direction of _allDirections; track direction.id) {
             <div>
               <app-checkbox [(ngModel)]="direction.isChecked"
                 (ngModelChange)="onDirectionChanged()">{{ direction.name }}
@@ -32,7 +32,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
             Выберите цели (приоритеты) социально-экономического развития,
             которым объект экспертизы <b>соответствует</b>:
           </label>
-          @for (item of _allGoals; track item) {
+          @for (item of _allGoals; track item.id) {
             <div>
               <app-checkbox [(ngModel)]="item.isChecked" (ngModelChange)="onGoalChanged()">{{ item.name }}
               </app-checkbox>

@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {DataService} from "@app/services/data.service";
 import {OrgDto} from "@app/dto/OrgDto";
@@ -9,11 +9,14 @@ import {SearchPersonComponent} from "@app/components/search/search-person/search
 import {PersonPlainDto} from "@app/dto/PersonPlainDto";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {SearchOrgComponent} from "@app/components/search/search-org/search-org.component";
+import {createTrackKeyStore} from "@app/support/utils";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-orgs',
     templateUrl: './orgs.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dataManagement) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class OrgsComponent extends FilterAndPages<OrgDto> {
 
@@ -22,12 +25,19 @@ export class OrgsComponent extends FilterAndPages<OrgDto> {
   selectedOrg: OrgDto;
   editedOrg: OrgDto;
 
+  private readonly _trackKey = createTrackKeyStore<object>('orgs:');
+
+  trackOrg(org: OrgDto): number | string {
+    return org.id || this._trackKey(org);
+  }
+
   @ViewChild(SearchPersonComponent) public searchPersonModal: SearchPersonComponent;
   @ViewChild(SearchOrgComponent) public searchOrgModal: SearchOrgComponent;
   @ViewChild('showSubOrgModal') showSubOrgModal: ModalComponent;
 
   constructor(private _toasty: GlobalToastyService,
-              private _dataService: DataService) {
+              private _dataService: DataService,
+              private cdr: ChangeDetectorRef) {
     super();
   }
 
@@ -38,6 +48,13 @@ export class OrgsComponent extends FilterAndPages<OrgDto> {
       SearchField.checkbox('disabled', 'Показывать неактивные'),
     ];
     this.enableFilterCache("orgs");
+    // Если нет сохранённого состояния фильтров, загружаем данные явно
+    setTimeout(() => {
+      const hasCachedFilters = localStorage.getItem('filter_cache_orgs');
+      if (!hasCachedFilters) {
+        this.update();
+      }
+    }, 100);
   }
 
   loadPage() {
@@ -45,7 +62,11 @@ export class OrgsComponent extends FilterAndPages<OrgDto> {
       this.setLoading(false);
       this._page = res;
       this.orgs = this._page.content;
-    }, () => this.setLoading(false));
+      this.cdr?.markForCheck?.();
+    }, () => {
+      this.setLoading(false);
+      this.cdr?.markForCheck?.();
+    });
   }
 
   editOrg(org: OrgDto) {
@@ -73,6 +94,7 @@ export class OrgsComponent extends FilterAndPages<OrgDto> {
       this._toasty.success("Сохранено.");
       this.update();
       this.searchOrgModal.update();
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -80,10 +102,12 @@ export class OrgsComponent extends FilterAndPages<OrgDto> {
     let newOrg = new OrgDto();
     this.orgs.unshift(newOrg);
     this.editOrg(newOrg);
+    this.cdr?.markForCheck?.();
   }
 
   deleteOrg(orgInd) {
     this.orgs.splice(orgInd, 1);
+    this.cdr?.markForCheck?.();
   }
 
   showPersonModal() {
@@ -97,11 +121,13 @@ export class OrgsComponent extends FilterAndPages<OrgDto> {
   selectPerson(person: PersonPlainDto) {
     this.editedOrg.chairman = person;
     this.searchPersonModal.hide();
+    this.cdr?.markForCheck?.();
   }
 
   selectOrg(org: OrgDto) {
     this.editedOrg.parentOrg = org;
     this.searchOrgModal.hide();
+    this.cdr?.markForCheck?.();
   }
 
   deleteParentOrg() {

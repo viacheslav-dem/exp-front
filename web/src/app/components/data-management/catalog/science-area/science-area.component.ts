@@ -1,8 +1,9 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {Catalog, DataService} from "@app/services/data.service";
 import {SimpleCatalogComponent} from "@app/components/data-management/catalog/simple-catalog/simple-catalog.component";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {ScienceAreaDto} from "@app/dto/ScienceAreaDto";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-science-area',
@@ -96,7 +97,10 @@ import {ScienceAreaDto} from "@app/dto/ScienceAreaDto";
         </div>
     `,
     styles: [],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class ScienceAreaComponent extends SimpleCatalogComponent<ScienceAreaDto> {
 

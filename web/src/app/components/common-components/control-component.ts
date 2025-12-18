@@ -1,5 +1,5 @@
 import {ControlValueAccessor} from "@angular/forms";
-import { OnInit, Directive, input } from "@angular/core";
+import {ChangeDetectorRef, Directive, inject, input, OnInit} from "@angular/core";
 
 @Directive()
 export class ControlComponent<T> implements OnInit, ControlValueAccessor {
@@ -8,6 +8,16 @@ export class ControlComponent<T> implements OnInit, ControlValueAccessor {
   readonly name = input<string>('unnamed_control_' + Math.random());
   readonly placeholder = input<string>('');
   readonly title = input<string>('');
+  // В обычном Angular DI-контексте ChangeDetectorRef доступен всегда.
+  // Но на всякий случай (например, если компонент создают вручную через `new` в legacy-тестах)
+  // не падаем, а деградируем в null.
+  protected readonly cdr: ChangeDetectorRef | null = (() => {
+    try {
+      return inject(ChangeDetectorRef);
+    } catch {
+      return null;
+    }
+  })();
   protected onTouchedCallbacks = [];
   protected onChangeCallbacks = [];
   protected debug: boolean;
@@ -28,6 +38,9 @@ export class ControlComponent<T> implements OnInit, ControlValueAccessor {
       this._value = v;
       this.onChangeCallbacks.forEach(f => f(v));
       this.onTouchedCallbacks.forEach(f => f());
+      // Важно для OnPush + zoneless: смена значения через CVA не является @Input,
+      // поэтому компонент может не быть проверен без явного markForCheck().
+      this.cdr?.markForCheck();
     }
   }
 
@@ -38,6 +51,8 @@ export class ControlComponent<T> implements OnInit, ControlValueAccessor {
       // Вызываем prepareValue только если значение не null/undefined
       // или если компонент может обработать null
       this.prepareValue();
+      // Важно для OnPush + zoneless: writeValue не триггерит проверку сам по себе.
+      this.cdr?.markForCheck();
     }
   }
 

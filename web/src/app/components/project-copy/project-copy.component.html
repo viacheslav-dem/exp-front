@@ -9,6 +9,67 @@
       <label class="form-group-label">Материалы объекта экспертизы</label>
       <app-checkbox-list [options]="docs" [selected]="selectedDocs"></app-checkbox-list>
     </div>
+
+    <div class="form-group">
+      <label class="form-group-label">Будет скопировано из исходного объекта</label>
+      <div class="small text-muted mb-1">
+        Эти поля копируются автоматически и будут доступны для редактирования уже в созданном объекте экспертизы.
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div><b>Код</b>: {{ _project.code?.code || '—' }}</div>
+          <div><b>Период</b>:
+            {{ _project.period?.start ? (_project.period.start | mdate) : '—' }}
+            —
+            {{ _project.period?.end ? (_project.period.end | mdate) : '—' }}
+          </div>
+          <div><b>Исполнитель</b>: {{ _project.executor || '—' }}</div>
+          <div><b>Валюта</b>: {{ _project.currency?.name || '—' }}</div>
+        </div>
+
+        <div class="col-md-6">
+          <div><b>Направления</b>:</div>
+          <div class="pl-2">
+            <div *ngFor="let d of (_project.directions || [])">{{ d?.name }}</div>
+            @if (!_project.directions || _project.directions.length === 0) { <div>—</div> }
+          </div>
+
+          <div class="mt-2"><b>Соц.-экон. цели</b>:</div>
+          <div class="pl-2">
+            <div *ngFor="let g of (_project.socialEconomicGoals || [])">{{ g?.name }}</div>
+            @if (!_project.socialEconomicGoals || _project.socialEconomicGoals.length === 0) { <div>—</div> }
+          </div>
+
+          <div class="mt-2"><b>Специализации</b>:</div>
+          <div class="pl-2">
+            <div *ngFor="let s of (_project.projectSpecialization || [])">{{ s?.name }}</div>
+            @if (!_project.projectSpecialization || _project.projectSpecialization.length === 0) { <div>—</div> }
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-2"><b>Финансирование</b>:</div>
+      <div class="pl-2">
+        <div *ngFor="let f of (_project.financing || [])">
+          {{ formatNumber(f?.value, 2) }} {{ _project.currency?.name || '' }}
+          @if (f?.type) { <span> — {{ f.type }}</span> }
+          @if (f?.source?.name) { <span> ({{ f.source.name }})</span> }
+          @if (f?.comment) { <span>: {{ f.comment }}</span> }
+        </div>
+        @if (!_project.financing || _project.financing.length === 0) { <div>—</div> }
+      </div>
+
+      <div class="mt-2"><b>Ожидаемый результат</b>:</div>
+      <div class="pl-2">
+        <div><b>Тип</b>: {{ _project.expectedResult?.expectedResultType || '—' }}</div>
+        <div><b>Характер</b>: {{ _project.expectedResult?.resultCharacter || '—' }}</div>
+        @if (_project.expectedResultDescription) {
+          <div><b>Описание</b>: {{ _project.expectedResultDescription }}</div>
+        }
+      </div>
+    </div>
+
     <div class="text-xs-center">
       <button class="btn btn-primary btn-sm mr-1" (click)="onSave()">Сохранить</button>
       <button class="btn btn-secondary btn-sm" (click)="onCancel()">Отмена</button>

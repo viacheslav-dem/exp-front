@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, input} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from "@angular/router";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
@@ -10,11 +10,13 @@ import {ModalComponent} from "@app/components/common-components/modal/modal.comp
 import {TransitionHistoryService} from "@app/services/transition-history.service";
 import {LifecycleGroupState} from "@app/pipes/lifecycle-group-state.pipe";
 import {ProjectDto} from "@app/dto/ProjectDto";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-lifecycle-info',
     templateUrl: './lifecycle-info.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.listsAndInfo) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class LifecycleInfoComponent implements OnInit, OnDestroy {
 
@@ -35,7 +37,8 @@ export class LifecycleInfoComponent implements OnInit, OnDestroy {
 
   constructor(private route: ActivatedRoute,
               private _toasty: GlobalToastyService,
-              private _transitionHistoryService: TransitionHistoryService) {
+              private _transitionHistoryService: TransitionHistoryService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -50,7 +53,10 @@ export class LifecycleInfoComponent implements OnInit, OnDestroy {
     this.transitionHistoryModal.show();
     this.subscriptions.push(
       this._transitionHistoryService.getLifecycleHistory(this._lifecycle)
-        .subscribe(res => this.transitionHistory = res)
+        .subscribe(res => {
+          this.transitionHistory = res;
+          this.cdr?.markForCheck?.();
+        })
     );
   }
 

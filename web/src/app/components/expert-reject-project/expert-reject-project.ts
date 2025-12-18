@@ -1,12 +1,17 @@
-import {Component, EventEmitter, Output, input} from "@angular/core";
+import {Component, EventEmitter, Output, input, ChangeDetectionStrategy, ChangeDetectorRef} from "@angular/core";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {DatePipe} from "@angular/common";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-expert-reject-project',
     templateUrl: 'expert-reject-project.html',
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 
 
@@ -22,11 +27,13 @@ export class ExpertRejectProject {
   date: Date;
 
   constructor(private _toasty: GlobalToastyService,
-              private _datePipe: DatePipe) {
+              private _datePipe: DatePipe,
+              private cdr: ChangeDetectorRef) {
   }
 
   onCancel() {
     this.cancel.emit();
+    this.cdr?.markForCheck?.();
   }
 
   onSave() {
@@ -46,8 +53,10 @@ export class ExpertRejectProject {
         finalReason = this.createOtherReason();
         break;
     }
-    if (finalReason != null)
+    if (finalReason != null) {
       this.confirm.emit(finalReason);
+      this.cdr?.markForCheck?.();
+    }
   }
 
   createTimeReason(): string {

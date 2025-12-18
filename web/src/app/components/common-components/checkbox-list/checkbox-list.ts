@@ -1,4 +1,5 @@
-import {Component, OnInit, input} from "@angular/core";
+import {Component, OnInit, input, ChangeDetectionStrategy, ChangeDetectorRef} from "@angular/core";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-checkbox-list',
@@ -11,9 +12,15 @@ import {Component, OnInit, input} from "@angular/core";
       }
     </div>
     `,
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class CheckBoxListComponent implements OnInit {
+  
+  constructor(private cdr: ChangeDetectorRef) {}
 
 
   readonly selected = input<any[]>(undefined);
@@ -46,6 +53,7 @@ export class CheckBoxListComponent implements OnInit {
         this.selected().splice(index, 1);
       }
     }
+    this.cdr?.markForCheck?.();
   }
 }
 

@@ -36,7 +36,7 @@
   <div class="row form-sub-group">
     <div class="col-md-6">
       <label class="form-group-label">Участники заседания (члены ГЭС)</label>
-      @for (assessor of assessors; track assessor; let i = $index) {
+      @for (assessor of assessors; track assessor.id; let i = $index) {
         <app-checkbox [(ngModel)]="assessor.isChecked"
           (onChecked)="participantsChanged()">
           <span class="italic">{{i + 1}}. {{assessor | fullName}}</span>
@@ -49,14 +49,14 @@
       @if (invited.length == 0) {
         <div class="italic mb-1">Отсутствуют</div>
       }
-      @for (person of invited; track person; let i = $index) {
+      @for (person of invited; track trackInvited(person); let i = $index) {
         <div class="input-group btn-group input-group-sm mb-2">
           <input title="Приглашённое лицо"
             [(ngModel)]="person.name" type="text" class="form-control" placeholder="И.О.Фамилия">
             <button (click)="invited.splice(i, 1)" type="button" class="btn btn-sm btn-outline-danger">&times;</button>
           </div>
         }
-        <button (click)="invited.push({name:''})" type="button" class="btn btn-primary btn-sm">
+        <button (click)="addInvited()" type="button" class="btn btn-primary btn-sm">
           Добавить приглашённое лицо
         </button>
       </div>

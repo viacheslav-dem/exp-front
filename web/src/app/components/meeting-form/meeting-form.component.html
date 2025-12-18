@@ -21,7 +21,7 @@
     </div>
     <div class="col-8">
       <h5>Объекты экспертизы</h5>
-      @for (project of projects; track project) {
+      @for (project of projects; track project.id) {
         <div>
           <ng-container>
             <app-checkbox [(ngModel)]="project.isChecked">{{project | titleAndCode}}</app-checkbox>

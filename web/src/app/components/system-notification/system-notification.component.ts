@@ -1,13 +1,15 @@
-import {Component} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from "@angular/core";
 import {DialogService} from "@app/components/dialogs/dialog.service";
 import {SystemNotificationService} from "@app/services/system-notification.service";
 import {SystemNotificationDto,} from "@app/dto/SystemNotificationDto";
 import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'system-notification',
     templateUrl: './system-notification.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class SystemNotificationComponent {
 
@@ -24,7 +26,8 @@ export class SystemNotificationComponent {
 
     constructor(private notificationService: SystemNotificationService,
                 private dialogService: DialogService,
-                private safeHtmlPipe: SafeHtmlPipe,) {
+                private safeHtmlPipe: SafeHtmlPipe,
+                private cdr: ChangeDetectorRef) {
     }
 
     ngOnInit() {
@@ -40,6 +43,7 @@ export class SystemNotificationComponent {
 
         if (this.notification.name == null) {
             this.notification.message = "";
+            this.cdr?.markForCheck?.();
         } else {
 
             this.notificationService.getNotification(this.notification).subscribe(
@@ -53,9 +57,11 @@ export class SystemNotificationComponent {
                         case SystemNotificationNames.ALL_PAGES_NOTIFICATION:
                             this.displayedNotificationStyleClass = "card-notification-all-pages"; break;
                     }
+                    this.cdr?.markForCheck?.();
                 },
                 () => {
                     this.notification.message = "";
+                    this.cdr?.markForCheck?.();
                 });
         }
     }
@@ -76,6 +82,7 @@ export class SystemNotificationComponent {
 
                 this.notificationService.saveNotification(this.notification).subscribe(res => {
                     this.notification = res;
+                    this.cdr?.markForCheck?.();
                 });
                 window.location.reload();
             })
@@ -94,6 +101,7 @@ export class SystemNotificationComponent {
 
                 this.notificationService.saveNotification(this.notification).subscribe(res => {
                     this.notification = res;
+                    this.cdr?.markForCheck?.();
                 });
             })
     }

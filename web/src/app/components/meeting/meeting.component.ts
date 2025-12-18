@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef} from "@angular/core";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "@app/services/auth.service";
@@ -20,11 +20,16 @@ import {LifecycleService} from "@app/services/lifecycle.service";
 import {RemarksContainerDto} from "@app/dto/RemarksContainerDto";
 import {MeetingProtocolFormComponent} from "@app/components/document-form/meeting-protocol-form/meeting-protocol-form.component";
 import {Subscription} from "rxjs";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-meeting',
     templateUrl: 'meeting.component.html',
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.meetings)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class MeetingComponent implements OnInit, OnDestroy {
 
@@ -53,7 +58,8 @@ export class MeetingComponent implements OnInit, OnDestroy {
               private _projectService: ProjectService,
               private _dialogService: DialogService,
               private router: Router,
-              private _lifecycleService: LifecycleService) {
+              private _lifecycleService: LifecycleService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -73,6 +79,7 @@ export class MeetingComponent implements OnInit, OnDestroy {
       this._meetingService.getMeeting(idDto).subscribe(res => {
         this.meeting = res;
         this.agendas = this.meeting.agendas;
+        this.cdr?.markForCheck?.();
       })
     );
   }
@@ -84,6 +91,7 @@ export class MeetingComponent implements OnInit, OnDestroy {
   onSave(meeting: MeetingDto) {
     this.meeting = meeting;
     this.agendas = meeting.agendas;
+    this.cdr?.markForCheck?.();
   }
 
   saveAgendaDecisions() {
@@ -97,6 +105,7 @@ export class MeetingComponent implements OnInit, OnDestroy {
             this.meeting = res;
             this.agendas = this.meeting.agendas;
             this._toasty.success("Заседание завершено.");
+            this.cdr?.markForCheck?.();
             this.router.navigateByUrl('/meetings');
           })
         );
@@ -123,6 +132,7 @@ export class MeetingComponent implements OnInit, OnDestroy {
             this.meeting = res;
             this.agendas = this.meeting.agendas;
             this._toasty.success("Заседание отменено.");
+            this.cdr?.markForCheck?.();
           })
         );
       })
@@ -137,6 +147,7 @@ export class MeetingComponent implements OnInit, OnDestroy {
           this.meeting.paymentDocument = res[1];
           this.closeProtocolForm();
           this.loadMeeting(this.meeting);
+          this.cdr?.markForCheck?.();
         })
     );
   }
@@ -151,6 +162,7 @@ export class MeetingComponent implements OnInit, OnDestroy {
       )
     );
     this.sectionRemarks.show();
+    this.cdr?.markForCheck?.();
   }
 
   generateBureauRemark(project: ProjectCodePlainDto) {
@@ -163,6 +175,7 @@ export class MeetingComponent implements OnInit, OnDestroy {
       )
     );
     this.bureauRemarks.show();
+    this.cdr?.markForCheck?.();
   }
 
   showCustomerAnswer(agenda: AgendaDto) {
@@ -180,23 +193,29 @@ export class MeetingComponent implements OnInit, OnDestroy {
     if (this.role === Role.SECTION_CHAIRMAN || this.role === Role.SECTION_ASSESSOR) {
       this.remarkResponseForSection.show();
     }
+    this.cdr?.markForCheck?.();
   }
 
 
   deleteProtocol() {
     this._meetingService.deleteMeetingProtocol(this.meeting.report, this.meeting, () =>
       this.meeting.report = null);
+    this.cdr?.markForCheck?.();
   }
 
   deleteProtocolAppendix() {
     this._meetingService.deleteMeetingProtocolAppendix(this.meeting.paymentDocument, this.meeting, () =>
       this.meeting.paymentDocument = null);
+    this.cdr?.markForCheck?.();
   }
 
   loadComments(agenda: AgendaDto) {
     this.subscriptions.push(
       this._agendaService.getCommentsByAgenda(agenda)
-        .subscribe(res => agenda.comments = res)
+        .subscribe(res => {
+          agenda.comments = res;
+          this.cdr?.markForCheck?.();
+        })
     );
   }
 
@@ -204,12 +223,18 @@ export class MeetingComponent implements OnInit, OnDestroy {
     if (this.role === Role.BUREAU_CHAIRMAN) {
       this.subscriptions.push(
         this._agendaService.getSectionReportsByBureauAssessor(agenda)
-          .subscribe(res => agenda.sectionProtocols = res)
+          .subscribe(res => {
+            agenda.sectionProtocols = res;
+            this.cdr?.markForCheck?.();
+          })
       );
     }
     this.subscriptions.push(
       this._agendaService.getAgendaExpertReviews(agenda)
-        .subscribe(res => agenda.expertReviews = res)
+        .subscribe(res => {
+          agenda.expertReviews = res;
+          this.cdr?.markForCheck?.();
+        })
     );
   }
 
@@ -219,6 +244,7 @@ export class MeetingComponent implements OnInit, OnDestroy {
       this.loadDocuments(agenda);
     }
     agenda.isCollapsed = !agenda.isCollapsed;
+    this.cdr?.markForCheck?.();
   }
 
   saveSectionRemarks(remarks: RemarksContainerDto) {
@@ -226,6 +252,7 @@ export class MeetingComponent implements OnInit, OnDestroy {
       this._meetingService.saveSectionRemarks(remarks).subscribe(value =>
         this.sectionRemarks.hide())
     );
+    this.cdr?.markForCheck?.();
   }
 
   saveBureauRemarks(remarks: RemarksContainerDto) {
@@ -233,12 +260,14 @@ export class MeetingComponent implements OnInit, OnDestroy {
       this._meetingService.saveBureauRemarks(remarks).subscribe(value =>
         this.bureauRemarks.hide())
     );
+    this.cdr?.markForCheck?.();
   }
 
   showProtocolForm() {
     this.protocolForm.prepareAgendaForms();
     this.protocolFormModal.show();
     this.protocolForm.startAutoSave();
+    this.cdr?.markForCheck?.();
   }
 
   closeProtocolForm() {

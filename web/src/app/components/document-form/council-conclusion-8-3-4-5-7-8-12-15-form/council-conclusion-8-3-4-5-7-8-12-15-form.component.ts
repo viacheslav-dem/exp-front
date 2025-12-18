@@ -195,12 +195,6 @@ export class CouncilConclusion_8_3_4_5_7_8_12_15_FormComponent extends CouncilCo
             throw "В пункте 'Обоснование конкурентоспособности разработки.' комментарий должен быть не менее 30 символов.";
         }
 
-        if (isEmptyOrNull(this._form.competitivenessText)) {
-            throw "В пункте 'Обоснование конкурентоспособности разработки.' нет комментария к заключению.";
-        } else if (this._form.competitivenessText.length < 30) {
-            throw "В пункте 'Обоснование конкурентоспособности разработки.' комментарий должен быть не менее 30 символов.";
-        }
-
         if (isEmptyOrNull(this._form.analogParamsText)) {
             throw "В пункте 'Основные технико-экономические и социально-экономические параметры планируемых новшеств.' нет комментария к заключению.";
         } else if (this._form.analogParamsText.length < 30) {
@@ -216,7 +210,9 @@ export class CouncilConclusion_8_3_4_5_7_8_12_15_FormComponent extends CouncilCo
             throw "В пункте 'Обоснование прогнозируемой потребности в разрабатываемой продукции.' комментарий должен быть не менее 30 символов.";
         }
 
-        if (this.showTarget8_8() || this.showTarget8_3() || this.showTarget8_4()) {
+        // По требованиям: пункт "Уровень технологического уклада..." не относится к объектам 8.4
+        // (и в шаблоне для 8.4 не должен отображаться), поэтому исключаем 8.4 из обязательной валидации.
+        if (this.showTarget8_8() || this.showTarget8_3()) {
             if (isEmptyOrNull(this._form.technologicalOrder)) {
                 throw "В пункте 'Уровень технологического уклада научно-технической продукции.' не выстановленно заключение.";
             }

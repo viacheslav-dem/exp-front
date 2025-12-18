@@ -1,8 +1,9 @@
 import {merge as observableMerge, Observable, of as observableOf, Subscription} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {Component, Injector, OnChanges, OnInit, Renderer2, SimpleChanges, input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Injector, OnChanges, OnInit, Renderer2, SimpleChanges, input} from '@angular/core';
 import {AbstractControl} from "@angular/forms";
 import {NestableFormDirective} from "app/components/common-components/custom-forms/nestable-form.directive";
+import {environment} from "../../../../../environments/environment";
 
 
 @Component({
@@ -17,7 +18,10 @@ import {NestableFormDirective} from "app/components/common-components/custom-for
     }
     <!--<app-show-json [objectToShow]="control.errors"></app-show-json>-->
     `,
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class ControlErrorMessagesComponent implements OnInit, OnChanges {
 
@@ -35,7 +39,7 @@ export class ControlErrorMessagesComponent implements OnInit, OnChanges {
 
   pattern_patternErrorMessage = {};
 
-  constructor(private renderer: Renderer2, private injector: Injector) {
+  constructor(private renderer: Renderer2, private injector: Injector, private cdr: ChangeDetectorRef) {
     // this.pattern_patternErrorMessage[constantsHolder.passwordPattern] = "пароль должен быть от 6 до 20 символов, содержать цифры и буквы латинского алфавита";
     // this.pattern_patternErrorMessage[constantsHolder.identificationNumberPattern] = "номер должен быть вида 0000000A000AA0 (буквы латинского алфавита)";
     // this.pattern_patternErrorMessage[constantsHolder.registrationIndexPattern] = "номер должен быть вида 00-00ААА либо 00-000ААА (буквы русского алфавита)";
@@ -72,6 +76,8 @@ export class ControlErrorMessagesComponent implements OnInit, OnChanges {
         // this.controlValue$ = Observable.merge(this.control.valueChanges, Observable.of(''), formSubmit$);
         this.controlSubscription = this.controlValue$.subscribe(() => {
           this.updateVisibility();
+          // Важно для OnPush/zoneless: ошибки/сообщения обновляются из подписки
+          this.cdr.markForCheck();
         });
       } else {
         // console.log("messages not available", this);

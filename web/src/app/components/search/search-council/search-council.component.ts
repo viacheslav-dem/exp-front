@@ -1,11 +1,13 @@
-import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {ModalDirective} from "ngx-bootstrap/modal";
 import {DataService} from "app/services/data.service";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-search-council',
     templateUrl: './search-council.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.search) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class SearchCouncilComponent implements OnInit {
 
@@ -13,7 +15,7 @@ export class SearchCouncilComponent implements OnInit {
   @Output() selected = new EventEmitter();
   @ViewChild('searchModal', { static: false }) public searchModal: ModalDirective;
 
-  constructor(private _dataService: DataService) {
+  constructor(private _dataService: DataService, private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -24,16 +26,21 @@ export class SearchCouncilComponent implements OnInit {
   }
 
   loadData() {
-    this._dataService.getCouncils().subscribe(res => this.data = res)
+    this._dataService.getCouncils().subscribe(res => {
+      this.data = res;
+      this.cdr?.markForCheck?.();
+    });
   }
 
   show() {
     this.loadData();
     this.searchModal.show();
+    this.cdr?.markForCheck?.();
   }
 
   hide() {
     this.searchModal.hide();
+    this.cdr?.markForCheck?.();
   }
 
 }

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, input} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {PersonService} from "@app/services/person.service";
 import {Router} from "@angular/router";
@@ -8,12 +8,17 @@ import {ProjectLifecycleDto} from "@app/dto/ProjectLifecycleDto";
 import {LifecycleGroupDto} from "@app/dto/LifecycleGroupDto";
 import {ProjectService} from "@app/services/project.service";
 import {ProjectDto} from "@app/dto/ProjectDto";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-lifecycle-group-list',
     templateUrl: './lifecycle-group-list.component.html',
     styleUrls: ['lifecycle-group-list.component.scss'],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class LifecycleGroupListComponent implements OnInit, OnDestroy {
 
@@ -31,7 +36,8 @@ export class LifecycleGroupListComponent implements OnInit, OnDestroy {
 
   constructor(private _plainService: PersonService,
               private _router: Router,
-              private _projectService: ProjectService) {
+              private _projectService: ProjectService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -58,6 +64,7 @@ export class LifecycleGroupListComponent implements OnInit, OnDestroy {
         this.groups().push(res);
         this.searchCouncilComponent.hide();
         this.changed();
+        this.cdr?.markForCheck?.();
       })
     );
   }
@@ -70,5 +77,6 @@ export class LifecycleGroupListComponent implements OnInit, OnDestroy {
   deleteGroup(group) {
     this.groups().splice(this.groups().indexOf(group), 1);
     this.changed();
+    this.cdr?.markForCheck?.();
   }
 }

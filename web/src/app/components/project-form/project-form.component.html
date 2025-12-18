@@ -13,7 +13,7 @@
                     data-toggle="dropdown">{{ _project.code ? _project.code.code : "Выберите код" }}
             </button>
             <ul class="dropdown-menu scrollable-menu">
-                @for (code of codes; track code.id) {
+                @for (code of codes; track (code?.id ?? code?.code ?? $index)) {
                     <li class="dropdown-item" (click)="selectCode(code)">
                         <span class="font-weight-bold">{{ code.code }}</span>{{
                             !code.name || code.name == '' ? '' : ' - ' +
@@ -40,7 +40,7 @@
 
     <div class="form-group">
         <label class="form-group-label">Коды специализации</label>
-        @for (specialization of _project.projectSpecialization; track trackBySpecialization(specialization); let i = $index) {
+        @for (specialization of _project.projectSpecialization; track trackBySpecialization(i, specialization); let i = $index) {
             <div class="specialization-item-wrapper mb-2">
                 <div class="input-group">
                     <ng-select
@@ -49,6 +49,7 @@
                         [typeahead]="getSpecializationSearchInput$(i)"
                         [(ngModel)]="_project.projectSpecialization[i]"
                         [compareWith]="compareSpecialization"
+                        [appendTo]="'body'"
                         placeholder="Выберите специализацию"
                         [searchable]="true"
                         [clearable]="true"
@@ -234,7 +235,7 @@
                 <div class="form-sub-group italic">
                     @if (directions.length != 0) {
                         <div>
-                            @for (dir of displayDirection(); track dir.id; let i = $index) {
+                            @for (dir of displayDirection(); track (dir?.id ?? i); let i = $index) {
                                 <div>
                                     {{ dir.name }}
                                     <a class="btn btn-icon btn-icon-sm" (click)="deleteDirection(dir, i)">
@@ -242,7 +243,7 @@
                                     </a>
                                     <br>
                                     <ul>
-                                        @for (subDir of dir.subDirectionDtos; track subDir.id; let j = $index) {
+                                        @for (subDir of dir.subDirectionDtos; track (subDir?.id ?? j); let j = $index) {
                                             <li>
                                                 {{ subDir.directionName }}
                                                 <a class="btn btn-icon btn-icon-sm" (click)="display(dir, j, i)">
@@ -370,7 +371,7 @@
                             data-toggle="dropdown">{{ _project.expectedResult ? _project.expectedResult.expectedResultType : "Выберите вид ожидаемого результата" }}
                     </button>
                     <ul class="dropdown-menu scrollable-menu">
-                        @for (result of expectedResultList; track result.id) {
+                        @for (result of expectedResultList; track (result?.id ?? result?.expectedResultType ?? $index)) {
                             <li class="dropdown-item"
                                 (click)="selectExpectedResult(result)">
                                 <span>{{ result.expectedResultType }}</span>
@@ -502,7 +503,7 @@
                     <div class="form-sub-group italic">
                         @if (_project.commercializationMethods.length != 0) {
                             <ul>
-                                @for (method of _project.commercializationMethods; track method.id; let i = $index) {
+                                @for (method of _project.commercializationMethods; track (method?.id ?? method?.name ?? i); let i = $index) {
                                     <li>
                                         <span>{{ method.name }}: </span>
                                         <a class="btn btn-icon btn-icon-sm" (click)="_project.commercializationMethods.splice(i, 1)">
@@ -594,7 +595,7 @@
         }
 
     <div class="text-xs-center mt-2">
-        <button class="btn btn-primary btn-sm mr-1" (click)="onSave()">Сохранить</button>
+        <button class="btn btn-primary btn-sm me-2" (click)="onSave()">Сохранить</button>
         <button class="btn btn-secondary btn-sm" (click)="onCancel()">Отмена</button>
     </div>
     </div>

@@ -1,4 +1,4 @@
-import {Component, Input, input} from "@angular/core";
+import {Component, Input, input, ChangeDetectionStrategy, ChangeDetectorRef, ComponentFactoryResolver} from "@angular/core";
 import {DocumentFormContainerComponent} from "@app/components/document-form/document-form-container/document-form-container.component";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ExpertReviewFormContent} from "@app/components/document-form/form-model/ExpertReviewFormContent";
@@ -6,6 +6,7 @@ import {ExpertReviewForm} from "@app/components/document-form/expert-review-form
 import {TemplateType} from "@app/components/document-form/form-model/TemplateType";
 import {DraftService} from "@app/components/document-form/draft.service";
 import {IdDto} from "@app/dto/IdDto";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-expert-review-form',
@@ -25,9 +26,17 @@ import {IdDto} from "@app/dto/IdDto";
           margin-bottom: 0.5rem;
       }
   `],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormContent> extends DocumentFormContainerComponent<Form> {
+  
+  constructor(resolver: ComponentFactoryResolver, cdr: ChangeDetectorRef) {
+    super(resolver, cdr);
+  }
 
   _project: ProjectDto;
 
@@ -60,17 +69,28 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
     }
   }
 
+  private getExpertReviewType(): string | undefined {
+    // Проект может приходить частично загруженным или ошибочно переданным (например, signal вместо значения).
+    // В проде лучше деградировать без падения UI.
+    return this._project?.code?.expertReviewType;
+  }
+
   isOldReviewType() {
-    return !this._project.code.expertReviewType.endsWith('_NEW');
+    const type = this.getExpertReviewType();
+    // Консервативное поведение: если тип неизвестен, считаем форму "старой", чтобы не требовать доп. выбора направлений.
+    if (!type) return true;
+    return !type.endsWith('_NEW');
   }
 
   canHasSocialEconomicGoals() {
-    return this._project.code.code == '8.13';
+    return this._project?.code?.code === '8.13';
   }
 
   needSelectDirections() {
+    const type = this.getExpertReviewType();
+    if (!type) return false;
     return !this.isOldReviewType()
-      && this._project.code.expertReviewType != TemplateType.EXPERT_REVIEW_8_10PVT_NEW
-      && this._project.code.expertReviewType != TemplateType.EXPERT_REVIEW_8_10PIT_NEW;
+      && type !== TemplateType.EXPERT_REVIEW_8_10PVT_NEW
+      && type !== TemplateType.EXPERT_REVIEW_8_10PIT_NEW;
   }
 }

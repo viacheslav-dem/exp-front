@@ -1,4 +1,4 @@
-import {Component, OnDestroy, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, ViewChild} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {PersonService} from "@app/services/person.service";
 import {Catalog, DataService} from "@app/services/data.service";
@@ -20,12 +20,14 @@ import {Subscription} from "rxjs";
 import {AcademicTitleTypePipe, getAllAcademicTitleTypes} from "@app/pipes/academic-title.pipe";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {LastSignEnumPipe} from "@app/pipes/last-sign.pipe";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-user-list',
     templateUrl: './user-list.component.html',
     styleUrls: ['user-list.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class UserListComponent extends FilterAndPages<PersonDto> implements OnDestroy {
 
@@ -44,7 +46,8 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
               private _academicTitleTypePipe: AcademicTitleTypePipe,
               private _rolePipe: RolePipe,
               private _lastSignPipe: LastSignEnumPipe,
-              private _degreeTypePipe: DegreeTypePipe) {
+              private _degreeTypePipe: DegreeTypePipe,
+              private cdr: ChangeDetectorRef) {
     super(10);
   }
 
@@ -73,21 +76,33 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
     ];
     this._dataService.getCatalog(Catalog.AREA_OF_COMPETENCE).subscribe((areas: IdNameDto[]) => {
       this.getSearchField('areas').setItems(areas);
+      this.cdr?.markForCheck?.();
     });
     this._dataService.getCatalog(Catalog.SPECIALITY).subscribe((speciality: IdNameDto[]) => {
       this.getSearchField('personInfo.specialities').setItems(speciality);
+      this.cdr?.markForCheck?.();
     });
     this._dataService.getCatalog(Catalog.SPECIALIZATION).subscribe((specialization: IdNameDto[]) => {
       this.getSearchField('personInfo.specializations').setItems(specialization);
+      this.cdr?.markForCheck?.();
     });
     this._dataService.getCatalog(Catalog.SCIENCE_AREA).subscribe((scienceArea: IdNameDto[]) => {
       this.getSearchField('personInfo.fullDegrees.scienceArea').setItems(scienceArea);
+      this.cdr?.markForCheck?.();
     });
     this._dataService.getOrgs().subscribe(orgs => {
       this.getSearchField('org').setItems(orgs);
+      this.cdr?.markForCheck?.();
     });
     this.onPersonListChangedSubscription = this._personService.onPersonListChanged.subscribe(() => this.update());
     this.enableFilterCache("users");
+    // Если нет сохранённого состояния фильтров, загружаем данные явно
+    setTimeout(() => {
+      const hasCachedFilters = localStorage.getItem('filter_cache_users');
+      if (!hasCachedFilters) {
+        this.update();
+      }
+    }, 100);
   }
 
   ngOnDestroy(): void {
@@ -101,7 +116,11 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
       this._page = res;
       this.users = res.content;
       this.setLoading(false);
-    }, () => this.setLoading(false));
+      this.cdr?.markForCheck?.();
+    }, () => {
+      this.setLoading(false);
+      this.cdr?.markForCheck?.();
+    });
   }
 
   showEditUserModal(user: PersonDto) {
@@ -120,6 +139,7 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
   showReadUserModal(user: PersonDto){
     this.selectedUser = user;
     this.showUserInfo.show();
+    this.cdr?.markForCheck?.();
   }
 
   deletePerson(user: PersonDto) {
@@ -155,6 +175,7 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
 
   toggleFilter() {
     this.filterCollapsed = !this.filterCollapsed;
+    this.cdr?.markForCheck?.();
   }
 
 }
