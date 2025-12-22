@@ -1,16 +1,16 @@
 <div class="program-version"> <p>{{programVersion}} </p></div>
 
-<div class="container">
-  <div class="mt-3 mb-3">
-    <app-menu [menu]="menu"></app-menu>
-    @if (systemNotificationForAllPages.enabled) {
-      <div class="card-notification-block">
-        <div class="card card-notification-all-pages" [ngClass]= "systemNotificationForAllPages.type">
-          <div [innerHTML]="notificationToSafeHtml(systemNotificationForAllPages.message)"> </div>
-        </div>
-      </div>
-    }
+<!-- Меню "на всю ширину" (фон до краёв экрана). Контент страниц остаётся внутри .container. -->
+<app-menu [menu]="menu"></app-menu>
 
-  </div>
+<div class="container">
+  @if (systemNotificationForAllPages.enabled) {
+    <div class="card-notification-block mt-3">
+      <div class="card card-notification-all-pages" [ngClass]= "systemNotificationForAllPages.type">
+        <div [innerHTML]="notificationToSafeHtml(systemNotificationForAllPages.message)"> </div>
+      </div>
+    </div>
+  }
+
   <router-outlet></router-outlet>
 </div>
