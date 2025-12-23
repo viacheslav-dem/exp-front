@@ -8,6 +8,7 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         {{num()}}. Достаточность требований, предъявляемых к квалификации и опыту (компетенции) лиц, привлекаемых для выполнения работ
         (оказания услуг), а также к уровню производственной, научной, конструкторско-технологической базы, необходимой для реализации мероприятия:
       </label>
+      <input type="hidden" [(ngModel)]="_form().requirements" name="requirements" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().requirements === true}" (click)="stateButton(true)">
           Достаточны
@@ -17,8 +18,8 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().requirementsText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea [(ngModel)]="_form().requirementsText" name="requirementsText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
     </div>
     `,

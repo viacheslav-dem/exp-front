@@ -12,6 +12,7 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
       <label>
         Целесообразность реализации объекта государственной экспертизы:
       </label>
+        <input type="hidden" [(ngModel)]="_form().conclusion" name="conclusion" required>
         <div class="btn-group" role="group" aria-label="Basic example">
             <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().conclusion === true}" (click)="stateButton(true)">
                 Целесообразно
@@ -20,8 +21,8 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
                 Нецелесообразно
             </button>
         </div>
-      <textarea [(ngModel)]="_form().conclusionText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
+      <textarea [(ngModel)]="_form().conclusionText" name="conclusionText" required minlength="30" rows="3" class="form-control mt-05"
+                placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       <div class="hint">
         <p>
           <b>Подсказка.</b>

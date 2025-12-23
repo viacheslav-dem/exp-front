@@ -9,13 +9,21 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         республиканского бюджета и (или) других источников финансирования:
       </label>
       <app-boolean-button
+        name="conclusion"
+        required
         [(ngModel)]="_form().conclusion"
         [disabled]="disabled()"
         [showDisabledSelection]="true"
         [trueLabel]="'целесообразно'"
         [falseLabel]="'нецелесообразно'"
         (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <textarea [(ngModel)]="_form().conclusionText" rows="3" class="form-control mt-05"
+      <textarea
+        [(ngModel)]="_form().conclusionText"
+        [attr.name]="'conclusionText_8_11_14_' + num().split('.').join('_')"
+        required
+        minlength="30"
+        rows="3"
+        class="form-control mt-05"
                 placeholder="Обязательный текст"></textarea>
       <div class="hint">
         <p>

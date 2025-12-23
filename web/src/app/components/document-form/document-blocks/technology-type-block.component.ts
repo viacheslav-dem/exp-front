@@ -10,6 +10,8 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <div>
         <span>V технологический уклад: </span>
         <app-boolean-button class="d-inline-block"
+          name="technologyType5"
+          required
           [(ngModel)]="_form().technologyType5"
           [trueLabel]="'да'"
           [falseLabel]="'нет'"
@@ -18,6 +20,8 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <div>
         <span>VI технологический уклад: </span>
         <app-boolean-button class="d-inline-block"
+          name="technologyType6"
+          required
           [(ngModel)]="_form().technologyType6"
           [trueLabel]="'да'"
           [falseLabel]="'нет'"
@@ -26,14 +30,23 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <div>
         <span>проект другого технологического уклада: </span>
         <app-boolean-button class="d-inline-block"
+          name="technologyOtherType"
+          required
           [(ngModel)]="_form().technologyOtherType"
           [trueLabel]="'да'"
           [falseLabel]="'нет'"
         (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().technologyTypeText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea
+          [(ngModel)]="_form().technologyTypeText"
+          [attr.name]="'technologyTypeText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
     </div>
     `,

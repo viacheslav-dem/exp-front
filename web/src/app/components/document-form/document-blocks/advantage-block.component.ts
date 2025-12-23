@@ -8,12 +8,19 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{num()}}. Обладание товаром более высокими технико-экономическими показателями по сравнению с другими товарами,
         представленными на определенном сегменте рынка:
       </label>
-      <app-boolean-button [(ngModel)]="_form().advantage" [trueLabel]="'да'"
+      <app-boolean-button name="advantage" required [(ngModel)]="_form().advantage" [trueLabel]="'да'"
         [falseLabel]="'нет'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().advantageText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea
+          [(ngModel)]="_form().advantageText"
+          [attr.name]="'advantageText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">

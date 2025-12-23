@@ -8,6 +8,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{ num() }}. Оценка соответствия предложений поставщиков (подрядчиков, исполнителей), претендующих на участие в
         реализации мероприятий, целям названных мероприятий:
       </label>
+      <input type="hidden" [(ngModel)]="_form().assessment" name="assessment" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().assessment === true}" (click)="stateButton(true)">
           Соответствует
@@ -17,8 +18,8 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().assessmentText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea [(ngModel)]="_form().assessmentText" name="assessmentText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
       @if (full()) {
         <div class="hint">

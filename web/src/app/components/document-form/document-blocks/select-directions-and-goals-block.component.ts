@@ -36,7 +36,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
               <app-checkbox [(ngModel)]="item.isChecked" (ngModelChange)="onGoalChanged()">{{item.name}}</app-checkbox>
             </div>
           }
-          <textarea [(ngModel)]="_form.directionsAndGoalsText" rows="3" class="form-control mt-05"
+          <textarea [(ngModel)]="_form.directionsAndGoalsText" name="directionsAndGoalsText" rows="3" class="form-control mt-05"
           placeholder="Пояснительный текст (при необходимости)."></textarea>
         </div>
       }

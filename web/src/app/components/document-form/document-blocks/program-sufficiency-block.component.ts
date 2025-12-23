@@ -10,11 +10,17 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
             государственной научно-технической программы для достижения запланированных программой целевых
             показателей:
           </label>
-          <app-boolean-button [(ngModel)]="_form().programSufficiency" [trueLabel]="'достаточен'"
+          <app-boolean-button name="programSufficiency" required [(ngModel)]="_form().programSufficiency" [trueLabel]="'достаточен'"
             [falseLabel]="'недостаточен'"
           (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
           @if (full()) {
-            <textarea [(ngModel)]="_form().programSufficiencyText" rows="3" class="form-control mt-05"
+            <textarea
+              [(ngModel)]="_form().programSufficiencyText"
+              [attr.name]="'programSufficiencyText_' + num().split('.').join('_')"
+              required
+              minlength="30"
+              rows="3"
+              class="form-control mt-05"
             placeholder="Обязательный текст"></textarea>
           }
           @if (full()) {

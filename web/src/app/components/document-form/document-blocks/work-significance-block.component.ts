@@ -10,13 +10,15 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         научных направлений:
       </label>
       <app-boolean-button
+        name="workSignificance"
+        required
         [(ngModel)]="_form().workSignificance"
         [trueLabel]="'присутствует'"
         [falseLabel]="'отсутствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().workSignificanceText" rows="3" class="form-control"
-        placeholder="Пояснительный текст (при необходимости)."></textarea>
+        <textarea [(ngModel)]="_form().workSignificanceText" name="workSignificanceText" required minlength="30" rows="3" class="form-control"
+        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
     </div>
     `,

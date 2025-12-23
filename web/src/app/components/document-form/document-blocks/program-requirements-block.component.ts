@@ -7,11 +7,17 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         <label>
           {{ num() }}. Соответствие требованиям, указанным в Положении о порядке реализации государственных программ:
         </label>
-        <app-boolean-button [(ngModel)]="_form().programRequirements" [trueLabel]="'соответствует'"
+        <app-boolean-button name="programRequirements" required [(ngModel)]="_form().programRequirements" [trueLabel]="'соответствует'"
           [falseLabel]="'не соответствует'"
         (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
         @if (full()) {
-          <textarea [(ngModel)]="_form().programRequirementsText" rows="3" class="form-control mt-05"
+          <textarea
+            [(ngModel)]="_form().programRequirementsText"
+            [attr.name]="'programRequirementsText_' + num().split('.').join('_')"
+            required
+            minlength="30"
+            rows="3"
+            class="form-control mt-05"
           placeholder="Обязательный текст"></textarea>
         }
         @if (full()) {

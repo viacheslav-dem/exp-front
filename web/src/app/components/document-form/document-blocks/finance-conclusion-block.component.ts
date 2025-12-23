@@ -19,8 +19,15 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().financeConclusionText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea
+          [(ngModel)]="_form().financeConclusionText"
+          [attr.name]="'financeConclusionText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if ((full() || disabled()) && noveltyNum() && economicSignificanceNum()) {
         <div class="hint">

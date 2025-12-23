@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { SimpleCatalogComponent } from './simple-catalog.component';
 import { GlobalToastyService } from '@app/services/global-toasty.service';
 import { DataService } from '@app/services/data.service';
@@ -21,7 +21,8 @@ import {
   faAngleDoubleLeft, 
   faAngleDoubleRight,
   faAngleLeft,
-  faAngleRight
+  faAngleRight,
+  faPlus
 } from '@fortawesome/free-solid-svg-icons';
 
 // Моки сервисов
@@ -93,7 +94,7 @@ describe('SimpleCatalogComponent', () => {
 
     // Регистрация иконок FontAwesome
     const iconLibrary = TestBed.inject(FaIconLibrary);
-    iconLibrary.addIcons(faCog, faSortAmountUp, faAngleDoubleLeft, faAngleDoubleRight, faAngleLeft, faAngleRight);
+    iconLibrary.addIcons(faCog, faSortAmountUp, faAngleDoubleLeft, faAngleDoubleRight, faAngleLeft, faAngleRight, faPlus);
 
     fixture = TestBed.createComponent(SimpleCatalogComponent);
     component = fixture.componentInstance;
@@ -256,24 +257,32 @@ describe('SimpleCatalogComponent', () => {
   });
 
   describe('Data loading', () => {
-    it('should load page data when update is called', () => {
+    it('should load page data when update is called', fakeAsync(() => {
       component.type = Catalog.SCIENCE_AREA;
       component.ngOnInit();
 
       component.update();
+      tick(0); // Ждём выполнения setTimeout для setLoading
       fixture.detectChanges();
 
       expect(dataService.getCatalogAdminPageCalls.length).toBeGreaterThan(0);
-    });
+    }));
 
-    it('should handle loading state during data fetch', () => {
+    it('should handle loading state during data fetch', fakeAsync(() => {
       component.type = Catalog.SCIENCE_AREA;
       component.ngOnInit();
 
       component.update();
+      tick(0); // Ждём выполнения setTimeout для setLoading(true)
 
       expect(component._loading).toBe(true);
-    });
+      
+      tick(100); // Ждём завершения асинхронного запроса
+      fixture.detectChanges();
+      
+      // После завершения загрузки _loading должен быть false
+      expect(component._loading).toBe(false);
+    }));
   });
 });
 

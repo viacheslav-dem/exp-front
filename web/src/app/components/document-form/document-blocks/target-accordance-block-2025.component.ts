@@ -7,6 +7,7 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
           <label>
             {{num()}}. Соответствие объекта государственной экспертизы заявленным целям:
           </label>
+          <input type="hidden" [(ngModel)]="_form().targetAccordance" name="targetAccordance" required>
           <div class="btn-group" role="group" aria-label="Basic example">
             <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().targetAccordance === true}" (click)="stateButton(true)">
               Соответсвует
@@ -17,13 +18,20 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
           </div>
           @if (!_form().targetAccordance) {
             <label>Рекомендуемые цели:</label>
-            <textarea [(ngModel)]="_form().targetSuggestion" rows="2" class="form-control"
+            <textarea [(ngModel)]="_form().targetSuggestion" name="targetSuggestion" required rows="2" class="form-control"
               title="Рекомендуемые цели"
             placeholder="Рекомендуемые цели"></textarea>
           }
           @if (full()) {
-            <textarea [(ngModel)]="_form().targetAccordanceText" rows="3" class="form-control mt-05"
-            placeholder="Обязательный текст"></textarea>
+            <textarea
+              [(ngModel)]="_form().targetAccordanceText"
+              [attr.name]="'targetAccordanceText_' + num().split('.').join('_')"
+              required
+              minlength="30"
+              rows="3"
+              class="form-control mt-05"
+              placeholder="Обязательный текст (не менее 30 символов)."
+            ></textarea>
           }
         </div>
         `,

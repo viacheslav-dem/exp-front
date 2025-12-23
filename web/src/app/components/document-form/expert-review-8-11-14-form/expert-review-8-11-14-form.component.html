@@ -5,7 +5,10 @@
       1. Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
       научно-технической деятельности в Республики Беларусь:
     </label>
-    <textarea [(ngModel)]="_form.accordance" rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.accordance"
+      name="accordance"
+      required
+      rows="3" class="form-control"
       placeholder="cоответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
     </textarea>
   </div>
@@ -16,7 +19,10 @@
       разработки новых технологических процессов, наукоемкой, конкурентоспособной продукции,
       формирования перспективных научных направлений:
     </label>
-    <textarea [(ngModel)]="_form.significance" rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.significance"
+      name="significance"
+      required
+      rows="3" class="form-control"
       placeholder="суть значения и важности работы для республики">
     </textarea>
   </div>
@@ -25,7 +31,10 @@
     <label>
       3. Сведения о проведении маркетинговых и патентных исследований и их результаты:
     </label>
-    <textarea [(ngModel)]="_form.marketing" rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.marketing"
+      name="marketing"
+      required
+      rows="3" class="form-control"
       placeholder="результаты проведения маркетинговых и патентных исследований по объекту экспертизы">
     </textarea>
   </div>
@@ -34,7 +43,10 @@
     <label>
       4. Возможный экономический и (или) социальный и (или) экологический эффект от реализации мероприятия:
     </label>
-    <textarea [(ngModel)]="_form.effect" rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.effect"
+      name="effect"
+      required
+      rows="3" class="form-control"
       placeholder="возможный эффект по объекту экспертизы">
     </textarea>
   </div>
@@ -54,7 +66,10 @@
       6. Сведения о предполагаемом владельце, операторе, пользователях программно-технических средств,
       информационных ресурсов, информационных систем и информационных сетей:
     </label>
-    <textarea [(ngModel)]="_form.users" rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.users"
+      name="users"
+      required
+      rows="3" class="form-control"
       placeholder="сведения по объекту экспертизы">
     </textarea>
   </div>
@@ -65,7 +80,10 @@
       и приобретаемых программного обеспечения, технических средств и (или) комплексов программно-технических средств,
       а также возможности достижения заданных значений указанных характеристик:
     </label>
-    <textarea [(ngModel)]="_form.characteristics" rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.characteristics"
+      name="characteristics"
+      required
+      rows="3" class="form-control"
       placeholder="все характеристики и возможности по объекту экспертизы">
     </textarea>
   </div>
@@ -107,7 +125,10 @@
       1. Требования к квалификации и опыту лиц, привлекаемых для выполнения работ (оказания услуг),
       к уровню производственной, научной, конструкторско-технологической базы, необходимой для реализации мероприятия:
     </label>
-    <textarea [(ngModel)]="_form.executorRequirements" rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.executorRequirements"
+      name="executorRequirements"
+      required
+      rows="3" class="form-control"
       placeholder="все требования к потенциальным исполнителям по объекту экспертизы">
     </textarea>
   </div>
@@ -117,7 +138,10 @@
       2. Оценка научно-технического уровня, эффективности, достаточности и соответствия предложений поставщиков
       (подрядчиков, исполнителей), претендующих на участие в реализации мероприятия, целям рассматриваемого мероприятия:
     </label>
-    <textarea [(ngModel)]="_form.assessment" rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.assessment"
+      name="assessment"
+      required
+      rows="3" class="form-control"
       placeholder="оценка по указанным параметрам для объекта экспертизы ">
     </textarea>
   </div>

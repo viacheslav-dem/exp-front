@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewContainerRef} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewContainerRef} from '@angular/core';
 import {Catalog, DataService} from "@app/services/data.service";
 import {CatalogDto} from "@app/dto/CatalogDto";
 import {PeriodDto} from "@app/dto/PeriodDto";
@@ -17,6 +17,7 @@ import {Pagination} from "@app/components/common-components/page-and-filter/mode
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import {SortOrder, Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
 import {environment} from "../../../environments/environment";
+import {GlobalToastyService} from "@app/services/global-toasty.service";
 
 
 @Component({
@@ -76,7 +77,9 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                 private _dataService: DataService,
                 private _personService: PersonService,
                 private _fundingPipe: FundingTypePipe,
-                private cdr: ChangeDetectorRef) {
+                private cdr: ChangeDetectorRef,
+                private readonly hostRef: ElementRef<HTMLElement>,
+                private readonly toasty: GlobalToastyService) {
         this.fundingToString = finance => _fundingPipe.transform(finance);
     }
 
@@ -185,7 +188,8 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
             this._project.code.code == '8.13'
         ) {
             this.disableExpectedResultButton = true;
-            this.selectExpectedResult( this.expectedResultList.find(result => result.expectedResultType === 'другое'));
+            const defaultResult = this.expectedResultList?.find(result => result.expectedResultType === 'другое');
+            this.selectExpectedResult(defaultResult);
         } else {
             let expRes: ExpectedResultDto;
             this.disableExpectedResultButton = false;
@@ -194,6 +198,33 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     }
 
   onSave() {
+    // 1) Сначала проверяем "стандартную" валидацию Angular (required/minlength/etc).
+    // Если уже есть .ng-invalid — не запускаем validate()+throw, а мягко ведём пользователя к полю.
+    if (this.hasInvalidControls()) {
+      const firstInvalid = this.getFirstInvalidElement();
+      const fieldName = firstInvalid ? this.getFieldLabel(firstInvalid) : null;
+      const errorType = firstInvalid ? this.getFieldErrorType(firstInvalid) : null;
+      this.scrollToFirstInvalidSoon();
+      // Сообщение с названием поля и типом ошибки (инкрементальная миграция): конкретные тексты постепенно уедут в inline-ошибки.
+      let message = 'Заполните обязательные поля и проверьте минимальную длину текста.';
+      if (fieldName) {
+        if (errorType === 'required') {
+          message = `Заполните обязательное поле "${fieldName}".`;
+        } else if (errorType === 'minlength') {
+          const minLength = firstInvalid?.getAttribute('minlength') || '30';
+          message = `Поле "${fieldName}" должно содержать не менее ${minLength} символов.`;
+        } else if (errorType === 'min') {
+          const min = firstInvalid?.getAttribute('min') || '0';
+          message = `Поле "${fieldName}" должно быть не менее ${min}.`;
+        } else {
+          message = `Заполните обязательное поле "${fieldName}" и проверьте минимальную длину текста.`;
+        }
+      }
+      this.toasty?.warn?.(message);
+      return;
+    }
+
+    // 2) Пока миграция не завершена — остаётся ручная бизнес-валидация через validate()+throw.
     this._project.directions = this.directions;
     this._project.subDirections = [];
     for (let i = 0; i < this.directions.length; i++) {
@@ -201,12 +232,45 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         this._project.subDirections.push(this.directions[i].subDirectionDtos[j]);
       }
     }
-    this.validate();
-    if (!this.canAddSocialEconomicGoals()) {
-      this._project.socialEconomicGoals = [];
+    try {
+      this.validate();
+      if (!this.canAddSocialEconomicGoals()) {
+        this._project.socialEconomicGoals = [];
+      }
+      this.validateExpectedResultBlock();
+      this.save.emit(this._project);
+    } catch (e) {
+      const errorMessage = e?.toString() || '';
+      // Пытаемся найти соответствующий элемент в DOM по тексту ошибки
+      const targetElement = this.findElementByErrorText(errorMessage);
+      if (targetElement) {
+        this.scrollToElement(targetElement);
+      } else {
+        this.scrollToFirstInvalidSoon();
+      }
+      // Извлекаем название поля из текста ошибки для более понятного сообщения
+      const fieldName = this.extractFieldNameFromError(errorMessage);
+      if (fieldName) {
+        // Проверяем, содержит ли сообщение название поля
+        const lowerError = errorMessage.toLowerCase();
+        const lowerFieldName = fieldName.toLowerCase();
+        const fieldNameInMessage = lowerFieldName.split(' ').some(word => 
+          word.length > 3 && lowerError.includes(word)
+        );
+        
+        if (fieldNameInMessage) {
+          // Если название поля уже в сообщении, показываем как есть
+          this.toasty?.warn?.(errorMessage);
+        } else {
+          // Если нет, добавляем название поля
+          this.toasty?.warn?.(`Заполните обязательное поле "${fieldName}". ${errorMessage}`);
+        }
+        // Не пробрасываем ошибку дальше, чтобы избежать дублирования
+        return;
+      }
+      // Если не нашли название поля, пробрасываем ошибку дальше (CustomErrorHandler покажет её)
+      throw e;
     }
-    this.validateExpectedResultBlock();
-    this.save.emit(this._project);
   }
 
     validateExpectedResultBlock() {
@@ -283,16 +347,16 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     }
 
     validate() {
-        if (this._project.code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025') {
-            if (isEmptyOrNull(this._project.program)) {
-                throw 'Наименование программы (подпрограммы) не может быть пустым.';
-            }
-        }
         if (isEmptyOrNull(this._project.title)) {
             throw 'Наименование объекта экспертизы не может быть пустым.';
         }
         if (!this._project.code) {
             throw 'Пожалуйста, выберите код объекта экспертизы.';
+        }
+        if (this._project.code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025') {
+            if (isEmptyOrNull(this._project.program)) {
+                throw 'Наименование программы (подпрограммы) не может быть пустым.';
+            }
         }
         const validSpecializations = this._project.projectSpecialization?.filter(s => s != null) || [];
         if (validSpecializations.length === 0) {
@@ -317,6 +381,10 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                 if (this._project.directions.length == 0 && this._project.socialEconomicGoals.length == 0 && this.canAddSocialEconomicGoals()) {
                     throw 'Пожалуйста, укажите приоритетное направление научных исследований и (или) научно-технической деятельности ' +
                     'или цель (приоритет) социально-экономического развития';
+                }
+                // Проверка финансирования
+                if (!this._project.financing || this._project.financing.length === 0) {
+                    throw 'Пожалуйста, укажите финансирование объекта экспертизы.';
                 }
             }
         }
@@ -460,14 +528,15 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         this.resultSpecificList = resultSpecificList;
 
         if (this._project.expectedResult) {
-            if (this._project.expectedResult.workTypeDtos.length === 1) {
+            const workTypeDtos = this._project.expectedResult.workTypeDtos || [];
+            if (workTypeDtos.length === 1) {
                 this.disableTypeOfWorkButton = true;
-                this._project.workType = this._project.expectedResult.workTypeDtos[0].description;
+                this._project.workType = workTypeDtos[0].description;
             } else {
                 this.disableTypeOfWorkButton = false;
                 this._project.workType = '';
             }
-            this.outputTypeOfWorkList = this._project.expectedResult.workTypeDtos
+            this.outputTypeOfWorkList = workTypeDtos;
         } else {
             this.outputTypeOfWorkList = typeOfWorkList;
         }
@@ -716,6 +785,276 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     removeSpecialization(index: number) {
         this._project.projectSpecialization.splice(index, 1);
         this.cdr?.markForCheck?.();
+    }
+
+    private hasInvalidControls(): boolean {
+        const root = this.hostRef?.nativeElement;
+        if (!root) return false;
+        return root.querySelector('.ng-invalid') !== null;
+    }
+
+    private getFirstInvalidElement(): HTMLElement | null {
+        const root = this.hostRef?.nativeElement;
+        if (!root) return null;
+        const invalidElements = Array.from(root.querySelectorAll<HTMLElement>('.ng-invalid'));
+        return invalidElements.find(el => el !== root && this.isElementVisible(el)) || null;
+    }
+
+    private getFieldLabel(element: HTMLElement): string | null {
+        // Ищем родительский form-sub-group или form-group
+        let parent = element.parentElement;
+        while (parent && !parent.classList.contains('form-sub-group') && !parent.classList.contains('form-group')) {
+            parent = parent.parentElement;
+        }
+        if (!parent) return null;
+
+        // Ищем первый label внутри form-sub-group или form-group
+        const label = parent.querySelector<HTMLLabelElement>('label');
+        if (!label) return null;
+
+        // Извлекаем текст из label, убирая лишние пробелы и переносы строк
+        let labelText = label.textContent?.trim() || '';
+        // Ограничиваем длину для читаемости
+        if (labelText.length > 100) {
+            labelText = labelText.substring(0, 97) + '...';
+        }
+        return labelText || null;
+    }
+
+    private getFieldErrorType(element: HTMLElement): string | null {
+        // Проверяем атрибуты элемента напрямую для определения типа ошибки
+        // Сначала проверяем minlength (более специфичная ошибка)
+        if (element.hasAttribute('minlength')) {
+            const minLength = parseInt(element.getAttribute('minlength') || '0');
+            const value = (element as HTMLInputElement | HTMLTextAreaElement).value || '';
+            if (value.length > 0 && value.length < minLength) {
+                return 'minlength';
+            }
+        }
+        // Затем проверяем min для числовых полей
+        if (element.hasAttribute('min')) {
+            const min = parseFloat(element.getAttribute('min') || '0');
+            const value = parseFloat((element as HTMLInputElement).value || '0');
+            if (!isNaN(value) && value < min) {
+                return 'min';
+            }
+        }
+        // Проверяем required (если поле пустое и имеет required)
+        if (element.hasAttribute('required')) {
+            const value = (element as HTMLInputElement | HTMLTextAreaElement).value;
+            if (!value || value.trim() === '') {
+                return 'required';
+            }
+        }
+        return null;
+    }
+
+    private scrollToFirstInvalidSoon(): void {
+        // Два rAF — чтобы дождаться пересчёта классов/DOM после любых синхронных изменений в validate().
+        requestAnimationFrame(() => requestAnimationFrame(() => this.scrollToFirstInvalid()));
+    }
+
+    private scrollToFirstInvalid(): void {
+        const root = this.hostRef?.nativeElement;
+        if (!root) return;
+
+        const invalidElements = Array.from(root.querySelectorAll<HTMLElement>('.ng-invalid'));
+        const target = invalidElements.find(el => el !== root && this.isElementVisible(el));
+        if (!target) return;
+
+        const focusTarget = this.findFocusable(target) ?? target;
+
+        try {
+            focusTarget.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'nearest'});
+        } catch {
+            // старые браузеры/нестандартные контейнеры скролла — деградируем без падения
+            focusTarget.scrollIntoView();
+        }
+
+        // Фокус улучшает доступность и подсвечивает поле; preventScroll не обязателен, но снижает "дёргание".
+        try {
+            (focusTarget as any).focus?.({preventScroll: true});
+        } catch {
+            try {
+                (focusTarget as any).focus?.();
+            } catch {
+                // ignore
+            }
+        }
+    }
+
+    private findFocusable(el: HTMLElement): HTMLElement | null {
+        if (this.isFocusable(el)) return el;
+        return el.querySelector<HTMLElement>(
+            'input:not([type="hidden"]), textarea, select, button, [tabindex]:not([tabindex="-1"])'
+        );
+    }
+
+    private isFocusable(el: HTMLElement): boolean {
+        const tag = el.tagName.toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'button') return true;
+        const tabindex = el.getAttribute('tabindex');
+        return tabindex !== null && tabindex !== '-1';
+    }
+
+    private isElementVisible(el: HTMLElement): boolean {
+        // offsetParent === null -> display:none или hidden в layout (кроме fixed).
+        // getClientRects().length === 0 -> element not rendered (например, collapsed/empty).
+        if (el.getClientRects().length === 0) return false;
+        if (el.offsetParent !== null) return true;
+        try {
+            return getComputedStyle(el).position === 'fixed';
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * Находит элемент в DOM по тексту ошибки валидации
+     */
+    private findElementByErrorText(errorMessage: string): HTMLElement | null {
+        const root = this.hostRef?.nativeElement;
+        if (!root) return null;
+
+        // Маппинг текстов ошибок на селекторы или ключевые слова для поиска
+        const errorMappings: { [key: string]: string } = {
+            'приоритетное направление': '.form-group-label',
+            'код объекта экспертизы': '.form-group-label',
+            'код специализации': '.form-group-label',
+            'исполнитель': '.form-group-label',
+            'сроки реализации': '.form-group-label',
+            'ожидаемый результат': '.form-group-label',
+            'вид работ': '.form-group-label',
+            'характер результата': '.form-group-label',
+            'коммерциализация': '.form-group-label',
+            'внедрение': '.form-group-label',
+            'технологический уклад': '.form-group-label',
+            'программа': '.form-group-label',
+            'финансирование': '.form-group-label'
+        };
+
+        // Ищем ключевое слово в тексте ошибки
+        const lowerError = errorMessage.toLowerCase();
+        for (const [keyword, selector] of Object.entries(errorMappings)) {
+            if (lowerError.includes(keyword)) {
+                // Ищем все labels с этим классом
+                const labels = Array.from(root.querySelectorAll<HTMLElement>(selector));
+                for (const label of labels) {
+                    const labelText = label.textContent?.toLowerCase() || '';
+                    if (labelText.includes(keyword)) {
+                        // Находим родительский form-group и ищем в нём фокусируемый элемент
+                        const formGroup = label.closest('.form-group');
+                        if (formGroup) {
+                            // Ищем различные типы элементов для прокрутки
+                            const selectors = [
+                                'input:not([type="hidden"])',
+                                'textarea',
+                                'select',
+                                'button:not(.btn-icon)',
+                                'app-select-catalog',
+                                'app-dropdown',
+                                '.dropdown button',
+                                '.dropdown-toggle',
+                                'ng-select'
+                            ];
+                            
+                            for (const sel of selectors) {
+                                const focusable = formGroup.querySelector<HTMLElement>(sel);
+                                if (focusable && this.isElementVisible(focusable)) {
+                                    return focusable;
+                                }
+                            }
+                            
+                            // Если не нашли фокусируемый элемент, возвращаем сам label
+                            if (this.isElementVisible(label)) {
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Извлекает название поля из текста ошибки или находит его в DOM
+     */
+    private extractFieldNameFromError(errorMessage: string): string | null {
+        const root = this.hostRef?.nativeElement;
+        if (!root) return null;
+
+        // Маппинг текстов ошибок на ключевые слова для поиска в DOM
+        const errorMappings: { [key: string]: string } = {
+            'приоритетное направление': 'приоритетное направление',
+            'код объекта экспертизы': 'код объекта экспертизы',
+            'код специализации': 'код специализации',
+            'исполнитель': 'исполнитель',
+            'сроки реализации': 'сроки',
+            'ожидаемый результат': 'ожидаемый результат',
+            'вид работ': 'вид работ',
+            'характер результата': 'характер результата',
+            'коммерциализация': 'коммерциализация',
+            'внедрение': 'внедрение',
+            'технологический уклад': 'технологический уклад',
+            'программа': 'программа',
+            'наименование объекта экспертизы': 'наименование объекта экспертизы',
+            'финансирование': 'финансирование'
+        };
+
+        const lowerError = errorMessage.toLowerCase();
+        for (const [keyword, searchKeyword] of Object.entries(errorMappings)) {
+            if (lowerError.includes(keyword)) {
+                // Пытаемся найти точное название в DOM
+                const labels = Array.from(root.querySelectorAll<HTMLLabelElement>('.form-group-label'));
+                for (const label of labels) {
+                    const labelText = label.textContent?.trim() || '';
+                    const lowerLabelText = labelText.toLowerCase();
+                    // Проверяем, содержит ли label ключевое слово
+                    if (lowerLabelText.includes(searchKeyword)) {
+                        // Ограничиваем длину для читаемости
+                        if (labelText.length > 100) {
+                            return labelText.substring(0, 97) + '...';
+                        }
+                        return labelText;
+                    }
+                }
+                // Если не нашли в DOM, пытаемся извлечь из текста ошибки
+                // Ищем паттерн "укажите <название поля>" или "выберите <название поля>"
+                const match = errorMessage.match(/(?:укажите|выберите|заполните|указать|выбрать|заполнить)\s+(.+?)(?:\.|$)/i);
+                if (match && match[1]) {
+                    return match[1].trim();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Прокручивает к указанному элементу
+     */
+    private scrollToElement(element: HTMLElement): void {
+        if (!element || !this.isElementVisible(element)) return;
+
+        const focusTarget = this.findFocusable(element) ?? element;
+
+        try {
+            focusTarget.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'nearest'});
+        } catch {
+            focusTarget.scrollIntoView();
+        }
+
+        try {
+            (focusTarget as any).focus?.({preventScroll: true});
+        } catch {
+            try {
+                (focusTarget as any).focus?.();
+            } catch {
+                // ignore
+            }
+        }
     }
 }
 

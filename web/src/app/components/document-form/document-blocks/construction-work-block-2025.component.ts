@@ -8,6 +8,7 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         {{num()}}. Необходимость осуществления работ в сфере строительной деятельности. Возведение, реконструкция,
         реставрация, капитальный ремонт, техническая модернизация зданий и сооружений, их благоустройство:
       </label>
+      <input type="hidden" [(ngModel)]="_form().constructionWorks" name="constructionWorks" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().constructionWorks === true}" (click)="stateButton(true)">
           Требуется
@@ -17,8 +18,15 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().constructionWorksText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea
+          [(ngModel)]="_form().constructionWorksText"
+          [attr.name]="'constructionWorksText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
     
       @if (full()) {

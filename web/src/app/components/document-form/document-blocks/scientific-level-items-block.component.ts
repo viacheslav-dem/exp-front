@@ -14,8 +14,8 @@ import {Text} from "@app/components/document-form/form-model/Text";
         </div>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form.scientificLevelItemsText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea [(ngModel)]="_form.scientificLevelItemsText" name="scientificLevelItemsText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
     </div>
     `,

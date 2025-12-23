@@ -7,6 +7,7 @@ import {Component, EventEmitter, OnInit, Output, input} from "@angular/core";
       <label>
         {{num()}}. Соответствие приоритетным направлениям научной, научно-технической и инновационной деятельности в Республике Беларусь
       </label>
+      <input type="hidden" [(ngModel)]="_form().priorityAreas" name="priorityAreas" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().priorityAreas === true}" (click)="stateButton(true)">
           Соответсвует
@@ -28,8 +29,15 @@ import {Component, EventEmitter, OnInit, Output, input} from "@angular/core";
       </div>
     }
     @if (full()) {
-      <textarea [(ngModel)]="_form().priorityAreasText" rows="3" class="form-control mt-05"
-      placeholder="Обязательный текст"></textarea>
+      <textarea
+        [(ngModel)]="_form().priorityAreasText"
+        [attr.name]="'priorityAreasText_' + num().split('.').join('_')"
+        required
+        minlength="30"
+        rows="3"
+        class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."
+      ></textarea>
     }
     @if (full()) {
       <div class="hint">

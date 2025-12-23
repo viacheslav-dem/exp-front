@@ -7,9 +7,15 @@ import {Component, input} from '@angular/core';
       <label>
         Наименование товаров (работ, услуг):
       </label>
-      <textarea [(ngModel)]="_form().productName" rows="2" class="form-control"
-                title="Наименование товаров"
-                placeholder="наименование"></textarea>
+      <textarea
+        [(ngModel)]="_form().productName"
+        name="productName"
+        required
+        rows="2"
+        class="form-control"
+        title="Наименование товаров"
+        placeholder="наименование"
+      ></textarea>
     </div>
   `,
     standalone: false

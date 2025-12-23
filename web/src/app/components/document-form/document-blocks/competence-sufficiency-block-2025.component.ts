@@ -7,11 +7,18 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
           <label>
             {{ num() }}. Достаточность компетенции кадрового состава потенциального исполнителя работ:
           </label>
-          <app-dropdown [options]="competenceSufficiencyOptions" [(ngModel)]="_form().competenceSufficiency"
+          <app-dropdown name="competenceSufficiency" required [options]="competenceSufficiencyOptions" [(ngModel)]="_form().competenceSufficiency"
           (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
           @if (full()) {
-            <textarea [(ngModel)]="_form().competenceSufficiencyText" rows="3" class="form-control mt-05"
-            placeholder="Обязательный текст"></textarea>
+            <textarea
+              [(ngModel)]="_form().competenceSufficiencyText"
+              [attr.name]="'competenceSufficiencyText_' + num().split('.').join('_')"
+              required
+              minlength="30"
+              rows="3"
+              class="form-control mt-05"
+              placeholder="Обязательный текст (не менее 30 символов)."
+            ></textarea>
           }
           @if (full()) {
             <div class="hint">

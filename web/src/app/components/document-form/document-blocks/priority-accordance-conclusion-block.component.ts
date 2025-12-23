@@ -8,12 +8,14 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{num()}}. Соответствие приоритетности направления инвестиций в технологии:
       </label>
       <app-boolean-button
+        name="priorityAccordance"
+        required
         [(ngModel)]="_form().priorityAccordance"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().priorityAccordanceText" rows="3" class="form-control"
+        <textarea [(ngModel)]="_form().priorityAccordanceText" name="priorityAccordanceText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
       @if (full()) {

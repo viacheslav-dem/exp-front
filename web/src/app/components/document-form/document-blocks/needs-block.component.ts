@@ -9,11 +9,18 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         внутри страны (возможно по сферам экономики, регионам республики, сведения об основных потребителях),
         в рамках Евразийского экономического союза и дальнего зарубежья:
       </label>
-      <app-dropdown [options]="needsOptions" [(ngModel)]="_form().needs"
+      <app-dropdown name="needs" required [options]="needsOptions" [(ngModel)]="_form().needs"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().needsText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea
+          [(ngModel)]="_form().needsText"
+          [attr.name]="'needsText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">

@@ -11,6 +11,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       </label>
       <div>
         <app-boolean-button class="d-inline-block"
+          name="neededProjectDocs"
+          required
           [(ngModel)]="_form().neededProjectDocs"
           [trueLabel]="'требуется'"
           [falseLabel]="'не требуется'"
@@ -19,8 +21,15 @@ import {ProjectDto} from "@app/dto/ProjectDto";
     
       <div>
         @if (full()) {
-          <textarea [(ngModel)]="_form().neededProjectDocsText" rows="3" class="form-control mt-05"
-          placeholder="Обязательный текст."></textarea>
+          <textarea
+            [(ngModel)]="_form().neededProjectDocsText"
+            [attr.name]="'neededProjectDocsText_' + num().split('.').join('_')"
+            required
+            minlength="30"
+            rows="3"
+            class="form-control mt-05"
+            placeholder="Обязательный текст (не менее 30 символов)."
+          ></textarea>
         }
       </div>
     

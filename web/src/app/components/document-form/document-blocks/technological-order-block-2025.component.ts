@@ -7,11 +7,11 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
       <label>
         {{num()}}. Уровень технологического уклада научно-технической продукции:
       </label>
-      <app-dropdown [options]="targetOptions" [(ngModel)]="_form().technologicalOrder"
+      <app-dropdown name="technologicalOrder" required [options]="targetOptions" [(ngModel)]="_form().technologicalOrder"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().technologicalOrderText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea [(ngModel)]="_form().technologicalOrderText" name="technologicalOrderText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full()) {
         <div class="hint">

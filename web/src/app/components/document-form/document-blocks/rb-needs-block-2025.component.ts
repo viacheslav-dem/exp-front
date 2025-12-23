@@ -10,11 +10,11 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         в том числе с учетом возможностей расширения экспорта и (или) сокращения импорта продукции,
         поставки потребителю разработанной и осваиваемой продукции:
       </label>
-      <app-dropdown [options]="needsOptions" [(ngModel)]="_form().rbNeeds"
+      <app-dropdown name="rbNeeds" required [options]="needsOptions" [(ngModel)]="_form().rbNeeds"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().rbNeedsText" rows="3" class="form-control mt-05"
-        placeholder="Пояснительный текст (при необходимости)."></textarea>
+        <textarea [(ngModel)]="_form().rbNeedsText" name="rbNeedsText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
       @if (full()) {
         <div class="hint">

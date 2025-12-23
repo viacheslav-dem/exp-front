@@ -9,11 +9,17 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         привлекаемых для выполнения работ (оказания услуг), а также к уровню производственной, научной,
         конструкторско-технологической базы, необходимой для реализации мероприятия:
       </label>
-      <app-boolean-button [(ngModel)]="_form().requirements" [trueLabel]="'достаточны'"
+      <app-boolean-button name="requirements" required [(ngModel)]="_form().requirements" [trueLabel]="'достаточны'"
         [falseLabel]="'недостаточны'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().requirementsText" rows="3" class="form-control mt-05"
+        <textarea
+          [(ngModel)]="_form().requirementsText"
+          [attr.name]="'requirementsText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
         placeholder="Обязательный текст."></textarea>
       }
     </div>

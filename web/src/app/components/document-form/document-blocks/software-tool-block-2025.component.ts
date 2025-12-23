@@ -9,6 +9,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
       <label>
         {{num()}}. Соответствие заявленному программному инструменту реализации:
       </label>
+      <input type="hidden" [(ngModel)]="_form().softwareTool" name="softwareTool" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().softwareTool === 1}" (click)="stateButton(1)">
           Соответсвует
@@ -22,13 +23,13 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
       </div>
       @if (_form().softwareTool == 2) {
         <label class="mt-2">Рекомендуемые программный инструмент:</label>
-        <textarea [(ngModel)]="_form().softwareToolSuggestion" rows="2" class="form-control"
+        <textarea [(ngModel)]="_form().softwareToolSuggestion" name="softwareToolSuggestion" required rows="2" class="form-control"
           title="Рекомендуемый программный инструмент"
         placeholder="Рекомендуемый программный инструмент"></textarea>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form().softwareToolText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea [(ngModel)]="_form().softwareToolText" name="softwareToolText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
     </div>
     @if (full()) {

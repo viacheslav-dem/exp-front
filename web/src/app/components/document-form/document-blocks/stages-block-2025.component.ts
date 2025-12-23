@@ -9,6 +9,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         государственной
         регистрации в соответствии с законодательством Республики Беларусь:
       </label>
+      <input type="hidden" [(ngModel)]="_form().stages" name="stages" required>
       <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().stages === true}"
         (click)="stateButton(true)">
         Имеются
@@ -19,8 +20,8 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       </button>
     
       @if (full() || _form().stages) {
-        <textarea [(ngModel)]="_form().stagesText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea [(ngModel)]="_form().stagesText" name="stagesText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
       @if (full()) {
         <div class="hint">

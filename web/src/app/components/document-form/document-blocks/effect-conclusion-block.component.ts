@@ -8,13 +8,15 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{num()}}. Возможный экономический и (или) социальный и (или) экологический эффект от реализации мероприятия:
       </label>
       <app-boolean-button
+        name="effect"
+        required
         [(ngModel)]="_form().effect"
         [trueLabel]="'присутствует'"
         [falseLabel]="'отсутствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().effectText" rows="3" class="form-control"
-        placeholder="Пояснительный текст (при необходимости)."></textarea>
+        <textarea [(ngModel)]="_form().effectText" name="effectText" required minlength="30" rows="3" class="form-control"
+        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
     </div>
     `,

@@ -8,12 +8,19 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{num()}}. Необходимость осуществления работ в сфере строительной деятельности. Возведение, реконструкция,
         реставрация, капитальный ремонт, техническая модернизация зданий и сооружений, их благоустройство:
       </label>
-      <app-boolean-button [(ngModel)]="_form().constructionWorks" [trueLabel]="'требуется'"
+      <app-boolean-button name="constructionWorks" required [(ngModel)]="_form().constructionWorks" [trueLabel]="'требуется'"
         [falseLabel]="'не требуется'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().constructionWorksText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea
+          [(ngModel)]="_form().constructionWorksText"
+          [attr.name]="'constructionWorksText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
     
       @if (full()) {

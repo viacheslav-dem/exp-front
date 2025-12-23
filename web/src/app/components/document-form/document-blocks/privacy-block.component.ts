@@ -8,12 +8,22 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{num()}}. Создание объекта права промышленной собственности
         при реализации объекта государственной экспертизы:
       </label>
-      <app-dropdown [options]="privacyOptions" [(ngModel)]="_form().privacyObjectsDescription"
+      <app-dropdown
+        [options]="privacyOptions"
+        [(ngModel)]="_form().privacyObjectsDescription"
+        [attr.name]="'privacyObjectsDescription_' + num().split('.').join('_')"
+        required
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full() || _form().privacyObjectsDescription == 'предусматривается') {
         <textarea
-          [(ngModel)]="_form().privacyObjectsDescriptionText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+          [(ngModel)]="_form().privacyObjectsDescriptionText"
+          [attr.name]="'privacyObjectsDescriptionText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">

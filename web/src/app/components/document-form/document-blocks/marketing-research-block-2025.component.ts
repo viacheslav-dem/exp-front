@@ -9,11 +9,18 @@ import {ProjectDto} from "@app/dto/ProjectDto";
           <label>
             {{ num() }}. Проведение маркетинговых и патентных исследований, их результаты:
           </label>
-          <app-dropdown [options]="marketingResearchOptions" [(ngModel)]="_form().marketingResearch"
+          <app-dropdown name="marketingResearch" required [options]="marketingResearchOptions" [(ngModel)]="_form().marketingResearch"
           (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
           @if (full()) {
-            <textarea [(ngModel)]="_form().marketingResearchText" rows="3" class="form-control mt-05"
-            placeholder="Обязательный текст"></textarea>
+            <textarea
+              [(ngModel)]="_form().marketingResearchText"
+              [attr.name]="'marketingResearchText_' + num().split('.').join('_')"
+              required
+              minlength="30"
+              rows="3"
+              class="form-control mt-05"
+              placeholder="Обязательный текст (не менее 30 символов)."
+            ></textarea>
           }
           @if (full()) {
             <div class="hint">

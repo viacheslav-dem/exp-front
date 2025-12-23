@@ -13,19 +13,25 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         либо перечня научных исследований и разработок по развитию государственной системы научно-технической
         информации Республики Беларусь:
       </label>
-      <app-boolean-button [(ngModel)]="_form().sufficiency" [trueLabel]="'достаточно'"
+      <app-boolean-button name="sufficiency" required [(ngModel)]="_form().sufficiency" [trueLabel]="'достаточно'"
         [falseLabel]="'недостаточно'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (!_form().sufficiency) {
         <label>Рекомендуется добавить:</label>
         <textarea
-          [(ngModel)]="_form().sufficiencySuggestion" rows="2" class="form-control"
+          [(ngModel)]="_form().sufficiencySuggestion" name="sufficiencySuggestion" required rows="2" class="form-control"
           title="Рекомендуется добавить"
           placeholder="перечисление ресурсов, которые необходимо добавить в процессе реализации объекта экспертизы"
         ></textarea>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form().sufficiencyText" rows="3" class="form-control mt-05"
+        <textarea
+          [(ngModel)]="_form().sufficiencyText"
+          [attr.name]="'sufficiencyText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
         placeholder="Обязательный текст."></textarea>
       }
     </div>

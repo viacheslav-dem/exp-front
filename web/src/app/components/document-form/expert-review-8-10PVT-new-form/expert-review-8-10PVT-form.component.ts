@@ -7,7 +7,6 @@ import {
 import {NumberPipe} from "@app/pipes/number.pipe";
 import {DataService} from "@app/services/data.service";
 import {ExpertReview_8_10PVT_NewFormContent} from "@app/components/document-form/form-model/ExpertReview_8_10PVT_NewFormContent";
-import {isEmptyOrNull} from "@app/support/utils";
 
 @Component({
     selector: 'app-review-8-10PVT-form',
@@ -37,11 +36,9 @@ export class ExpertReview_8_10PVT_NewFormComponent extends ExpertReviewForm<Expe
   }
 
   validate() {
+    // Инкрементальная миграция: обязательность/мин.длина выражаются через template-driven validators (required/minlength),
+    // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
-    if (isEmptyOrNull(this._form.productName)){
-
-      throw 'Пожалуйста, заполните Наименования поля заключения.'
-    }
   }
 
   get conclusion(): string {

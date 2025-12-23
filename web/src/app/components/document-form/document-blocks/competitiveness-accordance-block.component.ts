@@ -10,12 +10,14 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         31 октября 2012 г. № 995 (конкурентоспособность товара):
       </label>
       <app-boolean-button
+        name="competitiveness"
+        required
         [(ngModel)]="_form().competitiveness"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().competitivenessText" rows="3" class="form-control"
+        <textarea [(ngModel)]="_form().competitivenessText" name="competitivenessText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>

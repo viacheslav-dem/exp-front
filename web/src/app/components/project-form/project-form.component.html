@@ -3,6 +3,7 @@
     <div class="form-group">
         <label class="form-group-label">Наименование объекта экспертизы</label>
         <textarea rows="2" class="form-control" placeholder="Название объекта экспертизы"
+                  name="title" required
                   [(ngModel)]="_project.title" title="Название объекта экспертизы"></textarea>
     </div>
 
@@ -96,10 +97,14 @@
             @if (_project.code?.code != '8.4') {
                 <textarea rows="2" class="form-control"
                           placeholder="Наименование программы (подпрограммы)"
+                          name="program"
+                          [required]="_project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || _project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'"
                           [(ngModel)]="_project.program"></textarea>
             }
             @if (_project.code?.code == '8.4') {
                 <textarea rows="2" class="form-control" placeholder="Название страны"
+                          name="program"
+                          [required]="_project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || _project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'"
                           [(ngModel)]="_project.program"></textarea>
             }
             <div class="hint">
@@ -131,6 +136,7 @@
     <div class="form-group">
         <label class="form-group-label">Потенциальный(-е) исполнитель(-и) объекта государственной экспертизы</label>
         <textarea rows="2" class="form-control" placeholder="Организация-исполнитель проекта"
+                  name="executor" required
                   [(ngModel)]="_project.executor" title="Наименование организации"></textarea>
         <div class="hint">
             <p class="font-italic">
@@ -221,6 +227,7 @@
                     </div>
                     <div class="col-sm-2 pe-0">
                         <input class="form-control" min="0" numberInput type="text" placeholder="Сумма"
+                               name="fundingValue"
                                [(ngModel)]="funding.value" title="Сумма"/>
                     </div>
                     <div class="col-sm-2">
@@ -396,6 +403,7 @@
                     организационно-технического решения. Допускается ввод по нескольким видам ожидаемого результата.
                 </p>
                 <textarea class="form-control" rows="2" placeholder="Введите вид ожидаемого результата"
+                          name="otherExpectedResult" required
                           [(ngModel)]="_project.otherExpectedResult"></textarea>
                 </div>
             }
@@ -411,6 +419,7 @@
             }
             <div class="form-sub-group">
             <textarea class="form-control" rows="2" placeholder="Описание ожидаемого результата"
+                      name="expectedResultDescription" required minlength="30" maxlength="500"
                       [(ngModel)]="_project.expectedResultDescription"></textarea>
             </div>
         </div>
@@ -440,6 +449,7 @@
             @if (_project.workType === 'другое') {
                 <div class="form-sub-group mt-2">
                 <textarea class="form-control" rows="2" placeholder="Введите вид работ"
+                          name="otherWorkType" required
                           [(ngModel)]="_project.otherWorkType"></textarea>
                 </div>
             }
@@ -498,6 +508,7 @@
                 <label class="form-group-label">Коммерциализация результата</label>
                 <div class="form-sub-group">
                 <textarea class="form-control mb-2" rows="2" placeholder="Описание объекта коммерциализации"
+                          name="commercializationDescription" required minlength="30" maxlength="256"
                           [(ngModel)]="_project.commercializationDescription"></textarea>
 
                     <div class="form-sub-group italic">
@@ -553,8 +564,10 @@
                         </ul>
                     </div>
                     <textarea class="form-control mb-2 mt-2" rows="2" placeholder="Описание объекта внедрения"
+                              name="implementationDescription" required minlength="30" maxlength="256"
                               [(ngModel)]="_project.implementationDescription"></textarea>
                     <textarea class="form-control mb-2" rows="2" placeholder="Указание способа внедрения"
+                              name="implementationSpecifying" required
                               [(ngModel)]="_project.implementationSpecifying"></textarea>
                 </div>
                 </div>
@@ -588,6 +601,7 @@
                 @if (isAnotherTechnologyType) {
                     <textarea class="form-control mb-2 mt-2" rows="2"
                               placeholder="Введите технологический уклад"
+                              name="otherTechnologicalOrder" required
                               [(ngModel)]="_project.otherTechnologicalOrder"></textarea>
                 }
             </div>

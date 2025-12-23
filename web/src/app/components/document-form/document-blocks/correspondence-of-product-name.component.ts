@@ -12,7 +12,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
           Товарной номенклатурой внешнеэкономической деятельности Евразийского экономического союза (далее – ТН ВЭД
           ЕАЭС), к которому относится товар:
       </label>
-      <textarea [(ngModel)]="_form().correspondenceOfProductName" rows="3" class="form-control mt-05"
+      <textarea [(ngModel)]="_form().correspondenceOfProductName" name="correspondenceOfProductName" rows="3" class="form-control mt-05"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
   `,

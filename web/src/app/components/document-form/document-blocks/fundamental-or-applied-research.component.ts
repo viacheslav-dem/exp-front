@@ -9,6 +9,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <label>
         {{num()}}. Соответствие научного исследования по объекту государственной экспертизы:
       </label>
+      <input type="hidden" [(ngModel)]="_form().fundamentalOrAppliedResearch" name="fundamentalOrAppliedResearch" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().fundamentalOrAppliedResearch === true}" (click)="stateButton(true)">
           Соответсвует
@@ -24,8 +25,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         </div>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form().fundamentalOrAppliedResearchText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea [(ngModel)]="_form().fundamentalOrAppliedResearchText" name="fundamentalOrAppliedResearchText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full()) {
         <div class="hint">

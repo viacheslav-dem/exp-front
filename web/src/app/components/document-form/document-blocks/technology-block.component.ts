@@ -7,12 +7,19 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <label>
         {{num()}}. Оптимальность выбранной технологии и ее инновационность для Республики Беларусь:
       </label>
-      <app-boolean-button [(ngModel)]="_form().technology" [trueLabel]="'подтверждается'"
+      <app-boolean-button name="technology" required [(ngModel)]="_form().technology" [trueLabel]="'подтверждается'"
         [falseLabel]="'не подтверждается'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().technologyText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea
+          [(ngModel)]="_form().technologyText"
+          [attr.name]="'technologyText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">

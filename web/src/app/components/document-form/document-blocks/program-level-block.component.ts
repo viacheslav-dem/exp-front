@@ -9,12 +9,14 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         в части научно-технического уровня для достижения запланированных государственной программой показателей:
       </label>
       <app-boolean-button
+        name="programLevel"
+        required
         [(ngModel)]="_form().programLevel"
         [trueLabel]="'достаточно'"
         [falseLabel]="'недостаточно'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().programLevelText" rows="3" class="form-control"
+        <textarea [(ngModel)]="_form().programLevelText" name="programLevelText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
       @if (full()) {

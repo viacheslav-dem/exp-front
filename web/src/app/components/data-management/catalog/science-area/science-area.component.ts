@@ -67,7 +67,7 @@ import {environment} from "../../../../../environments/environment";
                         placeholder="например, технических наук" class="form-control" title="Наименование в родительном падеже">
                       </div>
                       <div class="mt-1">
-                        <button class="btn btn-secondary" (click)="cancelEditItem()">Отмена</button>
+                        <button class="btn btn-secondary me-2" (click)="cancelEditItem()">Отмена</button>
                         <button class="btn btn-primary" (click)="saveEditedItem()">Сохранить</button>
                         @if (selectedItem.id == 0) {
                           <button class="btn btn-danger" (click)="deleteItem(areaInd)">

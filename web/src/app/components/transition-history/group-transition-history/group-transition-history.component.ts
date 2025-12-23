@@ -27,9 +27,9 @@ export class GroupTransitionHistoryComponent implements OnInit {
   @Input() set history(history: LifecycleGroupTransitionHistoryDto) {
     if (!history) return;
     this._history = history;
-    this.hasInProcessingTransition = !!this._history.transitions
+    this.hasInProcessingTransition = !!(this._history.transitions || [])
       .find(transition => transition.newState == LifecycleGroupState.IN_PROCESSING);
-    this.transitionsCount = this._history.transitions.length;
+    this.transitionsCount = (this._history.transitions || []).length;
     this.cdr?.markForCheck?.();
   }
 

@@ -9,8 +9,14 @@ import {Component, input} from '@angular/core';
         поставщиков (подрядчиков, исполнителей), претендующих на участие в реализации мероприятия,
         целям рассматриваемого мероприятия.
       </label>
-      <textarea [(ngModel)]="_form().assessment" rows="3" class="form-control"
-      placeholder="Обязательный текст."></textarea>
+      <textarea
+        [(ngModel)]="_form().assessment"
+        [attr.name]="'assessment_' + num().split('.').join('_')"
+        required
+        minlength="30"
+        rows="3"
+        class="form-control"
+      placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       @if (full()) {
         <div class="hint">
           <p>

@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {ExpertReviewForm} from "@app/components/document-form/expert-review-form-container/expert-review-form";
 import {IndustryDto} from "@app/dto/IndustryDto";
 import {Catalog, DataService} from "@app/services/data.service";
-import {isEmptyOrNull} from "@app/support/utils";
 
 @Component({
     selector: 'app-review-8-12IP-form',
@@ -80,23 +79,12 @@ export class ExpertReview_8_12IP_FormComponent extends ExpertReviewForm<any> {
   }
 
   validate() {
+    // Инкрементальная миграция: обязательность/мин.длина выражаются через template-driven validators (required/minlength),
+    // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
+    // Проверка product/service оставлена через throw, так как это boolean и сложно валидировать через template-driven
     if (this._form.product == null && this._form.service == null) {
       throw 'Пожалуйста, выберите тип конечного результата проекта.'
-    }
-    if (isEmptyOrNull(this._form.accordance) ||
-      isEmptyOrNull(this._form.marketing) ||
-      !this._form.sectionNotPresented && isEmptyOrNull(this._form.sectionPlace) ||
-      !this._form.addedValueNotPresented && this._form.addedValue == null ||
-      !this._form.addedValueNotPresented && isEmptyOrNull(this._form.addedValuePlace) ||
-      !this._form.balanceNotPresented && this._form.balance == null ||
-      !this._form.balanceNotPresented && isEmptyOrNull(this._form.balancePlace) ||
-      isEmptyOrNull(this._form.scientificLevel) ||
-      isEmptyOrNull(this._form.analogue) ||
-      isEmptyOrNull(this._form.differences) ||
-      isEmptyOrNull(this._form.relevance) ||
-      isEmptyOrNull(this._form.consequences)) {
-      throw 'Пожалуйста, заполните все поля заключения.';
     }
   }
 }

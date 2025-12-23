@@ -8,12 +8,19 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{num()}}. Создание и внедрение новых технологий и (или) производство новой для Республики Беларусь
         и (или) мировой экономики продукции:
       </label>
-      <app-boolean-button [(ngModel)]="_form().noveltyExists" [trueLabel]="'соответствует'"
+      <app-boolean-button name="noveltyExists" required [(ngModel)]="_form().noveltyExists" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().noveltyExistsText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea
+          [(ngModel)]="_form().noveltyExistsText"
+          [attr.name]="'noveltyExistsText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
     </div>
     `,

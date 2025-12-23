@@ -86,7 +86,7 @@ import {environment} from "../../../../../environments/environment";
                                 class="form-control" title="Коэффициент для членов экспертного совета">
                               </div>
                               <div class="mt-1">
-                                <button class="btn btn-secondary" (click)="cancelEditItem()">Отмена</button>
+                                <button class="btn btn-secondary me-2" (click)="cancelEditItem()">Отмена</button>
                                 <button class="btn btn-primary" (click)="saveEditedItem()">Сохранить</button>
                                 @if (selectedItem.id == 0) {
                                   <button class="btn btn-danger" (click)="deleteItem(areaInd)">

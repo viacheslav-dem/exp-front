@@ -8,8 +8,15 @@ import {Component, input} from '@angular/core';
         {{num()}}. Признаки, которыми технологии и (или) продукция отличаются от аналогов на
         территории Республики Беларусь и (или) в мире.
       </label>
-      <textarea [(ngModel)]="_form().analogParamsText" rows="3" class="form-control"
-      placeholder="Обязательный текст."></textarea>
+      <textarea
+        [(ngModel)]="_form().analogParamsText"
+        [attr.name]="'analogParamsText_' + num().split('.').join('_')"
+        required
+        minlength="30"
+        rows="3"
+        class="form-control"
+        placeholder="Обязательный текст (не менее 30 символов)."
+      ></textarea>
       @if (full()) {
         <div class="hint">
           <p>

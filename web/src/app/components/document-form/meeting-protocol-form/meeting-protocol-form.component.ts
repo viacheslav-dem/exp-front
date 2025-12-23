@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, Input, Type, ViewChild, ViewContainerRef, input, ChangeDetectionStrategy, ChangeDetectorRef} from "@angular/core";
+import {Component, ComponentFactoryResolver, Input, Type, ViewChild, ViewContainerRef, input, ChangeDetectionStrategy, ChangeDetectorRef, signal} from "@angular/core";
 import {MeetingDto} from "@app/dto/MeetingDto";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {Role} from "@app/pipes/role.pipe";
@@ -50,6 +50,9 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
   invited: { name: string }[] = [];
   searchPersonRoles: Role[] | string[] | string = "none";
   agendaComponents: { [key: number]: AgendaNewForm } = {};
+
+  // Аккордеон: открыт максимум один проект за раз.
+  readonly openedAgendaProjectId = signal<number | null>(null);
   @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
   @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
 
@@ -87,6 +90,8 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
 
   @Input() set meeting(meeting: MeetingDto) {
     this._meeting = meeting;
+    // При смене заседания сбрасываем открытый проект, чтобы не "залипало" состояние.
+    this.openedAgendaProjectId.set(null);
     this._form.endDate = this._form.endDate || this._meeting.period.end;
     this._meetingService.getMeetingAssessors(this._meeting).subscribe(res => {
       sortPersonsByName(res);
@@ -95,6 +100,14 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
       this.cdr?.markForCheck?.();
     });
     this.prepareAgendaForms();
+    this.cdr?.markForCheck?.();
+  }
+
+  toggleAgendaProject(projectId: number | undefined | null) {
+    if (projectId == null) {
+      return;
+    }
+    this.openedAgendaProjectId.update(curr => (curr === projectId ? null : projectId));
     this.cdr?.markForCheck?.();
   }
 

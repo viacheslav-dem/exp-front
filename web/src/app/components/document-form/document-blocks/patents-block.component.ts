@@ -9,12 +9,19 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         (изобретений, полезных моделей, промышленных образцов, топологий интегральных микросхем, сортов растений,
         на которые в установленном порядке получены патенты (свидетельства) либо приняты решения патентного органа об их выдаче):
       </label>
-      <app-boolean-button [(ngModel)]="_form().patents" [trueLabel]="'да'"
+      <app-boolean-button name="patents" required [(ngModel)]="_form().patents" [trueLabel]="'да'"
         [falseLabel]="'нет'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().patentsText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea
+          [(ngModel)]="_form().patentsText"
+          [attr.name]="'patentsText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">

@@ -8,12 +8,12 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{num()}}. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы
         в части объемов их финансирования для достижения запланированных государственной программой показателей:
       </label>
-      <app-boolean-button [(ngModel)]="_form().programSufficiency"
+      <app-boolean-button name="programSufficiency" required [(ngModel)]="_form().programSufficiency"
         [trueLabel]="'достаточно'"
         [falseLabel]="'недостаточно'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().programSufficiencyText" rows="3" class="form-control mt-05"
+        <textarea [(ngModel)]="_form().programSufficiencyText" name="programSufficiencyText" rows="3" class="form-control mt-05"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
       @if (full()) {

@@ -31,6 +31,14 @@ import {
   faAngleLeft,
   faAngleRight
 } from '@fortawesome/free-solid-svg-icons';
+import { DocumentService } from '@app/services/document.service';
+import { DocumentDto } from '@app/dto/DocumentDto';
+import { StorageService } from '@app/services/storage.service';
+import { HttpClientSecure } from '@app/services/http.client';
+import { TransitionHistoryModule } from '@app/components/transition-history/transition-history.module';
+import { RemarkResponseComponent } from '@app/components/remark-response/remark-response.component';
+import { FormsModule } from '@angular/forms';
+import { DataService } from '@app/services/data.service';
 
 // Моки сервисов
 class RouterMock {
@@ -123,12 +131,12 @@ class TransitionHistoryServiceMock {
 
   getGroupHistory(group: LifecycleGroupDto) {
     this.getGroupHistoryCalls.push(group);
-    return of({});
+    return of({ transitions: [], lifecycleHistories: [] });
   }
 
   getLifecycleHistory(lifecycle: ProjectLifecycleDto) {
     this.getLifecycleHistoryCalls.push(lifecycle);
-    return of({});
+    return of({ transitions: [] });
   }
 }
 
@@ -175,6 +183,100 @@ class DialogServiceMock {
   }
 }
 
+class DocumentServiceMock {
+  checkPdfViewCalls: any[] = [];
+  downloadDocumentCalls: any[] = [];
+
+  checkPdfView(doc: DocumentDto) {
+    this.checkPdfViewCalls.push(doc);
+    return of(false);
+  }
+
+  downloadDocument(doc: DocumentDto, url: string) {
+    this.downloadDocumentCalls.push({ doc, url });
+    return of({});
+  }
+}
+
+class StorageServiceMock {
+  getCurrRole() {
+    return null;
+  }
+
+  getAccessToken() {
+    return null;
+  }
+
+  getRefreshToken() {
+    return null;
+  }
+
+  getRoles() {
+    return null;
+  }
+
+  getRolesInfo() {
+    return null;
+  }
+
+  getUsername() {
+    return null;
+  }
+
+  getUserId() {
+    return null;
+  }
+
+  getRedirectUrl() {
+    return null;
+  }
+
+  setRedirectUrl(url: string) {}
+  changeCurrRole(newRole: string) {}
+  saveCredentials(accessToken: string, refreshToken: string, roles: string[], userId: any, username: string, rolesInfo: any[]) {}
+  resetCredentials() {}
+  clear() {}
+  isAccessTokenValidNow(leewaySeconds?: number) {
+    return false;
+  }
+}
+
+class HttpClientSecureMock {
+  getBlock(url: string, options?: any) {
+    return of(new Blob());
+  }
+
+  postBlock(url: string, body: any, options?: any) {
+    return of({});
+  }
+
+  deleteBlock(url: string, options?: any) {
+    return of({});
+  }
+
+  putBlock(url: string, body: any, options?: any) {
+    return of({});
+  }
+
+  getTokenParamsString() {
+    return 'token=test';
+  }
+}
+
+class DataServiceMock {
+  getSections(councilId: any) {
+    return of([]);
+  }
+
+  getCouncils() {
+    return of([]);
+  }
+
+  getBelisa() {
+    return of(null);
+  }
+}
+
 describe('LifecycleGroupComponent', () => {
   let component: LifecycleGroupComponent;
   let fixture: ComponentFixture<LifecycleGroupComponent>;
@@ -197,13 +299,16 @@ describe('LifecycleGroupComponent', () => {
         LifecycleGroupStatePipe,
         LifecycleStatePipe,
         SectionPipe,
-        CouncilPipe
+        CouncilPipe,
+        RemarkResponseComponent
       ],
       imports: [
         CommonModule,
+        FormsModule,
         CommonComponentsModule,
         SearchModule,
-        CustomPipesModule
+        CustomPipesModule,
+        TransitionHistoryModule
       ],
       providers: [
         { provide: Router, useClass: RouterMock },
@@ -211,7 +316,11 @@ describe('LifecycleGroupComponent', () => {
         { provide: TransitionHistoryService, useValue: transitionHistoryService },
         { provide: LifecycleService, useValue: lifecycleService },
         { provide: GlobalToastyService, useValue: toastyService },
-        { provide: DialogService, useValue: dialogService }
+        { provide: DialogService, useValue: dialogService },
+        { provide: DocumentService, useClass: DocumentServiceMock },
+        { provide: StorageService, useClass: StorageServiceMock },
+        { provide: HttpClientSecure, useClass: HttpClientSecureMock },
+        { provide: DataService, useClass: DataServiceMock }
       ]
     }).compileComponents();
 
@@ -265,11 +374,15 @@ describe('LifecycleGroupComponent', () => {
     beforeEach(() => {
       const group = new LifecycleGroupDto();
       group.id = 1;
+      group.state = LifecycleGroupState.ON_CHECKING;
+      group.council = { id: 1 } as any;
       group.lifecycles = [
-        { id: 1, state: ProjectLifecycleState.ON_CHOOSING_MEETING } as ProjectLifecycleDto,
-        { id: 2, state: ProjectLifecycleState.READY_FOR_MEETING } as ProjectLifecycleDto,
-        { id: 3, state: ProjectLifecycleState.ON_EXPERT_EXAMINATION } as ProjectLifecycleDto
+        { id: 1, state: ProjectLifecycleState.ON_CHOOSING_MEETING, remarks: [], remarkDocuments: [], meetingProtocol: [] } as ProjectLifecycleDto,
+        { id: 2, state: ProjectLifecycleState.READY_FOR_MEETING, remarks: [], remarkDocuments: [], meetingProtocol: [] } as ProjectLifecycleDto,
+        { id: 3, state: ProjectLifecycleState.ON_EXPERT_EXAMINATION, remarks: [], remarkDocuments: [], meetingProtocol: [] } as ProjectLifecycleDto
       ];
+      group.remarkDocuments = [];
+      group.meetingProtocol = [];
       component.group = group;
       fixture.detectChanges();
     });
@@ -309,6 +422,11 @@ describe('LifecycleGroupComponent', () => {
 
     it('should emit onDeleted when group is deleted', () => {
       const group = new LifecycleGroupDto();
+      group.id = 1;
+      group.state = LifecycleGroupState.ON_CHECKING;
+      group.council = { id: 1 } as any;
+      group.remarkDocuments = [];
+      group.meetingProtocol = [];
       component._group = group;
       spyOn(component.onDeleted, 'emit');
 
@@ -323,6 +441,10 @@ describe('LifecycleGroupComponent', () => {
       const lifecycle = new ProjectLifecycleDto();
       lifecycle.remarks = [];
       component.lifecycleRemark = lifecycle;
+      // Инициализируем модальное окно
+      component.remarkResponseForSection = {
+        hide: jasmine.createSpy('hide')
+      } as any;
       const project = new ProjectDto();
       project.title = 'Updated Project';
       lifecycleService.replyForSectionRemark = jasmine.createSpy().and.returnValue(of(project));
@@ -349,6 +471,11 @@ describe('LifecycleGroupComponent', () => {
 
     it('should unsubscribe from all subscriptions in ngOnDestroy', () => {
       const group = new LifecycleGroupDto();
+      group.id = 1;
+      group.state = LifecycleGroupState.ON_CHECKING;
+      group.council = { id: 1 } as any;
+      group.remarkDocuments = [];
+      group.meetingProtocol = [];
       component.group = group;
       // Создаем мок для transitionHistoryModal
       component.transitionHistoryModal = {

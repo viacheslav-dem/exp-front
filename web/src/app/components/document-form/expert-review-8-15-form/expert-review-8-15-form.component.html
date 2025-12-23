@@ -5,7 +5,7 @@
       1. Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
       научно-технической деятельности в Республики Беларусь:
     </label>
-    <textarea [(ngModel)]="_form.accordance" rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.accordance" name="accordance" required rows="3" class="form-control"
       placeholder="cоответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
     </textarea>
   </div>
@@ -14,7 +14,7 @@
     <label>
       2. Значение работы для реализации приоритетов социально-экономического развития:
     </label>
-    <textarea [(ngModel)]="_form.significance" rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.significance" name="significance" required rows="3" class="form-control"
       placeholder="суть значения и важности работы для республики">
     </textarea>
   </div>
@@ -23,7 +23,7 @@
     <label>
       3. Значение работы для разработки новых технологических процессов, наукоемкой, конкурентоспособной продукции:
     </label>
-    <textarea [(ngModel)]="_form.technologySignificance" rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.technologySignificance" name="technologySignificance" required rows="3" class="form-control"
       placeholder="суть значения и важности работы для республики">
     </textarea>
   </div>
@@ -32,7 +32,7 @@
     <label>
       4. Значение работы для формирования перспективных научных направлений:
     </label>
-    <textarea [(ngModel)]="_form.scientificSignificance" rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.scientificSignificance" name="scientificSignificance" required rows="3" class="form-control"
       placeholder="суть значения и важности работы для республики">
     </textarea>
   </div>

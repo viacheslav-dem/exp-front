@@ -9,11 +9,11 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <label>
         {{num()}}. Способ коммерциализации результата (-ов) научно-технической деятельности:
       </label>
-      <app-dropdown [options]="noveltyOptions()" [(ngModel)]="_form().commerce"
+      <app-dropdown name="commerce" required [options]="noveltyOptions()" [(ngModel)]="_form().commerce"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().commerceText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea [(ngModel)]="_form().commerceText" name="commerceText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
       @if (full()) {
         <div class="hint">

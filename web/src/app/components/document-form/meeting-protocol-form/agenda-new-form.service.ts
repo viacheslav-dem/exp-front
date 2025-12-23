@@ -1,6 +1,6 @@
 import {DocumentForm} from "app/components/document-form/document-form";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
-import {Injectable} from "@angular/core";
+import {computed, Injectable} from "@angular/core";
 import {MeetingProtocolFormComponent} from "@app/components/document-form/meeting-protocol-form/meeting-protocol-form.component";
 import {AgendaNewFormContent} from "@app/components/document-form/meeting-protocol-form/AgendaNewFormContent";
 import {PeriodDto} from "@app/dto/PeriodDto";
@@ -15,6 +15,19 @@ export abstract class AgendaNewForm extends DocumentForm<AgendaNewFormContent> {
   canRescheduled: boolean;
   _project: ProjectPlainDto;
   financeConclusionNum;
+
+  // Аккордеон: раскрытие управляется родителем (MeetingProtocolFormComponent.openedAgendaProjectId)
+  // и вычисляется реактивно (zoneless/OnPush friendly).
+  readonly expanded = computed(() => {
+    const parent = this.parent;
+    const openedId = parent?.openedAgendaProjectId?.();
+    const myId = this._project?.id;
+    return openedId != null && myId != null && openedId === myId;
+  });
+
+  toggleExpanded() {
+    this.parent?.toggleAgendaProject?.(this._project?.id);
+  }
 
   createNewForm(): AgendaNewFormContent {
     return new AgendaNewFormContent();

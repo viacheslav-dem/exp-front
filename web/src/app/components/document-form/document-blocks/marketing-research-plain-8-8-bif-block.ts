@@ -7,7 +7,11 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <label>
         {{num()}}. Проведение маркетинговых и патентных исследований, их результаты:
       </label>
-      <app-dropdown [options]="marketingResearchOptions" [(ngModel)]="_form().marketingResearch"
+      <app-dropdown
+        [options]="marketingResearchOptions"
+        [(ngModel)]="_form().marketingResearch"
+        [attr.name]="'marketingResearch_8_8_' + num().split('.').join('_')"
+        required
                     (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
     </div>
   `,

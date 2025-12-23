@@ -8,12 +8,14 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{num()}}. Возможность отнесения товаров (работ, услуг) к категории инновационных:
       </label>
       <app-boolean-button
+        name="innovative"
+        required
         [(ngModel)]="_form().innovative"
         [trueLabel]="'возможно'"
         [falseLabel]="'невозможно'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().innovativeText" rows="3" class="form-control"
+        <textarea [(ngModel)]="_form().innovativeText" name="innovativeText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>

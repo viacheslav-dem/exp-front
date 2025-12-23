@@ -8,8 +8,14 @@ import {Component, input} from "@angular/core";
         {{num()}}. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
         и необходимости модернизации (реконструкции) взаимосвязанных действующих производственных объектов.
       </label>
-      <textarea [(ngModel)]="_form().consequences" rows="3" class="form-control"
-      placeholder="Обязательный текст."></textarea>
+      <textarea
+        [(ngModel)]="_form().consequences"
+        [attr.name]="'consequences_' + num().split('.').join('_')"
+        required
+        rows="3"
+        class="form-control"
+        placeholder="Обязательный текст."
+      ></textarea>
       @if (full()) {
         <div class="hint">
           <p>

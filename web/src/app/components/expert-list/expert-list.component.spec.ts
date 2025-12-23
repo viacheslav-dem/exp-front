@@ -9,13 +9,18 @@ import { Router } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
 import { ExpertReviewService } from '@app/services/expert-review.service';
 import { PersonExpertDto } from '@app/dto/PersonExpertDto';
-import { DegreeTypePipe } from '@app/pipes/degree.pipe';
-import { AcademicTitleTypePipe } from '@app/pipes/academic-title.pipe';
+import { DegreeTypePipe, DegreePipe } from '@app/pipes/degree.pipe';
+import { AcademicTitleTypePipe, AcademicTitlePipe } from '@app/pipes/academic-title.pipe';
 import { PersonFullNamePipe } from '@app/pipes/person-full-name.pipe';
+import { AcademicInfoPipe } from '@app/pipes/academic-info.pipe';
+import { FullDegreePipe } from '@app/pipes/full-degree.pipe';
+import { PhonesPipe } from '@app/pipes/phones.pipe';
 import { ChangeDetectorRef } from '@angular/core';
 import { of } from 'rxjs';
 import { Page } from '@app/components/common-components/page-and-filter/model/Page';
 import { Role } from '@app/pipes/role.pipe';
+import { AcademicTitleType } from '@app/pipes/academic-title.pipe';
+import { PersonInfoDto } from '@app/dto/PersonInfoDto';
 
 // Моки сервисов
 class GlobalToastyServiceMock {
@@ -29,9 +34,47 @@ class PersonServiceMock {
   searchExperts(request: any) {
     this.searchExpertsCalls.push(request);
     const page = new Page<PersonExpertDto>();
+    const personInfo: PersonInfoDto = {
+      academicTitleType: AcademicTitleType.WITHOUT_TITLE,
+      fullDegrees: [],
+      specializations: [],
+      specialities: []
+    } as PersonInfoDto;
     page.content = [
-      { id: 1, email: 'expert1@test.com' } as PersonExpertDto,
-      { id: 2, email: 'expert2@test.com' } as PersonExpertDto
+      { 
+        id: 1, 
+        email: 'expert1@test.com', 
+        personInfo: personInfo, 
+        phones: [],
+        areas: [],
+        realTimeStats: {
+          projectsOnExamination: 0,
+          reviewsOnConfirmation: 0,
+          reviewsTermsViolation: { red: 0 },
+          acceptedProjects: 0,
+          rejectedProjects: 0,
+          rejectedReviewsByExpert: 0,
+          rejectedReviewsByGknt: 0
+        },
+        stats: {}
+      } as PersonExpertDto,
+      { 
+        id: 2, 
+        email: 'expert2@test.com', 
+        personInfo: personInfo, 
+        phones: [],
+        areas: [],
+        realTimeStats: {
+          projectsOnExamination: 0,
+          reviewsOnConfirmation: 0,
+          reviewsTermsViolation: { red: 0 },
+          acceptedProjects: 0,
+          rejectedProjects: 0,
+          rejectedReviewsByExpert: 0,
+          rejectedReviewsByGknt: 0
+        },
+        stats: {}
+      } as PersonExpertDto
     ];
     page.totalElements = 2;
     page.totalPages = 1;
@@ -86,6 +129,36 @@ class AcademicTitleTypePipeMock {
   }
 }
 
+class AcademicTitlePipeMock {
+  transform(value: any) {
+    return value;
+  }
+}
+
+class DegreePipeMock {
+  transform(value: any) {
+    return value;
+  }
+}
+
+class FullDegreePipeMock {
+  transform(value: any) {
+    return value;
+  }
+}
+
+class AcademicInfoPipeMock {
+  transform(value: any) {
+    return 'Test Academic Info';
+  }
+}
+
+class PhonesPipeMock {
+  transform(value: any) {
+    return '+375 29 1234567';
+  }
+}
+
 class PersonFullNamePipeMock {
   transform(value: any) {
     return 'Test Name';
@@ -115,7 +188,14 @@ describe('ExpertListComponent', () => {
     cdr = new ChangeDetectorRefMock();
 
     await TestBed.configureTestingModule({
-      declarations: [ExpertListComponent],
+      declarations: [
+        ExpertListComponent,
+        PersonFullNamePipe,
+        DegreeTypePipe,
+        AcademicTitleTypePipe,
+        AcademicInfoPipe,
+        PhonesPipe
+      ],
       providers: [
         { provide: GlobalToastyService, useClass: GlobalToastyServiceMock },
         { provide: PersonService, useValue: personService },
@@ -125,10 +205,15 @@ describe('ExpertListComponent', () => {
         { provide: Router, useValue: router },
         { provide: AuthService, useValue: authService },
         { provide: ExpertReviewService, useClass: ExpertReviewServiceMock },
+        { provide: ChangeDetectorRef, useValue: cdr },
+        { provide: PersonFullNamePipe, useClass: PersonFullNamePipeMock },
         { provide: DegreeTypePipe, useClass: DegreeTypePipeMock },
         { provide: AcademicTitleTypePipe, useClass: AcademicTitleTypePipeMock },
-        { provide: PersonFullNamePipe, useClass: PersonFullNamePipeMock },
-        { provide: ChangeDetectorRef, useValue: cdr }
+        { provide: AcademicInfoPipe, useClass: AcademicInfoPipeMock },
+        { provide: DegreePipe, useClass: DegreePipeMock },
+        { provide: AcademicTitlePipe, useClass: AcademicTitlePipeMock },
+        { provide: FullDegreePipe, useClass: FullDegreePipeMock },
+        { provide: PhonesPipe, useClass: PhonesPipeMock }
       ]
     }).compileComponents();
 
@@ -160,9 +245,15 @@ describe('ExpertListComponent', () => {
 
     it('should set expertId when showExpertPayInfoDialog is called', () => {
       const expert = { id: 5 } as PersonExpertDto;
+      // Мокаем expertPayInfoModal, так как это ViewChild который не инициализирован в тесте
+      component.expertPayInfoModal = {
+        show: jasmine.createSpy('show')
+      } as any;
+      
       component.showExpertPayInfoDialog(expert);
 
       expect(component.expertId()).toBe(5);
+      expect(component.expertPayInfoModal.show).toHaveBeenCalled();
     });
 
     it('should initialize showFilter signal as false', () => {
@@ -192,9 +283,14 @@ describe('ExpertListComponent', () => {
 
   describe('List rendering', () => {
     beforeEach(() => {
+      // Сбрасываем счетчики перед каждым тестом
+      personService.searchExpertsCalls = [];
+      dataService.getOrgsCalls = [];
       component.ngOnInit();
       // Wait for async operations in ngOnInit (setTimeout)
       fixture.detectChanges();
+      // Ждем завершения всех асинхронных операций из ngOnInit
+      // Это нужно, чтобы update() не вызывал loadPage() после того, как мы сбросили счетчики
     });
 
     it('should initialize search fields in ngOnInit', () => {
@@ -202,14 +298,20 @@ describe('ExpertListComponent', () => {
     });
 
     it('should load experts when loadPage is called', (done) => {
-      component.loadPage();
-      fixture.detectChanges();
-
-      // Wait for async operations
+      // Ждем завершения всех асинхронных операций из ngOnInit
+      // (update() может вызвать loadPage() через setTimeout)
       setTimeout(() => {
-        expect(personService.searchExpertsCalls.length).toBe(1);
-        expect(component.experts().length).toBe(2);
-        done();
+        // Сбрасываем счетчик перед вызовом loadPage
+        personService.searchExpertsCalls = [];
+        component.loadPage();
+        fixture.detectChanges();
+
+        // Wait for async operations
+        setTimeout(() => {
+          expect(personService.searchExpertsCalls.length).toBe(1);
+          expect(component.experts().length).toBe(2);
+          done();
+        }, 200);
       }, 200);
     });
 
@@ -285,7 +387,38 @@ describe('ExpertListComponent', () => {
   });
 
   describe('Component lifecycle', () => {
+    beforeEach((done) => {
+      // Ждем завершения всех асинхронных операций из предыдущих блоков
+      // (beforeEach блока "List rendering" может вызвать ngOnInit)
+      setTimeout(() => {
+        // Сбрасываем счетчики перед каждым тестом
+        dataService.getOrgsCalls = [];
+        personService.searchExpertsCalls = [];
+        // Мокируем chartContainers для предотвращения ошибок с changes
+        component.chartContainers = {
+          changes: of([]),
+          length: 0,
+          first: undefined,
+          last: undefined,
+          get: () => undefined,
+          forEach: () => {},
+          map: () => [],
+          filter: () => ({ length: 0, changes: of([]) } as any),
+          find: () => undefined,
+          some: () => false,
+          toArray: () => [],
+          reset: () => {},
+          notifyOnChanges: () => {},
+          destroy: () => {}
+        } as any;
+        done();
+      }, 250);
+    });
+
     it('should load organizations in ngOnInit', (done) => {
+      // Убеждаемся, что счетчик сброшен перед тестом
+      // (beforeEach уже сбросил счетчик после завершения всех асинхронных операций)
+      dataService.getOrgsCalls = [];
       component.ngOnInit();
       fixture.detectChanges();
 
