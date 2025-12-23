@@ -185,6 +185,7 @@
 @if (_group && canEditConclusion()) {
   <app-modal #councilFormModal [title]="'Заключение ГЭС'" (onClose)="closeConclusionForm()">
   <app-council-conclusion-form [project]="projectValue" [group]="_group"
+                               [loading]="isCreatingConclusion"
                                [draftOwner]="_group"
                                [draftService]="_lifecycleGroupService"
                                (onSave)="generateConclusion($event)"

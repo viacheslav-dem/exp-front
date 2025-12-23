@@ -18,7 +18,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
         </button>
       </div>
       @if (!_form().financeAccordance) {
-        <label class="ml-2">Рекомендуемый объем финансирования, {{project()?.currency?.name || 'руб.'}}:</label>
+        <label class="ms-2">Рекомендуемый объем финансирования, {{project()?.currency?.name || 'руб.'}}:</label>
         <div class="input-group mt-2">
           <input [(ngModel)]="_form().financeSuggestion" min="0" numberInput type="text" class="form-control"
             [title]="'Рекомендуемый объем финансирования, ' + (project()?.currency?.name || 'руб.')"

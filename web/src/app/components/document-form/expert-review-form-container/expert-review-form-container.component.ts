@@ -40,6 +40,9 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
 
   _project: ProjectDto;
 
+  // Управляемое состояние загрузки (прокидывается из контейнера, где выполняется HTTP)
+  readonly loading = input<boolean>(false);
+
   // Override parent @Input to expose as component input (parent field is used directly)
   readonly draftService = input<DraftService<Form>>(undefined);
   readonly draftOwner = input<IdDto>(undefined);

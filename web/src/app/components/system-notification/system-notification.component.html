@@ -36,7 +36,7 @@
           </div>
           <div class="mt-1">
             <button class="btn btn-secondary" (click)="deleteNotification()">Очистить текст оповещения</button>
-            <button class="btn btn-primary btn-right" (click)="postNotification(notification.message)">Сохранить</button>
+            <button class="btn btn-primary btn-right" [disabled]="isSaving" (click)="postNotification(notification.message)">Сохранить</button>
           </div>
         </div>
       }

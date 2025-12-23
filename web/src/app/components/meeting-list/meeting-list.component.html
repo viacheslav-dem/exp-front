@@ -4,7 +4,7 @@
     <button class="btn btn-primary btn-sm" (click)="showCreateMeetingModal()">Новое заседание</button>
   </div>
   <div class="row">
-    <div class="col-lg-8 pr-0">
+    <div class="col-lg-8 pe-0">
       <div [loadingData]="_loading" class="list-group mt-3">
         @if (meetings.length == 0) {
           <div class="alert alert-info italic mb-3">

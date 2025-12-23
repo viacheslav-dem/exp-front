@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, Input, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {Component, ComponentFactoryResolver, Input, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, input} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {SearchPersonByRolesComponent} from "@app/components/search/search-person/search-person-by-role.component";
 import {Role} from "@app/pipes/role.pipe";
@@ -44,6 +44,9 @@ import {environment} from "../../../../environments/environment";
 export class CouncilConclusionFormContainerComponent extends DocumentForm<CouncilConclusionFormContent> {
 
   Role = Role;
+
+  // Управляемое состояние загрузки (прокидывается из контейнера, где выполняется HTTP)
+  readonly loading = input<boolean>(false);
 
   documents: Text[] = [];
   formComponent: CouncilConclusionForm;

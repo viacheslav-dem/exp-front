@@ -48,6 +48,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   
   isCreatingReferral = false;
+  isCreatingConclusion = false;
 
   readonly role = input(undefined);
   readonly project = input<ProjectDto>(new ProjectDto());
@@ -304,12 +305,22 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   }
 
   generateConclusion(form) {
+    this.isCreatingConclusion = true;
+    this.cdr?.markForCheck?.();
     this.subscriptions.push(
-      this._lifecycleGroupService.generateCouncilConclusion(this._group, form).subscribe(res => {
-        this.closeConclusionForm();
-        this._group.conclusion = res;
-        this.changed();
-        this.cdr?.markForCheck?.();
+      this._lifecycleGroupService.generateCouncilConclusion(this._group, form).subscribe({
+        next: (res) => {
+          this.isCreatingConclusion = false;
+          this.closeConclusionForm();
+          this._group.conclusion = res;
+          this.changed();
+          this.cdr?.markForCheck?.();
+        },
+        error: () => {
+          this.isCreatingConclusion = false;
+          this._toasty.error('Ошибка при создании документа');
+          this.cdr?.markForCheck?.();
+        }
       })
     );
   }

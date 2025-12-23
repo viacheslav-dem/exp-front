@@ -63,7 +63,7 @@
                     <div class="grid-item-drop-zone file-drop-zone"
                          (dragover)="onDragOver($event, 'docx', template)"
                          (dragleave)="onDragLeave($event, 'docx')"
-                         (drop)="onDrop($event, 'docx', template)"
+                         (drop)="onDrop($event, 'docx', template, docxUploader)"
                          [class.drag-over]="isDragOverDocx === template.id">
                       <div class="grid-item-actions">
                         <button class="btn btn-sm btn-outline-primary" (click)="downloadTemplate(template)">
@@ -73,6 +73,7 @@
                       </div>
                       <div class="grid-item-upload">
                         <app-silent-file-uploader
+                          #docxUploader
                           [controlClass]="'width-auto custom-file-inline'" 
                           [typesAccept]="DocType.DOCX.extension"
                           [url]="SERVER_URL + '/document/template/source?id=' + template.id">
@@ -94,7 +95,7 @@
                     <div class="grid-item-drop-zone file-drop-zone"
                          (dragover)="onDragOver($event, 'xml', template)"
                          (dragleave)="onDragLeave($event, 'xml')"
-                         (drop)="onDrop($event, 'xml', template)"
+                         (drop)="onDrop($event, 'xml', template, xmlUploader)"
                          [class.drag-over]="isDragOverXml === template.id">
                       <div class="grid-item-actions">
                         <button class="btn btn-sm btn-outline-primary" (click)="downloadTemplateXml(template)">
@@ -104,6 +105,7 @@
                       </div>
                       <div class="grid-item-upload">
                         <app-silent-file-uploader
+                          #xmlUploader
                           [controlClass]="'width-auto'" 
                           [typesAccept]="DocType.XML.extension"
                           [url]="SERVER_URL + '/document/template-xml/source?id=' + template.id">

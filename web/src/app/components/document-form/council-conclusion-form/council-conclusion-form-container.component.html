@@ -57,8 +57,15 @@
     <hr/>
 
     <div class="mt-2">
-      <button type="button" class="btn btn-secondary" (click)="close()">Отмена</button>
-      <button type="button" class="btn btn-primary ml-05" (click)="save()">Создать</button>
+      <button type="button" class="btn btn-secondary" (click)="close()" [disabled]="loading()">Отмена</button>
+      <button type="button" class="btn btn-primary ml-05" (click)="save()" [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          Создание...
+        } @else {
+          Создать
+        }
+      </button>
       <div class="mt-1 text-sm italic">Черновик формы автоматически сохраняется каждые 30 секунд и при закрытии формы.</div>
       <div class="mt-1 text-sm italic">Будьте внимательны! Если Вы ранее уже создавали этот документ, то он будет перезаписан.</div>
     </div>

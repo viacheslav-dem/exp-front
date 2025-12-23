@@ -43,6 +43,8 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
 
   _meeting: MeetingDto;
   readonly role = input<string>(undefined);
+  // Управляемое состояние загрузки (прокидывается из контейнера, где выполняется HTTP)
+  readonly loading = input<boolean>(false);
   currentPerson: PersonPlainDto;
   assessors: PersonPlainDto[] = [];
   invited: { name: string }[] = [];

@@ -55,8 +55,14 @@
       }
       @if (canEditReviewDocument()) {
         <button class="btn btn-sm btn-primary btn-right-sm"
-                (click)="showReviewFormModal()">
-          Создать
+                (click)="showReviewFormModal()"
+                [disabled]="isCreatingReviewDocument">
+          @if (isCreatingReviewDocument) {
+            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            Создание...
+          } @else {
+            Создать
+          }
         </button>
       }
     </div>
@@ -134,6 +140,7 @@
                           [project]="project()"
                           [draftService]="_reviewService"
                           [draftOwner]="expertReview"
+                          [loading]="isCreatingReviewDocument"
                           (onSave)="generateReviewDocument($event)"
                           (onClose)="closeModal()">
   </app-expert-review-form>

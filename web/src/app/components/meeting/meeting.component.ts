@@ -42,6 +42,8 @@ export class MeetingComponent implements OnInit, OnDestroy {
   remarks: RemarksContainerDto = new RemarksContainerDto();
   private subscriptions: Subscription[] = [];
 
+  isCreatingProtocol = false;
+
   @ViewChild("protocolFormModal", { static: false }) protocolFormModal: ModalComponent;
   @ViewChild(MeetingFormComponent, { static: false }) createMeetingModal: MeetingFormComponent;
   @ViewChild("sectionRemarks", { static: false }) sectionRemarks: ModalComponent;
@@ -140,14 +142,25 @@ export class MeetingComponent implements OnInit, OnDestroy {
   }
 
   generateMeetingProtocol(form) {
+    this.isCreatingProtocol = true;
+    this.cdr?.markForCheck?.();
+
     this.subscriptions.push(
       this._meetingService.generateCouncilMeetingProtocol(this.meeting, form)
-        .subscribe(res => {
-          this.meeting.report = res[0];
-          this.meeting.paymentDocument = res[1];
-          this.closeProtocolForm();
-          this.loadMeeting(this.meeting);
-          this.cdr?.markForCheck?.();
+        .subscribe({
+          next: (res) => {
+            this.isCreatingProtocol = false;
+            this.meeting.report = res[0];
+            this.meeting.paymentDocument = res[1];
+            this.closeProtocolForm();
+            this.loadMeeting(this.meeting);
+            this.cdr?.markForCheck?.();
+          },
+          error: () => {
+            this.isCreatingProtocol = false;
+            this._toasty.error('Ошибка при создании документа');
+            this.cdr?.markForCheck?.();
+          }
         })
     );
   }

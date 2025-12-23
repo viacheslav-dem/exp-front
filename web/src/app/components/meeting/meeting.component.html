@@ -53,7 +53,7 @@
       <div class="d-inline-block text-muted">Повестки дня</div>
       @if (meeting.state=='READY') {
         <div class="btn-right">
-          <button class="btn btn-sm btn-secondary mr-1" (click)="cancelAgendaDecisions()">Отменить заседание</button>
+          <button class="btn btn-sm btn-secondary me-2" (click)="cancelAgendaDecisions()">Отменить заседание</button>
           <button class="btn btn-sm btn-primary" (click)="saveAgendaDecisions()">Завершить заседание</button>
         </div>
       }
@@ -134,6 +134,7 @@
         [meeting]="meeting"
         [draftOwner]="meeting"
         [draftService]="_meetingService"
+        [loading]="isCreatingProtocol"
         (onSave)="generateMeetingProtocol($event)"
         (onClose)="protocolFormModal.hide()" [role]="role">
       </app-meeting-protocol-form>

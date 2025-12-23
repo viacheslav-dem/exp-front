@@ -151,6 +151,7 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> impl
     } else {
       this.isDragOverXml = template.id;
     }
+    this.cdr?.markForCheck?.();
   }
 
   onDragLeave(event: DragEvent, type: 'docx' | 'xml') {
@@ -161,9 +162,10 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> impl
     } else {
       this.isDragOverXml = null;
     }
+    this.cdr?.markForCheck?.();
   }
 
-  onDrop(event: DragEvent, type: 'docx' | 'xml', template: TemplateDocumentDto) {
+  onDrop(event: DragEvent, type: 'docx' | 'xml', template: TemplateDocumentDto, uploader?: SilentFileUploaderComponent) {
     event.preventDefault();
     event.stopPropagation();
     if (type === 'docx') {
@@ -173,11 +175,18 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> impl
     }
     const files = event.dataTransfer && event.dataTransfer.files;
     if (files && files.length) {
-      const key = `${template.id}_${type}`;
-      const uploader = this.uploaderMap.get(key);
-      if (uploader) {
-        uploader.onFilesChosen(Array.from(files) as File[]);
+      const effectiveUploader =
+        uploader ?? this.uploaderMap.get(`${template.id}_${type}`);
+
+      if (!effectiveUploader) {
+        // Важно для прод-диагностики: если мапа не успела обновиться, drag&drop "молчит".
+        this._toasty.warn("Не удалось определить загрузчик для выбранного шаблона. Попробуйте выбрать файл через диалог или обновить страницу.");
+        this.cdr?.markForCheck?.();
+        return;
       }
+
+      effectiveUploader.onFilesChosen(Array.from(files) as File[]);
+      this.cdr?.markForCheck?.();
     }
   }
 }

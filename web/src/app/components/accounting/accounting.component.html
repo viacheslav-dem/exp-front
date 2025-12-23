@@ -263,7 +263,7 @@
   <div>Дата проведения оплаты ({{selectedRecord()?.stateStartDate | date:'dd.MM.yyyy HH:mm'}} {{selectedRecord()?.termsMessage}}):</div>
   <app-date-input [ngModel]="payDate()" (ngModelChange)="payDate.set($event)"></app-date-input>
   <div class="mt-4">
-    <button type="button" class="btn btn-danger" (click)="closeFinishAccountingModal()">Отмена</button>
+    <button type="button" class="btn btn-danger me-2" (click)="closeFinishAccountingModal()">Отмена</button>
     <button type="button" class="btn btn-primary" (click)="finishAccounting()">Оплачено</button>
   </div>
 </app-modal>

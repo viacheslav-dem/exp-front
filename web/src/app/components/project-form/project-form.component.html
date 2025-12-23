@@ -178,7 +178,7 @@
                         <span>Валюта: </span>
                     </label>
                     <app-select-catalog
-                            class="d-inline-block ml-1"
+                            class="d-inline-block ms-1"
                             [catalog]="Catalog.CURRENCY"
                             [resetEnabled]="false"
                             [(ngModel)]="_project.currency"
@@ -206,20 +206,20 @@
                     }
                 </div>
                 <div class="row">
-                    <div class="col-sm-2 pr-0">
+                    <div class="col-sm-2 pe-0">
                         <app-dropdown class="dropdown btn-group" [options]="(allFundingType)"
                                       [optionToString]="fundingToString" [notSelected]="'Тип не выбран'"
                                       [(ngModel)]="funding.type"></app-dropdown>
                     </div>
-                    <div class="col-sm-3 pr-0">
+                    <div class="col-sm-3 pe-0">
           <textarea rows="1" class="form-control" placeholder="Комментарий"
                     [(ngModel)]="funding.comment" title="Комментарий"></textarea>
                     </div>
-                    <div class="col-sm-3 pr-0">
+                    <div class="col-sm-3 pe-0">
                         <app-select-catalog [catalog]="Catalog.FUNDING" [(ngModel)]="funding.source"
                                             [notSelected]="'Источник не выбран'"></app-select-catalog>
                     </div>
-                    <div class="col-sm-2 pr-0">
+                    <div class="col-sm-2 pe-0">
                         <input class="form-control" min="0" numberInput type="text" placeholder="Сумма"
                                [(ngModel)]="funding.value" title="Сумма"/>
                     </div>
@@ -270,11 +270,11 @@
                     }
                 </div>
                 <div class="row">
-                    <div class="col-10 pr-2">
+                    <div class="col-10 pe-2">
                         <app-select-catalog [catalog]="Catalog.DIRECTION"
                                             [(ngModel)]="newDirection"></app-select-catalog>
                     </div>
-                    <div class="col-2 pl-2">
+                    <div class="col-2 ps-2">
                         <button class="btn btn-primary w-100" [disabled]="!subDirection" (click)="addDirection()">
                             Добавить
                         </button>

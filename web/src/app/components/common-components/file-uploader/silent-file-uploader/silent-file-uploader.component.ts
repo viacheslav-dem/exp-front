@@ -32,7 +32,15 @@ export class SilentFileUploaderComponent extends UploadHelper {
     super.ngOnInit();
     this.onSuccess = (item: any, response: string) => {
       this._toasty.success("Файл успешно загружен.");
-      this.saved.next(JSON.parse(response));
+      // Бэкенд может вернуть не-JSON (например, пустое тело/строку).
+      // В проде это не должно ломать UX и "съедать" показ уведомления.
+      let parsed: any = null;
+      try {
+        parsed = response ? JSON.parse(response) : null;
+      } catch {
+        parsed = response;
+      }
+      this.saved.emit(parsed);
       this.cdr.markForCheck();
     };
     this.onError = (item: any, response: string, status: number) => {
@@ -50,6 +58,7 @@ export class SilentFileUploaderComponent extends UploadHelper {
 
   onFilesChosen(files: File[]) {
     this.file = files[0];
+    this.progressValue = 0;
     this._toasty.info("Загрузка файла началась.");
     this.saveFile();
     this.cdr.markForCheck();

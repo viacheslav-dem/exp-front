@@ -59,6 +59,8 @@ export class ExpertReviewComponent implements OnInit {
 
     formRenderer: Type<ExpertReviewForm<any>>;
 
+    isCreatingReviewDocument = false;
+
     @ViewChild('reviewFormModal', { static: false }) reviewFormModal: ModalComponent;
     @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
     @ViewChild(ExpertReviewFormContainerComponent, { static: false }) expertReviewForm: ExpertReviewFormContainerComponent<any>;
@@ -102,6 +104,9 @@ export class ExpertReviewComponent implements OnInit {
     }
 
     showReviewFormModal() {
+        if (this.isCreatingReviewDocument) {
+            return;
+        }
         const expertReviewType = this.project()?.code?.expertReviewType;
         this.formRenderer = expertReviewType
           ? this._formResolver.getFormRenderer(expertReviewType)
@@ -172,11 +177,25 @@ export class ExpertReviewComponent implements OnInit {
     }
 
     generateReviewDocument(reviewForm) {
-        console.log(reviewForm);
-        this._reviewService.generateReviewDocument(this.expertReview, reviewForm).subscribe(res => {
-            this.closeForm();
-            this.review = res;
-            this.changed();
+        if (this.isCreatingReviewDocument) {
+            return;
+        }
+        this.isCreatingReviewDocument = true;
+        this.cdr?.markForCheck?.();
+
+        this._reviewService.generateReviewDocument(this.expertReview, reviewForm).subscribe({
+            next: (res) => {
+                this.isCreatingReviewDocument = false;
+                this.closeForm();
+                this.review = res;
+                this.changed();
+                this.cdr?.markForCheck?.();
+            },
+            error: () => {
+                this.isCreatingReviewDocument = false;
+                this._toasty.error('Ошибка при создании документа');
+                this.cdr?.markForCheck?.();
+            }
         });
     }
 

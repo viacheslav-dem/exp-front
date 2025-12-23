@@ -20,14 +20,14 @@ a {
   }
   
   // Для внешних ссылок внутри текста
-  &[href]:not([routerLink]):not(.btn):not(.nav-link):not(.dropdown-item) {
-    color: var(--bs-link-color, #0d6efd);
-    text-decoration: underline;
+ // &[href]:not([routerLink]):not(.btn):not(.nav-link):not(.dropdown-item) {
+//    color: var(--bs-link-color, #0d6efd);
+//    text-decoration: underline;
     
-    &:hover {
-      color: var(--bs-link-hover-color, #0a58ca);
-    }
-  }
+ //   &:hover {
+//      color: var(--bs-link-hover-color, #0a58ca);
+//    }
+//  }
 }
 
 // Закомментировано: использование !important без необходимости
