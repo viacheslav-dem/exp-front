@@ -10,9 +10,8 @@ import {
 } from "@app/components/document-form/form-model/ExpertReview_8_5_7_8_12IP_2025FormContent";
 
 @Component({
-    selector: 'app-expert-review-8-5-7-8-12IP-2025-form',
-    templateUrl: './expert-review_8_5_7_8_12-i-p_2025-form.component.html',
-    standalone: false
+  selector: 'app-expert-review-8-5-7-8-12IP-2025-form',
+  templateUrl: './expert-review_8_5_7_8_12-i-p_2025-form.component.html'
 })
 export class ExpertReview_8_5_7_8_12IP_2025FormComponent extends ExpertReviewForm<ExpertReview_8_5_7_8_12IP_2025FormContent> {
 
@@ -29,20 +28,20 @@ export class ExpertReview_8_5_7_8_12IP_2025FormComponent extends ExpertReviewFor
   }
 
   private validationLengthCommentsOnConclusionRelusAndResult() {
-    if (this._form.nameAccordanceText.length < 30) {
-      throw "В пункте 'Соответствие объекта государственной экспертизы своему наименованию.' комментарий должен быть не менее 30 символов."
+    if (this._form.nameAccordanceText.length < 30 || this._form.nameAccordanceText.length > 5000) {
+      throw "В пункте 'Соответствие объекта государственной экспертизы своему наименованию.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.termsAccordanceText.length < 30) {
-      throw "В пункте 'Соответствие сроков выполнения объекта государственной экспертизы необходимым.' комментарий должен быть не менее 30 символов."
+    if (this._form.termsAccordanceText.length < 30 || this._form.termsAccordanceText.length > 5000) {
+      throw "В пункте 'Соответствие сроков выполнения объекта государственной экспертизы необходимым.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.financeAccordanceText.length < 30) {
-      throw "В пункте 'Соответствие заявленного финансирования планируемому объему выполняемых работ.' комментарий должен быть не менее 30 символов."
+    if (this._form.financeAccordanceText.length < 30 || this._form.financeAccordanceText.length > 5000) {
+      throw "В пункте 'Соответствие заявленного финансирования планируемому объему выполняемых работ.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.financeConclusionText.length < 30) {
-      throw "В пункте 'Целесообразность реализации объекта государственной экспертизы и его финансирования за счет средств республиканского бюджета и (или) других источников финансирования.' комментарий должен быть не менее 30 символов."
+    if (this._form.financeConclusionText.length < 30 || this._form.financeConclusionText.length > 5000) {
+      throw "В пункте 'Целесообразность реализации объекта государственной экспертизы и его финансирования за счет средств республиканского бюджета и (или) других источников финансирования.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.targetAccordanceText.length < 30) {
-      throw "В пункте 'Соответствие объекта государственной экспертизы заявленным целям.' комментарий должен быть не менее 30 символов."
+    if (this._form.targetAccordanceText.length < 30 || this._form.targetAccordanceText.length > 5000) {
+      throw "В пункте 'Соответствие объекта государственной экспертизы заявленным целям.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
   }
 
@@ -65,33 +64,33 @@ export class ExpertReview_8_5_7_8_12IP_2025FormComponent extends ExpertReviewFor
   }
 
   private validationLengthCommentsOnConclusionAnalysisAndEvaluation() {
-    if (this._form.priorityAreasText.length < 30) {
-      throw "В пункте 'Соответствие приоритетным направлениям научной, научно-технической и инновационной деятельности в Республике Беларусь.' комментарий должен быть не менее 30 символов."
+    if (this._form.priorityAreasText.length < 30 || this._form.priorityAreasText.length > 5000) {
+      throw "В пункте 'Соответствие приоритетным направлениям научной, научно-технической и инновационной деятельности в Республике Беларусь.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.noveltyText.length < 30) {
-      throw "В пункте 'Новизна (инновационность) объекта государственной экспертизы.' нет комментария к заключению."
+    if (this._form.noveltyText.length < 30 || this._form.noveltyText.length > 5000) {
+      throw "В пункте 'Новизна (инновационность) объекта государственной экспертизы.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.economicSignificanceText.length < 30) {
-      throw "В пункте 'Экономическая и (или) социальная значимость объекта государственной экспертизы.' нет комментария к заключению."
+    if (this._form.economicSignificanceText.length < 30 || this._form.economicSignificanceText.length > 5000) {
+      throw "В пункте 'Экономическая и (или) социальная значимость объекта государственной экспертизы.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.sectionText.length < 30) {
+    if (this._form.sectionText.length < 30 || this._form.sectionText.length > 5000) {
       throw "В пункте 'Секция и подсекция основного вида экономической деятельности, " +
-      "которому соответствует планируемый к реализации инновационный проект.' нет комментария к заключению."
+      "которому соответствует планируемый к реализации инновационный проект.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.resourcesSufficiencyText.length < 30) {
-      throw "В пункте 'Достаточность материально-технической базы и кадрового потенциала исполнителя работ.' нет комментария к заключению."
+    if (this._form.resourcesSufficiencyText.length < 30 || this._form.resourcesSufficiencyText.length > 5000) {
+      throw "В пункте 'Достаточность материально-технической базы и кадрового потенциала исполнителя работ.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.competenceSufficiencyText.length < 30) {
-      throw "В пункте 'Достаточность компетенции кадрового состава потенциального исполнителя работ' нет комментария к заключению."
+    if (this._form.competenceSufficiencyText.length < 30 || this._form.competenceSufficiencyText.length > 5000) {
+      throw "В пункте 'Достаточность компетенции кадрового состава потенциального исполнителя работ' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.marketingResearchText.length < 30) {
-      throw "В пункте 'Проведение маркетинговых и патентных исследований, их результаты.' нет комментария к заключению."
+    if (this._form.marketingResearchText.length < 30 || this._form.marketingResearchText.length > 5000) {
+      throw "В пункте 'Проведение маркетинговых и патентных исследований, их результаты.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.risksText.length < 30) {
-      throw "В пункте 'Риски реализации проекта.' нет комментария к заключению."
+    if (this._form.risksText.length < 30 || this._form.risksText.length > 5000) {
+      throw "В пункте 'Риски реализации проекта.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.privacyObjectsDescriptionText.length < 30) {
-      throw "В пункте 'Создание объекта права промышленной собственности при реализации объекта государственной экспертизы.' нет комментария к заключению."
+    if (this._form.privacyObjectsDescriptionText.length < 30 || this._form.privacyObjectsDescriptionText.length > 5000) {
+      throw "В пункте 'Создание объекта права промышленной собственности при реализации объекта государственной экспертизы.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
   }
 
