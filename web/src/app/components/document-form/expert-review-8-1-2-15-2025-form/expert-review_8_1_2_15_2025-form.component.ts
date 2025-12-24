@@ -11,9 +11,8 @@ import {
 import {DataService} from "@app/services/data.service";
 
 @Component({
-    selector: 'app-expert-review-8-1-2-15-2025-form',
-    templateUrl: './expert-review_8_1_2_15_2025-form.component.html',
-    standalone: false
+  selector: 'app-expert-review-8-1-2-15-2025-form',
+  templateUrl: './expert-review_8_1_2_15_2025-form.component.html'
 })
 export class ExpertReview_8_1_2_15_2025FormComponent extends ExpertReviewForm<ExpertReview_8_1_2_15_2025FormContent> {
 
@@ -44,28 +43,28 @@ export class ExpertReview_8_1_2_15_2025FormComponent extends ExpertReviewForm<Ex
   }
 
   private validationLengthCommentsOnConclusionRelusAndResult() {
-    if (this._form.nameAccordanceText.length < 30) {
-      throw "В пункте 'Соответствие объекта государственной экспертизы своему наименованию.' комментарий должен быть не менее 30 символов."
+    if (this._form.nameAccordanceText.length < 30 || this._form.nameAccordanceText.length > 5000) {
+      throw "В пункте 'Соответствие объекта государственной экспертизы своему наименованию.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.termsAccordanceText.length < 30) {
-      throw "В пункте 'Соответствие сроков выполнения объекта государственной экспертизы необходимым.' комментарий должен быть не менее 30 символов."
+    if (this._form.termsAccordanceText.length < 30 || this._form.termsAccordanceText.length > 5000) {
+      throw "В пункте 'Соответствие сроков выполнения объекта государственной экспертизы необходимым.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.socialOrSecurityText.length < 30) {
+    if (this._form.socialOrSecurityText.length < 30 || this._form.socialOrSecurityText.length > 5000) {
       throw "В пункте 'Объект государственной экспертизы является социально значимым или " +
-      "направленным на обеспечение национальной безопасности.' комментарий должен быть не менее 30 символов."
+      "направленным на обеспечение национальной безопасности.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.financeAccordanceText.length < 30) {
-      throw "Соответствие заявленного финансирования планируемому объему выполняемых работ.' комментарий должен быть не менее 30 символов."
+    if (this._form.financeAccordanceText.length < 30 || this._form.financeAccordanceText.length > 5000) {
+      throw "Соответствие заявленного финансирования планируемому объему выполняемых работ.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
     // if (this._form.softwareToolText.length < 30) {
     //   throw "В пункте 'Соответствие заявленному программному инструменту реализации.' комментарий должен быть не менее 30 символов."
     // }
-    if (this._form.financeConclusionText.length < 30) {
+    if (this._form.financeConclusionText.length < 30 || this._form.financeConclusionText.length > 5000) {
       throw "В пункте 'Целесообразность реализации объекта государственной экспертизы и его " +
-      "финансирования за счет средств республиканского бюджета и (или) других источников финансирования.' комментарий должен быть не менее 30 символов."
+      "финансирования за счет средств республиканского бюджета и (или) других источников финансирования.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.conclusionText.length < 30) {
-      throw "В пункте 'Заключение эксперта по объекту государственной экспертизы.' нет комментария к заключению."
+    if (this._form.conclusionText.length < 30 || this._form.conclusionText.length > 5000) {
+      throw "В пункте 'Заключение эксперта по объекту государственной экспертизы.' нет комментария к заключению и не более 5000 символов."
     }
   }
 
@@ -96,33 +95,33 @@ export class ExpertReview_8_1_2_15_2025FormComponent extends ExpertReviewForm<Ex
   }
 
   private validationLengthCommentsOnConclusionAnalysisAndEvaluation() {
-    if (this._form.noveltyText.length < 30) {
-      throw "В пункте 'Новизна (инновационность) объекта государственной экспертизы.' комментарий должен быть не менее 30 символов."
+    if (this._form.noveltyText.length < 30 || this._form.noveltyText.length > 5000) {
+      throw "В пункте 'Новизна (инновационность) объекта государственной экспертизы.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.economicSignificanceText.length < 30) {
-      throw "В пункте 'Экономическая и (или) социальная значимость объекта государственной экспертизы.' комментарий должен быть не менее 30 символов."
+    if (this._form.economicSignificanceText.length < 30 || this._form.economicSignificanceText.length > 5000) {
+      throw "В пункте 'Экономическая и (или) социальная значимость объекта государственной экспертизы.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.commerceText.length < 30) {
-      throw "В пункте 'Способ коммерциализации результата (-ов) научно-технической деятельности.' комментарий должен быть не менее 30 символов."
+    if (this._form.commerceText.length < 30 || this._form.commerceText.length > 5000) {
+      throw "В пункте 'Способ коммерциализации результата (-ов) научно-технической деятельности.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.resourcesSufficiencyText.length < 30) {
-      throw "В пункте 'Достаточность материально-технической базы и кадрового потенциала исполнителя работ.' комментарий должен быть не менее 30 символов."
+    if (this._form.resourcesSufficiencyText.length < 30 || this._form.resourcesSufficiencyText.length > 5000) {
+      throw "В пункте 'Достаточность материально-технической базы и кадрового потенциала исполнителя работ.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.competenceSufficiencyText.length < 30) {
-      throw "В пункте 'Достаточность компетенции кадрового состава потенциального исполнителя работ.' комментарий должен быть не менее 30 символов."
+    if (this._form.competenceSufficiencyText.length < 30 || this._form.competenceSufficiencyText.length > 5000) {
+      throw "В пункте 'Достаточность компетенции кадрового состава потенциального исполнителя работ.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.marketingResearchText.length < 30) {
-      throw "В пункте 'Проведение маркетинговых и патентных исследований, их результаты.' комментарий должен быть не менее 30 символов."
+    if (this._form.marketingResearchText.length < 30 || this._form.marketingResearchText.length > 5000) {
+      throw "В пункте 'Проведение маркетинговых и патентных исследований, их результаты.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.risksText.length < 30) {
-      throw "В пункте 'Риски реализации проекта.' комментарий должен быть не менее 30 символов."
+    if (this._form.risksText.length < 30 || this._form.risksText.length > 5000) {
+      throw "В пункте 'Риски реализации проекта.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.privacyObjectsDescriptionText.length < 30) {
-      throw "В пункте 'Создание объекта права промышленной собственности.' комментарий должен быть не менее 30 символов."
+    if (this._form.privacyObjectsDescriptionText.length < 30 || this._form.privacyObjectsDescriptionText.length > 5000) {
+      throw "В пункте 'Создание объекта права промышленной собственности.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
-    if (this._form.stagesExistText.length < 30) {
+    if (this._form.stagesExistText.length < 30 || this._form.stagesExistText.length > 5000) {
       throw "В пункте 'Целесообразность государственной " +
-      "регистрации объекта государственной экспертизы в соответствии с законодательством Республики Беларусь.' комментарий должен быть не менее 30 символов."
+      "регистрации объекта государственной экспертизы в соответствии с законодательством Республики Беларусь.' комментарий должен быть не менее 30 символов и не более 5000 символов."
     }
   }
 
