@@ -10,7 +10,7 @@
     "build-prod": "ng build --configuration production"
   },
   "dependencies": {
-    "@angular-slider/ngx-slider": "^20.0.0",
+    "@angular-slider/ngx-slider": "^21.0.0",
     "@angular/animations": "21.0.3",
     "@angular/common": "21.0.3",
     "@angular/compiler": "21.0.3",

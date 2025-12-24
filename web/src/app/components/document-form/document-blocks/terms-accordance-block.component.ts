@@ -11,10 +11,10 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.termsAccordance === true}" (click)="stateButton(true)">
-          Соответсвует
+          Соответствует
         </button>
         <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.termsAccordance === false}" (click)="stateButton(false)">
-          Не соотвествует
+          Не соответствует
         </button>
       </div>
       @if (!_form.termsAccordance) {
