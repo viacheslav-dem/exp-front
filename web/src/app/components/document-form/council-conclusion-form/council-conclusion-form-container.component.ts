@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, Input, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, input} from '@angular/core';
+import {Component, ComponentFactoryResolver, ElementRef, Input, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, input} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {SearchPersonByRolesComponent} from "@app/components/search/search-person/search-person-by-role.component";
 import {Role} from "@app/pipes/role.pipe";
@@ -16,6 +16,8 @@ import {Text} from "@app/components/document-form/form-model/Text";
 import {CouncilConclusionFormResolver} from "@app/components/document-form/council-conclusion-form/council-conclusion-form-resolver.service";
 import {createTrackKeyStore} from "@app/support/utils";
 import {environment} from "../../../../environments/environment";
+import {GlobalToastyService} from "@app/services/global-toasty.service";
+import {FormValidationScrollService} from "@app/services/form-validation-scroll.service";
 
 @Component({
     selector: 'app-council-conclusion-form',
@@ -60,7 +62,10 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   constructor(private _personService: PersonService,
               private resolver: ComponentFactoryResolver,
               private _formTypeResolver: CouncilConclusionFormResolver,
-              private cdr: ChangeDetectorRef) {
+              private cdr: ChangeDetectorRef,
+              private readonly hostRef: ElementRef<HTMLElement>,
+              private readonly toasty: GlobalToastyService,
+              private readonly validationScrollService: FormValidationScrollService) {
     super();
   }
 
@@ -123,6 +128,46 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   validate() {
     super.validate();
     this.formComponent.validate();
+  }
+
+  /**
+   * UX: при ошибке валидации автоматически прокрутить к первой ошибке,
+   * не требуя массовых правок форм/блоков.
+   */
+  override save() {
+    // 1) Сначала проверяем "стандартную" валидацию Angular (required/minlength/etc).
+    // Если уже есть .ng-invalid — не запускаем validate()+throw, а мягко ведём пользователя к полю.
+    if (this.validationScrollService.hasInvalidControls(this.hostRef?.nativeElement)) {
+      const firstInvalid = this.validationScrollService.getFirstInvalidElement(this.hostRef?.nativeElement);
+      const fieldName = firstInvalid ? this.validationScrollService.getFieldLabel(firstInvalid) : null;
+      const errorType = firstInvalid ? this.validationScrollService.getFieldErrorType(firstInvalid) : null;
+      this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
+      // Сообщение с названием поля и типом ошибки
+      let message = 'Заполните обязательные поля и проверьте минимальную длину текста.';
+      if (fieldName) {
+        if (errorType === 'required') {
+          message = `Заполните обязательное поле "${fieldName}".`;
+        } else if (errorType === 'minlength') {
+          const minLength = firstInvalid?.getAttribute('minlength') || '30';
+          message = `Поле "${fieldName}" должно содержать не менее ${minLength} символов.`;
+        } else if (errorType === 'min') {
+          const min = firstInvalid?.getAttribute('min') || '0';
+          message = `Поле "${fieldName}" должно быть не менее ${min}.`;
+        } else {
+          message = `Заполните обязательное поле "${fieldName}" и проверьте минимальную длину текста.`;
+        }
+      }
+      this.toasty?.warn?.(message);
+      return;
+    }
+
+    // 2) Пока миграция не завершена — остаётся ручная бизнес-валидация через validate()+throw.
+    try {
+      super.save();
+    } catch (e) {
+      this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
+      throw e;
+    }
   }
 
   getForm(): CouncilConclusionFormContent {

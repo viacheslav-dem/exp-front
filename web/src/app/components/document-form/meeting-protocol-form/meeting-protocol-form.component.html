@@ -7,22 +7,29 @@
 
   <div class="form-sub-group">
     <label>Дата составления протокола</label>
-    <app-date-input class="width-100 input-group-sm input-group" [(ngModel)]="_form.date"></app-date-input>
+    <app-date-input class="width-100 input-group-sm input-group" 
+                    name="date" required
+                    [(ngModel)]="_form.date"></app-date-input>
   </div>
 
   <div class="form-sub-group">
     <label>Фактическое время окончания заседания</label>
-    <app-time-input [(ngModel)]="_form.endDate"></app-time-input>
+    <app-time-input name="endDate" required
+                    [(ngModel)]="_form.endDate"></app-time-input>
   </div>
 
   <div class="form-sub-group">
     <label>Время затраченное <b>руководителем</b> для предварительного рассмотрения материалов по объектам экспертизы, подготовки и проведения заседаний секций или бюро экспертного совета, а также оформления соответствующих материалов:</label>
-    <input class="form-control" type="number" [(ngModel)]="_form.prepareTimeByChairman" numberInput/>
+    <input class="form-control" type="number" 
+           name="prepareTimeByChairman" min="0"
+           [(ngModel)]="_form.prepareTimeByChairman" numberInput/>
   </div>
 
   <div class="form-sub-group">
     <label>Время затраченное <b>секретарём</b> для предварительного рассмотрения материалов по объектам экспертизы, подготовки и проведения заседаний секций или бюро экспертного совета, а также оформления соответствующих материалов:</label>
-    <input class="form-control" type="number" [(ngModel)]="_form.prepareTimeBySecretary" numberInput/>
+    <input class="form-control" type="number" 
+           name="prepareTimeBySecretary" min="0"
+           [(ngModel)]="_form.prepareTimeBySecretary" numberInput/>
   </div>
 
   <div class="form-sub-group">

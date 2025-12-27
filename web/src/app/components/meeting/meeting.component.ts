@@ -43,6 +43,7 @@ export class MeetingComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   isCreatingProtocol = false;
+  isFinishingMeeting = false;
 
   @ViewChild("protocolFormModal", { static: false }) protocolFormModal: ModalComponent;
   @ViewChild(MeetingFormComponent, { static: false }) createMeetingModal: MeetingFormComponent;
@@ -102,13 +103,23 @@ export class MeetingComponent implements OnInit, OnDestroy {
         'Завершить заседание?', this.meeting.description,
         'Пожалуйста, проверьте данные протокола, поскольку изменить их будет уже невозможно.'
       ).subscribe(() => {
+        this.isFinishingMeeting = true;
+        this.cdr?.markForCheck?.();
         this.subscriptions.push(
-          this._meetingService.finishMeeting(this.meeting).subscribe(res => {
-            this.meeting = res;
-            this.agendas = this.meeting.agendas;
-            this._toasty.success("Заседание завершено.");
-            this.cdr?.markForCheck?.();
-            this.router.navigateByUrl('/meetings');
+          this._meetingService.finishMeeting(this.meeting).subscribe({
+            next: (res) => {
+              this.isFinishingMeeting = false;
+              this.meeting = res;
+              this.agendas = this.meeting.agendas;
+              this._toasty.success("Заседание завершено.");
+              this.cdr?.markForCheck?.();
+              this.router.navigateByUrl('/meetings');
+            },
+            error: () => {
+              this.isFinishingMeeting = false;
+              this._toasty.error('Ошибка при завершении заседания');
+              this.cdr?.markForCheck?.();
+            }
           })
         );
       })

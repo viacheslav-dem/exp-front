@@ -53,8 +53,15 @@
       <div class="d-inline-block text-muted">Повестки дня</div>
       @if (meeting.state=='READY') {
         <div class="btn-right">
-          <button class="btn btn-sm btn-secondary me-2" (click)="cancelAgendaDecisions()">Отменить заседание</button>
-          <button class="btn btn-sm btn-primary" (click)="saveAgendaDecisions()">Завершить заседание</button>
+          <button class="btn btn-sm btn-secondary me-2" (click)="cancelAgendaDecisions()" [disabled]="isFinishingMeeting">Отменить заседание</button>
+          <button class="btn btn-sm btn-primary" (click)="saveAgendaDecisions()" [disabled]="isFinishingMeeting">
+            @if (isFinishingMeeting) {
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+              Завершение...
+            } @else {
+              Завершить заседание
+            }
+          </button>
         </div>
       }
     </div>

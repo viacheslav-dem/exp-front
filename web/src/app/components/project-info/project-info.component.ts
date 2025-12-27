@@ -740,6 +740,11 @@ export class ProjectInfoComponent implements OnInit {
         fullProjectToSave.id = newId;
         fullProjectToSave.title = this.editedProject.title;
         fullProjectToSave.documents = this.editedProject.documents;
+        // Используем финансирование из созданной копии, чтобы оно не потерялось при обновлении
+        // Финансирование уже скопировано на бэкенде в saveCopyProject, поэтому используем его из результата
+        if (res?.financing) {
+          fullProjectToSave.financing = res.financing;
+        }
 
         this._projectService.updateProject({ id: newId } as any, fullProjectToSave)
           .subscribe(updated => {

@@ -7,6 +7,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
 import {DraftService} from "@app/components/document-form/draft.service";
 import {IdDto} from "@app/dto/IdDto";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
+import {FormValidationScrollService} from "@app/services/form-validation-scroll.service";
 import {environment} from "../../../../environments/environment";
 
 @Component({
@@ -39,7 +40,8 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
     resolver: ComponentFactoryResolver,
     cdr: ChangeDetectorRef,
     private readonly hostRef: ElementRef<HTMLElement>,
-    private readonly toasty: GlobalToastyService
+    private readonly toasty: GlobalToastyService,
+    private readonly validationScrollService: FormValidationScrollService
   ) {
     super(resolver, cdr);
   }
@@ -87,11 +89,11 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
   override save() {
     // 1) Сначала проверяем "стандартную" валидацию Angular (required/minlength/etc).
     // Если уже есть .ng-invalid — не запускаем validate()+throw, а мягко ведём пользователя к полю.
-    if (this.hasInvalidControls()) {
-      const firstInvalid = this.getFirstInvalidElement();
-      const fieldName = firstInvalid ? this.getFieldLabel(firstInvalid) : null;
-      const errorType = firstInvalid ? this.getFieldErrorType(firstInvalid) : null;
-      this.scrollToFirstInvalidSoon();
+    if (this.validationScrollService.hasInvalidControls(this.hostRef?.nativeElement)) {
+      const firstInvalid = this.validationScrollService.getFirstInvalidElement(this.hostRef?.nativeElement);
+      const fieldName = firstInvalid ? this.validationScrollService.getFieldLabel(firstInvalid) : null;
+      const errorType = firstInvalid ? this.validationScrollService.getFieldErrorType(firstInvalid) : null;
+      this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
       // Сообщение с названием поля и типом ошибки (инкрементальная миграция): конкретные тексты постепенно уедут в inline-ошибки.
       let message = 'Заполните обязательные поля и проверьте минимальную длину текста.';
       if (fieldName) {
@@ -115,132 +117,39 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
     try {
       super.save();
     } catch (e) {
-      this.scrollToFirstInvalidSoon();
+      const errorMessage = (e as Error).message || e.toString();
+      // Пытаемся найти соответствующий элемент в DOM по тексту ошибки
+      const targetElement = this.findElementByErrorText(errorMessage);
+      if (targetElement) {
+        this.validationScrollService.scrollToElement(targetElement);
+      } else {
+        this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
+      }
+      // Извлекаем название поля из текста ошибки для более понятного сообщения
+      const fieldName = this.extractFieldNameFromError(errorMessage);
+      if (fieldName) {
+        // Проверяем, содержит ли сообщение название поля
+        const lowerError = errorMessage.toLowerCase();
+        const lowerFieldName = fieldName.toLowerCase();
+        const fieldNameInMessage = lowerFieldName.split(' ').some(word => 
+          word.length > 3 && lowerError.includes(word)
+        );
+        
+        if (fieldNameInMessage) {
+          // Если название поля уже в сообщении, показываем как есть
+          this.toasty?.warn?.(errorMessage);
+        } else {
+          // Если нет, добавляем название поля
+          this.toasty?.warn?.(`Заполните обязательное поле "${fieldName}". ${errorMessage}`);
+        }
+        // Не пробрасываем ошибку дальше, чтобы избежать дублирования
+        return;
+      }
+      // Если не нашли название поля, пробрасываем ошибку дальше (CustomErrorHandler покажет её)
       throw e;
     }
   }
 
-  private hasInvalidControls(): boolean {
-    const root = this.hostRef?.nativeElement;
-    if (!root) return false;
-    return root.querySelector('.ng-invalid') !== null;
-  }
-
-  private getFirstInvalidElement(): HTMLElement | null {
-    const root = this.hostRef?.nativeElement;
-    if (!root) return null;
-    const invalidElements = Array.from(root.querySelectorAll<HTMLElement>('.ng-invalid'));
-    return invalidElements.find(el => el !== root && this.isElementVisible(el)) || null;
-  }
-
-  private getFieldLabel(element: HTMLElement): string | null {
-    // Ищем родительский form-sub-group
-    let parent = element.parentElement;
-    while (parent && !parent.classList.contains('form-sub-group')) {
-      parent = parent.parentElement;
-    }
-    if (!parent) return null;
-
-    // Ищем первый label внутри form-sub-group
-    const label = parent.querySelector<HTMLLabelElement>('label');
-    if (!label) return null;
-
-    // Извлекаем текст из label, убирая лишние пробелы и переносы строк
-    let labelText = label.textContent?.trim() || '';
-    // Ограничиваем длину для читаемости
-    if (labelText.length > 100) {
-      labelText = labelText.substring(0, 97) + '...';
-    }
-    return labelText || null;
-  }
-
-  private getFieldErrorType(element: HTMLElement): string | null {
-    // Проверяем атрибуты элемента напрямую для определения типа ошибки
-    // Сначала проверяем minlength (более специфичная ошибка)
-    if (element.hasAttribute('minlength')) {
-      const minLength = parseInt(element.getAttribute('minlength') || '0');
-      const value = (element as HTMLInputElement | HTMLTextAreaElement).value || '';
-      if (value.length > 0 && value.length < minLength) {
-        return 'minlength';
-      }
-    }
-    // Затем проверяем min для числовых полей
-    if (element.hasAttribute('min')) {
-      const min = parseFloat(element.getAttribute('min') || '0');
-      const value = parseFloat((element as HTMLInputElement).value || '0');
-      if (!isNaN(value) && value < min) {
-        return 'min';
-      }
-    }
-    // Проверяем required (если поле пустое и имеет required)
-    if (element.hasAttribute('required')) {
-      const value = (element as HTMLInputElement | HTMLTextAreaElement).value;
-      if (!value || value.trim() === '') {
-        return 'required';
-      }
-    }
-    return null;
-  }
-
-  private scrollToFirstInvalidSoon(): void {
-    // Два rAF — чтобы дождаться пересчёта классов/DOM после любых синхронных изменений в validate().
-    requestAnimationFrame(() => requestAnimationFrame(() => this.scrollToFirstInvalid()));
-  }
-
-  private scrollToFirstInvalid(): void {
-    const root = this.hostRef?.nativeElement;
-    if (!root) return;
-
-    const invalidElements = Array.from(root.querySelectorAll<HTMLElement>('.ng-invalid'));
-    const target = invalidElements.find(el => el !== root && this.isElementVisible(el));
-    if (!target) return;
-
-    const focusTarget = this.findFocusable(target) ?? target;
-
-    try {
-      focusTarget.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'nearest'});
-    } catch {
-      // старые браузеры/нестандартные контейнеры скролла — деградируем без падения
-      focusTarget.scrollIntoView();
-    }
-
-    // Фокус улучшает доступность и подсвечивает поле; preventScroll не обязателен, но снижает "дёргание".
-    try {
-      (focusTarget as any).focus?.({preventScroll: true});
-    } catch {
-      try {
-        (focusTarget as any).focus?.();
-      } catch {
-        // ignore
-      }
-    }
-  }
-
-  private findFocusable(el: HTMLElement): HTMLElement | null {
-    if (this.isFocusable(el)) return el;
-    return el.querySelector<HTMLElement>(
-      'input:not([type="hidden"]), textarea, select, button, [tabindex]:not([tabindex="-1"])'
-    );
-  }
-
-  private isFocusable(el: HTMLElement): boolean {
-    const tag = el.tagName.toLowerCase();
-    if (tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'button') return true;
-    const tabindex = el.getAttribute('tabindex');
-    return tabindex !== null && tabindex !== '-1';
-  }
-
-  private isElementVisible(el: HTMLElement): boolean {
-    // offsetParent === null -> display:none или hidden в layout (кроме fixed).
-    // getClientRects().length === 0 -> element not rendered (например, collapsed/empty).
-    if (el.getClientRects().length === 0) return false;
-    if (el.offsetParent !== null) return true;
-    try {
-      return getComputedStyle(el).position === 'fixed';
-    } catch {
-      return false;
-    }
-  }
 
   private getExpertReviewType(): string | undefined {
     // Проект может приходить частично загруженным или ошибочно переданным (например, signal вместо значения).
@@ -265,5 +174,86 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
     return !this.isOldReviewType()
       && type !== TemplateType.EXPERT_REVIEW_8_10PVT_NEW
       && type !== TemplateType.EXPERT_REVIEW_8_10PIT_NEW;
+  }
+
+  /**
+   * Находит элемент в DOM по тексту ошибки валидации
+   */
+  private findElementByErrorText(errorMessage: string): HTMLElement | null {
+    const root = this.hostRef?.nativeElement;
+    if (!root) return null;
+
+    const lowerError = errorMessage.toLowerCase();
+
+    // Маппинг текстов ошибок на селекторы или ключевые слова для поиска
+    const errorMappings: { [key: string]: string } = {
+      'количество часов': 'input[title*="часов"], input[placeholder*="Часы"]',
+      'часов': 'input[title*="часов"], input[placeholder*="Часы"]'
+    };
+
+    for (const [keyword, selector] of Object.entries(errorMappings)) {
+      if (lowerError.includes(keyword)) {
+        // Ищем элемент по селектору
+        const element = root.querySelector<HTMLElement>(selector);
+        if (element && this.validationScrollService.isElementVisible(element)) {
+          return element;
+        }
+        // Если прямой селектор не сработал, ищем по label
+        const labels = Array.from(root.querySelectorAll<HTMLLabelElement>('label'));
+        for (const label of labels) {
+          const labelText = label.textContent?.toLowerCase() || '';
+          if (labelText.includes(keyword)) {
+            // Находим родительский form-group и ищем в нём input
+            const formGroup = label.closest('.form-group');
+            if (formGroup) {
+              const input = formGroup.querySelector<HTMLElement>('input[type="text"], input:not([type])');
+              if (input && this.validationScrollService.isElementVisible(input)) {
+                return input;
+              }
+            }
+            return label;
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Извлекает название поля из текста ошибки или находит его в DOM
+   */
+  private extractFieldNameFromError(errorMessage: string): string | null {
+    const root = this.hostRef?.nativeElement;
+    if (!root) return null;
+
+    const lowerError = errorMessage.toLowerCase();
+
+    // Маппинг текстов ошибок на ключевые слова для поиска в DOM
+    const errorMappings: { [key: string]: string } = {
+      'количество часов': 'количество часов',
+      'часов': 'часов'
+    };
+
+    for (const [keyword, searchKeyword] of Object.entries(errorMappings)) {
+      if (lowerError.includes(keyword)) {
+        // Пытаемся найти точное название в DOM
+        const labels = Array.from(root.querySelectorAll<HTMLLabelElement>('label'));
+        for (const label of labels) {
+          const labelText = label.textContent?.trim() || '';
+          const lowerLabelText = labelText.toLowerCase();
+          // Проверяем, содержит ли label ключевое слово
+          if (lowerLabelText.includes(searchKeyword)) {
+            // Ограничиваем длину для читаемости
+            if (labelText.length > 100) {
+              return labelText.substring(0, 97) + '...';
+            }
+            return labelText;
+          }
+        }
+      }
+    }
+
+    return null;
   }
 }

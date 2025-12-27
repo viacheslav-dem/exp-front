@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, Input, Type, ViewChild, ViewContainerRef, input, ChangeDetectionStrategy, ChangeDetectorRef, signal} from "@angular/core";
+import {Component, ComponentFactoryResolver, ElementRef, Input, Type, ViewChild, ViewContainerRef, input, ChangeDetectionStrategy, ChangeDetectorRef, signal} from "@angular/core";
 import {MeetingDto} from "@app/dto/MeetingDto";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {Role} from "@app/pipes/role.pipe";
@@ -14,6 +14,8 @@ import {MeetingProtocolNewFormContent} from "@app/components/document-form/meeti
 import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form/agenda-new-form.service";
 import {createTrackKeyStore} from "@app/support/utils";
 import {environment} from "../../../../environments/environment";
+import {GlobalToastyService} from "@app/services/global-toasty.service";
+import {FormValidationScrollService} from "@app/services/form-validation-scroll.service";
 
 @Component({
     selector: 'app-meeting-protocol-form',
@@ -60,7 +62,10 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
               private _meetingService: MeetingService,
               private _agendaFormResolver: AgendaFormResolver,
               private resolver: ComponentFactoryResolver,
-              private cdr: ChangeDetectorRef) {
+              private cdr: ChangeDetectorRef,
+              private readonly hostRef: ElementRef<HTMLElement>,
+              private readonly toasty: GlobalToastyService,
+              private readonly validationScrollService: FormValidationScrollService) {
     super();
   }
 
@@ -107,7 +112,20 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
     if (projectId == null) {
       return;
     }
+    // Сохраняем текущий открытый ID перед изменением
+    const previousOpenedId = this.openedAgendaProjectId();
+    // Проверяем, закрывается ли какой-либо проект (был открыт проект)
+    const isClosingProject = previousOpenedId !== null;
+    
     this.openedAgendaProjectId.update(curr => (curr === projectId ? null : projectId));
+    
+    // Сохраняем черновик при сворачивании accordion (когда проект закрывается)
+    // Это гарантирует сохранение данных заполненных полей даже если они были изменены
+    // незадолго до сворачивания (до следующего автосохранения каждые 30 секунд)
+    if (isClosingProject) {
+      this.saveDraft();
+    }
+    
     this.cdr?.markForCheck?.();
   }
 
@@ -173,6 +191,74 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
     this._meeting.agendas.forEach(agenda => this.agendaComponents[agenda.project.id].validate());
   }
 
+  /**
+   * UX: при ошибке валидации автоматически прокрутить к первой ошибке,
+   * не требуя массовых правок форм/блоков.
+   */
+  override save() {
+    // 1) Сначала проверяем "стандартную" валидацию Angular (required/minlength/etc).
+    // Если уже есть .ng-invalid — не запускаем validate()+throw, а мягко ведём пользователя к полю.
+    if (this.validationScrollService.hasInvalidControls(this.hostRef?.nativeElement)) {
+      const firstInvalid = this.validationScrollService.getFirstInvalidElement(this.hostRef?.nativeElement);
+      const fieldName = firstInvalid ? this.validationScrollService.getFieldLabel(firstInvalid) : null;
+      const errorType = firstInvalid ? this.validationScrollService.getFieldErrorType(firstInvalid) : null;
+      this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
+      // Сообщение с названием поля и типом ошибки
+      let message = 'Заполните обязательные поля и проверьте минимальную длину текста.';
+      if (fieldName) {
+        if (errorType === 'required') {
+          message = `Заполните обязательное поле "${fieldName}".`;
+        } else if (errorType === 'minlength') {
+          const minLength = firstInvalid?.getAttribute('minlength') || '30';
+          message = `Поле "${fieldName}" должно содержать не менее ${minLength} символов.`;
+        } else if (errorType === 'min') {
+          const min = firstInvalid?.getAttribute('min') || '0';
+          message = `Поле "${fieldName}" должно быть не менее ${min}.`;
+        } else {
+          message = `Заполните обязательное поле "${fieldName}" и проверьте минимальную длину текста.`;
+        }
+      }
+      this.toasty?.warn?.(message);
+      return;
+    }
+
+    // 2) Пока миграция не завершена — остаётся ручная бизнес-валидация через validate()+throw.
+    try {
+      super.save();
+    } catch (e) {
+      const errorMessage = e?.toString() || '';
+      // Пытаемся найти соответствующий элемент в DOM по тексту ошибки
+      const targetElement = this.findElementByErrorText(errorMessage);
+      if (targetElement) {
+        this.scrollToElement(targetElement);
+      } else {
+        this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
+      }
+      // Извлекаем название поля из текста ошибки для более понятного сообщения
+      const fieldName = this.extractFieldNameFromError(errorMessage);
+      if (fieldName) {
+        // Проверяем, содержит ли сообщение название поля
+        const lowerError = errorMessage.toLowerCase();
+        const lowerFieldName = fieldName.toLowerCase();
+        const fieldNameInMessage = lowerFieldName.split(' ').some(word => 
+          word.length > 3 && lowerError.includes(word)
+        );
+        
+        if (fieldNameInMessage) {
+          // Если название поля уже в сообщении, показываем как есть
+          this.toasty?.warn?.(errorMessage);
+        } else {
+          // Если нет, добавляем название поля
+          this.toasty?.warn?.(`Заполните обязательное поле "${fieldName}". ${errorMessage}`);
+        }
+        // Не пробрасываем ошибку дальше, чтобы избежать дублирования
+        return;
+      }
+      // Если не нашли название поля, пробрасываем ошибку дальше (CustomErrorHandler покажет её)
+      throw e;
+    }
+  }
+
   getForm() {
     let form = super.getForm();
     form.invited = this.invited.map(person => person.name).filter(str => !isEmptyOrNull(str));
@@ -197,5 +283,103 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
       }
     });
     this.assessors.forEach(ass => ass.isChecked = this._form.participants.some(selected => selected.id == ass.id));
+  }
+
+
+  private findElementByErrorText(errorMessage: string): HTMLElement | null {
+    const root = this.hostRef?.nativeElement;
+    if (!root) return null;
+
+    // Маппинг текстов ошибок на селекторы или ключевые слова для поиска
+    const errorMappings: { [key: string]: string } = {
+      'дата составления': '.form-group-label',
+      'время окончания': '.form-group-label',
+      'время затраченное': '.form-group-label',
+      'секретарём': '.form-group-label',
+      'руководителем': '.form-group-label'
+    };
+
+    // Ищем ключевое слово в тексте ошибки
+    const lowerError = errorMessage.toLowerCase();
+    for (const [keyword, selector] of Object.entries(errorMappings)) {
+      if (lowerError.includes(keyword)) {
+        // Ищем все labels с этим классом
+        const labels = Array.from(root.querySelectorAll<HTMLElement>(selector));
+        for (const label of labels) {
+          const labelText = label.textContent?.toLowerCase() || '';
+          if (labelText.includes(keyword)) {
+            // Находим родительский form-group и ищем в нём фокусируемый элемент
+            const formGroup = label.closest('.form-sub-group') || label.closest('.form-group');
+            if (formGroup) {
+              // Ищем различные типы элементов для прокрутки
+              const selectors = [
+                'input:not([type="hidden"])',
+                'textarea',
+                'select',
+                'button:not(.btn-icon)',
+                'app-date-input',
+                'app-time-input',
+                'ng-select'
+              ];
+              
+              for (const sel of selectors) {
+                const focusable = formGroup.querySelector<HTMLElement>(sel);
+                if (focusable && this.validationScrollService.isElementVisible(focusable)) {
+                  return focusable;
+                }
+              }
+              
+              // Если не нашли фокусируемый элемент, возвращаем сам label
+              if (this.validationScrollService.isElementVisible(label)) {
+                return label;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private extractFieldNameFromError(errorMessage: string): string | null {
+    const root = this.hostRef?.nativeElement;
+    if (!root) return null;
+
+    // Маппинг текстов ошибок на ключевые слова для поиска в DOM
+    const errorMappings: { [key: string]: string } = {
+      'дата составления': 'дата составления',
+      'время окончания': 'время окончания',
+      'время затраченное секретарём': 'время затраченное',
+      'время затраченное руководителем': 'время затраченное',
+      'секретарём': 'секретарём',
+      'руководителем': 'руководителем'
+    };
+
+    const lowerError = errorMessage.toLowerCase();
+    for (const [keyword, searchKeyword] of Object.entries(errorMappings)) {
+      if (lowerError.includes(keyword)) {
+        // Пытаемся найти точное название в DOM
+        const labels = Array.from(root.querySelectorAll<HTMLLabelElement>('label'));
+        for (const label of labels) {
+          const labelText = label.textContent?.trim() || '';
+          const lowerLabelText = labelText.toLowerCase();
+          // Проверяем, содержит ли label ключевое слово
+          if (lowerLabelText.includes(searchKeyword)) {
+            // Ограничиваем длину для читаемости
+            if (labelText.length > 100) {
+              return labelText.substring(0, 97) + '...';
+            }
+            return labelText;
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private scrollToElement(element: HTMLElement): void {
+    this.validationScrollService.scrollToElement(element);
   }
 }

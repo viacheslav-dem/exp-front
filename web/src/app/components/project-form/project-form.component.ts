@@ -18,6 +18,7 @@ import {FilterBuilder} from "@app/components/common-components/page-and-filter/m
 import {SortOrder, Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
 import {environment} from "../../../environments/environment";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
+import {FormValidationScrollService} from "@app/services/form-validation-scroll.service";
 
 
 @Component({
@@ -79,7 +80,8 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                 private _fundingPipe: FundingTypePipe,
                 private cdr: ChangeDetectorRef,
                 private readonly hostRef: ElementRef<HTMLElement>,
-                private readonly toasty: GlobalToastyService) {
+                private readonly toasty: GlobalToastyService,
+                private readonly validationScrollService: FormValidationScrollService) {
         this.fundingToString = finance => _fundingPipe.transform(finance);
     }
 
@@ -200,11 +202,11 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
   onSave() {
     // 1) Сначала проверяем "стандартную" валидацию Angular (required/minlength/etc).
     // Если уже есть .ng-invalid — не запускаем validate()+throw, а мягко ведём пользователя к полю.
-    if (this.hasInvalidControls()) {
-      const firstInvalid = this.getFirstInvalidElement();
-      const fieldName = firstInvalid ? this.getFieldLabel(firstInvalid) : null;
-      const errorType = firstInvalid ? this.getFieldErrorType(firstInvalid) : null;
-      this.scrollToFirstInvalidSoon();
+    if (this.validationScrollService.hasInvalidControls(this.hostRef?.nativeElement)) {
+      const firstInvalid = this.validationScrollService.getFirstInvalidElement(this.hostRef?.nativeElement);
+      const fieldName = firstInvalid ? this.validationScrollService.getFieldLabel(firstInvalid) : null;
+      const errorType = firstInvalid ? this.validationScrollService.getFieldErrorType(firstInvalid) : null;
+      this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
       // Сообщение с названием поля и типом ошибки (инкрементальная миграция): конкретные тексты постепенно уедут в inline-ошибки.
       let message = 'Заполните обязательные поля и проверьте минимальную длину текста.';
       if (fieldName) {
@@ -246,7 +248,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
       if (targetElement) {
         this.scrollToElement(targetElement);
       } else {
-        this.scrollToFirstInvalidSoon();
+        this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
       }
       // Извлекаем название поля из текста ошибки для более понятного сообщения
       const fieldName = this.extractFieldNameFromError(errorMessage);
@@ -787,127 +789,6 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         this.cdr?.markForCheck?.();
     }
 
-    private hasInvalidControls(): boolean {
-        const root = this.hostRef?.nativeElement;
-        if (!root) return false;
-        return root.querySelector('.ng-invalid') !== null;
-    }
-
-    private getFirstInvalidElement(): HTMLElement | null {
-        const root = this.hostRef?.nativeElement;
-        if (!root) return null;
-        const invalidElements = Array.from(root.querySelectorAll<HTMLElement>('.ng-invalid'));
-        return invalidElements.find(el => el !== root && this.isElementVisible(el)) || null;
-    }
-
-    private getFieldLabel(element: HTMLElement): string | null {
-        // Ищем родительский form-sub-group или form-group
-        let parent = element.parentElement;
-        while (parent && !parent.classList.contains('form-sub-group') && !parent.classList.contains('form-group')) {
-            parent = parent.parentElement;
-        }
-        if (!parent) return null;
-
-        // Ищем первый label внутри form-sub-group или form-group
-        const label = parent.querySelector<HTMLLabelElement>('label');
-        if (!label) return null;
-
-        // Извлекаем текст из label, убирая лишние пробелы и переносы строк
-        let labelText = label.textContent?.trim() || '';
-        // Ограничиваем длину для читаемости
-        if (labelText.length > 100) {
-            labelText = labelText.substring(0, 97) + '...';
-        }
-        return labelText || null;
-    }
-
-    private getFieldErrorType(element: HTMLElement): string | null {
-        // Проверяем атрибуты элемента напрямую для определения типа ошибки
-        // Сначала проверяем minlength (более специфичная ошибка)
-        if (element.hasAttribute('minlength')) {
-            const minLength = parseInt(element.getAttribute('minlength') || '0');
-            const value = (element as HTMLInputElement | HTMLTextAreaElement).value || '';
-            if (value.length > 0 && value.length < minLength) {
-                return 'minlength';
-            }
-        }
-        // Затем проверяем min для числовых полей
-        if (element.hasAttribute('min')) {
-            const min = parseFloat(element.getAttribute('min') || '0');
-            const value = parseFloat((element as HTMLInputElement).value || '0');
-            if (!isNaN(value) && value < min) {
-                return 'min';
-            }
-        }
-        // Проверяем required (если поле пустое и имеет required)
-        if (element.hasAttribute('required')) {
-            const value = (element as HTMLInputElement | HTMLTextAreaElement).value;
-            if (!value || value.trim() === '') {
-                return 'required';
-            }
-        }
-        return null;
-    }
-
-    private scrollToFirstInvalidSoon(): void {
-        // Два rAF — чтобы дождаться пересчёта классов/DOM после любых синхронных изменений в validate().
-        requestAnimationFrame(() => requestAnimationFrame(() => this.scrollToFirstInvalid()));
-    }
-
-    private scrollToFirstInvalid(): void {
-        const root = this.hostRef?.nativeElement;
-        if (!root) return;
-
-        const invalidElements = Array.from(root.querySelectorAll<HTMLElement>('.ng-invalid'));
-        const target = invalidElements.find(el => el !== root && this.isElementVisible(el));
-        if (!target) return;
-
-        const focusTarget = this.findFocusable(target) ?? target;
-
-        try {
-            focusTarget.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'nearest'});
-        } catch {
-            // старые браузеры/нестандартные контейнеры скролла — деградируем без падения
-            focusTarget.scrollIntoView();
-        }
-
-        // Фокус улучшает доступность и подсвечивает поле; preventScroll не обязателен, но снижает "дёргание".
-        try {
-            (focusTarget as any).focus?.({preventScroll: true});
-        } catch {
-            try {
-                (focusTarget as any).focus?.();
-            } catch {
-                // ignore
-            }
-        }
-    }
-
-    private findFocusable(el: HTMLElement): HTMLElement | null {
-        if (this.isFocusable(el)) return el;
-        return el.querySelector<HTMLElement>(
-            'input:not([type="hidden"]), textarea, select, button, [tabindex]:not([tabindex="-1"])'
-        );
-    }
-
-    private isFocusable(el: HTMLElement): boolean {
-        const tag = el.tagName.toLowerCase();
-        if (tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'button') return true;
-        const tabindex = el.getAttribute('tabindex');
-        return tabindex !== null && tabindex !== '-1';
-    }
-
-    private isElementVisible(el: HTMLElement): boolean {
-        // offsetParent === null -> display:none или hidden в layout (кроме fixed).
-        // getClientRects().length === 0 -> element not rendered (например, collapsed/empty).
-        if (el.getClientRects().length === 0) return false;
-        if (el.offsetParent !== null) return true;
-        try {
-            return getComputedStyle(el).position === 'fixed';
-        } catch {
-            return false;
-        }
-    }
 
     /**
      * Находит элемент в DOM по тексту ошибки валидации
@@ -960,13 +841,13 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                             
                             for (const sel of selectors) {
                                 const focusable = formGroup.querySelector<HTMLElement>(sel);
-                                if (focusable && this.isElementVisible(focusable)) {
+                                if (focusable && this.validationScrollService.isElementVisible(focusable)) {
                                     return focusable;
                                 }
                             }
                             
                             // Если не нашли фокусируемый элемент, возвращаем сам label
-                            if (this.isElementVisible(label)) {
+                            if (this.validationScrollService.isElementVisible(label)) {
                                 return label;
                             }
                         }
@@ -1036,25 +917,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
      * Прокручивает к указанному элементу
      */
     private scrollToElement(element: HTMLElement): void {
-        if (!element || !this.isElementVisible(element)) return;
-
-        const focusTarget = this.findFocusable(element) ?? element;
-
-        try {
-            focusTarget.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'nearest'});
-        } catch {
-            focusTarget.scrollIntoView();
-        }
-
-        try {
-            (focusTarget as any).focus?.({preventScroll: true});
-        } catch {
-            try {
-                (focusTarget as any).focus?.();
-            } catch {
-                // ignore
-            }
-        }
+        this.validationScrollService.scrollToElement(element);
     }
 }
 

@@ -16,8 +16,6 @@ export class AuthErrorInterceptor implements HttpInterceptor {
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
   private refreshErrorSubject: BehaviorSubject<HttpErrorResponse | null> = new BehaviorSubject<HttpErrorResponse | null>(null);
-  private last403ErrorTime: number = 0;
-  private readonly ERROR_THROTTLE_MS = 2000; // Показываем ошибку не чаще чем раз в 2 секунды
 
   constructor(
       private storage: StorageService,
@@ -63,8 +61,9 @@ export class AuthErrorInterceptor implements HttpInterceptor {
           return this.handle401Error(authReq, next);
         }
         if (error.status === 403){
-          // При 403 также пытаемся обновить токен, если есть refresh token
-          // Это нужно для случая, когда сервер возвращает 403 вместо 401 при истекшем токене
+          // 403 (Forbidden) - это ошибка доступа, а не ошибка аутентификации
+          // Пользователь авторизован, но у него нет прав на операцию
+          // Обрабатываем как обычную ошибку доступа, без обновления токена
           return this.handle403Error(authReq, next, error);
         }
       }
@@ -73,77 +72,23 @@ export class AuthErrorInterceptor implements HttpInterceptor {
   }
 
   private handle403Error(request: HttpRequest<any>, next: HttpHandler, error?: HttpErrorResponse) {
-    // Проверяем наличие refresh token - если он есть, пытаемся обновить access token
-    // Это нужно для случая, когда сервер возвращает 403 вместо 401 при истекшем токене
-    const refreshToken = this.storage.getRefreshToken();
+    // 403 (Forbidden) - это ошибка доступа, а не ошибка аутентификации
+    // Пользователь авторизован (токен валиден), но у него нет прав на операцию
+    //
+    // Важно: согласно логике бэкенда:
+    // - Истекший access token → 401 (UnauthorizedException)
+    // - Истекший refresh token → 412 (InvalidatedDataInHeaderException) при попытке обновления
+    // - Нет прав доступа → 403 (ForbiddenException, AccessDeniedException)
+    //
+    // Поэтому при 403 не нужно пытаться обновить токен или делать logout.
+    // Просто пробрасываем ошибку дальше для обработки в HttpClientSecure.handleError().
+    // Пользователь остается авторизованным и может продолжать работать.
     
-    // Если уже идет обновление токена, ждем его завершения
-    if (this.isRefreshing) {
-      console.log("403 error received while token refresh is in progress. Waiting for refresh...");
-      return race(
-        this.refreshTokenSubject.pipe(
-          filter(token => token !== null),
-          take(1),
-          switchMap((token) => {
-            if (!token) {
-              return this.finalize403Error();
-            }
-            console.log("Token refreshed successfully. Retrying request after 403...");
-            return next.handle(this.addTokenHeader(request, token));
-          })
-        ),
-        this.refreshErrorSubject.pipe(
-          filter(error => error !== null),
-          take(1),
-          switchMap((error) => {
-            console.log("Token refresh failed. Finalizing 403 error...");
-            // Если это ошибка 412, показываем более информативное сообщение
-            if (error.status === 412) {
-              let errorMessage = "Сессия была завершена. Возможно, вы вошли с другого устройства или браузера.";
-              if (error.error) {
-                if (typeof error.error === 'string') {
-                  errorMessage = error.error;
-                } else if (error.error.message) {
-                  errorMessage = error.error.message;
-                } else if (error.error.error) {
-                  errorMessage = error.error.error;
-                }
-              }
-              this.toasty.err(412, errorMessage);
-            }
-            return this.finalize403Error();
-          })
-        )
-      );
-    }
-    
-    // Если refresh token есть и обновление не идет, пытаемся обновить токен
-    if (refreshToken) {
-      console.log("403 error received. Attempting to refresh token...");
-      return this.handle401Error(request, next);
-    }
-    
-    // Если refresh token отсутствует, обрабатываем как обычную 403 ошибку
-    return this.finalize403Error();
-  }
-
-  private finalize403Error() {
-    // Показываем ошибку только один раз при множественных запросах
-    const now = Date.now();
-    if (now - this.last403ErrorTime > this.ERROR_THROTTLE_MS) {
-      this.last403ErrorTime = now;
-      // Показываем toast сообщение об ошибке
-      this.toasty.err(403, "Доступ запрещён.");
-    }
-    
-    this.storage.resetCredentials();
-    this.storage.clear();
-    
-    // Перенаправляем на login только если мы еще не на странице логина
-    this.redirectToLoginIfNeeded();
-    
-    // Останавливаем распространение ошибки, так как она уже обработана
-    return EMPTY;
+    return throwError(error || new HttpErrorResponse({
+      error: 'Доступ запрещён.',
+      status: 403,
+      statusText: 'Forbidden'
+    }));
   }
 
 

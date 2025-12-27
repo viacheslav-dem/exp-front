@@ -1,7 +1,7 @@
 <div class="list-group">
   <div [loadingData]="_loading">
     @for (project of projects; track project) {
-      <div class="card card-block">
+      <div class="card card-block mb-3">
         <a class="h5 bold" target="_blank" [routerLink]="['/projects/',project.id]">{{project |
         titleAndCode}}</a>
         <div class="text-sm">

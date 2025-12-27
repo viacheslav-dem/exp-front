@@ -11,8 +11,8 @@ export const BB_CONTROL_VALUE_ACCESSOR: any = {
 @Component({
     selector: 'app-boolean-button',
     template: `
-    <div [class.disabled]="disabled()" style="display: inline-block; height:30px;" class="me-2">
-      <label (click)="toggleTrue(); $event.stopPropagation()" [class]="'btn btn-sm ' + trueStyle" [class.active]="_value === true" [class.disabled]="disabled()">
+    <div [class.disabled]="disabled()" style="display: inline-block; height:30px;" class="me-2 my-2">
+      <label (click)="toggleTrue(); $event.stopPropagation()" [class]="'btn btn-sm me-2 ' + trueStyle" [class.active]="_value === true" [class.disabled]="disabled()">
         @if (_value === true && (!disabled() || showDisabledSelection())) {
           <fa-icon icon="check"></fa-icon>
         }

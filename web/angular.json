@@ -40,7 +40,7 @@
             ],
             "aot": false,
             "extractLicenses": false,
-            "sourceMap": true,
+            "sourceMap": false,
             "optimization": false,
             "namedChunks": true,
             "browser": "src/main.ts"
