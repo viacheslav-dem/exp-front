@@ -158,6 +158,8 @@ export class AuthService implements OnInit {
     const refreshToken = this.storage.getRefreshToken();
     // Очищаем токены сразу, чтобы предотвратить дальнейшие запросы с устаревшими токенами
     this.storage.resetCredentials();
+    // Очищаем фильтры проектов при выходе из системы
+    localStorage.removeItem('filter_cache_project-list');
     // Отправляем refreshToken на сервер для удаления только этой сессии (мультисессии)
     this.http.post(`${SERVER_URL}/public/logout`, { refreshToken }).subscribe({
       next: () => {

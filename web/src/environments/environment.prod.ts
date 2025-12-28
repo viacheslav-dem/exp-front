@@ -5,21 +5,21 @@ export const environment = {
       // Prod по умолчанию: выключено. Включать постепенно по группам и пересобирать WAR.
       enabled: true,
       groups: {
-        coreShell: false,
-        dialogs: false,
-        listsAndFilters: false,
-        commonControls: false,
-        fileAndPdf: false,
-        catalogsAdmin: false,
-        projectFlow: false,
-        listsAndInfo: false,
-        projectDetail: false,
-        meetings: false,
-        search: false,
-        dataManagement: false,
-        stats: false,
-        settings: false,
-        history: false
+        coreShell: true,
+        dialogs: true,
+        listsAndFilters: true,
+        commonControls: true,
+        fileAndPdf: true,
+        catalogsAdmin: true,
+        projectFlow: true,
+        listsAndInfo: true,
+        projectDetail: true,
+        meetings: true,
+        search: true,
+        dataManagement: true,
+        stats: true,
+        settings: true,
+        history: true
       }
     }
   }

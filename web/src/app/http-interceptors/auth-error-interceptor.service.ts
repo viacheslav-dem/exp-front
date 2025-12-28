@@ -14,6 +14,7 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
 export class AuthErrorInterceptor implements HttpInterceptor {
 
   private isRefreshing = false;
+  private isRefreshTokenInvalid = false; // Флаг для предотвращения повторных попыток обновления после 412/401
   private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
   private refreshErrorSubject: BehaviorSubject<HttpErrorResponse | null> = new BehaviorSubject<HttpErrorResponse | null>(null);
 
@@ -28,17 +29,27 @@ export class AuthErrorInterceptor implements HttpInterceptor {
     // Пропускаем запросы на обновление токена, логин, логаут и системные уведомления, чтобы избежать рекурсии
     // Проверяем как относительный, так и абсолютный URL
     const url = req.url.toLowerCase();
+    
+    // Если это запрос на логин, сбрасываем флаг невалидности refresh token
+    // (при успешном логине будет установлен новый валидный refresh token)
+    if (url.includes('/public/login') || url.endsWith('/login')) {
+      // Сбрасываем флаг, так как после логина будет новый refresh token
+      this.isRefreshTokenInvalid = false;
+      return next.handle(req);
+    }
+    
     if (url.includes('/refresh-token') || 
-        url.includes('/public/login') || 
         url.includes('/public/logout') || 
-        url.includes('/system-notification/get') ||
-        url.endsWith('/login')) {
+        url.includes('/system-notification/get')) {
       return next.handle(req);
     }
 
     let headers: { [key: string]: string } = {};
     const authToken = this.storage.getAccessToken();
-    if (authToken != null) {
+    
+    // Если идет обновление токена, не используем старый токен из localStorage
+    // Вместо этого запрос будет обработан через handle401Error, который дождется нового токена
+    if (authToken != null && !this.isRefreshing) {
       headers[TOKEN_HEADER] = authToken;
     }
     // Устанавливаем Content-Type только если он еще не установлен и запрос имеет тело
@@ -61,9 +72,9 @@ export class AuthErrorInterceptor implements HttpInterceptor {
           return this.handle401Error(authReq, next);
         }
         if (error.status === 403){
-          // 403 (Forbidden) - это ошибка доступа, а не ошибка аутентификации
-          // Пользователь авторизован, но у него нет прав на операцию
-          // Обрабатываем как обычную ошибку доступа, без обновления токена
+          // 403 может означать как ошибку доступа, так и проблему с аутентификацией
+          // Spring Security может вернуть AccessDeniedException (403) когда токен истек
+          // Пытаемся обновить токен, если refresh token есть
           return this.handle403Error(authReq, next, error);
         }
       }
@@ -72,62 +83,160 @@ export class AuthErrorInterceptor implements HttpInterceptor {
   }
 
   private handle403Error(request: HttpRequest<any>, next: HttpHandler, error?: HttpErrorResponse) {
-    // 403 (Forbidden) - это ошибка доступа, а не ошибка аутентификации
-    // Пользователь авторизован (токен валиден), но у него нет прав на операцию
-    //
-    // Важно: согласно логике бэкенда:
-    // - Истекший access token → 401 (UnauthorizedException)
-    // - Истекший refresh token → 412 (InvalidatedDataInHeaderException) при попытке обновления
-    // - Нет прав доступа → 403 (ForbiddenException, AccessDeniedException)
-    //
-    // Поэтому при 403 не нужно пытаться обновить токен или делать logout.
-    // Просто пробрасываем ошибку дальше для обработки в HttpClientSecure.handleError().
-    // Пользователь остается авторизованным и может продолжать работать.
+    // 403 может означать как ошибку доступа, так и проблему с аутентификацией
+    // Spring Security может вернуть AccessDeniedException (403) когда токен истек или невалиден
+    // Проверяем наличие refresh token - если он есть, пытаемся обновить токен
+    // Если обновление успешно - повторяем запрос, если нет - делаем logout
     
-    return throwError(error || new HttpErrorResponse({
-      error: 'Доступ запрещён.',
-      status: 403,
-      statusText: 'Forbidden'
-    }));
+    const refreshToken = this.storage.getRefreshToken();
+    
+    // Если refresh token есть, пытаемся обновить токен (возможно, access token истек)
+    if (refreshToken) {
+      console.log("403 error received. Attempting to refresh token in case it's expired...");
+      
+      // Если уже идет обновление токена, ждем его завершения
+      if (this.isRefreshing) {
+        console.log("403 error received while token refresh is in progress. Waiting for refresh...");
+        return race(
+          this.refreshTokenSubject.pipe(
+            filter(token => token !== null),
+            take(1),
+            switchMap((token) => {
+              if (!token) {
+                // Если токен null, обновление не удалось - это ошибка доступа
+                return throwError(error || new HttpErrorResponse({
+                  error: 'Доступ запрещён.',
+                  status: 403,
+                  statusText: 'Forbidden'
+                }));
+              }
+              console.log("Token refreshed successfully. Retrying request after 403...");
+              return next.handle(this.addTokenHeader(request, token));
+            })
+          ),
+          this.refreshErrorSubject.pipe(
+            filter(error => error !== null),
+            take(1),
+            switchMap((refreshError) => {
+              console.log("Token refresh failed after 403. Logout already performed in handle401Error.");
+              // Если обновление токена не удалось (412 или 401), logout уже был выполнен в handle401Error
+              // Возвращаем EMPTY, чтобы остановить цепочку обработки ошибок
+              return EMPTY;
+            })
+          )
+        );
+      }
+      
+      // Если обновление не идет, вызываем handle401Error
+      return this.handle401Error(request, next).pipe(
+        catchError((refreshError) => {
+          // Если обновление токена не удалось, logout уже был выполнен в handle401Error
+          // Возвращаем EMPTY, чтобы остановить цепочку обработки ошибок
+          return EMPTY;
+        })
+      );
+    }
+    
+    // Если refresh token отсутствует, проверяем наличие access token
+    // Если access token тоже отсутствует - это проблема авторизации, делаем logout
+    // Если access token есть - это реальная ошибка доступа, просто показываем ошибку
+    const accessToken = this.storage.getAccessToken();
+    if (!accessToken) {
+      // Нет ни access token, ни refresh token - пользователь не авторизован
+      console.log("403 error received without refresh token and access token. Performing logout and redirecting to login...");
+      this.storage.resetCredentials();
+      this.storage.clear();
+      this.toasty.err(403, "Сессия истекла. Пожалуйста, выполните вход.");
+      this.redirectToLoginIfNeeded();
+      return EMPTY;
+    } else {
+      // Access token есть, но refresh token отсутствует - это реальная ошибка доступа
+      // Не делаем logout, просто показываем ошибку
+      console.log("403 error received without refresh token, but access token is present. This is likely an access denied error.");
+      return throwError(error || new HttpErrorResponse({
+        error: 'Доступ запрещён.',
+        status: 403,
+        statusText: 'Forbidden'
+      }));
+    }
   }
 
 
   private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
     if (!this.isRefreshing) {
 
+      const refreshToken = this.storage.getRefreshToken();
+      console.log("Refresh token:", refreshToken ? "present" : "missing");
+      
+      // Если refresh token отсутствует, и он уже был признан невалидным ранее, 
+      // не пытаемся обновлять токен повторно
+      if (!refreshToken && this.isRefreshTokenInvalid) {
+        console.log("Refresh token was previously invalidated and is still missing. Redirecting to login...");
+        this.storage.resetCredentials();
+        this.storage.clear();
+        this.redirectToLoginIfNeeded();
+        return EMPTY;
+      }
+      
+      // Если refresh token присутствует, даже если флаг был установлен ранее,
+      // пытаемся использовать его (возможно, пользователь залогинился заново)
+      // Флаг будет сброшен при успешном обновлении токена
+
       console.log("Access token is expired. Attempting to refresh...")
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
       this.refreshErrorSubject.next(null);
-
-      const refreshToken = this.storage.getRefreshToken();
-      console.log("Refresh token:", refreshToken ? "present" : "missing");
 
       if (refreshToken) {
         console.log("Calling refreshToken API...")
         return this.authService.refreshToken(refreshToken)
             .pipe(
             switchMap((credentials: UserCredentials) => {
-              this.isRefreshing = false;
-
               console.log("Refresh token successful. Updating credentials...")
               
               // Проверяем, что accessToken существует
+              // Это критическая ошибка - сервер вернул некорректный ответ
               if (!credentials || !credentials.accessToken) {
                 console.error("Invalid credentials received: missing accessToken");
+                console.error("Server returned 200 OK but response is missing accessToken field");
+                console.error("Received credentials:", credentials);
+                
+                // Устанавливаем флаг, так как это критическая проблема с ответом сервера
+                this.isRefreshTokenInvalid = true;
+                this.isRefreshing = false;
+                
+                // Показываем понятное сообщение пользователю
+                this.toasty.err(500, "Ошибка сервера: получен некорректный ответ при обновлении сессии. Пожалуйста, выполните вход заново.");
+                
+                // Очищаем токены и перенаправляем на login
+                this.storage.resetCredentials();
+                this.storage.clear();
+                this.redirectToLoginIfNeeded();
+                
+                // Создаем ошибку для уведомления ожидающих запросов
                 const error = new HttpErrorResponse({
                   error: 'Invalid credentials: missing accessToken',
                   status: 500,
                   statusText: 'Internal Server Error'
                 });
                 this.refreshErrorSubject.next(error);
-                return throwError(error);
+                return EMPTY;
               }
 
+              // При успешном обновлении токена сбрасываем флаг невалидности
+              this.isRefreshTokenInvalid = false;
+
+              // ВАЖНО: Сначала публикуем токен в subject для ожидающих запросов
+              // Это должно произойти ДО сохранения в localStorage и сброса флага isRefreshing
+              this.refreshTokenSubject.next(credentials.accessToken);
+              
+              // Затем сохраняем в localStorage
               this.authService.updateCredentials(credentials);
               
-              // Устанавливаем новый токен в subject для ожидающих запросов
-              this.refreshTokenSubject.next(credentials.accessToken);
+              // И только после этого сбрасываем флаг isRefreshing
+              // Это предотвращает race condition: новые запросы будут ждать через race(),
+              // а не пытаться использовать старый токен из localStorage
+              this.isRefreshing = false;
 
               console.log("Successful refresh of access token. Retrying original request...")
               
@@ -148,9 +257,14 @@ export class AuthErrorInterceptor implements HttpInterceptor {
               // Уведомляем ожидающие запросы об ошибке
               this.refreshErrorSubject.next(error);
               
+              // Критические ошибки, связанные с токенами (412, 401)
+              // Эти ошибки означают, что refresh token невалиден или истек
               if (error.status === 412 || error.status === 401) {
                 console.log("Invalid or expired refresh token. Status:", error.status)
                 console.log("Refresh token was:", this.storage.getRefreshToken() ? "present" : "missing")
+                
+                // Устанавливаем флаг, чтобы предотвратить повторные попытки обновления токена
+                this.isRefreshTokenInvalid = true;
                 
                 // Показываем понятное сообщение пользователю
                 if (error.status === 412) {
@@ -177,9 +291,35 @@ export class AuthErrorInterceptor implements HttpInterceptor {
                 return EMPTY;
               }
               
-              // Для других ошибок (500, сетевые и т.д.) тоже перенаправляем на login
-              // чтобы избежать зависания
-              console.log("Error refreshing token. Status:", error.status, "Error:", error)
+              // Временные ошибки сервера (500, 502, 503, 504) или сетевые ошибки
+              // Эти ошибки могут быть временными и не связаны с валидностью токена
+              // Не устанавливаем флаг, чтобы при следующей попытке можно было повторить обновление
+              const isTemporaryError = error.status === 500 || 
+                                       error.status === 502 || 
+                                       error.status === 503 || 
+                                       error.status === 504 ||
+                                       error.status === 0; // Сетевые ошибки (нет ответа от сервера)
+              
+              if (isTemporaryError) {
+                console.log("Temporary error during token refresh. Status:", error.status, "Error:", error)
+                console.log("Not setting isRefreshTokenInvalid flag - this may be a temporary server issue")
+                
+                // Показываем сообщение о временной ошибке
+                this.toasty.err(error.status || 500, "Временная ошибка сервера. Пожалуйста, попробуйте войти заново.");
+                
+                // Очищаем токены и перенаправляем на login, но НЕ устанавливаем флаг
+                // Это позволит при следующем логине попытаться обновить токен снова
+                this.storage.resetCredentials();
+                this.storage.clear();
+                this.redirectToLoginIfNeeded();
+                return EMPTY;
+              }
+              
+              // Для других неизвестных ошибок тоже перенаправляем на login
+              // но не устанавливаем флаг (на случай, если это временная проблема)
+              console.log("Unknown error during token refresh. Status:", error.status, "Error:", error)
+              this.toasty.err(error.status || 500, "Ошибка при обновлении сессии. Пожалуйста, выполните вход.");
+              
               this.storage.resetCredentials();
               this.storage.clear();
               this.redirectToLoginIfNeeded();

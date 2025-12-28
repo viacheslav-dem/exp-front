@@ -81,6 +81,8 @@ export class StorageService {
 
   changeCurrRole(newRole) {
     localStorage.setItem(this.currRolePlace, newRole);
+    // Очищаем фильтры проектов при смене роли
+    localStorage.removeItem('filter_cache_project-list');
   }
 
   clear() {

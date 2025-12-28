@@ -9,7 +9,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       </label>
       @if (full()) {
         <textarea [(ngModel)]="_form().cofTech" name="cofTech" rows="3" class="form-control"
-        placeholder="Пояснительный текст (при необходимости)." pattern="[0-9]+"></textarea>
+        placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>
     `,

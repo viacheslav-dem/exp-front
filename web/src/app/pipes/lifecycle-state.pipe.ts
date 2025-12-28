@@ -44,5 +44,5 @@ export enum ProjectLifecycleStateBadge {
   ACCEPTED = 'badge-success', // готовы результаты рассмотрения проекта секцией: проект рекомендован
   REJECTED = 'badge-danger', // готовы результаты рассмотрения проекта секцией: проект не рекомендован
   RETURNED = 'badge-danger', // проект возвращён без рассмотрения на заседании секции
-  RETURNED_WITHOUT_EXPERTISE = 'badge-secondary', // проект возвращён без рассмотрения и без результатов экспертизы
+  RETURNED_WITHOUT_EXPERTISE = 'badge-danger', // проект возвращён без рассмотрения и без результатов экспертизы
 }

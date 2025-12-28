@@ -9,6 +9,7 @@ import {
   switchDirection
 } from "@app/components/common-components/page-and-filter/model/SortOrder";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
+import {Page} from "@app/components/common-components/page-and-filter/model/Page";
 import {PersonExpertDto} from "@app/dto/PersonExpertDto";
 
 @Component({
@@ -30,6 +31,7 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
   }
 
   ngOnInit() {
+    // Используем кэш фильтров для сохранения поисковой строки при повторном открытии
     this.enableFilterCache("search-expert");
   }
 
@@ -44,14 +46,17 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
   }
 
   loadPage() {
-    this._service.searchExperts(this._searchRequest).subscribe(res => {
-      this._page = res;
-      this.experts = res.content;
-      this.setLoading(false);
-      this._cdr.detectChanges();
-    }, () => {
-      this.setLoading(false);
-      this._cdr.detectChanges();
+    this._service.searchExperts(this._searchRequest).subscribe({
+      next: (res) => {
+        this._page = res;
+        this.experts = res.content;
+        this.setLoading(false);
+        this._cdr.detectChanges();
+      },
+      error: () => {
+        this.setLoading(false);
+        this._cdr.detectChanges();
+      }
     });
   }
 
@@ -65,28 +70,29 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
   }
 
   show() {
+    // Очищаем результаты предыдущего поиска при открытии модального окна
+    this.experts = [];
+    this._page = new Page();
+    this._page.totalElements = null;
+    // Поля поиска НЕ очищаем - они сохраняются через кэш фильтров
+    // Сбрасываем страницу на первую
+    this._pagination.page = 1;
+    this._searchRequest.paging.page = 0;
+    
+    // Помечаем компонент для проверки изменений (важно для OnPush стратегии)
+    this._cdr.markForCheck();
+    
     this.searchPersonModal.show();
-    // Устанавливаем состояние загрузки сразу при открытии модального окна
+    // Загружаем первую страницу при открытии (убраны ненужные задержки для ускорения)
     this.setLoading(true);
-    // Принудительно обновляем view после открытия модального окна
-    // Используем requestAnimationFrame для гарантии, что модальное окно отобразилось
-    requestAnimationFrame(() => {
-      this._cdr.detectChanges();
-      // Загружаем данные при открытии модального окна, если они еще не загружены
-      // Проверяем через небольшую задержку, чтобы дать enableFilterCache возможность выполниться
-      setTimeout(() => {
-        if (this._page.totalElements === null || this.experts.length === 0) {
-          this.update();
-        } else {
-          // Если данные уже есть, убираем индикатор загрузки
-          this.setLoading(false);
-          this._cdr.detectChanges();
-        }
-      }, 50);
-    });
+    this.update();
   }
 
   hide() {
+    // Поисковые поля НЕ очищаем - они сохраняются через кэш фильтров
+    // Помечаем компонент для проверки изменений
+    this._cdr.markForCheck();
+    
     this.searchPersonModal.hide();
   }
 }

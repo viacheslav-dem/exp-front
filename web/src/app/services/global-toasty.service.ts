@@ -47,6 +47,19 @@ export class GlobalToastyService {
   }
 
   err(status: number, message:string) {
+    // Для ошибок валидации (400) не блокируем повторные показы, так как пользователь должен видеть каждую ошибку
+    // Для остальных ошибок используем блокировку по статусу, чтобы избежать спама одинаковых ошибок
+    if (status === 400) {
+      // Для ошибок 400 показываем toast без блокировки
+      const toastOptions: any = {
+        title: "Ошибка #" + status,
+        msg: message
+      };
+      this.error(toastOptions);
+      return;
+    }
+    
+    // Для остальных ошибок используем блокировку по статусу
     const key = "err" + status;
     if (this.active[key]) {
       return;
@@ -62,7 +75,7 @@ export class GlobalToastyService {
         // чтобы предотвратить повторное появление при быстрых последовательных ошибках
         setTimeout(() => {
           this.active[key] = false;
-        }, 1000);
+        }, 500);
       }
     };
     this.error(toastOptions);

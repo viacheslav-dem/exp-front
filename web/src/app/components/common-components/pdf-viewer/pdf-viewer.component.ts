@@ -51,34 +51,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Настройка worker для PDF.js
-    // ng2-pdf-viewer загружает pdfjs-dist, но мы можем настроить worker заранее
-    if (typeof window !== 'undefined') {
-      // Пытаемся настроить worker через глобальный объект
-      const setupWorker = () => {
-        try {
-          // Проверяем различные возможные пути к pdfjs-dist
-          const pdfjs = (window as any)['pdfjs-dist'] 
-            || (window as any)['pdfjs-dist/build/pdf']
-            || (window as any).pdfjsLib;
-          
-          if (pdfjs && pdfjs.GlobalWorkerOptions) {
-            pdfjs.GlobalWorkerOptions.workerSrc = './assets/pdfjs/build/pdf.worker.js';
-            return true;
-          }
-        } catch (e) {
-          // Игнорируем ошибку
-        }
-        return false;
-      };
-      
-      // Пытаемся настроить сразу
-      if (!setupWorker()) {
-        // Если не получилось, пробуем позже (ng2-pdf-viewer может еще не загрузить pdfjs-dist)
-        setTimeout(setupWorker, 100);
-        setTimeout(setupWorker, 500);
-      }
-    }
+    // Worker для PDF.js настроен глобально в main.ts
   }
 
   @Input() set doc(doc: DocumentDto) {

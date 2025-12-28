@@ -12,7 +12,7 @@
 <!--ACTIONS-->
 <div class="mb-3">
   @for (meta of buttons(); track (meta.title ?? $index)) {
-    <button [ngClass]="meta.styleClass" class="me-2" (click)="meta.onclick()">
+    <button [ngClass]="meta.styleClass" class="me-3 my-1" (click)="meta.onclick()">
       {{meta.title}}
     </button>
   }

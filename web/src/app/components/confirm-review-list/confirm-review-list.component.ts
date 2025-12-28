@@ -91,8 +91,12 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
       `Назначить эксперта "${this._personPipe.transform(review.expert.personName)}" на объект экспертизы "${project.title}"?`,
       'Пожалуйста, проверьте данные об эксперте, поскольку отменить действие будет невозможно.').subscribe(() => {
       this._reviewService.acceptExpert(review).subscribe(res => {
+        // Обновляем статус review - он останется в списке, но с новым статусом (ON_EXPERT_CONFIRMATION)
         review.state = res.state;
+        // Сразу обновляем UI - кнопки исчезнут, появится бейдж "Ожидание эксперта"
+        this.cdr?.markForCheck?.();
         this._toasty.success("Подтвержден.");
+        // Фоново синхронизируем с сервером для обновления других данных
         this.loadPage();
       });
     });
@@ -114,8 +118,12 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
           reason = dlgResult.value.reason;
         }
         this._reviewService.rejectExpert(review, reason).subscribe(res => {
+          // Обновляем статус review - он останется в списке, но с новым статусом (REJECTED)
           review.state = res.state;
+          // Сразу обновляем UI - кнопки исчезнут, появится бейдж "Отклонён"
+          this.cdr?.markForCheck?.();
           this._toasty.success("Отклонен.");
+          // Фоново синхронизируем с сервером для обновления других данных
           this.loadPage();
         });
       })
