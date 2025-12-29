@@ -12,10 +12,10 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
       <input type="hidden" [(ngModel)]="_form().softwareTool" name="softwareTool" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().softwareTool === 1}" (click)="stateButton(1)">
-          Соответсвует
+          соответствует
         </button>
         <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().softwareTool === 2}" (click)="stateButton(2)">
-          Не соотвествует
+          Не соответствует
         </button>
         <button type="button" class="btn btn-outline-warning" [ngClass]="{'active': _form().softwareTool === 3}" (click)="stateButton(3)">
           Целесообразна реализация вне рамок программ

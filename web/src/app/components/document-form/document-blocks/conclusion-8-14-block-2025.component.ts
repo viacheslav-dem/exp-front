@@ -13,10 +13,10 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
                 Целесообразно
             </button>
             <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().conclusion === false}" (click)="stateButton(false)">
-                Нецелесобразно
+                Нецелесообразно
             </button>
         </div>
-      <textarea [(ngModel)]="_form().conclusionText" name="conclusionText" required minlength="30" rows="3" class="form-control mt-05"
+      <textarea [(ngModel)]="_form().conclusionText" name="conclusionText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
                 placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       <div class="hint">
         <p>

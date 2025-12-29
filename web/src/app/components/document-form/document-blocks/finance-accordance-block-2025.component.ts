@@ -12,10 +12,10 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
       <input type="hidden" [(ngModel)]="_form().financeAccordance" name="financeAccordance" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().financeAccordance === true}" (click)="stateButton(true)">
-          Соответсвует
+          соответствует
         </button>
         <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().financeAccordance === false && _form().financeAccordance !== undefined}" (click)="stateButton(false)">
-          Не соотвествует
+          Не соответствует
         </button>
       </div>
       @if (!_form().financeAccordance) {

@@ -19,7 +19,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       @if (!_form().sufficiency) {
         <label>Рекомендуется добавить:</label>
         <textarea
-          [(ngModel)]="_form().sufficiencySuggestion" name="sufficiencySuggestion" required rows="2" class="form-control"
+          [(ngModel)]="_form().sufficiencySuggestion" name="sufficiencySuggestion" required maxlength="5000" rows="2" class="form-control"
           title="Рекомендуется добавить"
           placeholder="перечисление ресурсов, которые необходимо добавить в процессе реализации объекта экспертизы"
         ></textarea>
@@ -30,6 +30,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
           [attr.name]="'sufficiencyText_' + num().split('.').join('_')"
           required
           minlength="30"
+          maxlength="5000"
           rows="3"
           class="form-control mt-05"
         placeholder="Обязательный текст."></textarea>

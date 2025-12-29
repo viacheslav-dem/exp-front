@@ -20,6 +20,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
           [attr.name]="'noveltyText_' + num()"
           required
           minlength="30"
+          maxlength="5000"
           rows="3"
           class="form-control mt-05"
           placeholder="Обязательный текст (не менее 30 символов)."

@@ -10,10 +10,10 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
           <input type="hidden" [(ngModel)]="_form().targetAccordance" name="targetAccordance" required>
           <div class="btn-group" role="group" aria-label="Basic example">
             <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().targetAccordance === true}" (click)="stateButton(true)">
-              Соответсвует
+              соответствует
             </button>
             <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().targetAccordance === false && _form().targetAccordance !== undefined}" (click)="stateButton(false)">
-              Не соотвествует
+              Не соответствует
             </button>
           </div>
           @if (!_form().targetAccordance) {

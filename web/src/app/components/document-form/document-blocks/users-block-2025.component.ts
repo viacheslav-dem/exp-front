@@ -8,7 +8,7 @@ import {Component, input} from "@angular/core";
         {{num()}}. Сведения о предполагаемом владельце, операторе, пользователях программно-технических средств,
         информационных ресурсов, информационных систем и информационных сетей.
       </label>
-      <textarea [(ngModel)]="_form().users" name="users" required minlength="30" rows="3" class="form-control"
+      <textarea [(ngModel)]="_form().users" name="users" required minlength="30" maxlength="5000" rows="3" class="form-control"
       placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       @if (full()) {
         <div class="hint">

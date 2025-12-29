@@ -18,7 +18,7 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().requirementsText" name="requirementsText" required minlength="30" rows="3" class="form-control mt-05"
+        <textarea [(ngModel)]="_form().requirementsText" name="requirementsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
     </div>

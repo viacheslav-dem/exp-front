@@ -12,10 +12,10 @@ import {PeriodDto} from "@app/dto/PeriodDto";
       <input type="hidden" [(ngModel)]="_form.termsAccordance" name="termsAccordance" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.termsAccordance === true}" (click)="stateButton(true)">
-          Соответсвует
+          соответствует
         </button>
         <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.termsAccordance === false && _form.termsAccordance !== undefined}" (click)="stateButton(false)">
-          Не соотвествует
+          Не соответствует
         </button>
       </div>
       @if (!_form.termsAccordance) {

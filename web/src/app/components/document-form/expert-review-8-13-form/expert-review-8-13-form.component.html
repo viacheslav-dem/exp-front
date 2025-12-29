@@ -8,6 +8,7 @@
     <textarea [(ngModel)]="_form.accordance"
       name="accordance"
       required
+      maxlength="5000"
       rows="3" class="form-control"
       placeholder="cоответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
     </textarea>
@@ -20,6 +21,7 @@
     <textarea [(ngModel)]="_form.state"
       name="state"
       required
+      maxlength="5000"
       rows="3" class="form-control"
       placeholder="анализ и оценка текущего состояния соответствующей сферы планирования по объекту экспертизы">
     </textarea>
@@ -33,6 +35,7 @@
     <textarea [(ngModel)]="_form.prognosis"
       name="prognosis"
       required
+      maxlength="5000"
       rows="3" class="form-control"
       placeholder="анализ и оценка прогноза научно-технического развития соответствующей сферы планирования по объекту экспертизы">
     </textarea>
@@ -88,7 +91,7 @@
     }
     @for (note of notes; track note; let i = $index) {
       <div class="input-group btn-group mb-2">
-        <textarea [(ngModel)]="note.name" rows="2" class="form-control"
+        <textarea [(ngModel)]="note.name" rows="2" maxlength="5000" class="form-control"
         placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
         <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
       </div>

@@ -15,7 +15,7 @@
           </button>
           <ul class="dropdown-menu dropdown-menu-lg-end">
             @for (y of years(); track y) {
-              <li><button class="dropdown-item" type="button" (click)="updateResFunYear(y)">{{y}}</button></li>
+              <li><a class="dropdown-item" href="#" (click)="updateResFunYear(y); $event.preventDefault()">{{y}}</a></li>
             }
           </ul>
         </div>
@@ -29,11 +29,9 @@
               aria-expanded="false" >
               {{mouth()}}
             </button>
-          }
-          @if (isButtonMonthDisabled()) {
             <ul class="dropdown-menu dropdown-menu-lg-end">
               @for (m of months; track m; let i = $index) {
-                <li><button class="dropdown-item" type="button" (click)="updateResFunMonth(i)">{{m}}</button></li>
+                <li><a class="dropdown-item" href="#" (click)="updateResFunMonth(i); $event.preventDefault()">{{m}}</a></li>
               }
             </ul>
           }
@@ -59,42 +57,51 @@
         }
   </div>
   <div class="card pt-3">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col" class="align-middle text-center"><small class="font-weight-bold">ГЭС</small></th>
-          <!--                <th scope="col" class="align-middle text-center"><small class="font-weight-bold">ГЭС</small></th>-->
-          <th scope="col" class="align-middle text-center"><small class="font-weight-bold">Поступило проектов</small></th>
-          <th scope="col" class="align-middle text-center"><small class="font-weight-bold">На экспертизе</small></th>
-          <th scope="col" class="align-middle text-center"><small class="font-weight-bold">Просроченных</small></th>
-          <th scope="col" class="align-middle text-center"><small class="font-weight-bold">Кол-во дней просрочки</small></th>
-          <th scope="col" class="align-middle text-center"><small class="font-weight-bold">Кол-во рассмотренных</small></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (cs of councilStatsResponseDTOs(); track cs; let i = $index) {
+    @if (isLoading()) {
+      <div class="d-flex justify-content-center align-items-center p-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Загрузка...</span>
+        </div>
+        <span class="ms-3">Загрузка статистики...</span>
+      </div>
+    } @else {
+      <table class="table table-striped">
+        <thead>
           <tr>
-            <th class="align-middle text-center"><small class="font-weight-bold">{{i+1}}</small></th>
-            <!--                <th><small>{{cs.council.name}}</small></th>-->
-            <td class="align-middle text-center"><small>{{cs.projectsReceived}}</small></td>
-            <td class="align-middle text-center"><small>{{cs.projectsNotFinished}}</small></td>
-            <td class="align-middle text-center"><small>{{cs.projectsOverdue}}</small></td>
-            <td class="align-middle text-center"><small>{{cs.overdueDaysProject}}</small></td>
-            <td class="align-middle text-center"><small>{{cs.finishedProjects}}</small></td>
+            <th scope="col" class="align-middle text-center"><small class="font-weight-bold">ГЭС</small></th>
+            <!--                <th scope="col" class="align-middle text-center"><small class="font-weight-bold">ГЭС</small></th>-->
+            <th scope="col" class="align-middle text-center"><small class="font-weight-bold">Поступило проектов</small></th>
+            <th scope="col" class="align-middle text-center"><small class="font-weight-bold">На экспертизе</small></th>
+            <th scope="col" class="align-middle text-center"><small class="font-weight-bold">Просроченных</small></th>
+            <th scope="col" class="align-middle text-center"><small class="font-weight-bold">Кол-во дней просрочки</small></th>
+            <th scope="col" class="align-middle text-center"><small class="font-weight-bold">Кол-во рассмотренных</small></th>
           </tr>
-        }
-      </tbody>
-      <tfoot>
-        <tr>
-          <th class="align-middle text-center font-weight-bold">Итого</th>
-          <!--                <th><small>{{cs.council.name}}</small></th>-->
-          <td class="align-middle text-center font-weight-bold">{{resultCouncilStatsResponseDTO().projectsReceived}}</td>
-          <td class="align-middle text-center font-weight-bold">{{resultCouncilStatsResponseDTO().projectsNotFinished}}</td>
-          <td class="align-middle text-center font-weight-bold">{{resultCouncilStatsResponseDTO().projectsOverdue}}</td>
-          <td class="align-middle text-center font-weight-bold">{{resultCouncilStatsResponseDTO().overdueDaysProject}}</td>
-          <td class="align-middle text-center font-weight-bold">{{resultCouncilStatsResponseDTO().finishedProjects}}</td>
-        </tr>
-      </tfoot>
-    </table>
+        </thead>
+        <tbody>
+          @for (cs of councilStatsResponseDTOs(); track cs.id ?? $index; let i = $index) {
+            <tr>
+              <th class="align-middle text-center"><small class="font-weight-bold">{{i+1}}</small></th>
+              <!--                <th><small>{{cs.council.name}}</small></th>-->
+              <td class="align-middle text-center"><small>{{cs.projectsReceived ?? 0}}</small></td>
+              <td class="align-middle text-center"><small>{{cs.projectsNotFinished ?? 0}}</small></td>
+              <td class="align-middle text-center"><small>{{cs.projectsOverdue ?? 0}}</small></td>
+              <td class="align-middle text-center"><small>{{cs.overdueDaysProject ?? 0}}</small></td>
+              <td class="align-middle text-center"><small>{{cs.finishedProjects ?? 0}}</small></td>
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <th class="align-middle text-center font-weight-bold">Итого</th>
+            <!--                <th><small>{{cs.council.name}}</small></th>-->
+            <td class="align-middle text-center font-weight-bold">{{resultCouncilStatsResponseDTO().projectsReceived ?? 0}}</td>
+            <td class="align-middle text-center font-weight-bold">{{resultCouncilStatsResponseDTO().projectsNotFinished ?? 0}}</td>
+            <td class="align-middle text-center font-weight-bold">{{resultCouncilStatsResponseDTO().projectsOverdue ?? 0}}</td>
+            <td class="align-middle text-center font-weight-bold">{{resultCouncilStatsResponseDTO().overdueDaysProject ?? 0}}</td>
+            <td class="align-middle text-center font-weight-bold">{{resultCouncilStatsResponseDTO().finishedProjects ?? 0}}</td>
+          </tr>
+        </tfoot>
+      </table>
+    }
   </div>
 </div>

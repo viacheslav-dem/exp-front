@@ -5,7 +5,7 @@
       1. Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
       научно-технической деятельности в Республики Беларусь:
     </label>
-    <textarea [(ngModel)]="_form.accordance" name="accordance" required rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.accordance" name="accordance" required maxlength="5000" rows="3" class="form-control"
       placeholder="cоответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
     </textarea>
   </div>
@@ -16,7 +16,7 @@
       разработки новых технологических процессов, наукоемкой, конкурентоспособной продукции,
       формирования перспективных научных направлений:
     </label>
-    <textarea [(ngModel)]="_form.significance" name="significance" required rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.significance" name="significance" required maxlength="5000" rows="3" class="form-control"
       placeholder="суть значения и важности работы для республики">
     </textarea>
   </div>
@@ -25,7 +25,7 @@
     <label>
       3. Сведения о проведении маркетинговых и патентных исследований и их результаты:
     </label>
-    <textarea [(ngModel)]="_form.marketing" name="marketing" required rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.marketing" name="marketing" required maxlength="5000" rows="3" class="form-control"
       placeholder="результаты проведения маркетинговых и патентных исследований по объекту экспертизы">
     </textarea>
   </div>
@@ -35,7 +35,7 @@
       4. Принципиальная новизна, конкурентоспособность, научный и (или) научно-технический уровень,
       экономическая и (или) социальная эффективность:
     </label>
-    <textarea [(ngModel)]="_form.novelty" name="novelty" required rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.novelty" name="novelty" required maxlength="5000" rows="3" class="form-control"
       placeholder="суть новизны, конкурентоспособности, научно-технического уровня и эффективности">
     </textarea>
   </div>
@@ -46,7 +46,7 @@
       объекта экспертизы, в том числе с учетом возможностей расширения экспорта и (или) сокращения импорта продукции,
       поставки потребителю разработанной и осваиваемой продукции:
     </label>
-    <textarea [(ngModel)]="_form.need" name="need" required rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.need" name="need" required maxlength="5000" rows="3" class="form-control"
       placeholder="потребность республики (объем и потребители) в результатах реализации объекта экспертизы">
     </textarea>
   </div>
@@ -55,7 +55,7 @@
     <label>
       6. Способы и методы оценки результативности, а также экономической и (или) социальной эффективности:
     </label>
-    <textarea [(ngModel)]="_form.methods" name="methods" required rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.methods" name="methods" required maxlength="5000" rows="3" class="form-control"
       placeholder="анализ способов и методов оценки результативности и эффективности реализации объекта экспертизы">
     </textarea>
   </div>
@@ -88,7 +88,7 @@
       опытно-исследовательская, база потенциального исполнителя, а также кадровый потенциал, включая численность
       сотрудников, привлекаемых для реализации данного мероприятия:
     </label>
-    <textarea [(ngModel)]="_form.potential" name="potential" required rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.potential" name="potential" required maxlength="5000" rows="3" class="form-control"
       placeholder="достаточность имеющихся материально-технической базы и кадров исполнителя для реализации объекта экспертизы">
     </textarea>
   </div>
@@ -99,7 +99,7 @@
       выполнения государственных программ научных исследований и научно-технических программ, взятых за основу
       для реализации мероприятия:
     </label>
-    <textarea [(ngModel)]="_form.experience" name="experience" required rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.experience" name="experience" required maxlength="5000" rows="3" class="form-control"
       placeholder="имеющийся научный опыт исполнителя для реализации объекта экспертизы">
     </textarea>
   </div>
@@ -109,7 +109,7 @@
       3. Целесообразность проведения новых научных исследований, а также наличие необходимых для реализации
       мероприятия материальных и финансовых ресурсов:
     </label>
-    <textarea [(ngModel)]="_form.financeBase" name="financeBase" required rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.financeBase" name="financeBase" required maxlength="5000" rows="3" class="form-control"
       placeholder="целесообразность и достаточность финансовых ресурсов на основе анализа государственных реестров НИОК(Т)Р">
     </textarea>
   </div>
@@ -119,7 +119,7 @@
       4. Наличие проведенного потенциальным исполнителем инновационно-технологического мониторинга
       для реализации объекта экспертизы:
     </label>
-    <textarea [(ngModel)]="_form.monitoring" name="monitoring" required rows="3" class="form-control"
+    <textarea [(ngModel)]="_form.monitoring" name="monitoring" required maxlength="5000" rows="3" class="form-control"
       placeholder="анализ и оценка результатов инновационно-технологического мониторинга для реализации объекта экспертизы">
     </textarea>
   </div>
@@ -192,7 +192,7 @@
     }
     @for (note of notes; track note; let i = $index) {
       <div class="input-group btn-group mb-2">
-        <textarea [(ngModel)]="note.name" rows="2" class="form-control"
+        <textarea [(ngModel)]="note.name" rows="2" maxlength="5000" class="form-control"
         placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
         <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
       </div>

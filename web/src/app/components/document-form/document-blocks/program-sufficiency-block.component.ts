@@ -19,6 +19,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
               [attr.name]="'programSufficiencyText_' + num().split('.').join('_')"
               required
               minlength="30"
+              maxlength="5000"
               rows="3"
               class="form-control mt-05"
             placeholder="Обязательный текст"></textarea>

@@ -12,6 +12,7 @@ import {Component, input} from '@angular/core';
         [(ngModel)]="_form().users"
         [attr.name]="'users_' + num().split('.').join('_')"
         required
+        maxlength="5000"
         rows="3"
         class="form-control"
       placeholder="Обязательный текст."></textarea>

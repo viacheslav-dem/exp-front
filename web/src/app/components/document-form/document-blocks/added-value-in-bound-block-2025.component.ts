@@ -12,10 +12,10 @@ import {IndustryDto} from "@app/dto/IndustryDto";
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().addedValue >= _form().section?.addedValueBound}">
-          Соответсвует
+          соответствует
         </button>
         <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().addedValue < _form().section?.addedValueBound}">
-          Не соотвествует
+          Не соответствует
         </button>
       </div>
       @if (full()) {

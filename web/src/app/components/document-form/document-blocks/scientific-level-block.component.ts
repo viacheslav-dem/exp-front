@@ -12,6 +12,7 @@ import {Component, input} from '@angular/core';
         [(ngModel)]="_form().scientificLevel"
         [attr.name]="'scientificLevel_' + num().split('.').join('_')"
         required
+        maxlength="5000"
         rows="3"
         class="form-control"
         placeholder="Обязательный текст."

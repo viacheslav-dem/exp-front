@@ -13,10 +13,10 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <input type="hidden" [(ngModel)]="_form().financeConclusion" name="financeConclusion" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button [disabled]=disabled() type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().financeConclusion === true}" (click)="stateButton(true)">
-          Целесобразно
+          Целесообразно
         </button>
         <button [disabled]=disabled() type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().financeConclusion === false}" (click)="stateButton(false)">
-          Нецелесобразно
+          Нецелесообразно
         </button>
       </div>
       @if (full()) {

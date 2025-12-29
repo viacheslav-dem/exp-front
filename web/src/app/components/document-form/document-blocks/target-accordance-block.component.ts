@@ -12,7 +12,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (!_form().targetAccordance) {
         <label>Рекомендуемые цели:</label>
-        <textarea [(ngModel)]="_form().targetSuggestion" name="targetSuggestion" required rows="2" class="form-control"
+        <textarea [(ngModel)]="_form().targetSuggestion" name="targetSuggestion" required maxlength="5000" rows="2" class="form-control"
           title="Рекомендуемые цели"
         placeholder="Рекомендуемые цели"></textarea>
       }
@@ -22,6 +22,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
           [attr.name]="'targetAccordanceText_' + num().split('.').join('_')"
           required
           minlength="30"
+          maxlength="5000"
           rows="3"
           class="form-control mt-05"
           placeholder="Обязательный текст (не менее 30 символов)."

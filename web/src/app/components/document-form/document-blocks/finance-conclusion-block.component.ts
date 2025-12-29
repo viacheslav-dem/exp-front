@@ -12,10 +12,10 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button [disabled]=disabled() type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().financeConclusion === true}" (click)="stateButton(true)">
-          Целесобразно
+          Целесообразно
         </button>
         <button [disabled]=disabled() type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().financeConclusion === false}" (click)="stateButton(false)">
-          Нецелесобразно
+          Нецелесообразно
         </button>
       </div>
       @if (full()) {
@@ -24,6 +24,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
           [attr.name]="'financeConclusionText_' + num().split('.').join('_')"
           required
           minlength="30"
+          maxlength="5000"
           rows="3"
           class="form-control mt-05"
           placeholder="Обязательный текст (не менее 30 символов)."

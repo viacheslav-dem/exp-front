@@ -10,15 +10,15 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <input type="hidden" [(ngModel)]="_form().nameAccordance" name="nameAccordance" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().nameAccordance === true}" (click)="stateButton(true)">
-          Соответсвует
+          соответствует
         </button>
         <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().nameAccordance === false}" (click)="stateButton(false)">
-          Не соотвествует
+          Не соответствует
         </button>
       </div>
       @if (!_form().nameAccordance) {
         <label class="ml-2">Рекомендуемое наименование:</label>
-        <textarea [(ngModel)]="_form().nameSuggestion" name="nameSuggestion" required rows="2" class="form-control mt-2"
+        <textarea [(ngModel)]="_form().nameSuggestion" name="nameSuggestion" required maxlength="5000" rows="2" class="form-control mt-2"
           title="Рекомендуемое наименование"
         placeholder="Предлагаемое наименование"></textarea>
       }
@@ -28,6 +28,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
           [attr.name]="'nameAccordanceText_' + num().split('.').join('_')"
           required
           minlength="30"
+          maxlength="5000"
           rows="3"
           class="form-control mt-05"
           placeholder="Обязательный текст (не менее 30 символов)."

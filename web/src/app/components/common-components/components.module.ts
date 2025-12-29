@@ -66,6 +66,7 @@ import {PdfViewerModule} from "ng2-pdf-viewer";
     NgxSliderModule,
     PdfViewerModule,
     GlobalToastsComponent,
+    DropdownToggleDirective,
   ],
   exports: [
     CommonModule,
@@ -128,7 +129,6 @@ import {PdfViewerModule} from "ng2-pdf-viewer";
     PassportComponent,
     BankAccountComponent,
     DropdownComponent,
-    DropdownToggleDirective,
     DatePeriodComponent,
     NumberRangeComponent,
     FilterComponent,

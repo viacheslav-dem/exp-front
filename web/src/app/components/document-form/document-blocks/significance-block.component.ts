@@ -13,6 +13,7 @@ import {Component, input} from '@angular/core';
         [(ngModel)]="_form().significance"
         [attr.name]="'significance_' + num().split('.').join('_')"
         required
+        maxlength="5000"
         rows="3"
         class="form-control"
       placeholder="Обязательный текст."></textarea>

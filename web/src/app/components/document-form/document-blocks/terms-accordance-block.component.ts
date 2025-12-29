@@ -12,10 +12,10 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
       <input type="hidden" [(ngModel)]="_form.termsAccordance" name="termsAccordance" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.termsAccordance === true}" (click)="stateButton(true)">
-          Соответсвует
+          соответствует
         </button>
         <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form.termsAccordance === false}" (click)="stateButton(false)">
-          Не соотвествует
+          Не соответствует
         </button>
       </div>
       @if (!_form.termsAccordance) {
@@ -31,6 +31,7 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
           [attr.name]="'termsAccordanceText_' + num().split('.').join('_')"
           required
           minlength="30"
+          maxlength="5000"
           rows="3"
           class="form-control mt-05"
           placeholder="Обязательный текст (не менее 30 символов)."

@@ -14,6 +14,7 @@ import {Component, input} from '@angular/core';
         [attr.name]="'characteristics_' + num().split('.').join('_')"
         required
         minlength="30"
+        maxlength="5000"
         rows="3"
         class="form-control"
       placeholder="Обязательный текст (не менее 30 символов)."></textarea>

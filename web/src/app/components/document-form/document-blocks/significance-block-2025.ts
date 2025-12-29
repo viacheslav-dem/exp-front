@@ -9,7 +9,7 @@ import {Component, input} from "@angular/core";
         технологических процессов, наукоемкой, конкурентоспособной продукции,
         формирования перспективных научных направлений.
       </label>
-      <textarea [(ngModel)]="_form().significance" name="significance" required minlength="30" rows="3" class="form-control"
+      <textarea [(ngModel)]="_form().significance" name="significance" required minlength="30" maxlength="5000" rows="3" class="form-control"
       placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       @if (full()) {
         <div class="hint">

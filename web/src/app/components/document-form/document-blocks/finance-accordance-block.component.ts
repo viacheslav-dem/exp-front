@@ -28,6 +28,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
             [attr.name]="'financeAccordanceText_' + num().split('.').join('_')"
             [required]="isTextRequired()"
             [attr.minlength]="isTextRequired() ? 30 : null"
+            maxlength="5000"
             rows="3"
             class="form-control mt-05"
             [attr.placeholder]="isTextRequired() ? 'Обязательный текст (не менее 30 символов).' : 'Пояснительный текст (при необходимости).'"
