@@ -92,11 +92,8 @@ export class AuthErrorInterceptor implements HttpInterceptor {
     
     // Если refresh token есть, пытаемся обновить токен (возможно, access token истек)
     if (refreshToken) {
-      console.log("403 error received. Attempting to refresh token in case it's expired...");
-      
       // Если уже идет обновление токена, ждем его завершения
       if (this.isRefreshing) {
-        console.log("403 error received while token refresh is in progress. Waiting for refresh...");
         return race(
           this.refreshTokenSubject.pipe(
             filter(token => token !== null),
@@ -110,7 +107,6 @@ export class AuthErrorInterceptor implements HttpInterceptor {
                   statusText: 'Forbidden'
                 }));
               }
-              console.log("Token refreshed successfully. Retrying request after 403...");
               return next.handle(this.addTokenHeader(request, token));
             })
           ),
@@ -118,7 +114,6 @@ export class AuthErrorInterceptor implements HttpInterceptor {
             filter(error => error !== null),
             take(1),
             switchMap((refreshError) => {
-              console.log("Token refresh failed after 403. Logout already performed in handle401Error.");
               // Если обновление токена не удалось (412 или 401), logout уже был выполнен в handle401Error
               // Возвращаем EMPTY, чтобы остановить цепочку обработки ошибок
               return EMPTY;
@@ -143,7 +138,6 @@ export class AuthErrorInterceptor implements HttpInterceptor {
     const accessToken = this.storage.getAccessToken();
     if (!accessToken) {
       // Нет ни access token, ни refresh token - пользователь не авторизован
-      console.log("403 error received without refresh token and access token. Performing logout and redirecting to login...");
       this.storage.resetCredentials();
       this.storage.clear();
       this.toasty.err(403, "Сессия истекла. Пожалуйста, выполните вход.");
@@ -152,7 +146,6 @@ export class AuthErrorInterceptor implements HttpInterceptor {
     } else {
       // Access token есть, но refresh token отсутствует - это реальная ошибка доступа
       // Не делаем logout, просто показываем ошибку
-      console.log("403 error received without refresh token, but access token is present. This is likely an access denied error.");
       return throwError(error || new HttpErrorResponse({
         error: 'Доступ запрещён.',
         status: 403,
@@ -166,12 +159,10 @@ export class AuthErrorInterceptor implements HttpInterceptor {
     if (!this.isRefreshing) {
 
       const refreshToken = this.storage.getRefreshToken();
-      console.log("Refresh token:", refreshToken ? "present" : "missing");
       
       // Если refresh token отсутствует, и он уже был признан невалидным ранее, 
       // не пытаемся обновлять токен повторно
       if (!refreshToken && this.isRefreshTokenInvalid) {
-        console.log("Refresh token was previously invalidated and is still missing. Redirecting to login...");
         this.storage.resetCredentials();
         this.storage.clear();
         this.redirectToLoginIfNeeded();
@@ -182,18 +173,14 @@ export class AuthErrorInterceptor implements HttpInterceptor {
       // пытаемся использовать его (возможно, пользователь залогинился заново)
       // Флаг будет сброшен при успешном обновлении токена
 
-      console.log("Access token is expired. Attempting to refresh...")
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
       this.refreshErrorSubject.next(null);
 
       if (refreshToken) {
-        console.log("Calling refreshToken API...")
         return this.authService.refreshToken(refreshToken)
             .pipe(
             switchMap((credentials: UserCredentials) => {
-              console.log("Refresh token successful. Updating credentials...")
-              
               // Проверяем, что accessToken существует
               // Это критическая ошибка - сервер вернул некорректный ответ
               if (!credentials || !credentials.accessToken) {
@@ -237,8 +224,6 @@ export class AuthErrorInterceptor implements HttpInterceptor {
               // Это предотвращает race condition: новые запросы будут ждать через race(),
               // а не пытаться использовать старый токен из localStorage
               this.isRefreshing = false;
-
-              console.log("Successful refresh of access token. Retrying original request...")
               
               // Повторяем оригинальный запрос с новым токеном
               return next.handle(this.addTokenHeader(request, credentials.accessToken));
@@ -260,9 +245,6 @@ export class AuthErrorInterceptor implements HttpInterceptor {
               // Критические ошибки, связанные с токенами (412, 401)
               // Эти ошибки означают, что refresh token невалиден или истек
               if (error.status === 412 || error.status === 401) {
-                console.log("Invalid or expired refresh token. Status:", error.status)
-                console.log("Refresh token was:", this.storage.getRefreshToken() ? "present" : "missing")
-                
                 // Устанавливаем флаг, чтобы предотвратить повторные попытки обновления токена
                 this.isRefreshTokenInvalid = true;
                 
@@ -301,9 +283,6 @@ export class AuthErrorInterceptor implements HttpInterceptor {
                                        error.status === 0; // Сетевые ошибки (нет ответа от сервера)
               
               if (isTemporaryError) {
-                console.log("Temporary error during token refresh. Status:", error.status, "Error:", error)
-                console.log("Not setting isRefreshTokenInvalid flag - this may be a temporary server issue")
-                
                 // Показываем сообщение о временной ошибке
                 this.toasty.err(error.status || 500, "Временная ошибка сервера. Пожалуйста, попробуйте войти заново.");
                 
@@ -317,7 +296,6 @@ export class AuthErrorInterceptor implements HttpInterceptor {
               
               // Для других неизвестных ошибок тоже перенаправляем на login
               // но не устанавливаем флаг (на случай, если это временная проблема)
-              console.log("Unknown error during token refresh. Status:", error.status, "Error:", error)
               this.toasty.err(error.status || 500, "Ошибка при обновлении сессии. Пожалуйста, выполните вход.");
               
               this.storage.resetCredentials();
@@ -329,7 +307,6 @@ export class AuthErrorInterceptor implements HttpInterceptor {
       }
       
       // Если нет refresh token, перенаправляем на login
-      console.log("No refresh token found. Redirecting to login...")
       this.isRefreshing = false;
       this.storage.resetCredentials();
       this.redirectToLoginIfNeeded();
