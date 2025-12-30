@@ -1,5 +1,5 @@
 <div [ngClass]="filterClass()">
-  @for (field of _fields; track field.key) {
+  @for (field of fieldsForTemplate(); track field.key) {
     <div class="mb-3" [ngClass]="fieldClass()">
       <!--TITLE-->
       @if (field.title) {
@@ -25,7 +25,8 @@
             [class.rounded-end]="!field.sortable && !field.resetEnabled"
             [class.rounded-0]="field.sortable || field.resetEnabled"
             class="form-control"
-            (input)="changeSearchText($event, field)" [value]="field.value"
+            [(ngModel)]="field.value"
+            (ngModelChange)="onTextValueChange(field)"
             (keyup.enter)="filterChanged()"
             [placeholder]="field.placeholder | orElse: 'Поиск...'">
         }

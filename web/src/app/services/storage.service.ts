@@ -90,6 +90,18 @@ export class StorageService {
     localStorage.clear();
   }
 
+  clearFilterCaches() {
+    // Очищаем все кэши фильтров
+    const filterCacheKeys: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('filter_cache_')) {
+        filterCacheKeys.push(key);
+      }
+    }
+    filterCacheKeys.forEach(key => localStorage.removeItem(key));
+  }
+
   /**
    * Проверяет, что access-токен существует и ещё не истёк (с запасом leewaySeconds).
    * Это предотвращает "залипание" протухшего токена в UI.

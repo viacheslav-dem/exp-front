@@ -1,5 +1,5 @@
 import { OnInit, Directive } from "@angular/core";
-import {SearchField, SearchFieldType} from "app/components/common-components/page-and-filter/model/SearchField";
+import {SearchField, SearchFieldType, MultiSelectField} from "app/components/common-components/page-and-filter/model/SearchField";
 import {Page} from "app/components/common-components/page-and-filter/model/Page";
 import {Filter} from "app/components/common-components/page-and-filter/model/Filter";
 import {SearchPageRequest} from "app/components/common-components/page-and-filter/model/SearchPageRequest";
@@ -16,8 +16,8 @@ export abstract class FilterAndPages<T> implements OnInit {
   _searchRequest: SearchPageRequest;
   _loading: boolean = false;
 
-  private _filterCachePageName: string | null = null;
-  private _initialLoadDone: boolean = false;
+  protected _filterCachePageName: string | null = null;
+  protected _initialLoadDone: boolean = false;
 
   _searchFields: SearchField[] = [];
   _filters: Filter<any>[] = [];
@@ -34,13 +34,19 @@ export abstract class FilterAndPages<T> implements OnInit {
   enableFilterCache(pageName: string) {
     this._filterCachePageName = pageName;
     // Загружаем состояние только один раз при инициализации
-    // После этого загрузка состояния не будет происходить автоматически
     setTimeout(() => {
       const hadSavedState = this.loadFilterState(pageName);
-      // Если было сохраненное состояние, обновляем данные
       if (hadSavedState) {
         this._initialLoadDone = true;
-        this.update();
+        // Создаем новый массив полей для immutable обновления
+        // Это триггерит @Input() set fields в FilterComponent, который обновит сигнал
+        this._searchFields = [...this._searchFields];
+        // Вызываем update() после загрузки значений из кэша
+        setTimeout(() => this.update(), 0);
+      } else {
+        // Если кэша нет, помечаем что начальная загрузка завершена
+        // чтобы разрешить обычную загрузку данных без фильтров
+        this._initialLoadDone = true;
       }
     }, 50);
   }
@@ -119,6 +125,27 @@ export abstract class FilterAndPages<T> implements OnInit {
             }
             if (isValidValue) {
               field.value = deserializedValue;
+              // Для MultiSelectField нужно обновить selectedItems на основе value
+              if (field.type === SearchFieldType.MULTI_SELECT && Array.isArray(deserializedValue)) {
+                const multiSelectField = field as MultiSelectField;
+                // Обновляем selectedItems только если allItems уже загружены
+                // Если каталог еще не загружен, selectedItems будет обновлен после загрузки каталога
+                if (multiSelectField.allItems && multiSelectField.allItems.length > 0) {
+                  // Напрямую устанавливаем selectedItems без вызова selectChanged(),
+                  // чтобы не изменять value (оно уже установлено из кэша)
+                  multiSelectField.selectedItems = deserializedValue
+                    .map(value => {
+                      // Ищем элемент в allItems по значению
+                      // Сравниваем по id или по самому значению
+                      return multiSelectField.allItems.find(item => {
+                        const itemValue = item.value?.id ?? item.value;
+                        const searchValue = value?.id ?? value;
+                        return itemValue === searchValue || itemValue == searchValue;
+                      });
+                    })
+                    .filter(item => item != null);
+                }
+              }
               if (saved.sortDirection) {
                 field.sortDirection = saved.sortDirection;
               }
@@ -164,6 +191,9 @@ export abstract class FilterAndPages<T> implements OnInit {
 
   protected getFilters(): Filter<any>[] {
     const activeFields = this._searchFields.filter(searchField => !searchField.isEmpty());
+    // ВРЕМЕННАЯ ОТЛАДКА: раскомментируйте для проверки
+    // console.log('getFilters - all fields:', this._searchFields.map(f => ({ key: f.key, value: f.value, type: f.type, isEmpty: f.isEmpty() })));
+    // console.log('getFilters - active fields:', activeFields.map(f => ({ key: f.key, value: f.value, isEmpty: f.isEmpty() })));
     const filters = this._filters.concat(activeFields.map(searchField => searchField.getFilter()));
     return filters;
   }
@@ -208,6 +238,30 @@ export abstract class FilterAndPages<T> implements OnInit {
   }
 
   update() {
+    // ЗАЩИТА: не вызываем update() до загрузки кэша, если есть кэш
+    // Проверяем все возможные имена кэша, так как _filterCachePageName может быть еще не установлен
+    // Это предотвращает вызов update() без фильтров до загрузки кэша
+    if (!this._initialLoadDone) {
+      let hasCachedFilters = false;
+      
+      if (this._filterCachePageName) {
+        hasCachedFilters = !!localStorage.getItem(`filter_cache_${this._filterCachePageName}`);
+      } else {
+        // Если _filterCachePageName еще не установлен, проверяем все возможные кэши
+        const possibleCacheNames = ['notification', 'users', 'project-list', 'search-expert'];
+        for (const name of possibleCacheNames) {
+          if (localStorage.getItem(`filter_cache_${name}`)) {
+            hasCachedFilters = true;
+            break;
+          }
+        }
+      }
+      
+      if (hasCachedFilters) {
+        return;
+      }
+    }
+    
     this.prepareRequest();
     // Откладываем изменение состояния загрузки на следующий тик,
     // чтобы избежать ExpressionChangedAfterItHasBeenCheckedError
@@ -215,6 +269,16 @@ export abstract class FilterAndPages<T> implements OnInit {
       this.setLoading(true);
     }, 0);
     this.loadPage();
+  }
+
+  protected shouldSkipLoadPage(): boolean {
+    // ЗАЩИТА: не загружаем данные до загрузки кэша, если есть кэш
+    // Это предотвращает загрузку данных без фильтров до загрузки кэша
+    if (this._filterCachePageName && !this._initialLoadDone) {
+      const hasCachedFilters = localStorage.getItem(`filter_cache_${this._filterCachePageName}`);
+      return !!hasCachedFilters;
+    }
+    return false;
   }
 
   protected abstract loadPage();

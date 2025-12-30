@@ -74,35 +74,63 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
       SearchField.multiSelect('personInfo.lastSignState', this._lastSignPipe.getAllSignTypes(), value => this._lastSignPipe.transform(value))
           .setSelectText('Выбрать роль').setCheckAllEnabled(true).setTitle('Последний вход'),
     ];
+    
+    // Подписка на изменения списка пользователей
+    // ВАЖНО: не вызываем update() до загрузки кэша фильтров, чтобы не сбросить фильтры
+    this.onPersonListChangedSubscription = this._personService.onPersonListChanged.subscribe(() => {
+      // Вызываем update() только если начальная загрузка завершена
+      // Это предотвращает вызов update() до загрузки фильтров из кэша
+      if (this._initialLoadDone) {
+        this.update();
+      }
+    });
+    
+    // Загружаем каталоги и после их загрузки включаем кэш фильтров
+    // Это нужно, чтобы multiSelect поля были готовы к загрузке значений из кэша
+    let catalogsLoaded = 0;
+    const totalCatalogs = 5; // areas, speciality, specialization, scienceArea, orgs
+    
+    const checkCatalogsAndEnableCache = () => {
+      catalogsLoaded++;
+      if (catalogsLoaded >= totalCatalogs) {
+        // Все каталоги загружены, теперь можно безопасно загружать кэш
+        this.enableFilterCache("users");
+        // enableFilterCache вызывает update() если есть сохраненное состояние
+        // Если кэша нет, загружаем данные без фильтров после завершения enableFilterCache
+        setTimeout(() => {
+          if (!localStorage.getItem('filter_cache_users')) {
+            this.update();
+          }
+        }, 300);
+      }
+    };
+    
+    // Подписываемся на загрузку каталогов
     this._dataService.getCatalog(Catalog.AREA_OF_COMPETENCE).subscribe((areas: IdNameDto[]) => {
       this.getSearchField('areas').setItems(areas);
       this.cdr?.markForCheck?.();
+      checkCatalogsAndEnableCache();
     });
     this._dataService.getCatalog(Catalog.SPECIALITY).subscribe((speciality: IdNameDto[]) => {
       this.getSearchField('personInfo.specialities').setItems(speciality);
       this.cdr?.markForCheck?.();
+      checkCatalogsAndEnableCache();
     });
     this._dataService.getCatalog(Catalog.SPECIALIZATION).subscribe((specialization: IdNameDto[]) => {
       this.getSearchField('personInfo.specializations').setItems(specialization);
       this.cdr?.markForCheck?.();
+      checkCatalogsAndEnableCache();
     });
     this._dataService.getCatalog(Catalog.SCIENCE_AREA).subscribe((scienceArea: IdNameDto[]) => {
       this.getSearchField('personInfo.fullDegrees.scienceArea').setItems(scienceArea);
       this.cdr?.markForCheck?.();
+      checkCatalogsAndEnableCache();
     });
     this._dataService.getOrgs().subscribe(orgs => {
       this.getSearchField('org').setItems(orgs);
       this.cdr?.markForCheck?.();
+      checkCatalogsAndEnableCache();
     });
-    this.onPersonListChangedSubscription = this._personService.onPersonListChanged.subscribe(() => this.update());
-    this.enableFilterCache("users");
-    // Если нет сохранённого состояния фильтров, загружаем данные явно
-    setTimeout(() => {
-      const hasCachedFilters = localStorage.getItem('filter_cache_users');
-      if (!hasCachedFilters) {
-        this.update();
-      }
-    }, 100);
   }
 
   ngOnDestroy(): void {
@@ -112,6 +140,10 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
   }
 
   loadPage() {
+    if (this.shouldSkipLoadPage()) {
+      return;
+    }
+    
     this._personService.getPersons(this._searchRequest).subscribe(res => {
       this._page = res;
       this.users = res.content;

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, input} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, input, signal, computed} from "@angular/core";
 import {
   CheckboxField,
   MultiCheck,
@@ -84,6 +84,13 @@ export class FilterComponent implements OnInit {
   SearchFieldType = SearchFieldType;
   searcherTimer: any;
   _fields: SearchField[] = [];
+  
+  // Сигнал для реактивного обновления полей фильтров
+  private _fieldsSignal = signal<SearchField[]>([]);
+  
+  // Computed для использования в шаблоне - автоматически обновляется при изменении сигнала
+  fieldsForTemplate = computed(() => this._fieldsSignal());
+  
   readonly fieldClass = input<string>('');
   readonly filterClass = input<string>('');
   @Output() onFilterChanged = new EventEmitter<Filter<any>[]>();
@@ -102,10 +109,20 @@ export class FilterComponent implements OnInit {
       return;
     }
     this._fields = fields;
+    // Обновляем сигнал при изменении полей - это триггерит реактивное обновление
+    this._fieldsSignal.set([...fields]);
+    
     this._fields.forEach(field => {
       if ((field.type == SearchFieldType.MULTI_SELECT) && field.catalog != null)
         this.dataService.getCatalog(field.catalog).subscribe(items => {
-          (<MultiSelectField>field).setItems(items);
+          const multiSelectField = <MultiSelectField>field;
+          multiSelectField.setItems(items);
+          // Если поле уже имеет значение (из кэша), обновляем selectedItems
+          if (multiSelectField.value && Array.isArray(multiSelectField.value) && multiSelectField.value.length > 0) {
+            multiSelectField.setSelectedValues(multiSelectField.value);
+          }
+          // Обновляем сигнал после загрузки каталога для реактивного обновления
+          this._fieldsSignal.set([...this._fields]);
           // Важно для OnPush/zoneless: обновление пришло асинхронно
           this.cdr.markForCheck();
         });
@@ -116,30 +133,47 @@ export class FilterComponent implements OnInit {
     this.onFilterChanged.emit(this._fields);
   }
 
-  changeSearchText($event: any, field: SearchField) {
-    field.value = $event.srcElement.value;
+  // Обработчик изменения текстового поля через ngModel
+  onTextValueChange(field: SearchField) {
+    // Обновляем сигнал для реактивного обновления UI
+    this._fieldsSignal.set([...this._fields]);
     clearTimeout(this.searcherTimer);
     this.searcherTimer = setTimeout(() => this.filterChanged(), 6000);
   }
 
+  // Старый метод оставлен для обратной совместимости, если где-то используется
+  changeSearchText($event: any, field: SearchField) {
+    const newValue = $event.srcElement.value;
+    field.value = newValue;
+    this.onTextValueChange(field);
+  }
+
   changePeriod($event, field: SearchField, type: 'start' | 'end') {
     field.value[type] = Number.parseInt($event.srcElement.value);
+    // Обновляем сигнал для реактивного обновления UI
+    this._fieldsSignal.set([...this._fields]);
     clearTimeout(this.searcherTimer);
     this.searcherTimer = setTimeout(() => this.filterChanged(), 6000);
   }
 
   changeMultiCheck(field: MultiCheckField, multiCheck: MultiCheck) {
     field.check(multiCheck);
+    // Обновляем сигнал для реактивного обновления UI
+    this._fieldsSignal.set([...this._fields]);
     this.filterChanged();
   }
 
   changeCheckbox(field: CheckboxField) {
     field.checked = !field.checked;
+    // Обновляем сигнал для реактивного обновления UI
+    this._fieldsSignal.set([...this._fields]);
     this.filterChanged();
   }
 
   changeMultiSelect(field: MultiSelectField) {
     field.selectChanged();
+    // Обновляем сигнал для реактивного обновления UI
+    this._fieldsSignal.set([...this._fields]);
     this.filterChanged();
   }
 
@@ -150,11 +184,15 @@ export class FilterComponent implements OnInit {
         f.sortDirection = null;
       }
     });
+    // Обновляем сигнал для реактивного обновления UI
+    this._fieldsSignal.set([...this._fields]);
     this.filterChanged();
   }
 
   reset(field: SearchField) {
     field.reset();
+    // Обновляем сигнал для реактивного обновления UI
+    this._fieldsSignal.set([...this._fields]);
     this.filterChanged();
   }
 
