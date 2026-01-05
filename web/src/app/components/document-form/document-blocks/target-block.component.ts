@@ -7,11 +7,11 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <label>
         {{num()}}. Оценка целевых показателей проекта:
       </label>
-      <app-dropdown [options]="targetOptions" [(ngModel)]="_form().target"
+      <app-dropdown name="target" required [options]="targetOptions" [(ngModel)]="_form().target"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().targetText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea [(ngModel)]="_form().targetText" name="targetText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full()) {
         <div class="hint">

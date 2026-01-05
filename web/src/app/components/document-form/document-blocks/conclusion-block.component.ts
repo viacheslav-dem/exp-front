@@ -17,8 +17,16 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
           Отрицательное
         </button>
       </div>
-      <textarea [(ngModel)]="_form().conclusionText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст"></textarea>
+      <textarea
+        [(ngModel)]="_form().conclusionText"
+        [attr.name]="'conclusionText'"
+        required
+        minlength="30"
+        maxlength="5000"
+        rows="3"
+        class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."
+      ></textarea>
       <div *ngIf="financeConclusionNum()" class="hint">
         <p>
           <b>Подсказка.</b>

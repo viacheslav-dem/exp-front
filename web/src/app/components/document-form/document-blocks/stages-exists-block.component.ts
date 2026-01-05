@@ -9,10 +9,21 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         Целесообразность государственной регистрации объекта государственной экспертизы в соответствии
         с законодательством Республики Беларусь:
       </label>
-      <app-dropdown [options]="stagesOptions" [(ngModel)]="_form().stagesExist"
+      <app-dropdown
+        [options]="stagesOptions"
+        [(ngModel)]="_form().stagesExist"
+        [attr.name]="'stagesExist_' + num().split('.').join('_')"
+        required
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().stagesExistText" rows="3" class="form-control mt-05"
+        <textarea
+          [(ngModel)]="_form().stagesExistText"
+          [attr.name]="'stagesExistText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
       @if (full() && askStages()) {

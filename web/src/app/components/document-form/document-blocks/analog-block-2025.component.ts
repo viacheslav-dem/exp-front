@@ -7,11 +7,11 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
       <label>
         {{num()}}. Направленность объекта государственной экспертизы:
       </label>
-      <app-dropdown [options]="analogOptions" [(ngModel)]="_form().analog"
+      <app-dropdown name="analog" required [options]="analogOptions" [(ngModel)]="_form().analog"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().analogText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea [(ngModel)]="_form().analogText" name="analogText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full()) {
         <div class="hint">

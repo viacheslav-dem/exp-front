@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {anyMatch, isEmptyOrNull} from "@app/support/utils";
+import {anyMatch} from "@app/support/utils";
 import {CouncilConclusionForm} from "@app/components/document-form/council-conclusion-form/council-conclusion-form";
 import {DecisionState} from "@app/pipes/decision.pipe";
 
@@ -11,10 +11,10 @@ import {DecisionState} from "@app/pipes/decision.pipe";
 export class CouncilConclusion_8_10PVT_FormComponent extends CouncilConclusionForm {
 
   validate() {
+    // Инкрементальная миграция: обязательность/мин.длина выражаются через template-driven validators (required/minlength),
+    // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
-    if (isEmptyOrNull(this._form.productName)) {
-      throw 'Пожалуйста, заполните все поля заключения.';
-    }
+    // Проверка highTech оставлена через throw, так как это бизнес-логика, не связанная с template-driven валидацией
     if (!this._form.highTech) {
       throw 'Недопустимо положительное заключение при наличии отрицательной оценки ' +
       'в пункте 7. Проект: ' + this.project.title;

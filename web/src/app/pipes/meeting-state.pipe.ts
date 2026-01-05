@@ -23,7 +23,7 @@ export enum MeetingState {
 export enum MeetingStateBadge {
   READY = 'badge-info',
   FINISHED = 'badge-success',
-  CANCELED = 'badge-secondary',
+  CANCELED = 'badge-danger',
 }
 
 export function getAllMeetingStates() {

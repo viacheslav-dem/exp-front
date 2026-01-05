@@ -9,12 +9,14 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         передовым технологиям, используемым в мире, и возможность ее применения на соответствующем производстве:
       </label>
       <app-boolean-button
+        name="scientificLevel"
+        required
         [(ngModel)]="_form().scientificLevel"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().scientificLevelText" rows="3" class="form-control"
+        <textarea [(ngModel)]="_form().scientificLevelText" name="scientificLevelText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
       @if (full()) {

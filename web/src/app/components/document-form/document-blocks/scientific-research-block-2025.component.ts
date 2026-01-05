@@ -10,16 +10,16 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         {{num()}}. Вид научного исследования:
       </label>
       @if (showTarget8_3() || showTarget8_4()) {
-        <app-dropdown [options]="scientificResearchOptions2" [(ngModel)]="_form().scientificResearch"
+        <app-dropdown name="scientificResearch" required [options]="scientificResearchOptions2" [(ngModel)]="_form().scientificResearch"
         (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       }
       @if (!(showTarget8_3() || showTarget8_4())) {
-        <app-dropdown [options]="scientificResearchOptions" [(ngModel)]="_form().scientificResearch"
+        <app-dropdown name="scientificResearch" required [options]="scientificResearchOptions" [(ngModel)]="_form().scientificResearch"
         (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form().scientificResearchText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea [(ngModel)]="_form().scientificResearchText" name="scientificResearchText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
       @if (full()) {
         <div class="hint">

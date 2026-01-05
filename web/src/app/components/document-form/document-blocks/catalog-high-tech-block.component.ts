@@ -7,7 +7,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <label>
         Отнесение товара к высокотехнологичному для его включения в перечень высокотехнологичных товаров:
       </label>
-        <app-boolean-button [(ngModel)]="_form().catalogHighTech" 
+        <app-boolean-button name="catalogHighTech" required [(ngModel)]="_form().catalogHighTech" 
                             [trueLabel]="'возможно отнесение'"
                             [falseLabel]="'невозможно отнесение'"
                             [disabled]="disabled()"

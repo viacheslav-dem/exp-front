@@ -9,6 +9,8 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         Заключение эксперта по объекту государственной экспертизы
       </label>
       <app-boolean-button
+        name="conclusion"
+        required
         [(ngModel)]="_form().conclusion"
         [disabled]="disabled()"
         [showDisabledSelection]="true"

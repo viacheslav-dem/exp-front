@@ -9,6 +9,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <label>
         {{num()}}. Объект государственной экспертизы является социально значимым или направленным на обеспечение национальной безопасности:
       </label>
+      <input type="hidden" [(ngModel)]="_form().socialOrSecurity" name="socialOrSecurity" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().socialOrSecurity === true}" (click)="stateButton(true)">
           Да (социально значимый / направлен на обеспечение национальной безопасности)
@@ -18,8 +19,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().socialOrSecurityText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea [(ngModel)]="_form().socialOrSecurityText" name="socialOrSecurityText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full()) {
         <div class="hint">

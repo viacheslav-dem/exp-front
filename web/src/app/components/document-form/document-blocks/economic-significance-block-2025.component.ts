@@ -16,11 +16,19 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
             работ,
             предусмотренных объектом государственной экспертизы:
           </label>
-          <app-dropdown [options]="significanceOptions" [(ngModel)]="_form().economicSignificance"
+          <app-dropdown name="economicSignificance" required [options]="significanceOptions" [(ngModel)]="_form().economicSignificance"
           (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
           @if (full()) {
-            <textarea [(ngModel)]="_form().economicSignificanceText" rows="3" class="form-control mt-05"
-            placeholder="Обязательный текст"></textarea>
+            <textarea
+              [(ngModel)]="_form().economicSignificanceText"
+              [attr.name]="'economicSignificanceText_' + num().split('.').join('_')"
+              required
+              minlength="30"
+              maxlength="5000"
+              rows="3"
+              class="form-control mt-05"
+              placeholder="Обязательный текст (не менее 30 символов)."
+            ></textarea>
           }
           @if (full()) {
             <div class="hint">

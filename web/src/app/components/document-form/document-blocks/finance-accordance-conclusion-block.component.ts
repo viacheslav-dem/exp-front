@@ -9,7 +9,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
       <label>
         {{num()}}. Соответствие заявленного финансирования планируемому объему выполняемых работ:
       </label>
-      <app-boolean-button [(ngModel)]="_form().financeAccordance" [trueLabel]="'соответствует'"
+      <app-boolean-button name="financeAccordance" required [(ngModel)]="_form().financeAccordance" [trueLabel]="'соответствует'"
                           [falseLabel]="'не соответствует'" 
                           (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
         <div class="form-sub-group">
@@ -17,7 +17,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
                 Обоснованность расходов по сравнению с аналогичными технологиями и (или) продукцией,
                 применяемыми и (или) выпускаемой в Республике Беларусь и (или) мире:
             </label>
-            <textarea [(ngModel)]="_form().financeValidity" rows="3" class="form-control"
+            <textarea [(ngModel)]="_form().financeValidity" name="financeValidity" rows="3" class="form-control"
                       placeholder="анализ и оценка обоснованности расходов во внедряемые технологии по объекту экспертизы">
     </textarea>
         </div>

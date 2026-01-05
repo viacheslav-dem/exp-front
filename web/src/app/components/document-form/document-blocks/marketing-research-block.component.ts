@@ -7,10 +7,21 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <label>
         {{num()}}. Проведение маркетинговых и патентных исследований, их результаты:
       </label>
-      <app-dropdown [options]="marketingResearchOptions" [(ngModel)]="_form().marketingResearch"
+      <app-dropdown
+        [options]="marketingResearchOptions"
+        [(ngModel)]="_form().marketingResearch"
+        [attr.name]="'marketingResearch_' + num().split('.').join('_')"
+        required
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().marketingResearchText" rows="3" class="form-control mt-05"
+        <textarea
+          [(ngModel)]="_form().marketingResearchText"
+          [attr.name]="'marketingResearchText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
       @if (full()) {

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, input} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {ProjectLifecycleState, ProjectLifecycleStateBadge} from "@app/pipes/lifecycle-state.pipe";
 import {Router} from "@angular/router";
@@ -21,11 +21,16 @@ import {DialogService} from "@app/components/dialogs/dialog.service";
 import {RemarkDto} from "@app/dto/RemarkDto";
 import {CouncilConclusionFormContainerComponent} from "@app/components/document-form/council-conclusion-form/council-conclusion-form-container.component";
 import {ProjectDto} from "@app/dto/ProjectDto";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-lifecycle-group',
     templateUrl: './lifecycle-group.component.html',
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class LifecycleGroupComponent implements OnInit, OnDestroy {
 
@@ -43,6 +48,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   
   isCreatingReferral = false;
+  isCreatingConclusion = false;
 
   readonly role = input(undefined);
   readonly project = input<ProjectDto>(new ProjectDto());
@@ -72,7 +78,8 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
               private _transitionHistoryService: TransitionHistoryService,
               private _lifecycleService: LifecycleService,
               private _toasty: GlobalToastyService,
-              private _dialogService: DialogService) {
+              private _dialogService: DialogService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -83,13 +90,17 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
     if (!group) return;
     this._lifecycleGroupService.prepareGroup(group);
     this._group = group;
+    this.cdr?.markForCheck?.();
   }
 
   showTransitionHistoryModal() {
     this.transitionHistoryModal.show();
     this.subscriptions.push(
       this._transitionHistoryService.getGroupHistory(this._group)
-        .subscribe(res => this.transitionHistory = res)
+        .subscribe(res => {
+          this.transitionHistory = res;
+          this.cdr?.markForCheck?.();
+        })
     );
   }
 
@@ -97,12 +108,16 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
     this.lifecycleTransitionHistoryModal.show();
     this.subscriptions.push(
       this._transitionHistoryService.getLifecycleHistory(lifecycle)
-        .subscribe(res => this.lifecycleTransitionHistory = res)
+        .subscribe(res => {
+          this.lifecycleTransitionHistory = res;
+          this.cdr?.markForCheck?.();
+        })
     );
   }
 
   changed() {
     this.onChanged.emit(this._group);
+    this.cdr?.markForCheck?.();
   }
 
   showSearchSectionModal() {
@@ -147,6 +162,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
 
   saveRemarkResponseForSection(remarks: RemarkDto[]) {
     this.lifecycleRemark.remarks = remarks;
+    this.cdr?.markForCheck?.();
     this.subscriptions.push(
       this._lifecycleService.saveAnswerForSectionRemarks(this.lifecycleRemark).subscribe()
     );
@@ -154,6 +170,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
 
   saveRemarkResponseForBureau(remarks: RemarkDto[]) {
     this.groupRemark.remarks = remarks;
+    this.cdr?.markForCheck?.();
     this.subscriptions.push(
       this._lifecycleGroupService.saveAnswerForBureauRemarks(this.groupRemark).subscribe()
     );
@@ -188,6 +205,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
                 this._project = value;
                 this._lifecycle = this.lifecycleRemark;
                 this.onReplyChanged.emit(this.projectValue);
+                this.cdr?.markForCheck?.();
               }
             )
           );
@@ -215,6 +233,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
                 this._project = value;
                 this._group = this.groupRemark;
                 this.onReplyChanged.emit(this.projectValue);
+                this.cdr?.markForCheck?.();
               }
             )
           );
@@ -228,6 +247,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
         this._toasty.success("Секция удалена.");
         this._group.lifecycles = this._group.lifecycles.filter(lc => lc !== lifecycle);
         this.changed();
+        this.cdr?.markForCheck?.();
       })
     );
   }
@@ -275,6 +295,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
         this._toasty.success("Секция прикреплена.");
         this.searchSectionListComponent.hide();
         this.changed();
+        this.cdr?.markForCheck?.();
       })
     );
   }
@@ -284,11 +305,22 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   }
 
   generateConclusion(form) {
+    this.isCreatingConclusion = true;
+    this.cdr?.markForCheck?.();
     this.subscriptions.push(
-      this._lifecycleGroupService.generateCouncilConclusion(this._group, form).subscribe(res => {
-        this.closeConclusionForm();
-        this._group.conclusion = res;
-        this.changed();
+      this._lifecycleGroupService.generateCouncilConclusion(this._group, form).subscribe({
+        next: (res) => {
+          this.isCreatingConclusion = false;
+          this.closeConclusionForm();
+          this._group.conclusion = res;
+          this.changed();
+          this.cdr?.markForCheck?.();
+        },
+        error: () => {
+          this.isCreatingConclusion = false;
+          this._toasty.error('Ошибка при создании документа');
+          this.cdr?.markForCheck?.();
+        }
       })
     );
   }
@@ -316,10 +348,12 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
           this.referralFormModal.hide();
           this._group.referral = res;
           this.changed();
+          this.cdr?.markForCheck?.();
         },
         error: (err) => {
           this.isCreatingReferral = false;
           this._toasty.error('Ошибка при создании документа');
+          this.cdr?.markForCheck?.();
         }
       })
     );
@@ -329,6 +363,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
     this._lifecycleGroupService.deleteReferral(_group.referral, _group, () => {
       _group.referral = null;
       this.changed();
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -345,6 +380,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
     this._lifecycleGroupService.deleteLifecycleGroupDecisionDocument(_group.decisionDocument, _group, () => {
       _group.decisionDocument = null;
       this.changed();
+      this.cdr?.markForCheck?.();
     });
   }
 

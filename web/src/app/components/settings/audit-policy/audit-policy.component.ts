@@ -1,8 +1,9 @@
-import {Component} from '@angular/core';
+import {Component, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 import {PropertyComponent} from "@app/components/settings/property.component";
 import {getAllAuditTypes} from "@app/pipes/audit-type.pipe";
 import {DataService} from "@app/services/data.service";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-audit-policy',
@@ -44,21 +45,41 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
           </div>
         }
         <div class="mt-1">
-          <button class="btn btn-secondary" (click)="isEdit = false">Отмена</button>
+          <button class="btn btn-secondary me-2" (click)="isEdit = false">Отмена</button>
           <button class="btn btn-primary" (click)="savePropertyValue()">Сохранить</button>
         </div>
       }
     </div>
     `,
     styles: [],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.settings)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class AuditPolicyComponent extends PropertyComponent<AuditPolicy> {
   types: string[] = getAllAuditTypes();
 
   constructor(protected _dataService: DataService,
-              protected _toasty: GlobalToastyService) {
+              protected _toasty: GlobalToastyService,
+              private cdr: ChangeDetectorRef) {
     super(_dataService, _toasty);
+  }
+  
+  override setProperty(property: any) {
+    super.setProperty(property);
+    this.cdr?.markForCheck?.();
+  }
+  
+  override edit() {
+    super.edit();
+    this.cdr?.markForCheck?.();
+  }
+  
+  override onSaved() {
+    super.onSaved();
+    this.cdr?.markForCheck?.();
   }
 }
 

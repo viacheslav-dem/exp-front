@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {ExpertReviewForm} from "@app/components/document-form/expert-review-form-container/expert-review-form";
-import {anyMatch, isEmptyOrNull} from "@app/support/utils";
+import {anyMatch} from "@app/support/utils";
 import {
     ExpertReview_8_3_4_12NIOKTR_NewFormContent
 } from "@app/components/document-form/form-model/ExpertReview_8_3_4_12NIOKTR_NewFormContent";

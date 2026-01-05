@@ -7,8 +7,16 @@ import {Component, input} from '@angular/core';
       <label>
         {{num()}}. Сведения о проведении маркетинговых и патентных исследований и их результаты.
       </label>
-      <textarea [(ngModel)]="_form().marketingResearchText" rows="3" class="form-control"
-      placeholder="Обязательный текст."></textarea>
+      <textarea
+        [(ngModel)]="_form().marketingResearchText"
+        [attr.name]="'marketingResearchResultsText_' + num().split('.').join('_')"
+        required
+        minlength="30"
+        maxlength="5000"
+        rows="3"
+        class="form-control"
+        placeholder="Обязательный текст (не менее 30 символов)."
+      ></textarea>
       @if (full()) {
         <div class="hint">
           <p>

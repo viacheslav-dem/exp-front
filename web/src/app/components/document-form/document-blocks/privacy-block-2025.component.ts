@@ -12,12 +12,19 @@ import {ProjectDto} from "@app/dto/ProjectDto";
           <label>при реализации объекта государственной экспертизы</label>
           }:
         </label>
-        <app-dropdown [options]="privacyOptions" [(ngModel)]="_form().privacyObjectsDescription"
+        <app-dropdown name="privacyObjectsDescription" required [options]="privacyOptions" [(ngModel)]="_form().privacyObjectsDescription"
         (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
         @if (full() || _form().privacyObjectsDescription == 'предусматривается') {
           <textarea
-            [(ngModel)]="_form().privacyObjectsDescriptionText" rows="3" class="form-control mt-05"
-          placeholder="Обязательный текст"></textarea>
+            [(ngModel)]="_form().privacyObjectsDescriptionText"
+            [attr.name]="'privacyObjectsDescriptionText_' + num().split('.').join('_')"
+            required
+            minlength="30"
+            maxlength="5000"
+            rows="3"
+            class="form-control mt-05"
+            placeholder="Обязательный текст (не менее 30 символов)."
+          ></textarea>
         }
         @if (full()) {
           <div class="hint">

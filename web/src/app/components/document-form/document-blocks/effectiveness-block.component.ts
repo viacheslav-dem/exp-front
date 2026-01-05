@@ -10,8 +10,15 @@ import {Component, input} from '@angular/core';
         разработок и их внедрения, утвержденными постановлением Государственного комитета по науке и технологиям
         Республики Беларусь от 20 апреля 2017 г. № 9.
       </label>
-      <textarea [(ngModel)]="_form().effectiveness" rows="3" class="form-control"
-                placeholder="Обязательный текст."></textarea>
+      <textarea
+        [(ngModel)]="_form().effectiveness"
+        [attr.name]="'effectiveness_' + num().split('.').join('_')"
+        required
+        minlength="30"
+        rows="3"
+        class="form-control"
+        placeholder="Обязательный текст (не менее 30 символов)."
+      ></textarea>
     </div>
   `,
     standalone: false

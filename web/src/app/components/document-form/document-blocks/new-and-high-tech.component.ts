@@ -7,7 +7,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <label>
         {{num()}}. Новые и высокие технологии и (или) высокотехнологичные производства, используемые при производстве товаров :
       </label>
-      <textarea [(ngModel)]="_form().correspondenceOfHighTechProduction" rows="3" class="form-control mt-05"
+      <textarea [(ngModel)]="_form().correspondenceOfHighTechProduction" name="correspondenceOfHighTechProduction" rows="3" class="form-control mt-05"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
   `,

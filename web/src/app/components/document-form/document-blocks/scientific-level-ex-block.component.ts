@@ -8,8 +8,15 @@ import {Component, input} from '@angular/core';
         {{num()}}. Научно-технический уровень внедряемой технологии по сравнению с передовыми технологиями,
         используемыми в мире, и возможность ее применения на соответствующем производстве.
       </label>
-      <textarea [(ngModel)]="_form().scientificLevel" rows="3" class="form-control"
-      placeholder="Обязательный текст."></textarea>
+      <textarea
+        [(ngModel)]="_form().scientificLevel"
+        [attr.name]="'scientificLevelEx_' + num().split('.').join('_')"
+        required
+        minlength="30"
+        rows="3"
+        class="form-control"
+        placeholder="Обязательный текст (не менее 30 символов)."
+      ></textarea>
       @if (full()) {
         <div class="hint">
           <p>

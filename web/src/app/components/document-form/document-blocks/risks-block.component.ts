@@ -7,11 +7,19 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <label>
         {{num()}}. Риски реализации проекта:
       </label>
-      <app-dropdown [options]="risksOptions" [(ngModel)]="_form().risks"
+      <app-dropdown name="risks" required [options]="risksOptions" [(ngModel)]="_form().risks"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().risksText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea
+          [(ngModel)]="_form().risksText"
+          [attr.name]="'risksText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">

@@ -1,9 +1,10 @@
-import {Component, EventEmitter, Output, input, OnDestroy, OnInit} from "@angular/core";
+import {Component, EventEmitter, Output, input, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, NgZone} from "@angular/core";
 import {StorageService} from "@app/services/storage.service";
 import {SERVER_URL} from "@app/config";
 import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/ConfirmDialogField";
 import {HttpClientSecure} from "@app/services/http.client";
 import {Subscription} from "rxjs";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-meth-rec-pdf',
@@ -16,7 +17,13 @@ import {Subscription} from "rxjs";
               <input class="form-control" [type]="field.type" [(ngModel)]="field.value" required [name]="field.name"/>
             </div>
           }
-          @if (pdfSrc) {
+          @if (isLoading) {
+            <div class="text-center py-4">
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Загрузка документа...
+            </div>
+          }
+          @if (showPdfViewer) {
             <pdf-viewer 
                   [src]="pdfSrc" 
                   [render-text]="true"
@@ -27,6 +34,9 @@ import {Subscription} from "rxjs";
                   style="width: 100%; height: 60vh; display: block;"
                   class="pdf-viewer-container">
             </pdf-viewer>
+          }
+          @if (loadError) {
+            <div class="alert alert-warning">Не удалось загрузить документ</div>
           }
           <div class="text-sm">{{description()}}</div>
           <div class="mt-3">
@@ -45,7 +55,11 @@ import {Subscription} from "rxjs";
             width: 100% !important;
             height: auto !important;
         }
-    `]
+    `],
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dialogs)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class MethRecPdfComponent implements OnInit, OnDestroy {
 
@@ -60,41 +74,39 @@ export class MethRecPdfComponent implements OnInit, OnDestroy {
 
     pdfSrc: string | Uint8Array | ArrayBuffer;
     private subscription: Subscription;
+    isLoading = false;
+    loadError = false;
+    showPdfViewer = false;  // Флаг для показа/скрытия pdf-viewer
+    private objectUrl: string = null;
 
     constructor(private _storage: StorageService,
-                private _http: HttpClientSecure) {
+                private _http: HttpClientSecure,
+                private cdr: ChangeDetectorRef,
+                private ngZone: NgZone) {
     }
 
     ngOnInit(): void {
-        // Настройка worker для PDF.js
-        // ng2-pdf-viewer загружает pdfjs-dist, но мы можем настроить worker заранее
-        if (typeof window !== 'undefined') {
-            // Пытаемся настроить worker через глобальный объект
-            const setupWorker = () => {
-                try {
-                    // Проверяем различные возможные пути к pdfjs-dist
-                    const pdfjs = (window as any)['pdfjs-dist'] 
-                        || (window as any)['pdfjs-dist/build/pdf']
-                        || (window as any).pdfjsLib;
-                    
-                    if (pdfjs && pdfjs.GlobalWorkerOptions) {
-                        pdfjs.GlobalWorkerOptions.workerSrc = './assets/pdfjs/build/pdf.worker.js';
-                        return true;
-                    }
-                } catch (e) {
-                    // Игнорируем ошибку
-                }
-                return false;
-            };
-            
-            // Пытаемся настроить сразу
-            if (!setupWorker()) {
-                // Если не получилось, пробуем позже (ng2-pdf-viewer может еще не загрузить pdfjs-dist)
-                setTimeout(setupWorker, 100);
-                setTimeout(setupWorker, 500);
-            }
-        }
+        // Worker для PDF.js настроен глобально в main.ts
+        
+        // Сбрасываем предыдущее состояние и загружаем PDF
+        this.cleanup();
+        this.pdfSrc = null;
         this.loadPdf();
+    }
+    
+    private cleanup(): void {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+            this.subscription = null;
+        }
+        // Освобождаем Object URL для предотвращения утечки памяти
+        if (this.objectUrl) {
+            URL.revokeObjectURL(this.objectUrl);
+            this.objectUrl = null;
+        }
+        this.isLoading = false;
+        this.loadError = false;
+        this.showPdfViewer = false;
     }
 
     confirm() {
@@ -111,27 +123,64 @@ export class MethRecPdfComponent implements OnInit, OnDestroy {
     }
 
     private loadPdf(): void {
-        const url = `${SERVER_URL}/document/get/meth_rec`;
+        // Предотвращаем повторную загрузку, если уже идёт
+        if (this.isLoading) {
+            return;
+        }
+        
+        this.isLoading = true;
+        this.loadError = false;
+        // Сначала полностью скрываем pdf-viewer, чтобы Angular его уничтожил
+        this.showPdfViewer = false;
+        this.pdfSrc = null;
+        this.cdr.detectChanges();  // Принудительное обновление DOM
+        
+        // Добавляем cache-busting параметр для предотвращения кэширования браузером
+        const timestamp = Date.now();
+        const url = `${SERVER_URL}/document/get/meth_rec?_t=${timestamp}`;
         
         this.subscription = this._http.getBlock<Blob>(url, {
             responseType: 'blob'
         }).subscribe(
             (blob: Blob) => {
-                // Конвертируем Blob в ArrayBuffer для ng2-pdf-viewer
-                blob.arrayBuffer().then(buffer => {
-                    this.pdfSrc = new Uint8Array(buffer);
-                });
+                // Конвертируем Blob в Uint8Array
+                const reader = new FileReader();
+                reader.onload = () => {
+                    this.ngZone.run(() => {
+                        const arrayBuffer = reader.result as ArrayBuffer;
+                        const pdfData = new Uint8Array(arrayBuffer);
+                        
+                        // Даём время Angular полностью удалить старый pdf-viewer из DOM
+                        setTimeout(() => {
+                            this.pdfSrc = pdfData;
+                            this.isLoading = false;
+                            this.showPdfViewer = true;
+                            this.cdr.detectChanges();
+                        }, 100);
+                    });
+                };
+                reader.onerror = () => {
+                    this.ngZone.run(() => {
+                        this.pdfSrc = null;
+                        this.isLoading = false;
+                        this.loadError = true;
+                        this.cdr.detectChanges();
+                    });
+                };
+                reader.readAsArrayBuffer(blob);
             },
-            (error) => {
-                console.error('Error loading PDF:', error);
-                this.pdfSrc = null;
+            () => {
+                this.ngZone.run(() => {
+                    this.pdfSrc = null;
+                    this.isLoading = false;
+                    this.loadError = true;
+                    this.cdr.detectChanges();
+                });
             }
         );
     }
 
     ngOnDestroy(): void {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
+        this.cleanup();
     }
 }

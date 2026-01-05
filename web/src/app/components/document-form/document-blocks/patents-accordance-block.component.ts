@@ -10,12 +10,14 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         31 октября 2012 г. № 995 (использование способных к правовой охране результатов интеллектуальной деятельности):
       </label>
       <app-boolean-button
+        name="patents"
+        required
         [(ngModel)]="_form().patents"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().patentsText" rows="3" class="form-control"
+        <textarea [(ngModel)]="_form().patentsText" name="patentsText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>

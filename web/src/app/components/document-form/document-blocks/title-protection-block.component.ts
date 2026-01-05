@@ -12,12 +12,14 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         утвержденной постановлением ГКНТ от 25 июля 2022 г. № 12:
       </label>
       <app-boolean-button
+        name="titleProtection"
+        required
         [(ngModel)]="_form().titleProtection"
         [trueLabel]="'да'"
         [falseLabel]="'нет'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().titleProtectionText" rows="3" class="form-control"
+        <textarea [(ngModel)]="_form().titleProtectionText" name="titleProtectionText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>

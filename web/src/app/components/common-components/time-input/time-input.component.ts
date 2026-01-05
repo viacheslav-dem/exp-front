@@ -24,7 +24,9 @@ export const TIME_CONTROL_VALUE_ACCESSOR: any = {
     providers: [TIME_CONTROL_VALUE_ACCESSOR],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.timeInput ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class TimeInputComponent extends ControlComponent<number> {
 
@@ -34,7 +36,7 @@ export class TimeInputComponent extends ControlComponent<number> {
   allMinutes: number[];
 
 
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor(private _cdr: ChangeDetectorRef) {
     super();
   }
 
@@ -42,7 +44,7 @@ export class TimeInputComponent extends ControlComponent<number> {
     super.ngOnInit();
     this.allHours = Array(24).fill(0).map((value, index) => index);
     this.allMinutes = Array(60).fill(0).map((value, index) => index);
-    this.cdr.markForCheck();
+    this._cdr.markForCheck();
   }
 
   prepareValue() {
@@ -50,7 +52,7 @@ export class TimeInputComponent extends ControlComponent<number> {
       let date = dayjs(this.value);
       this._hour = date.hour();
       this._minute = date.minute();
-      this.cdr.markForCheck();
+      this._cdr.markForCheck();
     }
   }
 

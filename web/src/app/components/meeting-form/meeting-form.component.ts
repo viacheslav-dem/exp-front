@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {ModalDirective} from "ngx-bootstrap/modal";
 import dayjs from 'dayjs';
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
@@ -9,11 +9,13 @@ import {MeetingDto} from "@app/dto/MeetingDto";
 import {ProjectService} from "@app/services/project.service";
 import {MeetingService} from "@app/services/meeting.service";
 import {isEmptyOrNull} from "@app/support/utils";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-meeting-form',
     templateUrl: './meeting-form.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.meetings) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class MeetingFormComponent {
 
@@ -27,11 +29,15 @@ export class MeetingFormComponent {
 
   constructor(private _meetingService: MeetingService,
               private _projectService: ProjectService,
-              private _toasty: GlobalToastyService) {
+              private _toasty: GlobalToastyService,
+              private cdr: ChangeDetectorRef) {
   }
 
   loadProjectsForMeeting() {
-    this._projectService.getProjectsForMeeting().subscribe(res => this.projects = res);
+    this._projectService.getProjectsForMeeting().subscribe(res => {
+      this.projects = res;
+      this.cdr?.markForCheck?.();
+    });
   }
 
   save() {
@@ -44,7 +50,7 @@ export class MeetingFormComponent {
       this._toasty.success("Заседание создано.");
       this.modal.hide();
       this.onAdd.emit(res);
-
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -58,6 +64,7 @@ export class MeetingFormComponent {
       this._toasty.success("Заседание перенесено.");
       this.modal.hide();
       this.onAdd.emit(res);
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -94,6 +101,7 @@ export class MeetingFormComponent {
           this.projects.push(agenda.project);
         }
         this.projects.push(...res);
+        this.cdr?.markForCheck?.();
       });
 
     }

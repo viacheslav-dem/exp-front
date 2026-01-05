@@ -85,9 +85,18 @@ export class HttpClientSecure {
     } else if (err.status == 403) {
       this.toasty.err(err.status, "Доступ запрещён.");
     } else if (err.status == 400) {
-      const errorMessage = err.error && typeof err.error === 'string' ? err.error : 
-                          (err.error && err.error.message ? err.error.message : "Неверный запрос. Проверьте корректность данных.");
-      this.toasty.err(err.status, "Ошибка в данных: " + errorMessage);
+      let errorMessage = "Неверный запрос. Проверьте корректность данных.";
+      if (err.error) {
+        if (typeof err.error === 'string') {
+          errorMessage = err.error;
+        } else if (err.error.message) {
+          errorMessage = err.error.message;
+        } else if (err.error.text) {
+          // Если Angular не смог распарсить body как JSON, он может положить его в err.error.text
+          errorMessage = err.error.text;
+        }
+      }
+      this.toasty.err(err.status, errorMessage);
     } else if (err.status > 400 && err.status < 500 && err.status != 412 && err.status != 403) {
       let errorMessage = "Неверный запрос";
       if (err.error) {

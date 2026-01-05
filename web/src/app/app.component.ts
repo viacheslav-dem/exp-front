@@ -39,6 +39,7 @@ import {
   faTimes,
   faTrashAlt,
   faUser,
+  faUsers,
   faPlayCircle,
   faFile
 } from '@fortawesome/free-solid-svg-icons';
@@ -58,7 +59,7 @@ export class AppComponent {
     this._localeService.use('ru');
     this.faIconLibrary.addIcons(
       faInfo, faTrashAlt, faPencilAlt, faArrowDown, faEye, faEyeSlash, faCog, faTimes,
-      faCheck, faPlus, faMinus, faCalendar, faCircle, faUser, faKey, faList, faInfoCircle, faPowerOff,
+      faCheck, faPlus, faMinus, faCalendar, faCircle, faUser, faUsers, faKey, faList, faInfoCircle, faPowerOff,
       faSortAlphaDown, faSortAlphaUp, faSortAmountDown, faSortAmountUp, faSort, faChevronUp, faChevronDown,
       faAngleDown, faAngleUp, faAngleLeft, faAngleRight, faAngleDoubleLeft, faAngleDoubleRight,
       faExclamationTriangle, faFileWord, faPlayCircle, faFile

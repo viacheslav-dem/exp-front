@@ -7,8 +7,8 @@ import {Component, input} from "@angular/core";
       <label>
         {{num()}}. Возможный экономический и (или) социальный и (или) экологический эффект от реализации мероприятия.
       </label>
-      <textarea [(ngModel)]="_form().effect" rows="3" class="form-control"
-      placeholder="Обязательный текст."></textarea>
+      <textarea [(ngModel)]="_form().effect" name="effect" required minlength="30" maxlength="5000" rows="3" class="form-control"
+      placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       @if (full()) {
         <div class="hint">
           <p>

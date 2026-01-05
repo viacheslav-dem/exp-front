@@ -33,7 +33,9 @@ export const DATE_INPUT_VALUE_ACCESSOR: any = {
     providers: [DATE_INPUT_VALUE_ACCESSOR],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.dateInput ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class DateInputComponent extends ControlComponent<number> implements OnChanges, AfterViewInit {
 
@@ -48,14 +50,14 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
   @ViewChild('dateInput', { static: false }) dateInput: ElementRef<HTMLInputElement>;
   bsConfig: any;
 
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor(private _cdr: ChangeDetectorRef) {
     super();
     this.updateBsConfig();
   }
 
   ngOnChanges() {
     this.updateBsConfig();
-    this.cdr.markForCheck();
+    this._cdr.markForCheck();
   }
 
   ngAfterViewInit() {
@@ -78,7 +80,7 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
       isAnimated: false, // Отключаем анимации, чтобы избежать проблем с NG05105
       returnFocusToInput: true
     };
-    this.cdr.markForCheck();
+    this._cdr.markForCheck();
   }
 
   /**
@@ -97,14 +99,14 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
   prepareValue(): void {
     if (this._value != null) {
       this.dateValue = this.getDate(this._value);
-      this.cdr.markForCheck();
+      this._cdr.markForCheck();
       // Обновляем отображение после установки значения
       requestAnimationFrame(() => {
         this.updateInputDisplay();
       });
     } else {
       this.dateValue = null;
-      this.cdr.markForCheck();
+      this._cdr.markForCheck();
     }
   }
 

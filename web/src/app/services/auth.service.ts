@@ -4,7 +4,7 @@ import {HttpClientSecure} from "./http.client";
 import {SERVER_URL} from "../config";
 import {Router} from "@angular/router";
 import {StorageService} from "./storage.service";
-import {Observable, Observer} from "rxjs";
+import {Observable, Observer, of, defer} from "rxjs";
 import {UserCredentials} from "@app/dto/UserCredentials";
 import {PasswordDto} from "@app/dto/PasswordDto";
 import {UserDto} from "@app/dto/UserDto";
@@ -13,9 +13,12 @@ import {DialogService} from "@app/components/dialogs/dialog.service";
 import {PersonService} from "@app/services/person.service";
 import {DocumentDto} from "@app/dto/DocumentDto";
 import {TokenDto} from "@app/dto/TokenDto";
+import {catchError, finalize, map as rxMap, shareReplay} from "rxjs/operators";
 
 @Injectable()
 export class AuthService implements OnInit {
+
+  private restoreSessionInFlight$?: Observable<boolean>;
 
   constructor(private http: HttpClientSecure,
               private storage: StorageService,
@@ -36,6 +39,49 @@ export class AuthService implements OnInit {
   isLoggedIn(): boolean {
     // Проверяем не только наличие токена, но и что он ещё не истёк (от "залипания" протухшего access)
     return this.storage.isAccessTokenValidNow();
+  }
+
+  /**
+   * Пытается восстановить сессию при протухшем access-токене, используя refresh-токен из localStorage.
+   *
+   * Зачем: иначе AuthGuard может сразу увести на /login и refresh никогда не произойдёт.
+   * Риск: минимальный — это ровно тот же refresh endpoint, который уже используется в interceptor'е.
+   * Поведение обратимо: при неуспехе ничего не "ломаем", просто возвращаем false.
+   */
+  restoreSessionIfPossible(): Observable<boolean> {
+    // Если access ещё валиден — ничего делать не надо.
+    if (this.storage.isAccessTokenValidNow()) {
+      return of(true);
+    }
+
+    const refreshToken = this.storage.getRefreshToken();
+    if (!refreshToken) {
+      return of(false);
+    }
+
+    // Дедупликация: если несколько гардов/инициализаций одновременно попытаются восстановить сессию,
+    // делаем один запрос на refresh и шарим результат.
+    if (this.restoreSessionInFlight$) {
+      return this.restoreSessionInFlight$;
+    }
+
+    this.restoreSessionInFlight$ = defer(() =>
+      this.refreshToken(refreshToken).pipe(
+        rxMap((credentials: UserCredentials) => {
+          // На всякий случай: если сервер вернул некорректный ответ, считаем восстановление неуспешным
+          if (!credentials?.accessToken) return false;
+          this.updateCredentials(credentials);
+          return true;
+        }),
+        catchError(() => of(false)),
+        finalize(() => {
+          this.restoreSessionInFlight$ = undefined;
+        }),
+        shareReplay({ bufferSize: 1, refCount: false })
+      )
+    );
+
+    return this.restoreSessionInFlight$;
   }
 
   inRole(roles: string[] | string): boolean {
@@ -112,6 +158,8 @@ export class AuthService implements OnInit {
     const refreshToken = this.storage.getRefreshToken();
     // Очищаем токены сразу, чтобы предотвратить дальнейшие запросы с устаревшими токенами
     this.storage.resetCredentials();
+    // Очищаем все кэши фильтров при выходе из системы
+    this.storage.clearFilterCaches();
     // Отправляем refreshToken на сервер для удаления только этой сессии (мультисессии)
     this.http.post(`${SERVER_URL}/public/logout`, { refreshToken }).subscribe({
       next: () => {

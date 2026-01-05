@@ -81,11 +81,25 @@ export class StorageService {
 
   changeCurrRole(newRole) {
     localStorage.setItem(this.currRolePlace, newRole);
+    // Очищаем фильтры проектов при смене роли
+    localStorage.removeItem('filter_cache_project-list');
   }
 
   clear() {
     sessionStorage.clear();
     localStorage.clear();
+  }
+
+  clearFilterCaches() {
+    // Очищаем все кэши фильтров
+    const filterCacheKeys: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('filter_cache_')) {
+        filterCacheKeys.push(key);
+      }
+    }
+    filterCacheKeys.forEach(key => localStorage.removeItem(key));
   }
 
   /**

@@ -14,7 +14,9 @@ import {environment} from "../../../environments/environment";
     styles: [],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.dialogs ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dialogs)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class DialogComponent implements OnInit, OnDestroy {
 
@@ -43,8 +45,14 @@ export class DialogComponent implements OnInit, OnDestroy {
       if (this.dlg != null) {
         this.cancel(); // close current dialog
       }
+      
+      // Сначала сбрасываем данные, чтобы Angular уничтожил старый компонент
+      this.dlg = null;
+      this.data = null;
+      this.cdr.markForCheck();
+      
       setTimeout(() => {
-        // open new dialog
+        // open new dialog - теперь Angular создаст новый экземпляр компонента
         this.dlg = dlg;
         this.data = dlg.data;
         this.title = dlg.data.title ? dlg.data.title : this.titleMap[this.dlg.type];
@@ -89,8 +97,11 @@ export class DialogComponent implements OnInit, OnDestroy {
 
   forceClose() {
     this.modalComponent.hide();
-    this.dlg.callback.complete();
+    if (this.dlg) {
+      this.dlg.callback.complete();
+    }
     this.dlg = null;
+    this.data = null;  // Сбрасываем data для уничтожения дочернего компонента
     this.cdr.markForCheck();
   }
 }

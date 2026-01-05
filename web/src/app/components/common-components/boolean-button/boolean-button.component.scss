@@ -6,7 +6,7 @@ label:first-child {
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
   margin-left: 0.5rem;
-  margin-right: 0.5rem; /* ДОБАВЛЕНО: отступ между кнопками */
+  /* Отступ между кнопками теперь через класс Bootstrap me-2 в template */
 }
 
 label:last-child {

@@ -9,12 +9,12 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
           {{num()}}. Создание объекта права промышленной собственности
           при реализации объекта государственной экспертизы:
         </label>
-        <app-dropdown [options]="deadlinesCompliance" [(ngModel)]="_form().deadlinesCompliance"
+        <app-dropdown name="deadlinesCompliance" required [options]="deadlinesCompliance" [(ngModel)]="_form().deadlinesCompliance"
         (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
         @if (full() || _form().deadlinesCompliance == 'предусматривается') {
           <textarea
-            [(ngModel)]="_form().deadlinesComplianceText" rows="3" class="form-control mt-05"
-          placeholder="Обязательный текст"></textarea>
+            [(ngModel)]="_form().deadlinesComplianceText" name="deadlinesComplianceText" required minlength="30" rows="3" class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)"></textarea>
         }
         @if (full()) {
           <div class="hint">

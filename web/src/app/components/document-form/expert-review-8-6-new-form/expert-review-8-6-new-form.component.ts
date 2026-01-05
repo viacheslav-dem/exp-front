@@ -1,6 +1,5 @@
 import {Component} from '@angular/core';
 import {ExpertReviewForm} from "@app/components/document-form/expert-review-form-container/expert-review-form";
-import {isEmptyOrNull} from "@app/support/utils";
 import {ExpertReview_8_6_NewFormContent} from "@app/components/document-form/form-model/ExpertReview_8_6_NewFormContent";
 
 @Component({
@@ -11,21 +10,9 @@ import {ExpertReview_8_6_NewFormContent} from "@app/components/document-form/for
 export class ExpertReview_8_6_NewFormComponent extends ExpertReviewForm<ExpertReview_8_6_NewFormContent> {
 
   validate() {
+    // Инкрементальная миграция: обязательность и мин.длина выражены template-driven валидаторами в блоках,
+    // чтобы контейнер гарантированно находил .ng-invalid и скроллил без зависимости от throw.
     super.validate();
-    if (isEmptyOrNull(this._form.results)
-      || isEmptyOrNull(this._form.effectiveness)
-        || isEmptyOrNull(this._form.accordanceText)
-        || isEmptyOrNull(this._form.effectAccordanceText)
-    ) {
-      throw 'Пожалуйста, заполните все поля заключения.';
-    }
-    if (this._form.results.length < 30
-        || this._form.effectiveness.length < 30
-        || this._form.accordanceText.length < 30
-        || this._form.effectAccordanceText.length < 30
-    ) {
-      throw 'Длина сообщения меньше 30 символов';
-    }
   }
 
   createNewForm(): ExpertReview_8_6_NewFormContent {

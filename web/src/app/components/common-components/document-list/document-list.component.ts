@@ -13,7 +13,9 @@ import {environment} from "../../../../environments/environment";
     templateUrl: './document-list.component.html',
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.documentList ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.fileAndPdf)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class DocumentListComponent implements OnInit, OnDestroy {
 

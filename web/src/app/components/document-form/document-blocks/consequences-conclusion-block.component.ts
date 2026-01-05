@@ -8,11 +8,11 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{num()}}. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
         и необходимости модернизации (реконструкции) взаимосвязанных действующих производственных объектов:
       </label>
-      <app-boolean-button [(ngModel)]="_form().consequences" [trueLabel]="'значительные'"
+      <app-boolean-button name="consequences" required [(ngModel)]="_form().consequences" [trueLabel]="'значительные'"
         [falseLabel]="'незначительные'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().consequencesText" rows="3" class="form-control mt-05"
+        <textarea [(ngModel)]="_form().consequencesText" name="consequencesText" rows="3" class="form-control mt-05"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
       @if (full()) {

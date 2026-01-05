@@ -1,5 +1,6 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {Catalog} from "app/services/data.service";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-social-economic-goals',
@@ -12,7 +13,10 @@ import {Catalog} from "app/services/data.service";
       [type]="Catalog.SOCIAL_ECONOMIC_GOAL"
     ></app-simple-catalog>
   `,
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class SocialEconomicGoalsComponent {
   Catalog = Catalog;

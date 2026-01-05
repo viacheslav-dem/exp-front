@@ -17,6 +17,13 @@ export class DefineRole  {
   }
 
   defineRedirectUrl(): string {
+    // Если access-токен валиден, но роль ещё не выбрана (curr_role отсутствует),
+    // нельзя отправлять пользователя на /login — он уже авторизован.
+    // В мульти-ролевом сценарии корректный UX: перейти на экран выбора роли.
+    if (this._authService.isLoggedIn() && !this._authService.getCurrRole()) {
+      return '/select-role';
+    }
+
     let role = this._authService.getCurrRole();
     switch (role) {
       case Role.SUB_CUSTOMER:
@@ -41,7 +48,8 @@ export class DefineRole  {
       case Role.BUHGALTER:
         return '/accounting';
       default:
-        return '/login';
+        // Если не авторизован — логин. Если авторизован, но роль неизвестна/пустая — выбор роли.
+        return this._authService.isLoggedIn() ? '/select-role' : '/login';
     }
   }
 }

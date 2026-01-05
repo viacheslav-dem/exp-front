@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from "@angular/core";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "@app/services/auth.service";
@@ -36,11 +36,13 @@ import {ReturnFromCouncilWithoutExpertiseFormContent} from "@app/components/docu
 import {DocumentDto} from "@app/dto/DocumentDto";
 import {DocumentService} from "@app/services/document.service";
 import {ActionButtonMetadata} from "./action-button-metadata";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-project-info',
     templateUrl: 'project-info.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class ProjectInfoComponent implements OnInit {
 
@@ -102,18 +104,20 @@ export class ProjectInfoComponent implements OnInit {
               private _reviewService: ExpertReviewService,
               private _dialogService: DialogService,
               private _personPipe: PersonFullNamePipe,
-              private _documentService: DocumentService) {
+              private _documentService: DocumentService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
     this.role = this._authService.getCurrRole();
     this._personService.getCurrentPerson().subscribe(res => {
       this.currentUser = res;
+      this.cdr?.markForCheck?.();
     });
     this.route.params.subscribe(params => {
       this.agenda = params['agendaId'] ? new IdDto(params['agendaId']) : null;
       this.loadProject(new IdDto(params['id']), params['group']);
-
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -121,6 +125,7 @@ export class ProjectInfoComponent implements OnInit {
     this._projectService.getLifecycle(this.project).subscribe(res => {
       this.lifecycle = res;
       this.initActionButtons();
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -128,6 +133,7 @@ export class ProjectInfoComponent implements OnInit {
     this._projectService.getLifecycleGroups(this.project).subscribe(res => {
       this.lifecycleGroups = res;
       this.initActionButtons();
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -135,6 +141,7 @@ export class ProjectInfoComponent implements OnInit {
     this._projectService.getLifecycleGroup(this.project).subscribe(res => {
       this.lifecycleGroup = res;
       this.initActionButtons();
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -168,11 +175,13 @@ export class ProjectInfoComponent implements OnInit {
         } else if (this.role == Role.EXPERT) {
           this.loadExpertReview();
         }
+        this.cdr?.markForCheck?.();
       },
       error: (err) => {
         // Error is already handled by HttpClientSecure.handleError which shows toast
         // Just prevent it from propagating to global error handler
         console.error('Error loading project:', err);
+        this.cdr?.markForCheck?.();
       }
     })
   }
@@ -182,15 +191,22 @@ export class ProjectInfoComponent implements OnInit {
       this.expertReview = res;
       this.initActionButtons();
       this.showProjectDocuments();
+      this.cdr?.markForCheck?.();
     });
   }
 
   loadSectionReports() {
-    this._agendaService.getSectionReportsByBureauAssessor(this.agenda).subscribe(res => this.sectionReports = res);
+    this._agendaService.getSectionReportsByBureauAssessor(this.agenda).subscribe(res => {
+      this.sectionReports = res;
+      this.cdr?.markForCheck?.();
+    });
   }
 
   loadAnonymousExpertReviews() {
-    this._projectService.getAnonymousReviews(this.project).subscribe(res => this.reviews = res);
+    this._projectService.getAnonymousReviews(this.project).subscribe(res => {
+      this.reviews = res;
+      this.cdr?.markForCheck?.();
+    });
   }
 
   checkVisibleForBureau(): boolean {
@@ -210,6 +226,7 @@ export class ProjectInfoComponent implements OnInit {
       this.expertReview.state == ExpertReviewState.REJECTED)) {
       this.visibleDocsForExpert = false;
     } else this.visibleDocsForExpert = true;
+    this.cdr?.markForCheck?.();
   }
 
 
@@ -218,10 +235,17 @@ export class ProjectInfoComponent implements OnInit {
       'Утверждение экспертных заключений',
       `Утвердить текущий список экспертных заключений для объекта "${this.project.title}" и перейти к рассмотрению в секции?`
     ).subscribe(() => {
-      this._lifecycleService.finishExpertExamination(this.lifecycle).subscribe(res => {
-        this.lifecycle = res;
-        this.loadProject(this.project, null);
-        this._toasty.success("Эксперты утверждены.");
+      this._lifecycleService.finishExpertExamination(this.lifecycle).subscribe({
+        next: (res) => {
+          this.lifecycle = res;
+          this.loadProject(this.project, null);
+          this._toasty.success("Эксперты утверждены.");
+          this.cdr?.markForCheck?.();
+        },
+        error: () => {
+          // Ошибка уже обработана в HttpClientSecure.handleError, который показывает toast
+          this.cdr?.markForCheck?.();
+        }
       });
     });
   }
@@ -238,6 +262,7 @@ export class ProjectInfoComponent implements OnInit {
             this._toasty.success("Вы вернули объект экспертизы.");
             this.lifecycle = res;
             // this.loadProject(this.project, null);
+            this.cdr?.markForCheck?.();
             this.router.navigateByUrl('/projects');
           });
       });
@@ -252,6 +277,7 @@ export class ProjectInfoComponent implements OnInit {
           this._toasty.success('Вы вернули объект экспертизы');
           this.lifecycle = res;
           this.loadProject(this.project, null);
+          this.cdr?.markForCheck?.();
         })
       })
   }
@@ -265,6 +291,7 @@ export class ProjectInfoComponent implements OnInit {
           this._toasty.success('Вы вернули объект экспертизы');
           this.lifecycleGroup = res;
           this.loadProject(this.project, null);
+          this.cdr?.markForCheck?.();
         })
       })
   }
@@ -276,6 +303,7 @@ export class ProjectInfoComponent implements OnInit {
         this.lifecycleGroup = res;
         this._toasty.success('Отправлен в секции.');
         this.initActionButtons();
+        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -291,6 +319,7 @@ export class ProjectInfoComponent implements OnInit {
         this._toasty.success("Вы приняли объект на экспертизу.");
         this.initActionButtons();
         this.showProjectDocuments();
+        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -300,6 +329,7 @@ export class ProjectInfoComponent implements OnInit {
       this.expertReview = res;
       this._toasty.success("Вы отклонили экспертизу объекта.");
       this.initActionButtons();
+      this.cdr?.markForCheck?.();
       this.router.navigateByUrl('projects');
     });
   }
@@ -313,6 +343,7 @@ export class ProjectInfoComponent implements OnInit {
         this.expertReview = res;
         this._toasty.success("Вы завершили экспертизу объекта.");
         this.initActionButtons();
+        this.cdr?.markForCheck?.();
       })
     });
   }
@@ -327,6 +358,7 @@ export class ProjectInfoComponent implements OnInit {
         this.project = res;
         this._toasty.success("Отправлен на экспертизу.");
         this.initActionButtons();
+        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -358,6 +390,7 @@ export class ProjectInfoComponent implements OnInit {
         this.project = res;
         this._toasty.success("Отправлен на утверждение.");
         this.initActionButtons();
+        this.cdr?.markForCheck?.();
       })
     })
   }
@@ -375,6 +408,7 @@ export class ProjectInfoComponent implements OnInit {
         this.project = res;
         this._toasty.success("Вы отправили документы начальнику подраделения.");
         this.initActionButtons();
+        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -390,6 +424,7 @@ export class ProjectInfoComponent implements OnInit {
         this.project = res;
         this._toasty.success("Объект экспертизы возвращён на доработку.");
         this.initActionButtons();
+        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -400,6 +435,7 @@ export class ProjectInfoComponent implements OnInit {
         this.project = res;
         this._toasty.success("Объект экспертизы возвращён на доработку.");
         this.initActionButtons();
+        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -410,6 +446,7 @@ export class ProjectInfoComponent implements OnInit {
         this.project = res;
         this._toasty.success("Объект экспертизы возвращён на доработку.");
         this.initActionButtons();
+        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -427,6 +464,7 @@ export class ProjectInfoComponent implements OnInit {
       this.project = res;
       this._toasty.success("Вы завершили экспертизу объекта.");
       this.initActionButtons();
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -459,6 +497,7 @@ export class ProjectInfoComponent implements OnInit {
       this.project = res;
       this._toasty.success("Вы вернули объект экспертизы заказчику без дальнейшего рассмотрения.");
       this.initActionButtons();
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -491,6 +530,7 @@ export class ProjectInfoComponent implements OnInit {
       this.project = res;
       this._toasty.success("Вы отправили документы зам. Председателя ГКНТ.");
       this.initActionButtons();
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -543,6 +583,7 @@ export class ProjectInfoComponent implements OnInit {
       this.project = dto;
       this._toasty.success("Вы отправили документы зам. Председателя ГКНТ.");
       this.initActionButtons();
+      this.cdr?.markForCheck?.();
     });
   }
 
@@ -571,6 +612,7 @@ export class ProjectInfoComponent implements OnInit {
       this.loadLifecycleGroups();
       this._toasty.success("Отправлен на экспертизу в ГЭС.");
       this.initActionButtons();
+      this.cdr?.markForCheck?.();
     })
   }
 
@@ -608,6 +650,7 @@ export class ProjectInfoComponent implements OnInit {
         this.project = res;
         this._toasty.success(`На этот объект экспертизы назначен ${this._personPipe.transform(person)}.`);
         this.initActionButtons();
+        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -622,6 +665,7 @@ export class ProjectInfoComponent implements OnInit {
     this._projectService.getTheSameProjectsByTitle(title).subscribe(value => {
       this.listSameProjects = value;
       this.listProjects.show();
+      this.cdr?.markForCheck?.();
     })
   }
 
@@ -659,6 +703,7 @@ export class ProjectInfoComponent implements OnInit {
         this.loadProject(this.project, null);
         this._toasty.success("Вы завершили экспертизу объекта.");
         this.initActionButtons();
+        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -675,6 +720,7 @@ export class ProjectInfoComponent implements OnInit {
           this.loadProject(this.project, null);
           this._toasty.success("Вы отклонили экспертизу объекта.");
           this.initActionButtons();
+          this.cdr?.markForCheck?.();
         });
   }
 
@@ -684,6 +730,8 @@ export class ProjectInfoComponent implements OnInit {
         this.project = res;
         this._toasty.success("Сохранено.");
         this.editProjectModal.hide();
+        this.initActionButtons();
+        this.cdr?.markForCheck?.();
       });
   }
 
@@ -694,10 +742,41 @@ export class ProjectInfoComponent implements OnInit {
     this.copiedProject.title = this.editedProject.title;
     this.copiedProject.documents = this.editedProject.documents;
     this.copiedProject.id = this.editedProject.id;
+    // 1) Создаём копию (контракт ProjectCopyDto определяет, что можно редактировать при копировании)
+    // 2) Сразу "докидываем" остальные поля из project-form через update/{newId}
+    // Это позволяет копировать ВСЕ поля без изменений бэкенда.
     this._projectService.saveCopyProject(this.copiedProject)
       .subscribe(res => {
-        this.copyProjectModal.hide();
-        this.router.navigate(['/projects', res.id]);
+        const newId = res?.id;
+        if (!newId) {
+          this.copyProjectModal.hide();
+          this.router.navigate(['/projects', res?.id]);
+          return;
+        }
+
+        // Берём полную модель из формы (editedProject — это cloneDeep исходного проекта),
+        // но фиксируем id нового проекта и оставляем title/documents как выбраны в модалке.
+        const fullProjectToSave: any = _.cloneDeep(this.editedProject);
+        fullProjectToSave.id = newId;
+        fullProjectToSave.title = this.editedProject.title;
+        fullProjectToSave.documents = this.editedProject.documents;
+        // Используем финансирование из созданной копии, чтобы оно не потерялось при обновлении
+        // Финансирование уже скопировано на бэкенде в saveCopyProject, поэтому используем его из результата
+        if (res?.financing) {
+          fullProjectToSave.financing = res.financing;
+        }
+
+        this._projectService.updateProject({ id: newId } as any, fullProjectToSave)
+          .subscribe(updated => {
+            this.copyProjectModal.hide();
+            this.router.navigate(['/projects', updated?.id || newId]);
+          }, () => {
+            // Если update по какой-то причине не прошёл (валидации/права/состояние),
+            // всё равно оставляем созданную копию, чтобы операция была обратимой.
+            this.copyProjectModal.hide();
+            this._toasty?.warn?.("Копия создана, но часть полей не удалось перенести автоматически. Проверьте данные в созданном объекте.");
+            this.router.navigate(['/projects', newId]);
+          });
       });
   }
 
@@ -725,6 +804,7 @@ export class ProjectInfoComponent implements OnInit {
     this.project = { ...this.project, expertReviews: reviews };
     // Инициализируем кнопки действий
     this.initActionButtons();
+    this.cdr?.markForCheck?.();
   }
 
   initActionButtons(review?: ExpertReviewDto) {
@@ -916,11 +996,17 @@ export class ProjectInfoComponent implements OnInit {
           () => this.sendOnDepartmentSigning(), 'btn-primary'));
       }
     }
+    // В OnPush/zoneless режиме пересборка массива buttons сама по себе может не отрисоваться
+    // без явного триггера CD (особенно если изменения пришли из subscribe/Promise).
+    this.cdr?.markForCheck?.();
   }
 
   reloadProject(project: ProjectDto) {
-    this._projectService.getProject(project).subscribe(value => this.project = value);
-    this.initActionButtons();
+    this._projectService.getProject(project).subscribe(value => {
+      this.project = value;
+      this.initActionButtons();
+      this.cdr?.markForCheck?.();
+    });
   }
 
   checkPossibleToReturnToGKNT(): boolean {
@@ -955,6 +1041,7 @@ export class ProjectInfoComponent implements OnInit {
   private geAcquainted() {
     this.agreement = true;
     this.initActionButtons();
+    this.cdr?.markForCheck?.();
   }
 }
 

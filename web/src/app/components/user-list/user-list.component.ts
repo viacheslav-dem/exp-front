@@ -1,4 +1,4 @@
-import {Component, OnDestroy, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, ViewChild} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {PersonService} from "@app/services/person.service";
 import {Catalog, DataService} from "@app/services/data.service";
@@ -20,12 +20,14 @@ import {Subscription} from "rxjs";
 import {AcademicTitleTypePipe, getAllAcademicTitleTypes} from "@app/pipes/academic-title.pipe";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {LastSignEnumPipe} from "@app/pipes/last-sign.pipe";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-user-list',
     templateUrl: './user-list.component.html',
     styleUrls: ['user-list.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class UserListComponent extends FilterAndPages<PersonDto> implements OnDestroy {
 
@@ -44,7 +46,8 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
               private _academicTitleTypePipe: AcademicTitleTypePipe,
               private _rolePipe: RolePipe,
               private _lastSignPipe: LastSignEnumPipe,
-              private _degreeTypePipe: DegreeTypePipe) {
+              private _degreeTypePipe: DegreeTypePipe,
+              private cdr: ChangeDetectorRef) {
     super(10);
   }
 
@@ -71,23 +74,63 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
       SearchField.multiSelect('personInfo.lastSignState', this._lastSignPipe.getAllSignTypes(), value => this._lastSignPipe.transform(value))
           .setSelectText('Выбрать роль').setCheckAllEnabled(true).setTitle('Последний вход'),
     ];
+    
+    // Подписка на изменения списка пользователей
+    // ВАЖНО: не вызываем update() до загрузки кэша фильтров, чтобы не сбросить фильтры
+    this.onPersonListChangedSubscription = this._personService.onPersonListChanged.subscribe(() => {
+      // Вызываем update() только если начальная загрузка завершена
+      // Это предотвращает вызов update() до загрузки фильтров из кэша
+      if (this._initialLoadDone) {
+        this.update();
+      }
+    });
+    
+    // Загружаем каталоги и после их загрузки включаем кэш фильтров
+    // Это нужно, чтобы multiSelect поля были готовы к загрузке значений из кэша
+    let catalogsLoaded = 0;
+    const totalCatalogs = 5; // areas, speciality, specialization, scienceArea, orgs
+    
+    const checkCatalogsAndEnableCache = () => {
+      catalogsLoaded++;
+      if (catalogsLoaded >= totalCatalogs) {
+        // Все каталоги загружены, теперь можно безопасно загружать кэш
+        this.enableFilterCache("users");
+        // enableFilterCache вызывает update() если есть сохраненное состояние
+        // Если кэша нет, загружаем данные без фильтров после завершения enableFilterCache
+        setTimeout(() => {
+          if (!localStorage.getItem('filter_cache_users')) {
+            this.update();
+          }
+        }, 300);
+      }
+    };
+    
+    // Подписываемся на загрузку каталогов
     this._dataService.getCatalog(Catalog.AREA_OF_COMPETENCE).subscribe((areas: IdNameDto[]) => {
       this.getSearchField('areas').setItems(areas);
+      this.cdr?.markForCheck?.();
+      checkCatalogsAndEnableCache();
     });
     this._dataService.getCatalog(Catalog.SPECIALITY).subscribe((speciality: IdNameDto[]) => {
       this.getSearchField('personInfo.specialities').setItems(speciality);
+      this.cdr?.markForCheck?.();
+      checkCatalogsAndEnableCache();
     });
     this._dataService.getCatalog(Catalog.SPECIALIZATION).subscribe((specialization: IdNameDto[]) => {
       this.getSearchField('personInfo.specializations').setItems(specialization);
+      this.cdr?.markForCheck?.();
+      checkCatalogsAndEnableCache();
     });
     this._dataService.getCatalog(Catalog.SCIENCE_AREA).subscribe((scienceArea: IdNameDto[]) => {
       this.getSearchField('personInfo.fullDegrees.scienceArea').setItems(scienceArea);
+      this.cdr?.markForCheck?.();
+      checkCatalogsAndEnableCache();
     });
     this._dataService.getOrgs().subscribe(orgs => {
       this.getSearchField('org').setItems(orgs);
+      this.cdr?.markForCheck?.();
+      checkCatalogsAndEnableCache();
     });
-    this.onPersonListChangedSubscription = this._personService.onPersonListChanged.subscribe(() => this.update());
-    this.enableFilterCache("users");
   }
 
   ngOnDestroy(): void {
@@ -97,11 +140,19 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
   }
 
   loadPage() {
+    if (this.shouldSkipLoadPage()) {
+      return;
+    }
+    
     this._personService.getPersons(this._searchRequest).subscribe(res => {
       this._page = res;
       this.users = res.content;
       this.setLoading(false);
-    }, () => this.setLoading(false));
+      this.cdr?.markForCheck?.();
+    }, () => {
+      this.setLoading(false);
+      this.cdr?.markForCheck?.();
+    });
   }
 
   showEditUserModal(user: PersonDto) {
@@ -120,6 +171,7 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
   showReadUserModal(user: PersonDto){
     this.selectedUser = user;
     this.showUserInfo.show();
+    this.cdr?.markForCheck?.();
   }
 
   deletePerson(user: PersonDto) {
@@ -155,6 +207,7 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
 
   toggleFilter() {
     this.filterCollapsed = !this.filterCollapsed;
+    this.cdr?.markForCheck?.();
   }
 
 }

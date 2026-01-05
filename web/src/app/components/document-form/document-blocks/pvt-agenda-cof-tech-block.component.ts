@@ -5,11 +5,11 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
     template: `
     <div class="form-sub-group">
       <label>
-        {{num()}}. Величина значения коэфициентп технологичности товара (работы, услуги):
+        {{num()}}. Величина значения коэффициента технологичности товара (работы, услуги):
       </label>
       @if (full()) {
-        <textarea [(ngModel)]="_form().cofTech" rows="3" class="form-control"
-        placeholder="Пояснительный текст (при необходимости)." pattern="[0-9]+"></textarea>
+        <textarea [(ngModel)]="_form().cofTech" name="cofTech" rows="3" class="form-control"
+        placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>
     `,

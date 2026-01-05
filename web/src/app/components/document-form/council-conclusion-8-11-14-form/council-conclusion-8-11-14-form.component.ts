@@ -1,5 +1,4 @@
 import {Component} from '@angular/core';
-import {isEmptyOrNull} from "@app/support/utils";
 import {CouncilConclusionForm} from "@app/components/document-form/council-conclusion-form/council-conclusion-form";
 
 @Component({
@@ -15,13 +14,9 @@ export class CouncilConclusion_8_11_14_FormComponent extends CouncilConclusionFo
   }
 
   validate() {
+    // Инкрементальная миграция: обязательность/мин.длина выражаются через template-driven validators (required/minlength),
+    // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
     this.validateFinanceConclusion();
-    if (isEmptyOrNull(this._form.marketingResearch)
-      || isEmptyOrNull(this._form.privacyObjectsDescription)
-      || isEmptyOrNull(this._form.stagesExist)
-    ) {
-      throw 'Пожалуйста, заполните все поля заключения.';
-    }
   }
 }

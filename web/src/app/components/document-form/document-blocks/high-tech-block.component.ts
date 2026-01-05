@@ -10,12 +10,14 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         если в подпункте 5.6 пункта 5 настоящего заключения значение коэффициента технологичности товара (работы, услуги) получено на уровне не менее 50 баллов).
       </label>
       <app-boolean-button
+        name="highTech"
+        required
         [(ngModel)]="_form().highTech"
         [trueLabel]="'возможно'"
         [falseLabel]="'невозможно'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().highTechText" rows="3" class="form-control"
+        <textarea [(ngModel)]="_form().highTechText" name="highTechText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>

@@ -7,7 +7,10 @@
     "start": "ng serve --proxy-config proxy.conf.json --host 0.0.0.0",
     "start-simple": "ng serve --proxy-config proxy.conf.json --host 0.0.0.0 --port 4220",
     "start-prod": "ng serve --configuration production --proxy-config proxy.conf.json --host 0.0.0.0",
-    "build-prod": "ng build --configuration production"
+    "build-prod": "ng build --configuration production",
+    "test": "ng test",
+    "test:watch": "ng test --watch",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless"
   },
   "dependencies": {
     "@angular-slider/ngx-slider": "^21.0.0",

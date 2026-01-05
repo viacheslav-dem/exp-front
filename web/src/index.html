@@ -8,12 +8,17 @@
   <link rel="icon" type="image/x-icon" href="assets/lupa.png">
   <style>
     /* PHASE 2B: Critical CSS - Safe to inline rules */
-    
+
     /* Body background and typography - SAFE: Independent styles */
     body {
-      background-image: url("assets/background.png");
+      /* Bootstrap 5 использует переменную --bs-body-bg для background-color у body.
+         Если задать только background-color тут, его может переопределить более поздний bootstrap.css.
+         Поэтому задаём переменную — это совместимо с BS и работает даже при дальнейших переопределениях. */
+      --bs-body-bg: #fff;
+      background-color: var(--bs-body-bg);
       font-size: 1.1rem;
       line-height: 1.6;
+
     }
     
     /* Typography - SAFE: Base styles, no Bootstrap dependency */

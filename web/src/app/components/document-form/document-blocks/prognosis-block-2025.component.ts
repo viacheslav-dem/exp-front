@@ -7,6 +7,7 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
       <label>
         {{num()}}. Оценка анализа текущего состояния и прогноза научно-технического развития соответствующей сферы планирования:
       </label>
+      <input type="hidden" [(ngModel)]="_form().prognosis" name="prognosis" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().prognosis === true}" (click)="stateButton(true)">
           Достаточна
@@ -16,8 +17,8 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().prognosisText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea [(ngModel)]="_form().prognosisText" name="prognosisText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full()) {
         <div class="hint">

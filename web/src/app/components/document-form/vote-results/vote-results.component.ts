@@ -1,7 +1,8 @@
-import {Component, forwardRef, input, Input} from '@angular/core';
+import {Component, forwardRef, input, Input, ChangeDetectionStrategy} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {VoteResults} from "@app/components/document-form/meeting-protocol-form/VoteResults";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
+import {environment} from "../../../../environments/environment";
 
 export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -70,7 +71,11 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
     
   `],
     providers: [VOTE_RESULTS_CONTROL_VALUE_ACCESSOR],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.meetings)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class VoteResultsComponent extends ControlComponent<VoteResults> {
 

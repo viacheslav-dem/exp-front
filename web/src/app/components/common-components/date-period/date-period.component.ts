@@ -32,7 +32,9 @@ export const PERIOD_FILTER_CONTROL_VALUE_ACCESSOR: any = {
     providers: [PERIOD_FILTER_CONTROL_VALUE_ACCESSOR],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.datePeriod ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class DatePeriodComponent extends ControlComponent<DateRange> implements OnChanges, AfterViewInit {
 
@@ -46,14 +48,14 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
 
   bsConfig: any;
 
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor(private _cdr: ChangeDetectorRef) {
     super();
     this.updateBsConfig();
   }
 
   ngOnChanges() {
     this.updateBsConfig();
-    this.cdr.markForCheck();
+    this._cdr.markForCheck();
   }
 
   ngAfterViewInit() {
@@ -74,7 +76,7 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
       containerClass: 'theme-default',
       showWeekNumbers: false
     };
-    this.cdr.markForCheck();
+    this._cdr.markForCheck();
   }
 
   /**
@@ -93,14 +95,14 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
   prepareValue(): void {
     if (this._value != null && this._value.start != null && this._value.end != null) {
       this.bsRangeValue = [this.getDate(this._value.start), this.getDate(this._value.end)];
-      this.cdr.markForCheck();
+      this._cdr.markForCheck();
       // Обновляем отображение после установки значения
       requestAnimationFrame(() => {
         this.updateInputDisplay();
       });
     } else {
       this.bsRangeValue = [];
-      this.cdr.markForCheck();
+      this._cdr.markForCheck();
     }
   }
 

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
 import {PersonService} from "app/services/person.service";
 import {ModalComponent} from "app/components/common-components/modal/modal.component";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
@@ -6,18 +6,20 @@ import {SearchField} from "@app/components/common-components/page-and-filter/mod
 import {Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
 import {Filter} from "@app/components/common-components/page-and-filter/model/Filter";
 import {PersonPlainDto} from "@app/dto/PersonPlainDto";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-search-person',
     templateUrl: './search-person.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.search) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class SearchPersonComponent extends FilterAndPages<PersonPlainDto> {
 
   @Output() selected = new EventEmitter<PersonPlainDto>();
   @ViewChild('searchModal', { static: false }) searchPersonModal: ModalComponent;
 
-  constructor(protected _service: PersonService) {
+  constructor(protected _service: PersonService, protected cdr: ChangeDetectorRef) {
     super();
     this._searchFields = [SearchField.startsWith('personName.lastName')
       .setPlaceholder('Поиск по фамилии...').setSortable(true).setSortDirection(Direction.ASC)];
@@ -29,6 +31,7 @@ export class SearchPersonComponent extends FilterAndPages<PersonPlainDto> {
   @Input() set searchFields(searchFields: SearchField[]) {
     if (!searchFields) return;
     this._searchFields = searchFields;
+    this.cdr?.markForCheck?.();
   }
 
   @Input() set filters(filters: Filter<any>[] | Filter<any>) {
@@ -37,6 +40,7 @@ export class SearchPersonComponent extends FilterAndPages<PersonPlainDto> {
     }
     this._filters = filters;
     this.onFilterChanged();
+    this.cdr?.markForCheck?.();
   }
 
   onSelected(user) {
@@ -47,14 +51,20 @@ export class SearchPersonComponent extends FilterAndPages<PersonPlainDto> {
     this._service.searchPersons(this._searchRequest).subscribe(res => {
       this._page = res;
       this.setLoading(false);
-    }, () => this.setLoading(false));
+      this.cdr?.markForCheck?.();
+    }, () => {
+      this.setLoading(false);
+      this.cdr?.markForCheck?.();
+    });
   }
 
   show() {
     this.searchPersonModal.show();
+    this.cdr?.markForCheck?.();
   }
 
   hide() {
     this.searchPersonModal.hide();
+    this.cdr?.markForCheck?.();
   }
 }

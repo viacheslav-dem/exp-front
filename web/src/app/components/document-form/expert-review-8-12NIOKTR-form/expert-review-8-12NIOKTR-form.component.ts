@@ -1,6 +1,5 @@
 import {Component} from '@angular/core';
 import {ExpertReviewForm} from "@app/components/document-form/expert-review-form-container/expert-review-form";
-import {isEmptyOrNull} from "@app/support/utils";
 import {Catalog} from "@app/services/data.service";
 
 @Component({
@@ -13,18 +12,8 @@ export class ExpertReview_8_12NIOKTR_FormComponent extends ExpertReviewForm<any>
   Catalog = Catalog;
 
   validate() {
+    // Инкрементальная миграция: обязательность/мин.длина выражаются через template-driven validators (required/minlength),
+    // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
-    if (isEmptyOrNull(this._form.accordance) ||
-      isEmptyOrNull(this._form.significance) ||
-      isEmptyOrNull(this._form.scientificLevel) ||
-      isEmptyOrNull(this._form.expedience) ||
-      isEmptyOrNull(this._form.efficiency) ||
-      isEmptyOrNull(this._form.realization) ||
-      isEmptyOrNull(this._form.socialEffects) ||
-      isEmptyOrNull(this._form.economicEffects) ||
-      isEmptyOrNull(this._form.ecologicEffects) ||
-      isEmptyOrNull(this._form.marketing)) {
-      throw 'Пожалуйста, заполните все поля заключения.';
-    }
   }
 }

@@ -52,11 +52,11 @@ export class StatsService {
   }
 
   getResFunMonth(date: number): Observable<Array<CouncilStatsResponseDTO>>{
-    return this._http.get(`${this.searchUrl}/council/result-fun-month`, {params: {date: date}});
+    return this._http.getBlock(`${this.searchUrl}/council/result-fun-month`, {params: {date: date}});
   }
 
   getResFunYear(dateFrom: number, dateTo: number): Observable<Array<CouncilStatsResponseDTO>> {
-    return this._http.get(`${this.searchUrl}/council/result-fun-year`, {params: {dateFrom: dateFrom, dateTo: dateTo}});
+    return this._http.getBlock(`${this.searchUrl}/council/result-fun-year`, {params: {dateFrom: dateFrom, dateTo: dateTo}});
   }
 
 }

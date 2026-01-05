@@ -11,7 +11,7 @@ import {Component, input} from '@angular/core';
           утверждённого постановлением Государственного комитета по стандартизации Республики Беларусь от 28 декабря 2012 г. № 83,
           и в отношении товаров (работ, услуг) когда единой Товарной номенклатуры внешнеэкономической деятельности Евразийского экономического союза (далее – ТН ВЭД ЕАЭС)).
       </label>
-      <textarea [(ngModel)]="_form().productName" rows="2" class="form-control"
+      <textarea [(ngModel)]="_form().productName" name="productName" rows="2" class="form-control"
                 title="Наименование товаров"
                 placeholder="наименование"></textarea>
     </div>

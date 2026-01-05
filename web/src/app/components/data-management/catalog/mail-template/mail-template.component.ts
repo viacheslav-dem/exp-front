@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {Catalog, DataService} from "app/services/data.service";
 import {SearchField} from "app/components/common-components/page-and-filter/model/SearchField";
@@ -6,6 +6,7 @@ import {Direction} from "app/components/common-components/page-and-filter/model/
 import {CatalogTemplate} from "app/components/data-management/catalog/CatalogTemplate";
 import {MailTemplateDto} from "@app/dto/MailTemplateDto";
 import {getAllMailPriorities, MailPriorityPipe} from "@app/pipes/mail-priority.pipe";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-mail-template',
@@ -20,7 +21,11 @@ import {getAllMailPriorities, MailPriorityPipe} from "@app/pipes/mail-priority.p
           word-wrap: break-word; /* Internet Explorer 5.5+ */
       }
   `],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class MailTemplateComponent extends CatalogTemplate<MailTemplateDto> {
 

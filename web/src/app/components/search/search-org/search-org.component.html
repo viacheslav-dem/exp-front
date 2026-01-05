@@ -7,7 +7,7 @@
   <div [loadingData]="_loading">
     <!--PAGE-->
     <ul class="list-group list-group-sm mt-3">
-      @for (org of _page.content; track org) {
+      @for (org of _page.content; track org.id) {
         <li class="list-group-item list-group-item-action selectable"
           (click)="onSelected(org)">
           {{org.name}}

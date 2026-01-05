@@ -1,5 +1,5 @@
 <div [ngClass]="filterClass()">
-  @for (field of _fields; track field) {
+  @for (field of fieldsForTemplate(); track field.key) {
     <div class="mb-3" [ngClass]="fieldClass()">
       <!--TITLE-->
       @if (field.title) {
@@ -25,7 +25,8 @@
             [class.rounded-end]="!field.sortable && !field.resetEnabled"
             [class.rounded-0]="field.sortable || field.resetEnabled"
             class="form-control"
-            (input)="changeSearchText($event, field)" [value]="field.value"
+            [(ngModel)]="field.value"
+            (ngModelChange)="onTextValueChange(field)"
             (keyup.enter)="filterChanged()"
             [placeholder]="field.placeholder | orElse: 'Поиск...'">
         }
@@ -53,7 +54,7 @@
             <!--CHECKBOXES-->
             @if (field.type == SearchFieldType.MULTI_CHECK) {
           <div class="d-flex flex-wrap gap-2 mt-2 w-100">
-                @for (check of field.multiCheck; track check) {
+                @for (check of field.multiCheck; track (check.item?.id ?? check.item ?? $index)) {
               <button type="button" class="btn btn-sm btn-outline-primary" 
                       [class.active]="check.selected"
                     (click)="changeMultiCheck(field, check)">

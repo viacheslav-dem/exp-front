@@ -16,6 +16,7 @@ export class LoginComponent implements OnInit {
   user: any = {};
   systemLoginNotification: SystemNotificationDto;
   showPassword: boolean = false;
+  isLoggingIn: boolean = false;
 
   constructor(private _authService: AuthService,
               private notificationService: SystemNotificationService,
@@ -30,6 +31,12 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
+      // Защита от двойного сабмита (Enter + submit / двойной клик)
+      if (this.isLoggingIn) {
+        return;
+      }
+      this.isLoggingIn = true;
+
       this._authService.login(this.user).subscribe({
           next: (res) => {
               this._authService.loginWithCredentials(res);
@@ -38,6 +45,10 @@ export class LoginComponent implements OnInit {
               // Ошибка уже обработана в HttpClientSecure.handleError() и показано toast-сообщение
               // Здесь просто предотвращаем попадание ошибки в глобальный обработчик
               console.error('Login error:', err);
+              this.isLoggingIn = false;
+          },
+          complete: () => {
+              this.isLoggingIn = false;
           }
       });
   }

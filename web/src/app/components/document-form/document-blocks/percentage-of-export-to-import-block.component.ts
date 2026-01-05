@@ -7,7 +7,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <label>
         {{num()}}.Импортозамещающая ориентированность товара (соотношение показателей экспорта к импорту):
       </label>
-      <textarea [(ngModel)]="_form().percentageOfExportToImport" rows="3" class="form-control mt-05"
+      <textarea [(ngModel)]="_form().percentageOfExportToImport" name="percentageOfExportToImport" rows="3" class="form-control mt-05"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
   `,

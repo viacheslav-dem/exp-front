@@ -1,14 +1,16 @@
-import {Component, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/core";
 import {StatsService} from "@app/services/stats.service";
 import {StatsDto} from "@app/dto/StatsDto";
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 import {BsDatepickerConfig} from 'ngx-bootstrap/datepicker';
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-period-stats',
     templateUrl: './period-stats.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class PeriodStatsComponent implements OnInit, AfterViewInit {
 
@@ -29,7 +31,8 @@ export class PeriodStatsComponent implements OnInit, AfterViewInit {
     showWeekNumbers: false
   };
 
-  constructor(private _statsService: StatsService) {
+  constructor(private _statsService: StatsService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
@@ -60,7 +63,10 @@ export class PeriodStatsComponent implements OnInit, AfterViewInit {
 
   update() {
     let dateToExclusive = dayjs(this.dateTo).add(1, 'month').valueOf();
-    this._statsService.getStatsByMonths(this.dateFrom, dateToExclusive).subscribe(res => this.stats = res);
+    this._statsService.getStatsByMonths(this.dateFrom, dateToExclusive).subscribe(res => {
+      this.stats = res;
+      this.cdr?.markForCheck?.();
+    });
   }
 
   changeDateTo(date: Date) {
@@ -74,6 +80,7 @@ export class PeriodStatsComponent implements OnInit, AfterViewInit {
           const formatted = dayjs(date).locale('ru').format('MM.YYYY');
           this.dateToInput.nativeElement.value = formatted;
         }
+        this.cdr?.markForCheck?.();
       });
     }
   }
@@ -89,6 +96,7 @@ export class PeriodStatsComponent implements OnInit, AfterViewInit {
           const formatted = dayjs(date).locale('ru').format('MM.YYYY');
           this.dateFromInput.nativeElement.value = formatted;
         }
+        this.cdr?.markForCheck?.();
       });
     }
   }

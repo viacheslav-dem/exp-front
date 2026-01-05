@@ -10,12 +10,14 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         товаров к высокотехнологичным, утвержденной постановлением ГКНТ от 18 декабря 2008 г. № 12:
       </label>
       <app-boolean-button
+        name="intellectualProperty"
+        required
         [(ngModel)]="_form().intellectualProperty"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().intellectualPropertyText" rows="3" class="form-control"
+        <textarea [(ngModel)]="_form().intellectualPropertyText" name="intellectualPropertyText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>

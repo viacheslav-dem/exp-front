@@ -99,6 +99,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { LOCALE_ID } from '@angular/core';
+import { BackToTopComponent } from './components/common-components/back-to-top/back-to-top.component';
 
 // Регистрация русской локали для Angular
 registerLocaleData(localeRu, 'ru', localeRuExtra);
@@ -153,7 +154,8 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         MeetingRemarkComponent,
         RemarkResponseComponent,
         NotificationComponent,
-        SystemNotificationComponent
+        SystemNotificationComponent,
+        BackToTopComponent
     ],
     bootstrap: [
         AppComponent

@@ -1,13 +1,24 @@
-<div bsModal #ng2Modal="bs-modal" class="modal" role="dialog" aria-hidden="true" [config]="config">
+<div bsModal #ng2Modal="bs-modal" #modalRoot class="modal" role="dialog" aria-hidden="true" [config]="config">
   <div class="modal-dialog" [ngClass]="modalClasses()">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">{{title()}}</h4>
         <button type="button" class="btn-close" aria-label="Закрыть" (click)="internalHide()"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" #modalBody>
         <ng-content></ng-content>
       </div>
+
+      @if (showBackToTop()) {
+        <button
+          type="button"
+          class="btn btn-primary modal-back-to-top shadow"
+          aria-label="Наверх"
+          (click)="scrollModalToTop()"
+        >
+          <fa-icon icon="angle-up"></fa-icon>
+        </button>
+      }
     </div>
   </div>
 </div>

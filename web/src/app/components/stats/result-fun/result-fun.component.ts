@@ -1,4 +1,4 @@
-import {Component, ChangeDetectionStrategy, inject, signal, computed} from '@angular/core';
+import {Component, ChangeDetectionStrategy, inject, signal, computed, ChangeDetectorRef} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {CommonModule} from '@angular/common';
 import {Subject, switchMap, catchError, of} from 'rxjs';
@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import {StatsService} from "@app/services/stats.service";
 import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO";
 import {HttpErrorResponse} from "@angular/common/http";
+import {DropdownToggleDirective} from "@app/components/common-components/dropdown/dropdown-toggle.directive";
 
 @Component({
     selector: 'app-result-fun',
@@ -14,13 +15,14 @@ import {HttpErrorResponse} from "@angular/common/http";
     styles: [],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule]
+    imports: [CommonModule, DropdownToggleDirective]
 })
 export class ResultFunComponent {
 
   readonly months: readonly string[] = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
   
   private readonly statsService = inject(StatsService);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly refreshTrigger$ = new Subject<void>();
 
   private readonly _monthIndex = signal<number>(new Date().getMonth());
@@ -48,15 +50,25 @@ export class ResultFunComponent {
   
   private readonly _isButtonDisabled = signal<boolean>(false);
   readonly isButtonDisabled = this._isButtonDisabled.asReadonly();
+  
+  private readonly _isLoading = signal<boolean>(false);
+  readonly isLoading = this._isLoading.asReadonly();
 
   readonly councilStatsResponseDTOs = signal<CouncilStatsResponseDTO[]>([]);
-  readonly resultCouncilStatsResponseDTO = signal<CouncilStatsResponseDTO>(new CouncilStatsResponseDTO());
+  readonly resultCouncilStatsResponseDTO = signal<CouncilStatsResponseDTO>(this.createEmptyStats());
+  
+  private createEmptyStats(): CouncilStatsResponseDTO {
+    const empty = new CouncilStatsResponseDTO();
+    empty.projectsReceived = 0;
+    empty.projectsNotFinished = 0;
+    empty.projectsOverdue = 0;
+    empty.overdueDaysProject = 0;
+    empty.finishedProjects = 0;
+    return empty;
+  }
 
   constructor() {
-    // Инициализация данных при загрузке
-    this.updateResFun();
-    
-    // Подписка на обновления с автоматической отпиской
+    // Сначала настраиваем подписку на обновления
     this.refreshTrigger$.pipe(
       switchMap(() => {
         if (this._isButtonMonthDisabled()) {
@@ -67,6 +79,9 @@ export class ResultFunComponent {
       }),
       takeUntilDestroyed()
     ).subscribe();
+    
+    // Затем инициализируем загрузку данных
+    this.updateResFun();
   }
 
   updateResFun() {
@@ -76,12 +91,14 @@ export class ResultFunComponent {
   updateResFunMonth(i: number) {
     this._monthIndex.set(i);
     this._isButtonDisabled.set(true);
+    this.cdr.markForCheck();
     this.refreshTrigger$.next();
   }
 
   updateResFunYear(y: number) {
     this._year.set(y);
     this._isButtonDisabled.set(true);
+    this.cdr.markForCheck();
     this.refreshTrigger$.next();
   }
 
@@ -95,41 +112,62 @@ export class ResultFunComponent {
       this._isButtonMonthDisabled.set(false);
       this._isButtonDisabled.set(true);
     }
+    this.cdr.markForCheck();
     this.refreshTrigger$.next();
   }
 
   private loadMonthData() {
-    const date = new Date(this._year(), this._monthIndex(), 1);
-    const dateToExclusive = dayjs(date).valueOf();
+    // Начало месяца: 1 число выбранного месяца, 00:00:00 UTC
+    // Используем UTC для избежания проблем с часовыми поясами
+    const dateToExclusive = Date.UTC(this._year(), this._monthIndex(), 1);
+    
+    this._isLoading.set(true);
+    this.cdr.markForCheck();
     
     return this.statsService.getResFunMonth(dateToExclusive).pipe(
       tap((res: CouncilStatsResponseDTO[]) => {
         this.councilStatsResponseDTOs.set(res);
         this.updateResultStats(res);
         this._isButtonDisabled.set(false);
+        this._isLoading.set(false);
+        this.cdr.detectChanges(); // Принудительное обновление view при OnPush стратегии
       }),
       catchError((err: HttpErrorResponse) => {
+        console.error('Error loading month data:', err);
         this.showStatus500(err);
         this._isButtonDisabled.set(false);
+        this._isLoading.set(false);
+        this.cdr.detectChanges();
         return of([]);
       })
     );
   }
 
   private loadYearData() {
-    const date = new Date(this._year(), 0, 1);
-    const dateFrom = dayjs(date).valueOf();
-    const dateTo = dayjs(date).add(1, 'year').valueOf();
+    // Начало года: 1 января выбранного года, 00:00:00
+    // Используем UTC для избежания проблем с часовыми поясами
+    const dateFrom = Date.UTC(this._year(), 0, 1);
+    // Конец года: 1 января следующего года (включительно для LessThanEqual)
+    // Бэкенд использует LessThanEqual, что включает все записи с endDate <= dateTo
+    const dateTo = Date.UTC(this._year() + 1, 0, 1);
+    
+    this._isLoading.set(true);
+    this.cdr.markForCheck();
     
     return this.statsService.getResFunYear(dateFrom, dateTo).pipe(
       tap((res: CouncilStatsResponseDTO[]) => {
         this.councilStatsResponseDTOs.set(res);
         this.updateResultStats(res);
         this._isButtonDisabled.set(false);
+        this._isLoading.set(false);
+        this.cdr.detectChanges(); // Принудительное обновление view при OnPush стратегии
       }),
       catchError((err: HttpErrorResponse) => {
+        console.error('Error loading year data:', err);
         this.showStatus500(err);
         this._isButtonDisabled.set(false);
+        this._isLoading.set(false);
+        this.cdr.detectChanges();
         return of([]);
       })
     );
@@ -142,27 +180,20 @@ export class ResultFunComponent {
     result.finishedProjects = stats.reduce((acc, obj) => acc + (obj.finishedProjects ?? 0), 0);
     result.projectsNotFinished = stats.reduce((acc, obj) => acc + (obj.projectsNotFinished ?? 0), 0);
     result.overdueDaysProject = stats.reduce((acc, obj) => acc + (obj.overdueDaysProject ?? 0), 0);
+    // Инициализируем все поля, чтобы избежать undefined
+    result.id = 0;
+    result.projectsAccepted = 0;
+    result.projectsRejected = 0;
+    result.projectsReturned = 0;
+    result.projectsReturnedWithoutExpertise = 0;
     this.resultCouncilStatsResponseDTO.set(result);
   }
 
   private showStatus500(err: HttpErrorResponse) {
     if (err.status === 500) {
-      this.councilStatsResponseDTOs.update(stats => {
-        stats.forEach(cs => {
-          cs.projectsReceived = 0;
-          cs.finishedProjects = 0;
-          cs.projectsNotFinished = 0;
-          cs.projectsOverdue = 0;
-        });
-        return stats;
-      });
-      
-      const emptyResult = new CouncilStatsResponseDTO();
-      emptyResult.projectsReceived = 0;
-      emptyResult.finishedProjects = 0;
-      emptyResult.projectsNotFinished = 0;
-      emptyResult.projectsOverdue = 0;
-      this.resultCouncilStatsResponseDTO.set(emptyResult);
+      this.councilStatsResponseDTOs.set([]);
+      this.resultCouncilStatsResponseDTO.set(this.createEmptyStats());
+      this.cdr.markForCheck();
     }
   }
 }

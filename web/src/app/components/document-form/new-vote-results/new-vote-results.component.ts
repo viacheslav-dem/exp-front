@@ -1,8 +1,9 @@
-import {Component, EventEmitter, forwardRef, Output, input} from '@angular/core';
+import {Component, EventEmitter, forwardRef, Output, input, ChangeDetectionStrategy} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {NewVoteResults} from "@app/components/document-form/meeting-protocol-form/NewVoteResults";
 import {DecisionPipe, getAllDecisionStates} from "@app/pipes/decision.pipe";
+import {environment} from "../../../../environments/environment";
 
 export const NEW_VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -17,7 +18,7 @@ export const NEW_VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
       <div>
         <label><i><b>Результаты голосования</b></i></label>
         <div class="row">
-          <div class="col-md-3 pr-2">
+          <div class="col-md-3 pe-2">
             <div class="input-group input-group-sm">
               <input min="0" numberInput type="text" class="form-control"
                 [(ngModel)]="_value.accepted" (ngModelChange)="onChanged.emit(_value)" required>
@@ -28,7 +29,7 @@ export const NEW_VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
                 </div>
               </div>
             </div>
-            <div class="col-md-3 pl-2 pr-2">
+            <div class="col-md-3 px-2">
               <div class="input-group input-group-sm">
                 <input min="0" numberInput type="text" class="form-control"
                   [(ngModel)]="_value.rejected" (ngModelChange)="onChanged.emit(_value)" required>
@@ -39,7 +40,7 @@ export const NEW_VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
                   </div>
                 </div>
               </div>
-              <div class="col-md-3 pl-2 pr-2">
+              <div class="col-md-3 px-2">
                 <div class="input-group input-group-sm">
                   <input min="0" numberInput type="text" class="form-control"
                     [(ngModel)]="_value.rescheduled" (ngModelChange)="onChanged.emit(_value)" required>
@@ -50,7 +51,7 @@ export const NEW_VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
                     </div>
                   </div>
                 </div>
-                <div class="col-md-3 pl-2">
+                <div class="col-md-3 ps-2">
                   <div class="input-group input-group-sm">
                     <input min="0" disabled numberInput type="text" class="form-control" [value]="all() - _value.getVoted()"
                       required>
@@ -85,7 +86,11 @@ export const NEW_VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
 
   `],
     providers: [NEW_VOTE_RESULTS_CONTROL_VALUE_ACCESSOR],
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.meetings)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class NewVoteResultsComponent extends ControlComponent<NewVoteResults> {
 

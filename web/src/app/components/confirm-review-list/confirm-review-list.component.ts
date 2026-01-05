@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {ExpertReviewAndExpertDto} from "@app/dto/ExpertReviewAndExpertDto";
@@ -16,12 +16,14 @@ import {ModalComponent} from "@app/components/common-components/modal/modal.comp
 import {ChartService} from "@app/services/chart.service";
 import {ActivatedRoute, Router} from '@angular/router';
 import {PageRequest} from '@app/components/common-components/page-and-filter/model/PageRequest';
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-confirm-review-list',
     templateUrl: './confirm-review-list.component.html',
     styleUrls: ['confirm-review-list.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExpertsDto> {
 
@@ -39,6 +41,7 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
     private _chartService: ChartService,
     private _route: ActivatedRoute,
     private _router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     super();
   }
@@ -68,6 +71,7 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
     this._projectService.getConfirmReviewPage(this._searchRequest).subscribe(res => {
       this._page = res;
       this.projects = res.content;
+      this.cdr?.markForCheck?.();
       this.setLoading(false);
     }, () => this.setLoading(false))
 
@@ -87,8 +91,13 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
       `Назначить эксперта "${this._personPipe.transform(review.expert.personName)}" на объект экспертизы "${project.title}"?`,
       'Пожалуйста, проверьте данные об эксперте, поскольку отменить действие будет невозможно.').subscribe(() => {
       this._reviewService.acceptExpert(review).subscribe(res => {
+        // Обновляем статус review - он останется в списке, но с новым статусом (ON_EXPERT_CONFIRMATION)
         review.state = res.state;
+        // Сразу обновляем UI - кнопки исчезнут, появится бейдж "Ожидание эксперта"
+        this.cdr?.markForCheck?.();
         this._toasty.success("Подтвержден.");
+        // Фоново синхронизируем с сервером для обновления других данных
+        this.loadPage();
       });
     });
   }
@@ -109,8 +118,12 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
           reason = dlgResult.value.reason;
         }
         this._reviewService.rejectExpert(review, reason).subscribe(res => {
+          // Обновляем статус review - он останется в списке, но с новым статусом (REJECTED)
           review.state = res.state;
+          // Сразу обновляем UI - кнопки исчезнут, появится бейдж "Отклонён"
+          this.cdr?.markForCheck?.();
           this._toasty.success("Отклонен.");
+          // Фоново синхронизируем с сервером для обновления других данных
           this.loadPage();
         });
       })

@@ -55,8 +55,14 @@
       }
       @if (canEditReviewDocument()) {
         <button class="btn btn-sm btn-primary btn-right-sm"
-                (click)="showReviewFormModal()">
-          Создать
+                (click)="showReviewFormModal()"
+                [disabled]="isCreatingReviewDocument">
+          @if (isCreatingReviewDocument) {
+            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            Создание...
+          } @else {
+            Создать
+          }
         </button>
       }
     </div>
@@ -131,9 +137,10 @@
 <!--REVIEW FORM-->
 <app-modal #reviewFormModal [title]="'Заключение эксперта'" [closePermission]="false" (onClose)="closeForm()">
   <app-expert-review-form [formRenderer]="formRenderer"
-                          [project]="project"
+                          [project]="project()"
                           [draftService]="_reviewService"
                           [draftOwner]="expertReview"
+                          [loading]="isCreatingReviewDocument"
                           (onSave)="generateReviewDocument($event)"
                           (onClose)="closeModal()">
   </app-expert-review-form>

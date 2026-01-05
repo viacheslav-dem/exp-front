@@ -1,13 +1,17 @@
-import {Component} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from "@angular/core";
 import {DialogService} from "@app/components/dialogs/dialog.service";
 import {SystemNotificationService} from "@app/services/system-notification.service";
 import {SystemNotificationDto,} from "@app/dto/SystemNotificationDto";
 import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
+import {environment} from "../../../environments/environment";
+import {finalize, take} from "rxjs";
+import {SystemNotificationStore} from "@app/services/system-notification.store";
 
 @Component({
     selector: 'system-notification',
     templateUrl: './system-notification.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class SystemNotificationComponent {
 
@@ -21,10 +25,14 @@ export class SystemNotificationComponent {
 
     displayedNotificationStyleClass = "";
 
+    isSaving = false;
+
 
     constructor(private notificationService: SystemNotificationService,
                 private dialogService: DialogService,
-                private safeHtmlPipe: SafeHtmlPipe,) {
+                private safeHtmlPipe: SafeHtmlPipe,
+                private notificationStore: SystemNotificationStore,
+                private cdr: ChangeDetectorRef) {
     }
 
     ngOnInit() {
@@ -40,6 +48,7 @@ export class SystemNotificationComponent {
 
         if (this.notification.name == null) {
             this.notification.message = "";
+            this.cdr?.markForCheck?.();
         } else {
 
             this.notificationService.getNotification(this.notification).subscribe(
@@ -53,9 +62,11 @@ export class SystemNotificationComponent {
                         case SystemNotificationNames.ALL_PAGES_NOTIFICATION:
                             this.displayedNotificationStyleClass = "card-notification-all-pages"; break;
                     }
+                    this.cdr?.markForCheck?.();
                 },
                 () => {
                     this.notification.message = "";
+                    this.cdr?.markForCheck?.();
                 });
         }
     }
@@ -66,19 +77,53 @@ export class SystemNotificationComponent {
     }
 
     postNotification(message: string) {
+        if (this.isSaving) {
+            return;
+        }
+
         this.dialogService.showConfirmDialog(
             'Сохранение системного уведомления',
             `Сохранить системное уведомление?`,
             'Пожалуйста, проверьте данные уведомления, поскольку предыдущее уведомление заменится новым.')
+            .pipe(take(1))
             .subscribe(() => {
+                this.isSaving = true;
+                this.notification.message = message ?? "";
+                this.cdr?.markForCheck?.();
 
-                this.notification.message = message;
-
-                this.notificationService.saveNotification(this.notification).subscribe(res => {
-                    this.notification = res;
-                });
-                window.location.reload();
-            })
+                // Важно: reload должен быть ПОСЛЕ успешного ответа, иначе перезагрузка может оборвать HTTP-запрос.
+                this.notificationService.saveNotification(this.notification)
+                    .pipe(finalize(() => {
+                        this.isSaving = false;
+                        this.cdr?.markForCheck?.();
+                    }))
+                    .subscribe({
+                        next: (res) => {
+                            this.notification = res;
+                            // Обновляем превью-класс (на случай, если changeNotification не вызывался)
+                            if (res?.name === 'LOGIN_PAGE_NOTIFICATION') {
+                                this.displayedNotificationStyleClass = "test-card-notification";
+                            }
+                            if (res?.name === 'ALL_PAGES_NOTIFICATION') {
+                                this.displayedNotificationStyleClass = "card-notification-all-pages";
+                            }
+                            this.cdr?.markForCheck?.();
+                            // Обновляем глобальные баннеры без reload страницы
+                            this.notificationStore.applySaved(res);
+                            // Дополнительно перечитываем с сервера (на случай server-side нормализации/дефолтов)
+                            if (res?.name === 'ALL_PAGES_NOTIFICATION') {
+                                this.notificationStore.refreshAllPages();
+                            }
+                            if (res?.name === 'LOGIN_PAGE_NOTIFICATION') {
+                                this.notificationStore.refreshLoginPage();
+                            }
+                        },
+                        error: (err) => {
+                            // Ошибка уже может быть обработана глобальным HttpClientSecure, но лог оставим для диагностики.
+                            console.error('Failed to save system notification', err);
+                        }
+                    });
+            });
     }
 
     deleteNotification() {
@@ -88,13 +133,35 @@ export class SystemNotificationComponent {
             'Уведомление будет удалено из базы данных.')
             .subscribe(() => {
 
+                if (this.isSaving) {
+                    return;
+                }
+                this.isSaving = true;
                 this.notification.message = "";
                 this.notification.enabled = false;
                 this.notification.type = "EMPTY_BACKGROUND";
 
-                this.notificationService.saveNotification(this.notification).subscribe(res => {
-                    this.notification = res;
-                });
+                this.notificationService.saveNotification(this.notification)
+                    .pipe(finalize(() => {
+                        this.isSaving = false;
+                        this.cdr?.markForCheck?.();
+                    }))
+                    .subscribe({
+                        next: (res) => {
+                            this.notification = res;
+                            this.notificationStore.applySaved(res);
+                            if (res?.name === 'ALL_PAGES_NOTIFICATION') {
+                                this.notificationStore.refreshAllPages();
+                            }
+                            if (res?.name === 'LOGIN_PAGE_NOTIFICATION') {
+                                this.notificationStore.refreshLoginPage();
+                            }
+                            this.cdr?.markForCheck?.();
+                        },
+                        error: (err) => {
+                            console.error('Failed to delete system notification', err);
+                        }
+                    });
             })
     }
 

@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {AuthService} from "@app/services/auth.service";
 import {Role} from "@app/pipes/role.pipe";
@@ -10,11 +10,13 @@ import {MeetingService} from "@app/services/meeting.service";
 import {anyMatch} from "@app/support/utils";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-meeting-list',
     templateUrl: 'meeting-list.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.meetings) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class MeetingListComponent extends FilterAndPages<MeetingDto> {
 
@@ -29,7 +31,8 @@ export class MeetingListComponent extends FilterAndPages<MeetingDto> {
   constructor(private _toasty: GlobalToastyService,
               private _authService: AuthService,
               private _meetingService: MeetingService,
-              private _meetingStatePipe: MeetingStatePipe) {
+              private _meetingStatePipe: MeetingStatePipe,
+              private cdr: ChangeDetectorRef) {
     super();
   }
 
@@ -43,6 +46,13 @@ export class MeetingListComponent extends FilterAndPages<MeetingDto> {
         .setSortable(true).setSortDirection(Direction.DESC)
     ];
     this.enableFilterCache("meetings");
+    // Если нет сохранённого состояния фильтров, загружаем данные явно
+    setTimeout(() => {
+      const hasCachedFilters = localStorage.getItem('filter_cache_meetings');
+      if (!hasCachedFilters) {
+        this.update();
+      }
+    }, 100);
   }
 
   loadPage() {
@@ -53,7 +63,11 @@ export class MeetingListComponent extends FilterAndPages<MeetingDto> {
       if (anyMatch(this.role, Role.BUREAU_CHAIRMAN, Role.SECTION_CHAIRMAN)) {
         this.meetings.forEach(meeting => meeting.routerLink = ['/meetings', meeting.id]);
       }
-    }, () => this.setLoading(false));
+      this.cdr?.markForCheck?.();
+    }, () => {
+      this.setLoading(false);
+      this.cdr?.markForCheck?.();
+    });
   }
 
   showCreateMeetingModal() {

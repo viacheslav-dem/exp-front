@@ -1,8 +1,9 @@
-import {Component, Directive, forwardRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Directive, forwardRef} from '@angular/core';
 import {ControlComponent} from "app/components/common-components/control-component";
 import {BankAccountDto} from "app/dto/BankAccountDto";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {getAllBankAccountTypes} from "@app/pipes/bank-account-type.pipe";
+import {environment} from "../../../../environments/environment";
 
 export const BANK_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -43,7 +44,10 @@ export const BANK_CONTROL_VALUE_ACCESSOR: any = {
       }
     `,
     providers: [BANK_CONTROL_VALUE_ACCESSOR],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class BankAccountComponent extends ControlComponent<BankAccountDto> {
 

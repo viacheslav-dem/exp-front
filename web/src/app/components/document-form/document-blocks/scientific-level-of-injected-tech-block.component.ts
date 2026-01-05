@@ -8,7 +8,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{num()}}. Научно-технический уровень внедряемых технологий
       </label>
       <br/>
-      <app-boolean-button [(ngModel)]="_form().scientificLevelOfInjectedTech" [trueLabel]="'подтверждается'"
+      <app-boolean-button name="scientificLevelOfInjectedTech" required [(ngModel)]="_form().scientificLevelOfInjectedTech" [trueLabel]="'подтверждается'"
         [falseLabel]="'не подтверждается'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {

@@ -9,7 +9,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
       <label>
         {{num()}}. Соответствие заявленного финансирования планируемому объему выполняемых работ:
       </label>
-      <app-boolean-button [(ngModel)]="_form().financeAccordance" [trueLabel]="'соответствует'"
+      <app-boolean-button name="financeAccordance" required [(ngModel)]="_form().financeAccordance" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (!_form().financeAccordance) {
@@ -17,12 +17,22 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
         <div class="input-group">
           <input [(ngModel)]="_form().financeSuggestion" min="0" numberInput type="text" class="form-control"
             [title]="'Рекомендуемый объем финансирования, ' + (project()?.currency?.name || 'руб.')"
-            [placeholder]="'сумма, ' + (project()?.currency?.name || 'руб.')">
+            [placeholder]="'сумма, ' + (project()?.currency?.name || 'руб.')"
+            name="financeSuggestion"
+            required>
           </div>
         }
         @if (full()) {
-          <textarea [(ngModel)]="_form().financeAccordanceText" rows="3" class="form-control mt-05"
-          [attr.placeholder]="isTextRequired() ? 'Обязательный текст.' : 'Пояснительный текст (при необходимости).'"></textarea>
+          <textarea
+            [(ngModel)]="_form().financeAccordanceText"
+            [attr.name]="'financeAccordanceText_' + num().split('.').join('_')"
+            [required]="isTextRequired()"
+            [attr.minlength]="isTextRequired() ? 30 : null"
+            maxlength="5000"
+            rows="3"
+            class="form-control mt-05"
+            [attr.placeholder]="isTextRequired() ? 'Обязательный текст (не менее 30 символов).' : 'Пояснительный текст (при необходимости).'"
+          ></textarea>
         }
         @if (full()) {
           <div class="hint">

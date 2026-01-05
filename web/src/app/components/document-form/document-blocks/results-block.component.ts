@@ -7,8 +7,15 @@ import {Component, input} from '@angular/core';
       <label>
         {{num()}}. Сопоставительный анализ запланированных результатов и их соответствия достигнутым результатам.
       </label>
-      <textarea [(ngModel)]="_form().results" rows="3" class="form-control"
-      placeholder="Обязательный текст."></textarea>
+      <textarea
+        [(ngModel)]="_form().results"
+        [attr.name]="'results_' + num().split('.').join('_')"
+        required
+        minlength="30"
+        rows="3"
+        class="form-control"
+        placeholder="Обязательный текст (не менее 30 символов)."
+      ></textarea>
       @if (full()) {
         <div class="hint">
           <p>

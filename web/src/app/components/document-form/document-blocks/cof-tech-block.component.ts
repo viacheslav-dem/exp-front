@@ -8,8 +8,8 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{num()}}. Значение коэффициента технологичности товара (работы, услуги), рассчитанного по формуле, указанной в пункте 5 Инструкции):
       </label>
       @if (full()) {
-        <textarea [(ngModel)]="_form().cofTech" rows="3" class="form-control"
-        placeholder="Пояснительный текст (при необходимости)." pattern="[0-9]+"></textarea>
+        <textarea [(ngModel)]="_form().cofTech" name="cofTech" rows="3" class="form-control"
+        placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>
     `,

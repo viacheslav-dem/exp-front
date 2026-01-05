@@ -1,5 +1,6 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {Catalog} from "@app/services/data.service";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-funding',
@@ -11,7 +12,10 @@ import {Catalog} from "@app/services/data.service";
       [type]="Catalog.FUNDING"
     ></app-simple-catalog>`,
     styles: [],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class FundingComponent {
   Catalog = Catalog;

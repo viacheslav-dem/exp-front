@@ -8,11 +8,18 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         {{num()}}. Оценка анализа текущего состояния и прогноза
         научно-технического развития соответствующей сферы планирования:
       </label>
-      <app-boolean-button [(ngModel)]="_form().prognosis" [trueLabel]="'достаточна'"
+      <app-boolean-button name="prognosis" required [(ngModel)]="_form().prognosis" [trueLabel]="'достаточна'"
         [falseLabel]="'недостаточна'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().prognosisText" rows="3" class="form-control mt-05"
+        <textarea
+          [(ngModel)]="_form().prognosisText"
+          [attr.name]="'prognosisText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
       @if (full()) {

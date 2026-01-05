@@ -2,7 +2,7 @@ import { Directive, ElementRef, HostListener, Renderer2, OnInit, OnDestroy } fro
 
 @Directive({
   selector: '[data-bs-toggle="dropdown"], [data-toggle="dropdown"]',
-  standalone: false
+  standalone: true
 })
 export class DropdownToggleDirective implements OnInit, OnDestroy {
   private documentClickListener?: () => void;

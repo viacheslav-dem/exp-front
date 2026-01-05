@@ -9,7 +9,9 @@ import {environment} from "../../../../environments/environment";
     templateUrl: './file-editor.component.html',
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.fileEditor ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.fileAndPdf)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class FileEditorComponent implements OnInit {
 

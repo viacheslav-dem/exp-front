@@ -12,6 +12,8 @@ import {Catalog} from "@app/services/data.service";
       </label>
       <app-select-catalog [catalog]="Catalog.INDUSTRY"
         [optionToString]="sectionToString"
+        name="section"
+        required
         [(ngModel)]="_form().section"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-select-catalog>
       @if (full()) {
@@ -22,8 +24,15 @@ import {Catalog} from "@app/services/data.service";
           </p>
         </div>
       }
-      <textarea [(ngModel)]="_form().sectionText" rows="3" class="form-control mt-05"
-      placeholder="Обязательный текст"></textarea>
+      <textarea
+        [(ngModel)]="_form().sectionText"
+        [attr.name]="'sectionText_' + num().split('.').join('_')"
+        required
+        minlength="30"
+        rows="3"
+        class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."
+      ></textarea>
       <div class="hint">
         <p>
           <b>Подсказка.</b>

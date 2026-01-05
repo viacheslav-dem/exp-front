@@ -9,8 +9,15 @@ import {Component, input} from '@angular/core';
         программного обеспечения, технических средств и (или) комплексов программно-технических средств,
         а также возможности достижения заданных значений указанных характеристик.
       </label>
-      <textarea [(ngModel)]="_form().characteristics" rows="3" class="form-control"
-      placeholder="Обязательный текст."></textarea>
+      <textarea
+        [(ngModel)]="_form().characteristics"
+        [attr.name]="'characteristics_' + num().split('.').join('_')"
+        required
+        minlength="30"
+        maxlength="5000"
+        rows="3"
+        class="form-control"
+      placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       @if (full()) {
         <div class="hint">
           <p>

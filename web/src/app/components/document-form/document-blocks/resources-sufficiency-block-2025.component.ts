@@ -7,11 +7,19 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <label>
         {{num()}}. Достаточность материально-технической базы и кадрового потенциала исполнителя работ:
       </label>
-      <app-dropdown [options]="resourcesSufficiencyOptions" [(ngModel)]="_form().resourcesSufficiency"
+      <app-dropdown name="resourcesSufficiency" required [options]="resourcesSufficiencyOptions" [(ngModel)]="_form().resourcesSufficiency"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().resourcesSufficiencyText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea
+          [(ngModel)]="_form().resourcesSufficiencyText"
+          [attr.name]="'resourcesSufficiencyText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">

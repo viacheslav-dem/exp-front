@@ -2,27 +2,25 @@ export const environment = {
   production: true,
   features: {
     onPush: {
-      // По умолчанию выключено: включать постепенно после проверки в dev/stage.
-      menu: false,
-      projectLi: false,
-      pagination: false,
-      filter: false,
-      loginoff: false,
-      dialogs: false,
-      modal: false,
-      progress: false,
-      fileEditor: false,
-      documentUploader: false,
-      dropdown: false,
-      selectCatalog: false,
-      dateInput: false,
-      datePeriod: false,
-      checkbox: false,
-      documentList: false,
-      pdfViewer: false,
-      timeInput: false,
-      numberRange: false,
-      passwordInput: false
+      // Prod по умолчанию: выключено. Включать постепенно по группам и пересобирать WAR.
+      enabled: true,
+      groups: {
+        coreShell: true,
+        dialogs: true,
+        listsAndFilters: true,
+        commonControls: true,
+        fileAndPdf: true,
+        catalogsAdmin: true,
+        projectFlow: true,
+        listsAndInfo: true,
+        projectDetail: true,
+        meetings: true,
+        search: true,
+        dataManagement: true,
+        stats: true,
+        settings: true,
+        history: true
+      }
     }
   }
 };

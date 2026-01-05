@@ -3,6 +3,7 @@
     <div class="form-group">
         <label class="form-group-label">Наименование объекта экспертизы</label>
         <textarea rows="2" class="form-control" placeholder="Название объекта экспертизы"
+                  name="title" required
                   [(ngModel)]="_project.title" title="Название объекта экспертизы"></textarea>
     </div>
 
@@ -13,7 +14,7 @@
                     data-toggle="dropdown">{{ _project.code ? _project.code.code : "Выберите код" }}
             </button>
             <ul class="dropdown-menu scrollable-menu">
-                @for (code of codes; track code.id) {
+                @for (code of codes; track (code?.id ?? code?.code ?? $index)) {
                     <li class="dropdown-item" (click)="selectCode(code)">
                         <span class="font-weight-bold">{{ code.code }}</span>{{
                             !code.name || code.name == '' ? '' : ' - ' +
@@ -40,7 +41,7 @@
 
     <div class="form-group">
         <label class="form-group-label">Коды специализации</label>
-        @for (specialization of _project.projectSpecialization; track trackBySpecialization(specialization); let i = $index) {
+        @for (specialization of _project.projectSpecialization; track trackBySpecialization(i, specialization); let i = $index) {
             <div class="specialization-item-wrapper mb-2">
                 <div class="input-group">
                     <ng-select
@@ -49,6 +50,7 @@
                         [typeahead]="getSpecializationSearchInput$(i)"
                         [(ngModel)]="_project.projectSpecialization[i]"
                         [compareWith]="compareSpecialization"
+                        [appendTo]="'body'"
                         placeholder="Выберите специализацию"
                         [searchable]="true"
                         [clearable]="true"
@@ -95,10 +97,14 @@
             @if (_project.code?.code != '8.4') {
                 <textarea rows="2" class="form-control"
                           placeholder="Наименование программы (подпрограммы)"
+                          name="program"
+                          [required]="_project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || _project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'"
                           [(ngModel)]="_project.program"></textarea>
             }
             @if (_project.code?.code == '8.4') {
                 <textarea rows="2" class="form-control" placeholder="Название страны"
+                          name="program"
+                          [required]="_project.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025' || _project.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025'"
                           [(ngModel)]="_project.program"></textarea>
             }
             <div class="hint">
@@ -130,6 +136,7 @@
     <div class="form-group">
         <label class="form-group-label">Потенциальный(-е) исполнитель(-и) объекта государственной экспертизы</label>
         <textarea rows="2" class="form-control" placeholder="Организация-исполнитель проекта"
+                  name="executor" required
                   [(ngModel)]="_project.executor" title="Наименование организации"></textarea>
         <div class="hint">
             <p class="font-italic">
@@ -177,7 +184,7 @@
                         <span>Валюта: </span>
                     </label>
                     <app-select-catalog
-                            class="d-inline-block ml-1"
+                            class="d-inline-block ms-1"
                             [catalog]="Catalog.CURRENCY"
                             [resetEnabled]="false"
                             [(ngModel)]="_project.currency"
@@ -205,21 +212,22 @@
                     }
                 </div>
                 <div class="row">
-                    <div class="col-sm-2 pr-0">
+                    <div class="col-sm-2 pe-0">
                         <app-dropdown class="dropdown btn-group" [options]="(allFundingType)"
                                       [optionToString]="fundingToString" [notSelected]="'Тип не выбран'"
                                       [(ngModel)]="funding.type"></app-dropdown>
                     </div>
-                    <div class="col-sm-3 pr-0">
+                    <div class="col-sm-3 pe-0">
           <textarea rows="1" class="form-control" placeholder="Комментарий"
                     [(ngModel)]="funding.comment" title="Комментарий"></textarea>
                     </div>
-                    <div class="col-sm-3 pr-0">
+                    <div class="col-sm-3 pe-0">
                         <app-select-catalog [catalog]="Catalog.FUNDING" [(ngModel)]="funding.source"
                                             [notSelected]="'Источник не выбран'"></app-select-catalog>
                     </div>
-                    <div class="col-sm-2 pr-0">
+                    <div class="col-sm-2 pe-0">
                         <input class="form-control" min="0" numberInput type="text" placeholder="Сумма"
+                               name="fundingValue"
                                [(ngModel)]="funding.value" title="Сумма"/>
                     </div>
                     <div class="col-sm-2">
@@ -234,7 +242,7 @@
                 <div class="form-sub-group italic">
                     @if (directions.length != 0) {
                         <div>
-                            @for (dir of displayDirection(); track dir.id; let i = $index) {
+                            @for (dir of displayDirection(); track (dir?.id ?? i); let i = $index) {
                                 <div>
                                     {{ dir.name }}
                                     <a class="btn btn-icon btn-icon-sm" (click)="deleteDirection(dir, i)">
@@ -242,7 +250,7 @@
                                     </a>
                                     <br>
                                     <ul>
-                                        @for (subDir of dir.subDirectionDtos; track subDir.id; let j = $index) {
+                                        @for (subDir of dir.subDirectionDtos; track (subDir?.id ?? j); let j = $index) {
                                             <li>
                                                 {{ subDir.directionName }}
                                                 <a class="btn btn-icon btn-icon-sm" (click)="display(dir, j, i)">
@@ -269,11 +277,11 @@
                     }
                 </div>
                 <div class="row">
-                    <div class="col-10 pr-2">
+                    <div class="col-10 pe-2">
                         <app-select-catalog [catalog]="Catalog.DIRECTION"
                                             [(ngModel)]="newDirection"></app-select-catalog>
                     </div>
-                    <div class="col-2 pl-2">
+                    <div class="col-2 ps-2">
                         <button class="btn btn-primary w-100" [disabled]="!subDirection" (click)="addDirection()">
                             Добавить
                         </button>
@@ -370,7 +378,7 @@
                             data-toggle="dropdown">{{ _project.expectedResult ? _project.expectedResult.expectedResultType : "Выберите вид ожидаемого результата" }}
                     </button>
                     <ul class="dropdown-menu scrollable-menu">
-                        @for (result of expectedResultList; track result.id) {
+                        @for (result of expectedResultList; track (result?.id ?? result?.expectedResultType ?? $index)) {
                             <li class="dropdown-item"
                                 (click)="selectExpectedResult(result)">
                                 <span>{{ result.expectedResultType }}</span>
@@ -395,6 +403,7 @@
                     организационно-технического решения. Допускается ввод по нескольким видам ожидаемого результата.
                 </p>
                 <textarea class="form-control" rows="2" placeholder="Введите вид ожидаемого результата"
+                          name="otherExpectedResult" required
                           [(ngModel)]="_project.otherExpectedResult"></textarea>
                 </div>
             }
@@ -410,6 +419,7 @@
             }
             <div class="form-sub-group">
             <textarea class="form-control" rows="2" placeholder="Описание ожидаемого результата"
+                      name="expectedResultDescription" required minlength="30" maxlength="500"
                       [(ngModel)]="_project.expectedResultDescription"></textarea>
             </div>
         </div>
@@ -439,6 +449,7 @@
             @if (_project.workType === 'другое') {
                 <div class="form-sub-group mt-2">
                 <textarea class="form-control" rows="2" placeholder="Введите вид работ"
+                          name="otherWorkType" required
                           [(ngModel)]="_project.otherWorkType"></textarea>
                 </div>
             }
@@ -497,12 +508,13 @@
                 <label class="form-group-label">Коммерциализация результата</label>
                 <div class="form-sub-group">
                 <textarea class="form-control mb-2" rows="2" placeholder="Описание объекта коммерциализации"
+                          name="commercializationDescription" required minlength="30" maxlength="256"
                           [(ngModel)]="_project.commercializationDescription"></textarea>
 
                     <div class="form-sub-group italic">
                         @if (_project.commercializationMethods.length != 0) {
                             <ul>
-                                @for (method of _project.commercializationMethods; track method.id; let i = $index) {
+                                @for (method of _project.commercializationMethods; track (method?.id ?? method?.name ?? i); let i = $index) {
                                     <li>
                                         <span>{{ method.name }}: </span>
                                         <a class="btn btn-icon btn-icon-sm" (click)="_project.commercializationMethods.splice(i, 1)">
@@ -552,8 +564,10 @@
                         </ul>
                     </div>
                     <textarea class="form-control mb-2 mt-2" rows="2" placeholder="Описание объекта внедрения"
+                              name="implementationDescription" required minlength="30" maxlength="256"
                               [(ngModel)]="_project.implementationDescription"></textarea>
                     <textarea class="form-control mb-2" rows="2" placeholder="Указание способа внедрения"
+                              name="implementationSpecifying" required
                               [(ngModel)]="_project.implementationSpecifying"></textarea>
                 </div>
                 </div>
@@ -587,6 +601,7 @@
                 @if (isAnotherTechnologyType) {
                     <textarea class="form-control mb-2 mt-2" rows="2"
                               placeholder="Введите технологический уклад"
+                              name="otherTechnologicalOrder" required
                               [(ngModel)]="_project.otherTechnologicalOrder"></textarea>
                 }
             </div>
@@ -594,7 +609,7 @@
         }
 
     <div class="text-xs-center mt-2">
-        <button class="btn btn-primary btn-sm mr-1" (click)="onSave()">Сохранить</button>
+        <button class="btn btn-primary btn-sm me-2" (click)="onSave()">Сохранить</button>
         <button class="btn btn-secondary btn-sm" (click)="onCancel()">Отмена</button>
     </div>
     </div>

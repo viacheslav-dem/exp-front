@@ -9,12 +9,12 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
             государственной
             регистрации в соответствии с законодательством Республики Беларусь:
           </label>
-          <app-boolean-button [(ngModel)]="_form().stages" [trueLabel]="'имеются'"
+          <app-boolean-button name="stages" required [(ngModel)]="_form().stages" [trueLabel]="'имеются'"
             [falseLabel]="'не имеются'"
           (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
           @if (full() || _form().stages) {
-            <textarea [(ngModel)]="_form().stagesText" rows="3" class="form-control mt-05"
-            [attr.placeholder]="isTextRequired() ? 'Обязательный текст.' : 'Пояснительный текст (при необходимости).'"></textarea>
+            <textarea [(ngModel)]="_form().stagesText" name="stagesText" [attr.required]="isTextRequired() ? '' : null" [attr.minlength]="isTextRequired() ? '30' : null" rows="3" class="form-control mt-05"
+            [attr.placeholder]="isTextRequired() ? 'Обязательный текст (не менее 30 символов).' : 'Пояснительный текст (при необходимости).'"></textarea>
           }
           @if (full()) {
             <div class="hint">

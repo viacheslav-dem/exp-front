@@ -7,11 +7,18 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <label>
         {{num()}}. Анализ целевых показателей:
       </label>
-      <app-boolean-button [(ngModel)]="_form().targetAnalysis" [trueLabel]="'достаточны'"
+      <app-boolean-button name="targetAnalysis" required [(ngModel)]="_form().targetAnalysis" [trueLabel]="'достаточны'"
         [falseLabel]="'недостаточны'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().targetAnalysisText" rows="3" class="form-control mt-05"
+        <textarea
+          [(ngModel)]="_form().targetAnalysisText"
+          [attr.name]="'targetAnalysisText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
       @if (full()) {

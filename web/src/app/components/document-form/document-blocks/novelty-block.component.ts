@@ -10,11 +10,19 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <label>
         Степень новизны (уровень инновационности) объекта государственной экспертизы:
       </label>
-      <app-dropdown [options]="noveltyOptions" [(ngModel)]="_form().novelty"
+      <app-dropdown name="novelty" required [options]="noveltyOptions" [(ngModel)]="_form().novelty"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().noveltyText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea
+          [(ngModel)]="_form().noveltyText"
+          [attr.name]="'noveltyText_' + num()"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">

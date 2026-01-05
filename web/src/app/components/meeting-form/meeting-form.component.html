@@ -21,7 +21,7 @@
     </div>
     <div class="col-8">
       <h5>Объекты экспертизы</h5>
-      @for (project of projects; track project) {
+      @for (project of projects; track project.id) {
         <div>
           <ng-container>
             <app-checkbox [(ngModel)]="project.isChecked">{{project | titleAndCode}}</app-checkbox>
@@ -35,9 +35,9 @@
   </div>
 
   <div class="mt-2">
-    <button type="button" class="btn btn-secondary" (click)="cancel()">Отмена</button>
+    <button type="button" class="btn btn-secondary me-2" (click)="cancel()">Отмена</button>
     @if (!isEdit) {
-      <button type="button" class="btn btn-primary" (click)="save()">Создать</button>
+      <button type="button" class="btn btn-primary me-2" (click)="save()">Создать</button>
     }
     @if (isEdit) {
       <button type="button" class="btn btn-primary" (click)="edit()">Сохранить</button>

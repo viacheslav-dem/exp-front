@@ -132,3 +132,4 @@ web/target/
 web/examination-web.iml
 web/.vscode
 web/.angular
+web/package-lock.json

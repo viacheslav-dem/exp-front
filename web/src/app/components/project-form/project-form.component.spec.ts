@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ChangeDetectorRef } from '@angular/core';
 import { ProjectFormComponent } from './project-form.component';
 import { DataService } from '@app/services/data.service';
 import { PersonService } from '@app/services/person.service';
@@ -18,6 +19,9 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { faMinus } from '@fortawesome/free-solid-svg-icons';
+import { ElementRef } from '@angular/core';
+import { GlobalToastyService } from '@app/services/global-toasty.service';
+import { CommonComponentsModule } from '@app/components/common-components/components.module';
 
 // Моки сервисов
 class DataServiceMock {
@@ -56,9 +60,21 @@ class FundingTypePipeMock {
   transform(value: any) {
     return value;
   }
+  init() {
+    // Мок для AbstractEnumPipe
+  }
 }
 
-class ViewContainerRefMock {}
+class ChangeDetectorRefMock {
+  markForCheck() {}
+  detectChanges() {}
+}
+
+class GlobalToastyServiceMock {
+  success(message: string) {}
+  error(message: string) {}
+  warn(message: string) {}
+}
 
 describe('ProjectFormComponent', () => {
   let component: ProjectFormComponent;
@@ -72,11 +88,24 @@ describe('ProjectFormComponent', () => {
 
     await TestBed.configureTestingModule({
       declarations: [ProjectFormComponent, PersonFullNamePipe, FundingTypePipe],
-      imports: [FormsModule, CommonModule, FontAwesomeModule],
+      imports: [
+        FormsModule,
+        CommonModule,
+        FontAwesomeModule,
+        CommonComponentsModule // Импортируем модуль с компонентами вместо NO_ERRORS_SCHEMA
+      ],
       providers: [
-        { provide: ViewContainerRef, useClass: ViewContainerRefMock },
         { provide: DataService, useValue: dataService },
-        { provide: PersonService, useValue: personService }
+        { provide: PersonService, useValue: personService },
+        { provide: FundingTypePipe, useClass: FundingTypePipeMock },
+        { provide: ChangeDetectorRef, useClass: ChangeDetectorRefMock },
+        { provide: GlobalToastyService, useClass: GlobalToastyServiceMock },
+        {
+          provide: ElementRef,
+          useValue: {
+            nativeElement: document.createElement('div')
+          }
+        }
       ]
     }).compileComponents();
 
@@ -86,6 +115,8 @@ describe('ProjectFormComponent', () => {
 
     fixture = TestBed.createComponent(ProjectFormComponent);
     component = fixture.componentInstance;
+    // Не вызываем detectChanges здесь, чтобы избежать автоматического вызова ngOnInit
+    // Каждый тест должен явно вызывать ngOnInit() если нужно
   });
 
   it('should create', () => {
@@ -93,6 +124,14 @@ describe('ProjectFormComponent', () => {
   });
 
   describe('Form initialization', () => {
+    beforeEach(() => {
+      // Сбрасываем счетчики перед каждым тестом
+      dataService.getCatalogCalls = [];
+      dataService.getExpectedResultCalls = [];
+      dataService.getCommercializationMethodsCalls = [];
+      personService.getCurrentPersonCalls = [];
+    });
+
     it('should initialize with default values', () => {
       expect(component.directions).toEqual([]);
       expect(component.funding).toBeInstanceOf(FundingDto);
@@ -107,24 +146,27 @@ describe('ProjectFormComponent', () => {
     });
 
     it('should load current person in ngOnInit', () => {
+      // Сбрасываем счетчик перед вызовом
+      personService.getCurrentPersonCalls = [];
       component.ngOnInit();
-      fixture.detectChanges();
 
       expect(personService.getCurrentPersonCalls.length).toBe(1);
       expect(component.customer).toBeTruthy();
     });
 
     it('should load expected results in ngOnInit', () => {
+      // Сбрасываем счетчик перед вызовом
+      dataService.getExpectedResultCalls = [];
       component.ngOnInit();
-      fixture.detectChanges();
 
       expect(dataService.getExpectedResultCalls.length).toBe(1);
       expect(component.expectedResultList.length).toBeGreaterThan(0);
     });
 
     it('should load commercialization methods in ngOnInit', () => {
+      // Сбрасываем счетчик перед вызовом
+      dataService.getCommercializationMethodsCalls = [];
       component.ngOnInit();
-      fixture.detectChanges();
 
       expect(dataService.getCommercializationMethodsCalls.length).toBe(1);
       expect(component.commercializationMethods.length).toBeGreaterThan(0);
@@ -155,13 +197,29 @@ describe('ProjectFormComponent', () => {
     beforeEach(() => {
       project = new ProjectDto();
       project.title = 'Test Project';
-      project.code = { id: 1, code: '8.1' } as any;
+      project.code = { id: 1, code: '8.1', expertReviewType: 'EXPERT_REVIEW_8_1' } as any;
       project.executor = 'Test Executor';
       project.period = new PeriodDto();
       project.period.start = Date.now();
       project.period.end = Date.now() + 86400000;
-      project.directions = [];
+      project.directions = [{ id: 1, name: 'Test Direction' } as any];
       project.subDirections = [];
+      project.projectSpecialization = [{ id: 1, name: 'Test Specialization' } as any];
+      // Инициализируем expectedResult с необходимыми полями для валидации
+      const expectedResult = new ExpectedResultDto();
+      expectedResult.expectedResultType = 'другое';
+      expectedResult.workTypeDtos = [];
+      project.expectedResult = expectedResult;
+      // Инициализируем обязательные поля для валидации
+      project.otherExpectedResult = 'Тестовый вид ожидаемого результата';
+      project.expectedResultDescription = 'Тестовое описание ожидаемого результата экспертизы, которое содержит более 30 символов';
+      project.workType = 'другое';
+      project.otherWorkType = 'Тестовый вид работ';
+      project.selectedResultSpecific = 'APPLIED';
+      project.resultCommercialization = 'Не подлежит';
+      project.implementationResult = 'Тестовый результат';
+      project.implementationDescription = 'Тестовое описание объекта внедрения, которое содержит более 30 символов';
+      project.implementationSpecifying = 'Тестовое указание способа внедрения';
       component.project = project;
     });
 
@@ -192,6 +250,8 @@ describe('ProjectFormComponent', () => {
     });
 
     it('should throw error when period dates are invalid', () => {
+      // Убеждаемся, что специализация есть, чтобы не получить ошибку о ней раньше
+      project.projectSpecialization = [{ id: 1, name: 'Test Specialization' } as any];
       project.period.start = Date.now() + 86400000;
       project.period.end = Date.now();
 
@@ -214,8 +274,10 @@ describe('ProjectFormComponent', () => {
     });
 
     it('should clear socialEconomicGoals when canAddSocialEconomicGoals is false', () => {
-      project.code = { id: 1, code: '8.1' } as any;
+      project.code = { id: 1, code: '8.1', expertReviewType: 'EXPERT_REVIEW_8_1' } as any;
       project.socialEconomicGoals = [{ id: 1 } as CatalogDto];
+      // Убеждаемся, что специализация есть
+      project.projectSpecialization = [{ id: 1, name: 'Test Specialization' } as any];
 
       component.onSave();
 
@@ -325,6 +387,14 @@ describe('ProjectFormComponent', () => {
   });
 
   describe('Code selection', () => {
+    beforeEach(() => {
+      // Инициализируем expectedResultList для тестов
+      const result = new ExpectedResultDto();
+      result.expectedResultType = 'другое';
+      result.workTypeDtos = [];
+      component.expectedResultList = [result];
+    });
+
     it('should disable expected result button for specific codes', () => {
       component._project = new ProjectDto();
       component._project.code = { id: 1, code: '8.5' } as any;

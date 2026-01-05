@@ -47,7 +47,7 @@ export enum LifecycleGroupStateBadge {
   ACCEPTED = 'badge-success', // готовы результаты экспертизы проекта ГЭСом: проект рекомендован
   REJECTED = 'badge-danger', // готовы результаты экспертизы проекта ГЭСом: проект не рекомендован
   RETURNED = 'badge-danger', // проект возвращён без дальнейшего рассмотрения, т.е. без рассмотрения на заседании бюро
-  RETURNED_WITHOUT_EXPERTISE = 'badge-secondary', // проект возвращён без рассмотрения и без результатов экспертизы
+  RETURNED_WITHOUT_EXPERTISE = 'badge-danger', // проект возвращён без рассмотрения и без результатов экспертизы
 }
 
 export enum LifecycleGroupTermsMessages {

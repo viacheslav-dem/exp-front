@@ -1,5 +1,6 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {Catalog} from "@app/services/data.service";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-speciality',
@@ -10,7 +11,10 @@ import {Catalog} from "@app/services/data.service";
         [noItemsLabel]="'Специальности отсутствуют'"
         [type]="Catalog.SPECIALITY"
     ></app-simple-catalog>`,
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class SpecialityComponent {
   Catalog = Catalog;

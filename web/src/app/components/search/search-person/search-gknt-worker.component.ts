@@ -1,12 +1,14 @@
-import {Component, Input} from "@angular/core";
+import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
 import {Role} from "app/pipes/role.pipe";
 import {SearchPersonComponent} from "app/components/search/search-person/search-person.component";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-search-gknt-worker',
     templateUrl: './search-person.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.search) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class SearchGkntWorkerComponent extends SearchPersonComponent {
 
@@ -20,6 +22,7 @@ export class SearchGkntWorkerComponent extends SearchPersonComponent {
   @Input() set gkntDepartmentId(id: number) {
     this._gkntDepartmentId = id;
     this.update();
+    this.cdr?.markForCheck?.();
   }
 
   getFilters() {

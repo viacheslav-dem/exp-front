@@ -86,14 +86,17 @@
 
 <!--EDIT PROJECT MODAL-->
 <app-modal #editProjectModal *ifRole="[Role.CUSTOMER,Role.SUB_CUSTOMER]"
-  [title]="'Редактирование данных объекта экспертизы'">
+  [title]="'Редактирование данных объекта экспертизы'"
+  [modalClasses]="'modal-xl modal-dialog-scrollable modal-fullscreen-lg-down'">
   <app-project-form [project]="editedProject"
     (save)="onUpdate($event)" (cancel)="editProjectModal.hide()">
   </app-project-form>
 </app-modal>
 
 <!--COPY PROJECT MODAL-->
-<app-modal #copyProjectModal *ifRole="[Role.CUSTOMER,Role.SUB_CUSTOMER]" [title]="'Копирование объекта экспертизы'">
+<app-modal #copyProjectModal *ifRole="[Role.CUSTOMER,Role.SUB_CUSTOMER]"
+  [title]="'Копирование объекта экспертизы'"
+  [modalClasses]="'modal-xl modal-dialog-scrollable modal-fullscreen-lg-down'">
   <app-project-copy [project]="editedProject" (save)="onCopy($event)"
   (cancel)="copyProjectModal.hide()"></app-project-copy>
 </app-modal>

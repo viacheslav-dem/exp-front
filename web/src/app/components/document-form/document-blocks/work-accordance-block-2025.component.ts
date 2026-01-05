@@ -9,6 +9,7 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         и сопровождению программно-технических средств, информационных ресурсов, информационных систем и информационных сетей,
         заявленным объемам финансирования:
       </label>
+      <input type="hidden" [(ngModel)]="_form().workAccordance" name="workAccordance" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().workAccordance === true}" (click)="stateButton(true)">
           Соответствует
@@ -18,8 +19,8 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().workAccordanceText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea [(ngModel)]="_form().workAccordanceText" name="workAccordanceText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
     </div>
     `,

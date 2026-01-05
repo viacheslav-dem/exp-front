@@ -11,7 +11,7 @@
           </button>
         }
         <span (click)="showTransitionHistoryModal()" class="selectable"
-              [ngClass]="['badge', LifecycleGroupStateBadge[_group.state]]">
+              [ngClass]="['badge', LifecycleGroupStateBadge[_group.state] || 'badge-info']">
           {{_group.state | lifecycleGroupState}}
         </span>
         <span class="text-sm">ГЭС {{_group.council | councilCodeAndName}}</span>
@@ -51,7 +51,7 @@
       }
 
       <!--PROTOCOL-->
-      @if (_group.remarkDocuments.length) {
+      @if (_group.remarkDocuments && _group.remarkDocuments.length) {
         <div class="mt-2 mb-1">
           <div class="text-muted text-sm">О наличии замечаний</div>
         </div>
@@ -59,7 +59,7 @@
       }
 
       <!--PROTOCOL-->
-      @if (_group.meetingProtocol.length) {
+      @if (_group.meetingProtocol && _group.meetingProtocol.length) {
         <div class="mt-2 mb-1">
           <div class="text-muted text-sm">Протокол заседания бюро</div>
         </div>
@@ -124,7 +124,7 @@
                   (click)="answerForSectionRemark(lifecycle)">Замечания
           </button>
         }
-        <span class="selectable" [ngClass]="['badge', ProjectLifecycleStateBadge[lifecycle.state]]"
+        <span class="selectable" [ngClass]="['badge', ProjectLifecycleStateBadge[lifecycle.state] || 'badge-info']"
               (click)="showLifecycleTransitionHistoryModal(lifecycle)">
           {{lifecycle.state | lifecycleState}}
         </span>
@@ -136,12 +136,12 @@
             ({{lifecycle.rejectionReason}})
           </span>
         }
-        @if (lifecycle.remarkDocuments.length) {
+        @if (lifecycle.remarkDocuments && lifecycle.remarkDocuments.length) {
           <div>
             <app-document-list [documents]="lifecycle.remarkDocuments"></app-document-list>
           </div>
         }
-        @if (lifecycle.meetingProtocol.length) {
+        @if (lifecycle.meetingProtocol && lifecycle.meetingProtocol.length) {
           <div class="mt-2">
             <app-document-list [documents]="lifecycle.meetingProtocol"></app-document-list>
           </div>
@@ -185,6 +185,7 @@
 @if (_group && canEditConclusion()) {
   <app-modal #councilFormModal [title]="'Заключение ГЭС'" (onClose)="closeConclusionForm()">
   <app-council-conclusion-form [project]="projectValue" [group]="_group"
+                               [loading]="isCreatingConclusion"
                                [draftOwner]="_group"
                                [draftService]="_lifecycleGroupService"
                                (onSave)="generateConclusion($event)"

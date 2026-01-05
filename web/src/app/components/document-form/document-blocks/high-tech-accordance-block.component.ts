@@ -10,12 +10,14 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         высокотехнологичным, утвержденной постановлением ГКНТ от 25 июля 2022 г. № 12:
       </label>
       <app-boolean-button
+        name="highTechAccordance"
+        required
         [(ngModel)]="_form().highTechAccordance"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().highTechAccordanceText" rows="3" class="form-control"
+        <textarea [(ngModel)]="_form().highTechAccordanceText" name="highTechAccordanceText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>

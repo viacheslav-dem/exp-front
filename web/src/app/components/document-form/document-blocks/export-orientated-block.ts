@@ -12,8 +12,14 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full() || _form().exportOrientation) {
         <textarea
-          [(ngModel)]="_form().exportOrientationText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+          [(ngModel)]="_form().exportOrientationText"
+          [attr.name]="'exportOrientationText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
     </div>
     `,

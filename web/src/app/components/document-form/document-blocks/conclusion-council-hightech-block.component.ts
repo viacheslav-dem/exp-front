@@ -13,7 +13,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
           {{group().finalAgendaState || DecisionState.REJECTED | decision}}
         </span>
       </label>
-      <textarea [(ngModel)]="form().conclusionText" rows="3" class="form-control"
+      <textarea [(ngModel)]="form().conclusionText" name="conclusionText" rows="3" class="form-control"
       placeholder="Выводы и предложения (при необходимости)."></textarea>
       @if (financeConclusionNum()) {
         <div class="hint">

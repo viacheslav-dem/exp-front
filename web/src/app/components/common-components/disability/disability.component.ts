@@ -1,7 +1,8 @@
-import {Component, forwardRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, forwardRef} from '@angular/core';
 import {ControlComponent} from "app/components/common-components/control-component";
 import {DisabilityDto} from "app/dto/DisabilityDto";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
+import {environment} from "../../../../environments/environment";
 
 export const DISABILITY_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -56,7 +57,10 @@ export const DISABILITY_CONTROL_VALUE_ACCESSOR: any = {
         }
     `,
     providers: [DISABILITY_CONTROL_VALUE_ACCESSOR],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class DisabilityComponent extends ControlComponent<DisabilityDto> {
 }

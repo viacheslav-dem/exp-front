@@ -41,8 +41,15 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         </div>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().technologyTypeText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea
+          [(ngModel)]="_form().technologyTypeText"
+          [attr.name]="'technologyTypeText_' + num().split('.').join('_')"
+          required
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст"
+        ></textarea>
       }
     </div>
     `,

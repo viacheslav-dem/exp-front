@@ -12,12 +12,21 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <label>Целесообразность реализации внедряемых технологий с учетом их оптимальности и инновационности:</label>
 
       <app-boolean-button
+        name="conclusion"
+        required
         [(ngModel)]="_form().conclusion"
         [trueLabel]="'целесообразно'"
         [falseLabel]="'нецелесообразно'"
         (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      <textarea [(ngModel)]="_form().conclusionText" rows="3" class="form-control mt-05"
-                placeholder="Обязательный текст."></textarea>
+      <textarea
+        [(ngModel)]="_form().conclusionText"
+        [attr.name]="'conclusionText_8_9'"
+        required
+        minlength="30"
+        rows="3"
+        class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."
+      ></textarea>
       <div class="hint">
         <p>
           <b>Подсказка.</b>

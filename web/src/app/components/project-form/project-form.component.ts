@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewContainerRef} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewContainerRef} from '@angular/core';
 import {Catalog, DataService} from "@app/services/data.service";
 import {CatalogDto} from "@app/dto/CatalogDto";
 import {PeriodDto} from "@app/dto/PeriodDto";
@@ -16,13 +16,17 @@ import {SearchPageRequest} from "@app/components/common-components/page-and-filt
 import {Pagination} from "@app/components/common-components/page-and-filter/model/Pagination";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import {SortOrder, Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
+import {environment} from "../../../environments/environment";
+import {GlobalToastyService} from "@app/services/global-toasty.service";
+import {FormValidationScrollService} from "@app/services/form-validation-scroll.service";
 
 
 @Component({
     selector: 'app-project-form',
     templateUrl: 'project-form.component.html',
     styleUrls: ['project-form.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class ProjectFormComponent implements OnInit, OnDestroy {
 
@@ -73,7 +77,11 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     constructor(private viewContainerRef: ViewContainerRef,
                 private _dataService: DataService,
                 private _personService: PersonService,
-                private _fundingPipe: FundingTypePipe) {
+                private _fundingPipe: FundingTypePipe,
+                private cdr: ChangeDetectorRef,
+                private readonly hostRef: ElementRef<HTMLElement>,
+                private readonly toasty: GlobalToastyService,
+                private readonly validationScrollService: FormValidationScrollService) {
         this.fundingToString = finance => _fundingPipe.transform(finance);
     }
 
@@ -81,12 +89,15 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         this.getProjectCodes();
         this._personService.getCurrentPerson().subscribe(res => {
             this.customer = res;
+            this.cdr?.markForCheck?.();
         });
         this._dataService.getExpectedResult().subscribe((res => {
             this.expectedResultList = res;
+            this.cdr?.markForCheck?.();
         }))
         this._dataService.getCommercializationMethods().subscribe((res => {
             this.commercializationMethods = res;
+            this.cdr?.markForCheck?.();
         }))
     }
 
@@ -105,6 +116,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         
         // Инициализируем данные для специализаций
         this.initSpecializationMaps();
+        this.cdr?.markForCheck?.();
     }
 
     private initSpecializationMaps() {
@@ -160,7 +172,10 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     }
 
     getProjectCodes() {
-        this._dataService.getCatalog(Catalog.PROJECT_CODE).subscribe(res => this.codes = res)
+        this._dataService.getCatalog(Catalog.PROJECT_CODE).subscribe(res => {
+            this.codes = res;
+            this.cdr?.markForCheck?.();
+        });
     }
 
     selectCode(code) {
@@ -175,7 +190,8 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
             this._project.code.code == '8.13'
         ) {
             this.disableExpectedResultButton = true;
-            this.selectExpectedResult( this.expectedResultList.find(result => result.expectedResultType === 'другое'));
+            const defaultResult = this.expectedResultList?.find(result => result.expectedResultType === 'другое');
+            this.selectExpectedResult(defaultResult);
         } else {
             let expRes: ExpectedResultDto;
             this.disableExpectedResultButton = false;
@@ -184,6 +200,33 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     }
 
   onSave() {
+    // 1) Сначала проверяем "стандартную" валидацию Angular (required/minlength/etc).
+    // Если уже есть .ng-invalid — не запускаем validate()+throw, а мягко ведём пользователя к полю.
+    if (this.validationScrollService.hasInvalidControls(this.hostRef?.nativeElement)) {
+      const firstInvalid = this.validationScrollService.getFirstInvalidElement(this.hostRef?.nativeElement);
+      const fieldName = firstInvalid ? this.validationScrollService.getFieldLabel(firstInvalid) : null;
+      const errorType = firstInvalid ? this.validationScrollService.getFieldErrorType(firstInvalid) : null;
+      this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
+      // Сообщение с названием поля и типом ошибки (инкрементальная миграция): конкретные тексты постепенно уедут в inline-ошибки.
+      let message = 'Заполните обязательные поля и проверьте минимальную длину текста.';
+      if (fieldName) {
+        if (errorType === 'required') {
+          message = `Заполните обязательное поле "${fieldName}".`;
+        } else if (errorType === 'minlength') {
+          const minLength = firstInvalid?.getAttribute('minlength') || '30';
+          message = `Поле "${fieldName}" должно содержать не менее ${minLength} символов.`;
+        } else if (errorType === 'min') {
+          const min = firstInvalid?.getAttribute('min') || '0';
+          message = `Поле "${fieldName}" должно быть не менее ${min}.`;
+        } else {
+          message = `Заполните обязательное поле "${fieldName}" и проверьте минимальную длину текста.`;
+        }
+      }
+      this.toasty?.warn?.(message);
+      return;
+    }
+
+    // 2) Пока миграция не завершена — остаётся ручная бизнес-валидация через validate()+throw.
     this._project.directions = this.directions;
     this._project.subDirections = [];
     for (let i = 0; i < this.directions.length; i++) {
@@ -191,12 +234,45 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         this._project.subDirections.push(this.directions[i].subDirectionDtos[j]);
       }
     }
-    this.validate();
-    if (!this.canAddSocialEconomicGoals()) {
-      this._project.socialEconomicGoals = [];
+    try {
+      this.validate();
+      if (!this.canAddSocialEconomicGoals()) {
+        this._project.socialEconomicGoals = [];
+      }
+      this.validateExpectedResultBlock();
+      this.save.emit(this._project);
+    } catch (e) {
+      const errorMessage = e?.toString() || '';
+      // Пытаемся найти соответствующий элемент в DOM по тексту ошибки
+      const targetElement = this.findElementByErrorText(errorMessage);
+      if (targetElement) {
+        this.scrollToElement(targetElement);
+      } else {
+        this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
+      }
+      // Извлекаем название поля из текста ошибки для более понятного сообщения
+      const fieldName = this.extractFieldNameFromError(errorMessage);
+      if (fieldName) {
+        // Проверяем, содержит ли сообщение название поля
+        const lowerError = errorMessage.toLowerCase();
+        const lowerFieldName = fieldName.toLowerCase();
+        const fieldNameInMessage = lowerFieldName.split(' ').some(word => 
+          word.length > 3 && lowerError.includes(word)
+        );
+        
+        if (fieldNameInMessage) {
+          // Если название поля уже в сообщении, показываем как есть
+          this.toasty?.warn?.(errorMessage);
+        } else {
+          // Если нет, добавляем название поля
+          this.toasty?.warn?.(`Заполните обязательное поле "${fieldName}". ${errorMessage}`);
+        }
+        // Не пробрасываем ошибку дальше, чтобы избежать дублирования
+        return;
+      }
+      // Если не нашли название поля, пробрасываем ошибку дальше (CustomErrorHandler покажет её)
+      throw e;
     }
-    this.validateExpectedResultBlock();
-    this.save.emit(this._project);
   }
 
     validateExpectedResultBlock() {
@@ -273,16 +349,16 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     }
 
     validate() {
-        if (this._project.code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025') {
-            if (isEmptyOrNull(this._project.program)) {
-                throw 'Наименование программы (подпрограммы) не может быть пустым.';
-            }
-        }
         if (isEmptyOrNull(this._project.title)) {
             throw 'Наименование объекта экспертизы не может быть пустым.';
         }
         if (!this._project.code) {
             throw 'Пожалуйста, выберите код объекта экспертизы.';
+        }
+        if (this._project.code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025') {
+            if (isEmptyOrNull(this._project.program)) {
+                throw 'Наименование программы (подпрограммы) не может быть пустым.';
+            }
         }
         const validSpecializations = this._project.projectSpecialization?.filter(s => s != null) || [];
         if (validSpecializations.length === 0) {
@@ -307,6 +383,10 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                 if (this._project.directions.length == 0 && this._project.socialEconomicGoals.length == 0 && this.canAddSocialEconomicGoals()) {
                     throw 'Пожалуйста, укажите приоритетное направление научных исследований и (или) научно-технической деятельности ' +
                     'или цель (приоритет) социально-экономического развития';
+                }
+                // Проверка финансирования
+                if (!this._project.financing || this._project.financing.length === 0) {
+                    throw 'Пожалуйста, укажите финансирование объекта экспертизы.';
                 }
             }
         }
@@ -352,6 +432,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
       this.newDirection = null;
       this.subDirection = null;
       flagDirection = false;
+      this.cdr?.markForCheck?.();
     // }
   }
 
@@ -381,6 +462,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         }
         this._project.financing.push(this.funding);
         this.funding = new FundingDto();
+        this.cdr?.markForCheck?.();
     }
 
     // select(option: SubDirectionDto) {
@@ -402,12 +484,14 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     if(dir.subDirectionDtos.length == 0){
       this.directions.splice(indexDir, 1);
     }
+    this.cdr?.markForCheck?.();
     return dir.subDirectionDtos;
   }
 
   deleteDirection(dir: DirectionDto, i: number) {
       dir.subDirectionDtos = [];
       this.directions.splice(i, 1);
+      this.cdr?.markForCheck?.();
   }
 
     clearAppliedFields() {
@@ -446,14 +530,15 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         this.resultSpecificList = resultSpecificList;
 
         if (this._project.expectedResult) {
-            if (this._project.expectedResult.workTypeDtos.length === 1) {
+            const workTypeDtos = this._project.expectedResult.workTypeDtos || [];
+            if (workTypeDtos.length === 1) {
                 this.disableTypeOfWorkButton = true;
-                this._project.workType = this._project.expectedResult.workTypeDtos[0].description;
+                this._project.workType = workTypeDtos[0].description;
             } else {
                 this.disableTypeOfWorkButton = false;
                 this._project.workType = '';
             }
-            this.outputTypeOfWorkList = this._project.expectedResult.workTypeDtos
+            this.outputTypeOfWorkList = workTypeDtos;
         } else {
             this.outputTypeOfWorkList = typeOfWorkList;
         }
@@ -472,6 +557,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
             this.disableResultSpecificButton = false;
             this._project.selectedResultSpecific = '';
         }
+        this.cdr?.markForCheck?.();
     }
 
     selectTypeOfWork(typeOfWork) {
@@ -496,6 +582,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                 this.selectResultSpecific('');
             }
         }
+        this.cdr?.markForCheck?.();
     }
 
     selectResultSpecific(resultSpecific) {
@@ -503,6 +590,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         if (this._project.selectedResultSpecific !== ResultSpecificEnum.APPLIED) {
             this.clearCommerceFields();
         }
+        this.cdr?.markForCheck?.();
     }
 
     isCommerce(flag: boolean) {
@@ -517,6 +605,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
             this._project.commercializationMethods = [];
             this._project.commercializationDescription = '';
         }
+        this.cdr?.markForCheck?.();
     }
 
     selectCommerceResult() {
@@ -525,15 +614,18 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         }
         this._project.commercializationMethods.push(this.selectedCommercializationMethod);
         this.selectedCommercializationMethod = null;
+        this.cdr?.markForCheck?.();
     }
 
     selectChoiceOfResultCharacterAppliedResult(selectedElement) {
         this._project.implementationResult = selectedElement;
+        this.cdr?.markForCheck?.();
     }
 
     selectTechnologyType(technologyType) {
         this._project.technologicalOrder = technologyType;
         this.isAnotherTechnologyType = this._project.technologicalOrder === 'другое';
+        this.cdr?.markForCheck?.();
     }
 
     // Методы работы со специализацией - lazy loading как в user-form
@@ -573,6 +665,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                             : [];
                         this.specializationItemsMap.set(index, [...existingSelected]);
                         this.specializationHasMoreMap.set(index, true);
+                        this.cdr?.markForCheck?.();
                         return of([]);
                     }
                     
@@ -584,7 +677,9 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                     this.specializationHasMoreMap.set(index, true);
                     return this.loadSpecializations(true, index);
                 })
-            ).subscribe();
+            ).subscribe(() => {
+                this.cdr?.markForCheck?.();
+            });
         }
         return this.specializationSearchInputMap.get(index);
     }
@@ -597,7 +692,9 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         if (items.length === 0 || (page === 0 && !loading)) {
             this.specializationPageMap.set(index, 0);
             this.specializationHasMoreMap.set(index, true);
-            this.loadSpecializations(true, index).subscribe();
+            this.loadSpecializations(true, index).subscribe(() => {
+                this.cdr?.markForCheck?.();
+            });
         }
     }
 
@@ -640,6 +737,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                 this.specializationHasMoreMap.set(index, page.page < page.totalPages);
                 this.specializationPageMap.set(index, currentPage + 1);
                 this.specializationLoadingMap.set(index, false);
+                this.cdr?.markForCheck?.();
                 return of(this.specializationItemsMap.get(index));
             })
         );
@@ -650,7 +748,9 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         const hasMore = this.specializationHasMoreMap.get(index) !== false;
         
         if (!loading && hasMore) {
-            this.loadSpecializations(false, index).subscribe();
+            this.loadSpecializations(false, index).subscribe(() => {
+                this.cdr?.markForCheck?.();
+            });
         }
     }
 
@@ -662,8 +762,10 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         return a && b ? a.id === b.id : a === b;
     }
 
-    trackBySpecialization(specialization: CatalogDto): any {
-        return specialization?.id || specialization?.name || null;
+    trackBySpecialization(index: number, specialization: CatalogDto | null): any {
+        // Важно: при нескольких пустых (null) элементах ключи должны быть уникальными,
+        // иначе Angular выбросит NG0955 (duplicated keys).
+        return specialization?.id ?? specialization?.name ?? index;
     }
 
     addSpecialization() {
@@ -679,10 +781,143 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         this.specializationPageMap.set(newIndex, 0);
         this.specializationHasMoreMap.set(newIndex, true);
         this.specializationCurrentSearchMap.set(newIndex, '');
+        this.cdr?.markForCheck?.();
     }
 
     removeSpecialization(index: number) {
         this._project.projectSpecialization.splice(index, 1);
+        this.cdr?.markForCheck?.();
+    }
+
+
+    /**
+     * Находит элемент в DOM по тексту ошибки валидации
+     */
+    private findElementByErrorText(errorMessage: string): HTMLElement | null {
+        const root = this.hostRef?.nativeElement;
+        if (!root) return null;
+
+        // Маппинг текстов ошибок на селекторы или ключевые слова для поиска
+        const errorMappings: { [key: string]: string } = {
+            'приоритетное направление': '.form-group-label',
+            'код объекта экспертизы': '.form-group-label',
+            'код специализации': '.form-group-label',
+            'исполнитель': '.form-group-label',
+            'сроки реализации': '.form-group-label',
+            'ожидаемый результат': '.form-group-label',
+            'вид работ': '.form-group-label',
+            'характер результата': '.form-group-label',
+            'коммерциализация': '.form-group-label',
+            'внедрение': '.form-group-label',
+            'технологический уклад': '.form-group-label',
+            'программа': '.form-group-label',
+            'финансирование': '.form-group-label'
+        };
+
+        // Ищем ключевое слово в тексте ошибки
+        const lowerError = errorMessage.toLowerCase();
+        for (const [keyword, selector] of Object.entries(errorMappings)) {
+            if (lowerError.includes(keyword)) {
+                // Ищем все labels с этим классом
+                const labels = Array.from(root.querySelectorAll<HTMLElement>(selector));
+                for (const label of labels) {
+                    const labelText = label.textContent?.toLowerCase() || '';
+                    if (labelText.includes(keyword)) {
+                        // Находим родительский form-group и ищем в нём фокусируемый элемент
+                        const formGroup = label.closest('.form-group');
+                        if (formGroup) {
+                            // Ищем различные типы элементов для прокрутки
+                            const selectors = [
+                                'input:not([type="hidden"])',
+                                'textarea',
+                                'select',
+                                'button:not(.btn-icon)',
+                                'app-select-catalog',
+                                'app-dropdown',
+                                '.dropdown button',
+                                '.dropdown-toggle',
+                                'ng-select'
+                            ];
+                            
+                            for (const sel of selectors) {
+                                const focusable = formGroup.querySelector<HTMLElement>(sel);
+                                if (focusable && this.validationScrollService.isElementVisible(focusable)) {
+                                    return focusable;
+                                }
+                            }
+                            
+                            // Если не нашли фокусируемый элемент, возвращаем сам label
+                            if (this.validationScrollService.isElementVisible(label)) {
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Извлекает название поля из текста ошибки или находит его в DOM
+     */
+    private extractFieldNameFromError(errorMessage: string): string | null {
+        const root = this.hostRef?.nativeElement;
+        if (!root) return null;
+
+        // Маппинг текстов ошибок на ключевые слова для поиска в DOM
+        const errorMappings: { [key: string]: string } = {
+            'приоритетное направление': 'приоритетное направление',
+            'код объекта экспертизы': 'код объекта экспертизы',
+            'код специализации': 'код специализации',
+            'исполнитель': 'исполнитель',
+            'сроки реализации': 'сроки',
+            'ожидаемый результат': 'ожидаемый результат',
+            'вид работ': 'вид работ',
+            'характер результата': 'характер результата',
+            'коммерциализация': 'коммерциализация',
+            'внедрение': 'внедрение',
+            'технологический уклад': 'технологический уклад',
+            'программа': 'программа',
+            'наименование объекта экспертизы': 'наименование объекта экспертизы',
+            'финансирование': 'финансирование'
+        };
+
+        const lowerError = errorMessage.toLowerCase();
+        for (const [keyword, searchKeyword] of Object.entries(errorMappings)) {
+            if (lowerError.includes(keyword)) {
+                // Пытаемся найти точное название в DOM
+                const labels = Array.from(root.querySelectorAll<HTMLLabelElement>('.form-group-label'));
+                for (const label of labels) {
+                    const labelText = label.textContent?.trim() || '';
+                    const lowerLabelText = labelText.toLowerCase();
+                    // Проверяем, содержит ли label ключевое слово
+                    if (lowerLabelText.includes(searchKeyword)) {
+                        // Ограничиваем длину для читаемости
+                        if (labelText.length > 100) {
+                            return labelText.substring(0, 97) + '...';
+                        }
+                        return labelText;
+                    }
+                }
+                // Если не нашли в DOM, пытаемся извлечь из текста ошибки
+                // Ищем паттерн "укажите <название поля>" или "выберите <название поля>"
+                const match = errorMessage.match(/(?:укажите|выберите|заполните|указать|выбрать|заполнить)\s+(.+?)(?:\.|$)/i);
+                if (match && match[1]) {
+                    return match[1].trim();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Прокручивает к указанному элементу
+     */
+    private scrollToElement(element: HTMLElement): void {
+        this.validationScrollService.scrollToElement(element);
     }
 }
 

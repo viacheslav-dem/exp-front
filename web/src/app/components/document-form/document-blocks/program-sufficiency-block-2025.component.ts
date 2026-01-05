@@ -8,6 +8,7 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         {{num()}}. Достаточность перечня мероприятий по научному обеспечению государственной программы / перечня заданий
         государственной научно-технической программы для достижения запланированных программой целевых показателей:
       </label>
+      <input type="hidden" [(ngModel)]="_form().programSufficiency" name="programSufficiency" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().programSufficiency === true}" (click)="stateButton(true)">
           Достаточен
@@ -17,8 +18,8 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().programSufficiencyText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea [(ngModel)]="_form().programSufficiencyText" name="programSufficiencyText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full()) {
         <div class="hint">

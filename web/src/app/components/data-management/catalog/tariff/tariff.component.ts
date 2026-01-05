@@ -1,8 +1,9 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {Catalog, DataService} from "@app/services/data.service";
 import {SimpleCatalogComponent} from "@app/components/data-management/catalog/simple-catalog/simple-catalog.component";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {TariffRateDto} from "@app/dto/TariffRateDto";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-tariff',
@@ -85,7 +86,7 @@ import {TariffRateDto} from "@app/dto/TariffRateDto";
                                 class="form-control" title="Коэффициент для членов экспертного совета">
                               </div>
                               <div class="mt-1">
-                                <button class="btn btn-secondary" (click)="cancelEditItem()">Отмена</button>
+                                <button class="btn btn-secondary me-2" (click)="cancelEditItem()">Отмена</button>
                                 <button class="btn btn-primary" (click)="saveEditedItem()">Сохранить</button>
                                 @if (selectedItem.id == 0) {
                                   <button class="btn btn-danger" (click)="deleteItem(areaInd)">
@@ -115,7 +116,10 @@ import {TariffRateDto} from "@app/dto/TariffRateDto";
                 </div>
     `,
     styles: [],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class TariffComponent extends SimpleCatalogComponent<TariffRateDto> {
 

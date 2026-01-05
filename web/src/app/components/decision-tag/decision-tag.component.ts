@@ -1,10 +1,12 @@
-import {Component, OnInit, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, input} from '@angular/core';
 import {DecisionStateBadge} from "@app/pipes/decision.pipe";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-decision-tag',
     templateUrl: './decision-tag.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class DecisionTagComponent implements OnInit {
 

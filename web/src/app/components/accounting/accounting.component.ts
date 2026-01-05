@@ -30,6 +30,7 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
 import {Router} from "@angular/router";
 import {DialogService} from "@app/components/dialogs/dialog.service";
 import {PeriodDto} from "@app/dto/PeriodDto";
+import {NumberPipe} from "@app/pipes/number.pipe";
 
 @Component({
     selector: 'app-accounting',
@@ -216,6 +217,19 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
 
   fixed(num: number): number{
     return Math.round(num*100)/100
+  }
+
+  /**
+   * В шаблоне нельзя использовать `| number`, потому что в scope одновременно попадают:
+   * - встроенная Angular pipe `number` (DecimalPipe из CommonModule)
+   * - наша кастомная `NumberPipe` с тем же именем `number` (из CustomPipesModule)
+   * Это вызывает NG0313. Здесь используем кастомный форматтер напрямую (без шаблонного pipe).
+   *
+   * Риск: меняем только одно место форматирования в accounting, поведение сохраняем.
+   * Изменение локальное и легко откатывается.
+   */
+  formatNumber(value: number | null | undefined, precision?: number, sign?: boolean): string | null {
+    return NumberPipe.transform(value as number, precision, sign);
   }
 
   changeDateToValue(dateTo: number) {

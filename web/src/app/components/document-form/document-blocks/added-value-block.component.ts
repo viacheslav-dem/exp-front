@@ -11,10 +11,19 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <input [(ngModel)]="_form().addedValue" min="0" numberInput type="text" class="form-control"
         title="Уровень добавленной стоимости"
         placeholder="сумма в евро"
+        name="addedValue"
+        required
         (ngModelChange)="onConditionsChanged.emit(true)">
         @if (full()) {
-          <textarea [(ngModel)]="_form().addedValueText" rows="3" class="form-control mt-05"
-          placeholder="Обязательный текст"></textarea>
+          <textarea
+            [(ngModel)]="_form().addedValueText"
+            [attr.name]="'addedValueText_' + num().split('.').join('_')"
+            required
+            minlength="30"
+            rows="3"
+            class="form-control mt-05"
+            placeholder="Обязательный текст (не менее 30 символов)."
+          ></textarea>
         }
         @if (full()) {
           <div class="hint">

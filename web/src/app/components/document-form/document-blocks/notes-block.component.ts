@@ -17,8 +17,9 @@ import {Text} from "@app/components/document-form/form-model/Text";
         }
         @for (note of _form().wrappedNotes; track note; let i = $index) {
           <div class="input-group mb-2">
-            <textarea [(ngModel)]="note.text" rows="2" class="form-control"
+            <textarea [(ngModel)]="note.text" [attr.name]="'note_' + i" rows="2" class="form-control"
               title="Замечание"
+              maxlength="5000"
             placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
             <div class="input-group-append">
               <button type="button" class="btn btn-outline-danger" (click)="deleteNote(i)">&times;</button>

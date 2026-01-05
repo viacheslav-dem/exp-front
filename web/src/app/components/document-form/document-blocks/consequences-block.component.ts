@@ -8,8 +8,15 @@ import {Component, input} from '@angular/core';
         {{num()}}. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
         и необходимости модернизации (реконструкции) взаимосвязанных действующих производственных объектов.
       </label>
-      <textarea [(ngModel)]="_form().consequences" rows="3" class="form-control"
-      placeholder="Обязательный текст."></textarea>
+      <textarea
+        [(ngModel)]="_form().consequences"
+        [attr.name]="'consequences_' + num().split('.').join('_')"
+        required
+        [attr.minlength]="minLen()"
+        rows="3"
+        class="form-control"
+        [attr.placeholder]="minLen() ? ('Обязательный текст (не менее ' + minLen() + ' символов).') : 'Обязательный текст.'"
+      ></textarea>
       @if (full()) {
         <div class="hint">
           <p>
@@ -50,6 +57,13 @@ export class ConsequencesBlockComponent {
   readonly num = input<string>("2.6");
 
   readonly full = input<boolean>(true);
+
+  /**
+   * Опционально: некоторые типы форм требуют минимум 30 символов (например, expert-review 8.9),
+   * но для других форм это требование не всегда есть.
+   * По умолчанию ограничение не применяется.
+   */
+  readonly minLen = input<number | null>(null);
 
   readonly _form = input<{
     consequences: string;

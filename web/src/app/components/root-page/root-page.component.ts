@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, OnInit} from "@angular/core";
 import {AuthService} from "@app/services/auth.service";
 import {Role} from "@app/pipes/role.pipe";
 import {SystemNotificationDto} from "@app/dto/SystemNotificationDto";
@@ -6,23 +6,34 @@ import {SystemNotificationService} from "@app/services/system-notification.servi
 import {SafeHtmlPipe} from "@app/pipes/safe-html-pipe";
 import {AuditService} from "@app/services/audit.service";
 import {Router} from "@angular/router";
+import {environment} from "../../../environments/environment";
+import {SystemNotificationStore} from "@app/services/system-notification.store";
 
 @Component({
     selector: 'app-root-page',
     templateUrl: 'root-page.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class RootPageComponent implements OnInit {
 
   public menu: any[];
-  systemNotificationForAllPages: SystemNotificationDto;
+  systemNotificationForAllPages: SystemNotificationDto = new SystemNotificationDto();
   programVersion = "";
 
   constructor(private _authService: AuthService,
               private notificationService: SystemNotificationService,
               private safeHtmlPipe: SafeHtmlPipe,
               private auditService: AuditService,
-              private router: Router) {
+              private router: Router,
+              private notificationStore: SystemNotificationStore,
+              private cdr: ChangeDetectorRef) {
+
+    // Без перезагрузки страницы: обновляем баннер, когда store меняется (zoneless/OnPush friendly).
+    effect(() => {
+      this.systemNotificationForAllPages = this.notificationStore.allPages();
+      this.cdr?.markForCheck?.();
+    });
   }
 
   ngOnInit(): void {
@@ -157,14 +168,8 @@ export class RootPageComponent implements OnInit {
   }
 
   getSystemNotificationForAllPages() {
-
-      this.systemNotificationForAllPages = new SystemNotificationDto();
-      this.systemNotificationForAllPages.name = "ALL_PAGES_NOTIFICATION";
-
-      this.notificationService.getNotification(this.systemNotificationForAllPages).subscribe(
-          (response) => {
-            if (response != null) this.systemNotificationForAllPages = response;
-        });
+      // Держим метод для обратимой миграции: фактически загружаем через store.
+      this.notificationStore.refreshAllPages();
   }
 
   notificationToSafeHtml(notificationMessage: string) {
@@ -174,9 +179,10 @@ export class RootPageComponent implements OnInit {
   updateProgramVersion() {
       let role = this._authService.getCurrRole();
       if (role == Role.ADMIN) {
-          this.auditService.getProjectVersion().subscribe(res =>
-              this.programVersion = "Версия: " + res.version
-          );
+          this.auditService.getProjectVersion().subscribe(res => {
+              this.programVersion = "Версия: " + res.version;
+              this.cdr?.markForCheck?.();
+          });
       }
   }
 

@@ -16,7 +16,9 @@ import {environment} from "../../../environments/environment";
     styleUrls: ['loginoff.component.scss'],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.loginoff ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class LoginoffComponent implements OnInit, OnDestroy {
   public roles: string[] = [];

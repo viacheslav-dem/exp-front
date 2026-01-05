@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild, input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild, input} from '@angular/core';
 import {ActionButtonMetadata} from "@app/components/project-info/action-button-metadata";
 import {ProjectState, ProjectStateBadge} from "@app/pipes/project-state.pipe";
 import {Role} from "@app/pipes/role.pipe";
@@ -21,11 +21,13 @@ import {LifecycleGroupState} from "@app/pipes/lifecycle-group-state.pipe";
 import {DirectionDto} from "@app/dto/DirectionDto";
 import {Catalog, DataService} from "@app/services/data.service";
 import {SubDirectionDto} from "@app/dto/SubDirectionDto";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-basic-project-info',
     templateUrl: './basic-project-info.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class BasicProjectInfoComponent implements OnInit {
 
@@ -56,7 +58,8 @@ export class BasicProjectInfoComponent implements OnInit {
               private _toasty: GlobalToastyService,
               private authService: AuthService,
               private _documentService: DocumentService,
-              private _dataService: DataService) {
+              private _dataService: DataService,
+              private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -69,6 +72,7 @@ export class BasicProjectInfoComponent implements OnInit {
     this._projectService.prepareProject(project);
     this.project = project;
     this.updateDisplayedDirections();
+    this.cdr?.markForCheck?.();
   }
 
   changed() {
@@ -81,7 +85,10 @@ export class BasicProjectInfoComponent implements OnInit {
     }
     this.transitionHistoryModal.show();
     this._transitionHistoryService.getProjectHistory(this.project)
-      .subscribe(res => this.transitionHistory = res);
+      .subscribe(res => {
+        this.transitionHistory = res;
+        this.cdr?.markForCheck?.();
+      });
   }
 
   canEditProjectDocuments(): boolean {

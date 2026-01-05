@@ -1,10 +1,14 @@
-import {Component, EventEmitter, OnInit, Output, OnChanges, SimpleChanges, input} from "@angular/core";
+import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, OnChanges, SimpleChanges, input} from "@angular/core";
 import {Options} from '@angular-slider/ngx-slider';
+import {environment} from "../../../../environments/environment";
 
 @Component({
     selector: 'app-slider',
     templateUrl: './slider.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class SliderComponent implements OnInit, OnChanges {
 

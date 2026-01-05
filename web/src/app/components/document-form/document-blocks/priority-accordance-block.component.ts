@@ -7,8 +7,15 @@ import {Component, input} from '@angular/core';
       <label>
         {{num()}}. Приоритетность направления инвестиций в технологию, обоснованность расходов.
       </label>
-      <textarea [(ngModel)]="_form().priorityAccordance" rows="3" class="form-control"
-      placeholder="Обязательный текст."></textarea>
+      <textarea
+        [(ngModel)]="_form().priorityAccordance"
+        [attr.name]="'priorityAccordance_' + num().split('.').join('_')"
+        required
+        minlength="30"
+        rows="3"
+        class="form-control"
+        placeholder="Обязательный текст (не менее 30 символов)."
+      ></textarea>
       @if (full()) {
         <div class="hint">
           <p>

@@ -17,7 +17,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
             научно-технической и инновационной деятельности в Республике Беларусь,
             которым объект экспертизы <b>соответствует</b>:
           </label>
-          @for (direction of _allDirections; track direction) {
+          @for (direction of _allDirections; track direction.id) {
             <div>
               <app-checkbox [(ngModel)]="direction.isChecked"
                 (ngModelChange)="onDirectionChanged()">{{ direction.name }}
@@ -32,19 +32,19 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
             Выберите цели (приоритеты) социально-экономического развития,
             которым объект экспертизы <b>соответствует</b>:
           </label>
-          @for (item of _allGoals; track item) {
+          @for (item of _allGoals; track item.id) {
             <div>
               <app-checkbox [(ngModel)]="item.isChecked" (ngModelChange)="onGoalChanged()">{{ item.name }}
               </app-checkbox>
             </div>
           }
-          <textarea [(ngModel)]="_form.directionsAndGoalsText" rows="3" class="form-control mt-05"
+          <textarea [(ngModel)]="_form.directionsAndGoalsText" name="directionsAndGoalsText" rows="3" class="form-control mt-05"
           placeholder="Пояснительный текст (при необходимости)."></textarea>
         </div>
       }
       @if (showTarget8_4()) {
-        <textarea [(ngModel)]="_form.multilateralDirectionsText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст."></textarea>
+        <textarea [(ngModel)]="_form.multilateralDirectionsText" name="multilateralDirectionsText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
       @if (showTarget8_4()) {
         <div class="hint">

@@ -25,6 +25,13 @@ thead th {
   white-space: nowrap;
 }
 
+// Bootstrap задаёт "светлую" шапку через .table-light.
+// Для списка пользователей хотим, чтобы фон страницы/таблицы оставался белым.
+thead.table-light,
+thead.table-light th {
+  background-color: #fff !important;
+}
+
 tbody td, tbody th {
   padding: 1rem 0.75rem;
   vertical-align: middle;

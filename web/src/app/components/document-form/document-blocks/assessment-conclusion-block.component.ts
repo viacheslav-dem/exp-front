@@ -10,12 +10,14 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
         мероприятия, целям рассматриваемого мероприятия:
       </label>
       <app-boolean-button
+        name="assessment"
+        required
         [(ngModel)]="_form().assessment"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().assessmentText" rows="3" class="form-control"
+        <textarea [(ngModel)]="_form().assessmentText" name="assessmentText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
       @if (full()) {

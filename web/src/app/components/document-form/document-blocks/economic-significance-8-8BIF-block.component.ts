@@ -11,11 +11,22 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
         {{num()}}. Значимость (экономическая и (или) социальная), которая должна быть достигнута по итогам выполнения работ,
         предусмотренных объектом государственной экспертизы:
       </label>
-      <app-dropdown [options]="significanceOptions" [(ngModel)]="_form().economicSignificance"
+      <app-dropdown
+        [options]="significanceOptions"
+        [(ngModel)]="_form().economicSignificance"
+        [attr.name]="'economicSignificance_8_8BIF_' + num().split('.').join('_')"
+        required
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().economicSignificanceText" rows="3" class="form-control mt-05"
-        placeholder="Пояснительный текст (при необходимости)."></textarea>
+        <textarea
+          [(ngModel)]="_form().economicSignificanceText"
+          [attr.name]="'economicSignificanceText_8_8BIF_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">

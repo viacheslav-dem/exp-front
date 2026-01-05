@@ -1,10 +1,14 @@
-import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, input} from "@angular/core";
+import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, input} from "@angular/core";
 import {DocType} from "@app/components/common-components/file-uploader/doc-type";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-choose-files',
     templateUrl: 'choose-files.component.html',
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.fileAndPdf)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class ChooseFilesComponent implements OnInit {
 

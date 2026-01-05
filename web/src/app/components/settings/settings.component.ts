@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, ViewChild, ViewContainerRef, AfterViewInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactoryResolver, ViewChild, ViewContainerRef, AfterViewInit} from '@angular/core';
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {DataService} from "@app/services/data.service";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
@@ -11,12 +11,14 @@ import {
   PropertyComponentResolver
 } from "@app/components/settings/property-component-resolver.service";
 import {PropertyComponent} from "@app/components/settings/property.component";
+import {environment} from "../../../environments/environment";
 
 @Component({
     selector: 'app-settings',
     templateUrl: './settings.component.html',
     styleUrls: ['./settings.component.scss'],
-    standalone: false
+    standalone: false,
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.settings) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
 export class SettingsComponent extends FilterAndPages<PropertyDto> implements AfterViewInit {
 
@@ -31,7 +33,8 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> implements Af
   constructor(private _toasty: GlobalToastyService,
               private _dataService: DataService,
               private _propertyComponentResolver: PropertyComponentResolver,
-              private _resolver: ComponentFactoryResolver) {
+              private _resolver: ComponentFactoryResolver,
+              private cdr: ChangeDetectorRef) {
     super(10);
   }
 
@@ -42,6 +45,13 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> implements Af
       SearchField.checkbox('disabled', 'Показывать неактивные'),
     ];
     this.enableFilterCache("properties");
+    // Если нет сохранённого состояния фильтров, загружаем данные явно
+    setTimeout(() => {
+      const hasCachedFilters = localStorage.getItem('filter_cache_properties');
+      if (!hasCachedFilters) {
+        this.update();
+      }
+    }, 100);
   }
 
   ngAfterViewInit() {
@@ -65,7 +75,11 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> implements Af
           this._pendingPropertySelection = this.properties[0];
         }
       }
-    }, () => this.setLoading(false));
+      this.cdr?.markForCheck?.();
+    }, () => {
+      this.setLoading(false);
+      this.cdr?.markForCheck?.();
+    });
   }
 
   selectProperty(property: PropertyDto) {
@@ -75,6 +89,7 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> implements Af
     this.selectedProperty = property;
     // show tooltips
     this.updatePropertyComponent();
+    this.cdr?.markForCheck?.();
   }
 
   editProperty() {
@@ -96,6 +111,7 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> implements Af
       this.properties[this.getSelectedPropertyInd()] = res;
       this.selectProperty(res);
       SettingsComponent.sortProperties(this.properties);
+      this.cdr?.markForCheck?.();
     });
   }
 

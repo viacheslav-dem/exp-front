@@ -10,11 +10,11 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         а также возможности использования промежуточных результатов исследований для других разработок (модификаций,
         а также в иных сферах экономики):
       </label>
-      <app-dropdown [options]="analogParamsOptions" [(ngModel)]="_form().analogParams"
+      <app-dropdown name="analogParams" required [options]="analogParamsOptions" [(ngModel)]="_form().analogParams"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().analogParamsText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea [(ngModel)]="_form().analogParamsText" name="analogParamsText" required minlength="30" rows="3" class="form-control mt-05"
+        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full()) {
         <div class="hint">

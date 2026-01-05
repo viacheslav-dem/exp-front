@@ -43,7 +43,9 @@ export const DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     providers: [DROPDOWN_CONTROL_VALUE_ACCESSOR],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
-    changeDetection: environment.features.onPush.dropdown ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class DropdownComponent<T> extends ControlComponent<T> {
 
@@ -57,7 +59,7 @@ export class DropdownComponent<T> extends ControlComponent<T> {
 
   isOpen: boolean = false;
 
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor(private _cdr: ChangeDetectorRef) {
     super();
   }
 
@@ -68,7 +70,7 @@ export class DropdownComponent<T> extends ControlComponent<T> {
       if (this.isOpen) {
         this.isOpen = false;
         // Важно для OnPush/zoneless: событие document:click приходит извне
-        this.cdr.markForCheck();
+        this._cdr.markForCheck();
       }
     }
   }
@@ -76,7 +78,7 @@ export class DropdownComponent<T> extends ControlComponent<T> {
   toggleDropdown() {
     if (!this.disabled()) {
       this.isOpen = !this.isOpen;
-      this.cdr.markForCheck();
+      this._cdr.markForCheck();
     }
   }
 
@@ -84,7 +86,7 @@ export class DropdownComponent<T> extends ControlComponent<T> {
     this.value = option;
     this.onSelected.emit(option);
     this.isOpen = false;
-    this.cdr.markForCheck();
+    this._cdr.markForCheck();
   }
 
   resetAvailable() {

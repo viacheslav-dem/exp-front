@@ -8,12 +8,22 @@ import {Component, input} from '@angular/core';
         {{num()}}. Наиболее близкий аналог используемой (выпускаемой) на территории Республики Беларусь
         и (или) в мире технологии и (или) продукции того же назначения:
       </label>
-      <input [(ngModel)]="_form().analog" type="text" class="form-control"
+      <input [(ngModel)]="_form().analog"
+        [attr.name]="'analog_' + num().split('.').join('_')"
+        required
+        type="text" class="form-control"
         title="Наиболее близкий аналог"
         placeholder="наименование аналога">
         @if (full()) {
-          <textarea [(ngModel)]="_form().analogText" rows="3" class="form-control mt-05"
-          placeholder="Обязательный текст."></textarea>
+          <textarea
+            [(ngModel)]="_form().analogText"
+            [attr.name]="'analogText_' + num().split('.').join('_')"
+            required
+            minlength="30"
+            rows="3"
+            class="form-control mt-05"
+            placeholder="Обязательный текст (не менее 30 символов)."
+          ></textarea>
         }
         @if (full()) {
           <div class="hint">

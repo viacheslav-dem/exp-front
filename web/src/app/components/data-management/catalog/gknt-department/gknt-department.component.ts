@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {Catalog, DataService} from "app/services/data.service";
 import {IdNameDto} from "app/dto/IdNameDto";
@@ -11,11 +11,16 @@ import {Filter} from "@app/components/common-components/page-and-filter/model/Fi
 import {PersonPlainDto} from "@app/dto/PersonPlainDto";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import {PersonDto} from "@app/dto/PersonDto";
+import {environment} from "../../../../../environments/environment";
 
 @Component({
     selector: 'app-gknt-department',
     templateUrl: './gknt-department.component.html',
-    standalone: false
+    standalone: false,
+    // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
+      ? ChangeDetectionStrategy.OnPush
+      : ChangeDetectionStrategy.Default
 })
 export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> {
 
@@ -26,7 +31,8 @@ export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> 
   @ViewChild(SearchPersonComponent) public searchPersonModal: SearchPersonComponent;
 
   constructor(public _toasty: GlobalToastyService,
-              public _dataService: DataService) {
+              public _dataService: DataService,
+              private cdr: ChangeDetectorRef) {
     super(_toasty, _dataService);
     this._type = Catalog.GKNT_DEPARTMENT;
   }
@@ -35,6 +41,7 @@ export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> 
     this._dataService.getGknt().subscribe(res => {
       this.searchPersonFilter = FilterBuilder.equals('org', res);
       this.gknt = res;
+      this.cdr.markForCheck();
     });
     this._searchFields = [
       SearchField.contains('name').setPlaceholder('Поиск по описанию...').setSortDirection(Direction.ASC).setSortable(true),
@@ -45,6 +52,7 @@ export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> 
   editItem(item: GkntDepartmentDto) {
     super.editItem(item);
     this.selectedItem.isExpanded = true;
+    this.cdr.markForCheck();
   }
 
   showSearchChairmanModal() {
@@ -78,6 +86,7 @@ export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> 
   selectPerson(person: PersonDto) {
     this.onPersonSelected(person);
     this.searchPersonModal.hide();
+    this.cdr.markForCheck();
   }
 
   create(): GkntDepartmentDto {
