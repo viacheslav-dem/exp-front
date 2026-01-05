@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -6,7 +6,6 @@ import { CommonModule } from '@angular/common';
 import { catchError, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { PersonDto } from "@app/dto/PersonDto";
-import { DegreeTypePipe } from "@app/pipes/degree.pipe";
 import { CustomPipesModule } from "@app/pipes/custom-pipes.module";
 
 @Component({
@@ -21,7 +20,7 @@ import { CustomPipesModule } from "@app/pipes/custom-pipes.module";
 export class BestExpertComponent {
 
     private readonly http = inject(HttpClient);
-    readonly _degreeTypePipe = inject(DegreeTypePipe);
+    private readonly destroyRef = inject(DestroyRef);
 
     private readonly _startDate = signal<string>('');
     private readonly _endDate = signal<string>('');
@@ -78,7 +77,7 @@ export class BestExpertComponent {
                 this.expertsList.set([]);
                 return of([]);
             }),
-            takeUntilDestroyed()
+            takeUntilDestroyed(this.destroyRef)
         ).subscribe();
     }
 
