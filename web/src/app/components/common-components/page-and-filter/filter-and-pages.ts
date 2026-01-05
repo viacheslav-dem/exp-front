@@ -131,19 +131,9 @@ export abstract class FilterAndPages<T> implements OnInit {
                 // Обновляем selectedItems только если allItems уже загружены
                 // Если каталог еще не загружен, selectedItems будет обновлен после загрузки каталога
                 if (multiSelectField.allItems && multiSelectField.allItems.length > 0) {
-                  // Напрямую устанавливаем selectedItems без вызова selectChanged(),
-                  // чтобы не изменять value (оно уже установлено из кэша)
-                  multiSelectField.selectedItems = deserializedValue
-                    .map(value => {
-                      // Ищем элемент в allItems по значению
-                      // Сравниваем по id или по самому значению
-                      return multiSelectField.allItems.find(item => {
-                        const itemValue = item.value?.id ?? item.value;
-                        const searchValue = value?.id ?? value;
-                        return itemValue === searchValue || itemValue == searchValue;
-                      });
-                    })
-                    .filter(item => item != null);
+                  // Используем setSelectedValues для единообразного поведения со всеми multiSelect фильтрами
+                  // Это пересчитает value на основе найденных элементов и отфильтрует несуществующие
+                  multiSelectField.setSelectedValues(deserializedValue);
                 }
               }
               if (saved.sortDirection) {

@@ -6,7 +6,6 @@ import { CommonModule } from '@angular/common';
 import { catchError, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { PersonDto } from "@app/dto/PersonDto";
-import { DegreeTypePipe } from "@app/pipes/degree.pipe";
 import { CustomPipesModule } from "@app/pipes/custom-pipes.module";
 
 @Component({
@@ -20,10 +19,8 @@ import { CustomPipesModule } from "@app/pipes/custom-pipes.module";
 })
 export class BestExpertComponent {
 
-    destroyRef = inject(DestroyRef)
-
     private readonly http = inject(HttpClient);
-    readonly _degreeTypePipe = inject(DegreeTypePipe);
+    private readonly destroyRef = inject(DestroyRef);
 
     private readonly _startDate = signal<string>('');
     private readonly _endDate = signal<string>('');

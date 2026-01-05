@@ -340,6 +340,10 @@ export class MultiSelectField extends SearchField {
   selectChanged() {
     let result = [];
     this.selectedItems.forEach(selectItem => {
+      // Защита от undefined: если selectItem не определен, пропускаем его
+      if (!selectItem) {
+        return;
+      }
       if (!Array.isArray(selectItem.value)) {
         return result.push(selectItem.value);
       } else {
@@ -354,7 +358,17 @@ export class MultiSelectField extends SearchField {
   }
 
   setSelectedValues(values: any[] = []) {
-    this.selectedItems = values.map(value => this.allItems.find(item => item.value == value));
+    // Фильтруем undefined значения после map, чтобы избежать ошибок в selectChanged
+    this.selectedItems = values
+      .map(value => {
+        // Используем более точное сравнение, как в filter-and-pages.ts
+        return this.allItems.find(item => {
+          const itemValue = item.value?.id ?? item.value;
+          const searchValue = value?.id ?? value;
+          return itemValue === searchValue || itemValue == searchValue;
+        });
+      })
+      .filter(item => item != null); // Удаляем undefined и null значения
     this.selectChanged();
   }
 
