@@ -10,7 +10,8 @@ import {
 
 @Component({
   selector: 'app-expert-review_8_14_2025-form',
-  templateUrl: './expert-review_8_14_2025-form.component.html'
+  templateUrl: './expert-review_8_14_2025-form.component.html',
+  standalone: false
 })
 export class ExpertReview_8_14_2025FormComponent extends ExpertReviewForm<ExpertReview_8_14_2025FormContent> {
 
