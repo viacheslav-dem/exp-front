@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
+import {Component, ChangeDetectionStrategy, signal, inject, DestroyRef} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -19,6 +19,8 @@ import { CustomPipesModule } from "@app/pipes/custom-pipes.module";
     imports: [CommonModule, FormsModule, CustomPipesModule]
 })
 export class BestExpertComponent {
+
+    destroyRef = inject(DestroyRef)
 
     private readonly http = inject(HttpClient);
     readonly _degreeTypePipe = inject(DegreeTypePipe);
@@ -78,7 +80,7 @@ export class BestExpertComponent {
                 this.expertsList.set([]);
                 return of([]);
             }),
-            takeUntilDestroyed()
+            takeUntilDestroyed(this.destroyRef)
         ).subscribe();
     }
 
