@@ -39,8 +39,8 @@
                 <table class="table table-hover mb-0">
                   <thead class="table-light">
                     <tr>
-                      <th class="border-0 fw-semibold small text-muted" style="min-width: 80px;">#id</th>
-                      <th (click)="sortBy('person')" class="selectable border-0 fw-semibold small text-muted cursor-pointer">
+                      <th class="border-0 fw-semibold small text-muted" style="min-width: 60px; width: 60px;">#id</th>
+                      <th (click)="sortBy('person')" class="selectable border-0 fw-semibold small text-muted cursor-pointer" style="min-width: 180px; max-width: 200px;">
                         <span>ФИО</span>
                         @if (sortOrder.property == 'person') {
                           <fa-icon class="fa-active ms-1 text-primary"
@@ -49,10 +49,10 @@
                           <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
                         }
                       </th>
-                      <th class="border-0 fw-semibold small text-muted">
+                      <th class="border-0 fw-semibold small text-muted" style="min-width: 120px; max-width: 180px;">
                         <span>Роли</span>
                       </th>
-                      <th (click)="sortBy('email')" class="selectable border-0 fw-semibold small text-muted cursor-pointer">
+                      <th (click)="sortBy('email')" class="selectable border-0 fw-semibold small text-muted cursor-pointer" style="min-width: 150px; max-width: 180px;">
                         <span>Email</span>
                         @if (sortOrder.property == 'email') {
                           <fa-icon class="fa-active ms-1 text-primary"
@@ -61,7 +61,7 @@
                           <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
                         }
                       </th>
-                      <th class="border-0 fw-semibold small text-muted text-center" style="min-width: 120px;">Действия</th>
+                      <th class="border-0 fw-semibold small text-muted text-center actions-column" style="min-width: 110px; width: 110px;">Действия</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -86,8 +86,8 @@
                         <td class="text-body-secondary small user-email-cell" [title]="user.email">
                           {{user.email}}
                         </td>
-                        <td>
-                          <div class="d-flex justify-content-center gap-2">
+                        <td class="actions-column">
+                          <div class="d-flex justify-content-center gap-1 gap-md-2">
                             @if (!user.deleted) {
                               <button class="btn btn-sm btn-link text-primary p-1" 
                                       (click)="showReadUserModal(user)"

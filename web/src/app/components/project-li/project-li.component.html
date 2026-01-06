@@ -57,7 +57,7 @@
               <i class="fas fa-phone me-2 text-primary"></i>
               <span class="fw-medium">Контакты:</span>
               @for (contact of belisaPersons; track contact.id) {
-                <div class="ms-4 mt-1">
+                <div class="mt-1">
                   {{contact.personName.lastName}} {{contact.personName.firstName}} {{contact.personName.middleName}}
                   - {{contact.phones | phones: true | orElse: 'телефон не указан' }};
                 </div>

@@ -39,17 +39,34 @@ tbody td, tbody th {
 }
 
 .user-name-cell {
-  max-width: 250px;
+  max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .user-email-cell {
-  max-width: 200px;
+  max-width: 180px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+// Колонка действий - всегда видна
+.actions-column {
+  position: relative;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+// Ограничение ширины колонки ролей
+td:nth-child(3) {
+  max-width: 180px;
+  
+  .badge {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.6rem;
+  }
 }
 
 .user-table-row {
@@ -110,13 +127,106 @@ tbody td, tbody th {
   color: #bb2d3b !important;
 }
 
+// Старые мониторы (992px - 1600px) - не Full HD
+@media (min-width: 992px) and (max-width: 1600px) {
+  table {
+    font-size: 0.9rem;
+  }
+
+  thead th, tbody td, tbody th {
+    padding: 0.875rem 0.625rem;
+  }
+
+  .user-name-cell {
+    max-width: 180px;
+  }
+
+  .user-email-cell {
+    max-width: 160px;
+  }
+
+  td:nth-child(3) {
+    max-width: 160px;
+  }
+
+  .actions-column {
+    min-width: 110px !important;
+    width: 110px !important;
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.55rem;
+  }
+}
+
+// Планшеты в портретной ориентации (768px - 991.98px)
 @media (max-width: 991.98px) {
+  table {
+    font-size: 0.85rem;
+  }
+
+  thead th, tbody td, tbody th {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .user-name-cell {
+    max-width: 150px;
+  }
+
+  .user-email-cell {
+    max-width: 140px;
+  }
+
+  td:nth-child(3) {
+    max-width: 140px;
+  }
+
+  .actions-column {
+    min-width: 100px !important;
+    width: 100px !important;
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.5rem;
+  }
+}
+
+// Маленькие планшеты и большие телефоны (576px - 767.98px)
+@media (max-width: 767.98px) {
   table {
     font-size: 0.8rem;
   }
 
   thead th, tbody td, tbody th {
-    padding: 0.75rem 0.5rem;
+    padding: 0.5rem 0.4rem;
+  }
+
+  .user-name-cell {
+    max-width: 120px;
+  }
+
+  .user-email-cell {
+    max-width: 110px;
+  }
+
+  td:nth-child(3) {
+    max-width: 110px;
+  }
+
+  .actions-column {
+    min-width: 90px !important;
+    width: 90px !important;
+  }
+
+  .btn-link {
+    padding: 0.25rem !important;
+  }
+
+  .badge {
+    font-size: 0.6rem;
+    padding: 0.25rem 0.4rem;
   }
 }
 
@@ -153,8 +263,45 @@ tbody td, tbody th {
   word-break: break-all;
 }
 
-// Стили для очень маленьких экранов (360px и меньше, до 575.98px)
+// Маленькие телефоны (до 575.98px)
 @media (max-width: 575.98px) {
+  // Таблица скрыта на таких экранах, используется карточный вид
+  // Но на всякий случай оптимизируем, если таблица все же отображается
+  table {
+    font-size: 0.75rem;
+  }
+
+  thead th, tbody td, tbody th {
+    padding: 0.4rem 0.3rem;
+  }
+
+  .user-name-cell {
+    max-width: 100px;
+  }
+
+  .user-email-cell {
+    max-width: 90px;
+  }
+
+  td:nth-child(3) {
+    max-width: 90px;
+  }
+
+  .actions-column {
+    min-width: 80px !important;
+    width: 80px !important;
+  }
+
+  .btn-link {
+    padding: 0.2rem !important;
+  }
+
+  .badge {
+    font-size: 0.55rem;
+    padding: 0.2rem 0.35rem;
+  }
+
+  // Стили для карточек пользователей
   // Переопределяем h-100 для очень маленьких экранов
   .card.user-card.h-100 {
     height: auto !important;

@@ -23,12 +23,8 @@ import {DocType} from "@app/components/common-components/file-uploader/doc-type"
 import {
     ExpertReviewFormContainerComponent
 } from "@app/components/document-form/expert-review-form-container/expert-review-form-container.component";
-import {DataService} from "@app/services/data.service";
 //import { takeWhile } from 'rxjs/operators';
-import {PeriodDto} from "@app/dto/PeriodDto";
-import dayjs from 'dayjs';
 import {AccountingPlainDto} from "@app/dto/AccountingPlainDto";
-import {TemplateType} from "@app/components/document-form/form-model/TemplateType";
 import {environment} from "../../../environments/environment";
 
 @Component({
@@ -47,7 +43,6 @@ export class ExpertReviewComponent implements OnInit {
     ExpertReviewState = ExpertReviewState;
     SERVER_URL = SERVER_URL;
     DocType = DocType;
-    period = new PeriodDto(dayjs().valueOf(), dayjs().valueOf());
 
     expertReview: ExpertReviewDto = new ExpertReviewDto();
     transitionHistory: ExpertTransitionHistoryDto;
@@ -74,8 +69,6 @@ export class ExpertReviewComponent implements OnInit {
                 private _accountingService: AccountingService,
                 private _dialogService: DialogService,
                 private _personPipe: PersonFullNamePipe,
-                private toastService: GlobalToastyService,
-                private _dataService: DataService,
                 private cdr: ChangeDetectorRef) {
     }
 
@@ -93,9 +86,16 @@ export class ExpertReviewComponent implements OnInit {
     showTransitionHistoryModal() {
         this.transitionHistoryModal.show();
         this._transitionHistoryService.getExpertHistory(this.expertReview)
-            .subscribe(res => {
-                this.transitionHistory = res;
-                this.cdr?.markForCheck?.();
+            .subscribe({
+                next: (res) => {
+                    this.transitionHistory = res;
+                    this.cdr?.markForCheck?.();
+                },
+                error: (error) => {
+                    const errorMessage = error?.error || error?.message || 'Произошла ошибка при загрузке истории переходов';
+                    this._toasty.error(errorMessage);
+                    this.cdr?.markForCheck?.();
+                }
             });
     }
 
@@ -133,6 +133,7 @@ export class ExpertReviewComponent implements OnInit {
     reviewScanLoaded(doc) {
         this.expertReview.reviewScan = doc;
         this.changed();
+        this.cdr?.markForCheck?.();
     }
 
     canReadReviewScan() {
@@ -151,14 +152,18 @@ export class ExpertReviewComponent implements OnInit {
             'Пересоздание документа',
                  `Пересоздать договор в соответствии с изменившимися данными в системе?`,
                  'Дата договора при этом останется неизменной'
-        ).subscribe((dlgResult: DialogResult<any>) => {
-         //   let period = new PeriodDto(dlgResult.value.startDate, dlgResult.value.endDate)
-            this._accountingService.refreshContract(this.expertReview.accounting
-            //    , period
-            ).subscribe(res => {
-                this.expertReview.accounting = <AccountingPlainDto>res;
-                this._toasty.success("Документ успешно обновлён.");
-                this.cdr?.markForCheck?.();
+        ).subscribe(() => {
+            this._accountingService.refreshContract(this.expertReview.accounting).subscribe({
+                next: (res) => {
+                    this.expertReview.accounting = <AccountingPlainDto>res;
+                    this._toasty.success("Документ успешно обновлён.");
+                    this.cdr?.markForCheck?.();
+                },
+                error: (error) => {
+                    const errorMessage = error?.error || error?.message || 'Произошла ошибка при обновлении договора';
+                    this._toasty.error(errorMessage);
+                    this.cdr?.markForCheck?.();
+                }
             });
         });
     }
@@ -169,9 +174,17 @@ export class ExpertReviewComponent implements OnInit {
             `Пересоздать акт в соответствии с изменившимися данными в системе?`,
             'Дата акта и сумма выплат при этом останутся неизменными'
         ).subscribe(() => {
-            this._accountingService.refreshAct(this.expertReview.accounting).subscribe(res => {
-                this.expertReview.accounting = <AccountingPlainDto>res;
-                this._toasty.success("Документ успешно обновлён.");
+            this._accountingService.refreshAct(this.expertReview.accounting).subscribe({
+                next: (res) => {
+                    this.expertReview.accounting = <AccountingPlainDto>res;
+                    this._toasty.success("Документ успешно обновлён.");
+                    this.cdr?.markForCheck?.();
+                },
+                error: (error) => {
+                    const errorMessage = error?.error || error?.message || 'Произошла ошибка при обновлении акта';
+                    this._toasty.error(errorMessage);
+                    this.cdr?.markForCheck?.();
+                }
             });
         });
     }
@@ -203,13 +216,22 @@ export class ExpertReviewComponent implements OnInit {
         this._reviewService.deleteReviewDocument(this.expertReview, doc, () => {
             this.expertReview.documents = this.expertReview.documents.filter(d => d.id != doc.id);
             this.changed();
+            this.cdr?.markForCheck?.();
         });
     }
 
     deleteReviewScan() {
-        this._reviewService.deleteReviewScan(this.expertReview).subscribe(() => {
-            this.expertReview.reviewScan = null;
-            this.changed();
+        this._reviewService.deleteReviewScan(this.expertReview).subscribe({
+            next: () => {
+                this.expertReview.reviewScan = null;
+                this.changed();
+                this.cdr?.markForCheck?.();
+            },
+            error: (error) => {
+                const errorMessage = error?.error || error?.message || 'Произошла ошибка при удалении скана';
+                this._toasty.error(errorMessage);
+                this.cdr?.markForCheck?.();
+            }
         });
     }
 
@@ -220,10 +242,26 @@ export class ExpertReviewComponent implements OnInit {
             'Он сможет приступить к работе после согласования зам. Председателя ГКНТ ' +
             'и обязан будет завершить экспертизу в течение установленного нормативными актами срока.'
         ).subscribe(() => {
-            this._reviewService.acceptProject(this.expertReview).subscribe(res => {
-                this.review = res;
-                this._toasty.success("Вы подтвердили согласие эксперта.");
-                this.changed();
+            this._reviewService.acceptProject(this.expertReview).subscribe({
+                next: (res) => {
+                    this.review = res;
+                    this._toasty.success("Вы подтвердили согласие эксперта.");
+                    this.changed();
+                    this.cdr?.markForCheck?.();
+                },
+                error: (error) => {
+                    // При ошибке 400 (невозможный переход) обновляем данные с сервера
+                    // и показываем понятное сообщение пользователю
+                    const errorMessage = error?.error || error?.message || 'Произошла ошибка при подтверждении';
+                    if (error?.status === 400) {
+                        this._toasty.error('Невозможно подтвердить согласие. Состояние экспертизы могло измениться. Обновите страницу.');
+                        // Обновляем данные через changed(), чтобы родительский компонент перезагрузил данные
+                        this.changed();
+                    } else {
+                        this._toasty.error(errorMessage);
+                    }
+                    this.cdr?.markForCheck?.();
+                }
             });
         });
     }
@@ -240,10 +278,23 @@ export class ExpertReviewComponent implements OnInit {
             `Назначить повторно эксперта "${this._personPipe.transform(this.expertReview.expert)}" на объект экспертизы "${this.project().title}"?`,
             ''
         ).subscribe(() => {
-            this._reviewService.reassignExpert(this.expertReview).subscribe(res => {
-                this.review = res;
-                this._toasty.success("Эксперт переназначен.");
-                this.changed();
+            this._reviewService.reassignExpert(this.expertReview).subscribe({
+                next: (res) => {
+                    this.review = res;
+                    this._toasty.success("Эксперт переназначен.");
+                    this.changed();
+                    this.cdr?.markForCheck?.();
+                },
+                error: (error) => {
+                    const errorMessage = error?.error || error?.message || 'Произошла ошибка при переназначении';
+                    if (error?.status === 400) {
+                        this._toasty.error('Невозможно переназначить эксперта. Состояние экспертизы могло измениться. Обновите страницу.');
+                        this.changed();
+                    } else {
+                        this._toasty.error(errorMessage);
+                    }
+                    this.cdr?.markForCheck?.();
+                }
             });
         });
     }
@@ -257,10 +308,24 @@ export class ExpertReviewComponent implements OnInit {
                 let reason = "";
                 if (dlgResult != null && dlgResult.value != null)
                     reason = dlgResult.value.reason;
-                this._reviewService.rejectProject(this.expertReview, reason).subscribe(res => {
-                    this.review = res;
-                    this._toasty.success("Вы подтвердили отказ эксперта.");
-                    this.changed();
+                this._reviewService.rejectProject(this.expertReview, reason).subscribe({
+                    next: (res) => {
+                        // Обновляем review через сеттер, который автоматически обновит badge и другие поля
+                        this.review = res;
+                        this._toasty.success("Вы подтвердили отказ эксперта.");
+                        this.changed();
+                        this.cdr?.markForCheck?.();
+                    },
+                    error: (error) => {
+                        const errorMessage = error?.error || error?.message || 'Произошла ошибка при отклонении';
+                        if (error?.status === 400) {
+                            this._toasty.error('Невозможно отклонить эксперта. Состояние экспертизы могло измениться. Обновите страницу.');
+                            this.changed();
+                        } else {
+                            this._toasty.error(errorMessage);
+                        }
+                        this.cdr?.markForCheck?.();
+                    }
                 });
             });
     }
@@ -278,11 +343,24 @@ export class ExpertReviewComponent implements OnInit {
             'Завершение экспертизы',
             `Завершить экспертизу объекта "${this.project().title} экспертом ${this._personPipe.transform(this.expertReview.expert)}"?`
         ).subscribe(() => {
-            this._reviewService.finishReview(this.expertReview).subscribe(res => {
-                this.review = res;
-                this._toasty.success("Вы завершили экспертизу объекта.");
-                this.changed();
-            })
+            this._reviewService.finishReview(this.expertReview).subscribe({
+                next: (res) => {
+                    this.review = res;
+                    this._toasty.success("Вы завершили экспертизу объекта.");
+                    this.changed();
+                    this.cdr?.markForCheck?.();
+                },
+                error: (error) => {
+                    const errorMessage = error?.error || error?.message || 'Произошла ошибка при завершении экспертизы';
+                    if (error?.status === 400) {
+                        this._toasty.error('Невозможно завершить экспертизу. Состояние могло измениться. Обновите страницу.');
+                        this.changed();
+                    } else {
+                        this._toasty.error(errorMessage);
+                    }
+                    this.cdr?.markForCheck?.();
+                }
+            });
         });
     }
 
@@ -291,19 +369,36 @@ export class ExpertReviewComponent implements OnInit {
             'Доработка экспертного заключения',
             `Отправить экспертное заключение на доработку экспертом ${this._personPipe.transform(this.expertReview.expert)}"?`
         ).subscribe(() => {
-            this._reviewService.rollbackReview(this.expertReview).subscribe(res => {
-                this.review = res;
-                this._toasty.success("Отправили заключение на доработку.");
-                this.changed();
-            })
+            this._reviewService.rollbackReview(this.expertReview).subscribe({
+                next: (res) => {
+                    this.review = res;
+                    this._toasty.success("Отправили заключение на доработку.");
+                    this.changed();
+                    this.cdr?.markForCheck?.();
+                },
+                error: (error) => {
+                    const errorMessage = error?.error || error?.message || 'Произошла ошибка при отправке на доработку';
+                    if (error?.status === 400) {
+                        this._toasty.error('Невозможно отправить на доработку. Состояние могло измениться. Обновите страницу.');
+                        this.changed();
+                    } else {
+                        this._toasty.error(errorMessage);
+                    }
+                    this.cdr?.markForCheck?.();
+                }
+            });
         });
     }
 
     closeForm() {
-        this.expertReviewForm.close();
+        if (this.expertReviewForm) {
+            this.expertReviewForm.close();
+        }
     }
 
     closeModal() {
-        this.reviewFormModal.hide();
+        if (this.reviewFormModal) {
+            this.reviewFormModal.hide();
+        }
     }
 }
