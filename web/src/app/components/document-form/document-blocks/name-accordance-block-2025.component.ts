@@ -22,8 +22,14 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
         placeholder="Предлагаемое наименование"></textarea>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form().nameAccordanceText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea [(ngModel)]="_form().nameAccordanceText"
+          [attr.name]="'nameAccordanceText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст"></textarea>
       }
     </div>
     `,

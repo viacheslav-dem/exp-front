@@ -12,8 +12,14 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <app-dropdown name="commerce" required [options]="noveltyOptions()" [(ngModel)]="_form().commerce"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().commerceText" name="commerceText" required minlength="30" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
+        <textarea [(ngModel)]="_form().commerceText"
+          name="commerceText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
       @if (full()) {
         <div class="hint">

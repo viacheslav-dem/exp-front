@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, ElementRef, Input, Type, ViewChild, ViewContainerRef, input, ChangeDetectionStrategy, ChangeDetectorRef, signal} from "@angular/core";
+import {Component, ElementRef, Input, Type, ViewChild, ViewContainerRef, input, ChangeDetectionStrategy, ChangeDetectorRef, signal} from "@angular/core";
 import {MeetingDto} from "@app/dto/MeetingDto";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {Role} from "@app/pipes/role.pipe";
@@ -61,7 +61,6 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
   constructor(private _personService: PersonService,
               private _meetingService: MeetingService,
               private _agendaFormResolver: AgendaFormResolver,
-              private resolver: ComponentFactoryResolver,
               private cdr: ChangeDetectorRef,
               private readonly hostRef: ElementRef<HTMLElement>,
               private readonly toasty: GlobalToastyService,
@@ -137,8 +136,7 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
     this._meeting.agendas.forEach((agenda, i) => {
       let formRenderer: Type<AgendaNewForm> = this._agendaFormResolver.getFormRenderer(agenda.project.code.code);
       if (formRenderer) {
-        let componentFactory = this.resolver.resolveComponentFactory(formRenderer);
-        const componentRef = this.formContainer.createComponent(componentFactory);
+        const componentRef = this.formContainer.createComponent(formRenderer);
         let component: AgendaNewForm = this.agendaComponents[agenda.project.id] = componentRef.instance;
         component.ind = i;
         component.project = agenda.project;
@@ -176,17 +174,14 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
   }
 
   validate() {
+    // Инкрементальная миграция: min="0" реализован через template-driven validators в HTML,
+    // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
+    // Бизнес-валидация: проверка времени окончания заседания
     let endDate = dayjs(this._form.endDate);
     let meetingEndWithTime = dayjs(this._meeting.period.end).hour(endDate.hour()).minute(endDate.minute());
     if (meetingEndWithTime.valueOf() <= this._meeting.period.start) {
       throw 'Время окончания должно следовать за временем начала заседания.';
-    }
-    if (this._form.prepareTimeBySecretary<0){
-      throw 'Время затраченное секретарём для предварительного рассмотрения материалов по объектам экспертизы, подготовки и проведения заседаний секций или бюро экспертного совета, а также оформления соответствующих материалов должно быть неотрицательным';
-    }
-    if (this._form.prepareTimeByChairman<0){
-      throw 'Время затраченное руководителем для предварительного рассмотрения материалов по объектам экспертизы, подготовки и проведения заседаний секций или бюро экспертного совета, а также оформления соответствующих материалов должно быть неотрицательным';
     }
     this._meeting.agendas.forEach(agenda => this.agendaComponents[agenda.project.id].validate());
   }
@@ -226,35 +221,7 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
     try {
       super.save();
     } catch (e) {
-      const errorMessage = e?.toString() || '';
-      // Пытаемся найти соответствующий элемент в DOM по тексту ошибки
-      const targetElement = this.findElementByErrorText(errorMessage);
-      if (targetElement) {
-        this.scrollToElement(targetElement);
-      } else {
-        this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
-      }
-      // Извлекаем название поля из текста ошибки для более понятного сообщения
-      const fieldName = this.extractFieldNameFromError(errorMessage);
-      if (fieldName) {
-        // Проверяем, содержит ли сообщение название поля
-        const lowerError = errorMessage.toLowerCase();
-        const lowerFieldName = fieldName.toLowerCase();
-        const fieldNameInMessage = lowerFieldName.split(' ').some(word => 
-          word.length > 3 && lowerError.includes(word)
-        );
-        
-        if (fieldNameInMessage) {
-          // Если название поля уже в сообщении, показываем как есть
-          this.toasty?.warn?.(errorMessage);
-        } else {
-          // Если нет, добавляем название поля
-          this.toasty?.warn?.(`Заполните обязательное поле "${fieldName}". ${errorMessage}`);
-        }
-        // Не пробрасываем ошибку дальше, чтобы избежать дублирования
-        return;
-      }
-      // Если не нашли название поля, пробрасываем ошибку дальше (CustomErrorHandler покажет её)
+      this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
       throw e;
     }
   }
@@ -286,100 +253,4 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
   }
 
 
-  private findElementByErrorText(errorMessage: string): HTMLElement | null {
-    const root = this.hostRef?.nativeElement;
-    if (!root) return null;
-
-    // Маппинг текстов ошибок на селекторы или ключевые слова для поиска
-    const errorMappings: { [key: string]: string } = {
-      'дата составления': '.form-group-label',
-      'время окончания': '.form-group-label',
-      'время затраченное': '.form-group-label',
-      'секретарём': '.form-group-label',
-      'руководителем': '.form-group-label'
-    };
-
-    // Ищем ключевое слово в тексте ошибки
-    const lowerError = errorMessage.toLowerCase();
-    for (const [keyword, selector] of Object.entries(errorMappings)) {
-      if (lowerError.includes(keyword)) {
-        // Ищем все labels с этим классом
-        const labels = Array.from(root.querySelectorAll<HTMLElement>(selector));
-        for (const label of labels) {
-          const labelText = label.textContent?.toLowerCase() || '';
-          if (labelText.includes(keyword)) {
-            // Находим родительский form-group и ищем в нём фокусируемый элемент
-            const formGroup = label.closest('.form-sub-group') || label.closest('.form-group');
-            if (formGroup) {
-              // Ищем различные типы элементов для прокрутки
-              const selectors = [
-                'input:not([type="hidden"])',
-                'textarea',
-                'select',
-                'button:not(.btn-icon)',
-                'app-date-input',
-                'app-time-input',
-                'ng-select'
-              ];
-              
-              for (const sel of selectors) {
-                const focusable = formGroup.querySelector<HTMLElement>(sel);
-                if (focusable && this.validationScrollService.isElementVisible(focusable)) {
-                  return focusable;
-                }
-              }
-              
-              // Если не нашли фокусируемый элемент, возвращаем сам label
-              if (this.validationScrollService.isElementVisible(label)) {
-                return label;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    return null;
-  }
-
-  private extractFieldNameFromError(errorMessage: string): string | null {
-    const root = this.hostRef?.nativeElement;
-    if (!root) return null;
-
-    // Маппинг текстов ошибок на ключевые слова для поиска в DOM
-    const errorMappings: { [key: string]: string } = {
-      'дата составления': 'дата составления',
-      'время окончания': 'время окончания',
-      'время затраченное секретарём': 'время затраченное',
-      'время затраченное руководителем': 'время затраченное',
-      'секретарём': 'секретарём',
-      'руководителем': 'руководителем'
-    };
-
-    const lowerError = errorMessage.toLowerCase();
-    for (const [keyword, searchKeyword] of Object.entries(errorMappings)) {
-      if (lowerError.includes(keyword)) {
-        // Пытаемся найти точное название в DOM
-        const labels = Array.from(root.querySelectorAll<HTMLLabelElement>('label'));
-        for (const label of labels) {
-          const labelText = label.textContent?.trim() || '';
-          const lowerLabelText = labelText.toLowerCase();
-          // Проверяем, содержит ли label ключевое слово
-          if (lowerLabelText.includes(searchKeyword)) {
-            // Ограничиваем длину для читаемости
-            if (labelText.length > 100) {
-              return labelText.substring(0, 97) + '...';
-            }
-            return labelText;
-          }
-        }
-      }
-    }
-
-    return null;
-  }
-
-  private scrollToElement(element: HTMLElement): void {
-    this.validationScrollService.scrollToElement(element);
-  }
 }

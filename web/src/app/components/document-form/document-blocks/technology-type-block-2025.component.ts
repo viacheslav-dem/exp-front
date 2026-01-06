@@ -45,6 +45,7 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
           [(ngModel)]="_form().technologyTypeText"
           [attr.name]="'technologyTypeText_' + num().split('.').join('_')"
           required
+          minlength="30"
           maxlength="5000"
           rows="3"
           class="form-control mt-05"

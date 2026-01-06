@@ -74,10 +74,9 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
   }
 
   validate() {
+    // Инкрементальная миграция: required/min реализованы через template-driven validators,
+    // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
-    if (!this._form.hours || this._form.hours < 1) {
-      throw 'Количество часов должно быть положительным числом.';
-    }
   }
 
   /**

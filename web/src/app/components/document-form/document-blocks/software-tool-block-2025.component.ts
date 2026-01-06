@@ -27,7 +27,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
         placeholder="Рекомендуемый программный инструмент"></textarea>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form().softwareToolText" rows="3" class="form-control mt-05"
+        <textarea [(ngModel)]="_form().softwareToolText" name="softwareToolText" [required]="isTextRequired()" minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
     </div>

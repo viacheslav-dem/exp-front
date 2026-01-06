@@ -25,8 +25,14 @@ import {PeriodDto} from "@app/dto/PeriodDto";
         </div>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form.termsAccordanceText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea [(ngModel)]="_form.termsAccordanceText"
+          [attr.name]="'termsAccordanceText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст"></textarea>
       }
     </div>
     `,

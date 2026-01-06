@@ -11,7 +11,7 @@ import {Component, EventEmitter, Output, input} from '@angular/core';
       <app-dropdown name="stagesExist" required [options]="stagesOptions" [(ngModel)]="_form().stagesExist"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().stagesExistText" name="stagesExistText" required minlength="30" rows="3" class="form-control mt-05"
+        <textarea [(ngModel)]="_form().stagesExistText" name="stagesExistText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full() && askStages()) {

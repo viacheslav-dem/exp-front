@@ -10,7 +10,7 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
       <app-dropdown name="taskLists" required [options]="taskListsOptions" [(ngModel)]="_form().taskLists"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().taskListsText" name="taskListsText" required minlength="30" rows="3" class="form-control mt-05"
+        <textarea [(ngModel)]="_form().taskListsText" name="taskListsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
     </div>

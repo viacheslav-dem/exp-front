@@ -26,8 +26,14 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
           </div>
         }
         @if (full()) {
-          <textarea [(ngModel)]="_form().financeAccordanceText" rows="3" class="form-control mt-05"
-          placeholder="Обязательный текст"></textarea>
+          <textarea [(ngModel)]="_form().financeAccordanceText"
+            [attr.name]="'financeAccordanceText_' + num().split('.').join('_')"
+            [required]="isTextRequired()"
+            minlength="30"
+            maxlength="5000"
+            rows="3"
+            class="form-control mt-05"
+            placeholder="Обязательный текст"></textarea>
         }
       </div>
     `,

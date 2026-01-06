@@ -13,7 +13,7 @@ import {Component, EventEmitter, Output, input} from "@angular/core";
       <app-dropdown name="analogParams" required [options]="analogParamsOptions" [(ngModel)]="_form().analogParams"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().analogParamsText" name="analogParamsText" required minlength="30" rows="3" class="form-control mt-05"
+        <textarea [(ngModel)]="_form().analogParamsText" name="analogParamsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full()) {

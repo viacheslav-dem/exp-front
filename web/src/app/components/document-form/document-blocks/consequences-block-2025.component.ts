@@ -12,6 +12,8 @@ import {Component, input} from "@angular/core";
         [(ngModel)]="_form().consequences"
         [attr.name]="'consequences_' + num().split('.').join('_')"
         required
+        minlength="30"
+        maxlength="5000"
         rows="3"
         class="form-control"
         placeholder="Обязательный текст."

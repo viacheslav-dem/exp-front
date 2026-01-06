@@ -5,7 +5,6 @@ import {MeetingProtocolFormComponent} from "@app/components/document-form/meetin
 import {AgendaNewFormContent} from "@app/components/document-form/meeting-protocol-form/AgendaNewFormContent";
 import {PeriodDto} from "@app/dto/PeriodDto";
 import {NewVoteResults} from "@app/components/document-form/meeting-protocol-form/NewVoteResults";
-import {isEmptyOrNull} from "@app/support/utils";
 
 @Injectable()
 export abstract class AgendaNewForm extends DocumentForm<AgendaNewFormContent> {

@@ -28,8 +28,14 @@ import {Component, EventEmitter, OnInit, Output, input} from "@angular/core";
       </div>
     }
     @if (full()) {
-      <textarea [(ngModel)]="_form().priorityAreasText" rows="3" class="form-control mt-05"
-      placeholder="Обязательный текст"></textarea>
+      <textarea [(ngModel)]="_form().priorityAreasText"
+        [attr.name]="'priorityAreasText_' + num().split('.').join('_')"
+        required
+        minlength="30"
+        maxlength="5000"
+        rows="3"
+        class="form-control mt-05"
+        placeholder="Обязательный текст"></textarea>
     }
     @if (full()) {
       <div class="hint">

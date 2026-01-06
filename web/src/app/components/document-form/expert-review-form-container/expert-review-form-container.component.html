@@ -33,7 +33,14 @@
     <div class="form-group">
       <label>Количество часов, затраченных на подготовку экспертного заключения</label>
       <input title="Количество затраченных часов"
-        [(ngModel)]="_form.hours" min="1" numberInput type="text" class="form-control" placeholder="Часы">
+        [(ngModel)]="_form.hours"
+        name="hours"
+        required
+        min="1"
+        numberInput
+        type="text"
+        class="form-control"
+        placeholder="Часы">
         <div class="hint">
           <p>
             <b>Подсказка.</b>
