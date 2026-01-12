@@ -244,12 +244,17 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
     this._form.projectsById = this._form.projectsById || {};
     this._form.chairman = this._form.chairman || this.currentPerson;
     this.invited = this._form.invited.map(name => ({ name }));
-    this._meeting.agendas.map(agenda => agenda.project.id).forEach(projectId => {
-      if (this.agendaComponents[projectId]) {
-        this.agendaComponents[projectId].setForm(this._form.projectsById[projectId]);
-      }
-    });
+    if (this._meeting?.agendas) {
+      this._meeting.agendas.map(agenda => agenda.project.id).forEach(projectId => {
+        if (this.agendaComponents[projectId]) {
+          this.agendaComponents[projectId].setForm(this._form.projectsById[projectId]);
+        }
+      });
+    }
     this.assessors.forEach(ass => ass.isChecked = this._form.participants.some(selected => selected.id == ass.id));
+    // Обновление представления после загрузки данных из черновика
+    // Необходимо для OnPush change detection, чтобы данные отображались сразу после загрузки
+    this.cdr?.markForCheck?.();
   }
 
 

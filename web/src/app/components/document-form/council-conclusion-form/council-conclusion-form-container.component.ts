@@ -187,6 +187,9 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     if (this.formComponent) {
       this.formComponent.setForm(this._form.projectProtocol);
     }
+    // Обновление представления после загрузки данных из черновика
+    // Необходимо для OnPush change detection, чтобы данные отображались сразу после загрузки
+    this.cdr?.markForCheck?.();
   }
 
   showSearchChairmanModal() {

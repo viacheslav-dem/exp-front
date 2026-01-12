@@ -75,7 +75,6 @@
     // Применяем только когда dropdown открыт (имеет класс .show)
     .dropdown-menu.show {
       z-index: 1070 !important;
-
     }
     
     &.flex-grow-1 {
@@ -248,7 +247,6 @@
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
         border-right: 0;
-
       }
     }
     
@@ -306,32 +304,12 @@
       }
       
       .ng-select-container {
-        border: none !important;
+        border: none;
         min-height: 38px;
         border-top-left-radius: 0.375rem;
         border-bottom-left-radius: 0.375rem;
       }
-      
-      &.ng-select-focused .ng-select-container {
-        border-color: #86b7fe !important;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
-      }
 
-      // Центрирование кнопки очистки справа
-      .ng-clear-wrapper {
-        position: absolute;
-        right: 30px;
-        top: 50%;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 17px;
-        height: 17px;
-        cursor: pointer;
-        z-index: 10;
-      }
-      
       .ng-arrow-wrapper {
         right: 8px;
       }
@@ -354,15 +332,15 @@
 ::ng-deep {
   // Убираем overflow: hidden с модального окна для корректного отображения dropdown
   .modal-body {
-    overflow: visible !important;
+    overflow: visible;
   }
-  
+
   .modal-content {
-    overflow: visible !important;
+    overflow: visible;
   }
   
   .modal-dialog {
-    overflow: visible !important;
+    overflow: visible;
   }
   
   // Глобальные стили для ng-select в модальном окне
@@ -370,53 +348,25 @@
   // Устанавливаем очень высокий z-index, чтобы dropdown был выше всех input полей и других элементов
   .ng-select.ng-select-opened .ng-dropdown-panel {
     z-index: 10000 !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    position: absolute !important;
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    position: absolute;
   }
   
   // Стили для выбранных значений в специальностях, специализациях и областях компетенции
   // Делаем их курсивом и серым цветом ТОЛЬКО когда список открыт, чтобы было понятно, что их можно изменить
-  
-  // Специальности
-  .speciality-item-wrapper {
-    ::ng-deep .ng-select.ng-select-opened .ng-value-container .ng-value .ng-value-label {
-      font-style: italic !important;
-      color: #6c757d !important;
-      opacity: 0.85 !important;
-      
-      &:hover {
-        opacity: 1 !important;
-        color: #495057 !important;
-      }
-    }
-  }
-  
-  // Специализации
-  .specialization-item-wrapper {
-    ::ng-deep .ng-select.ng-select-opened .ng-value-container .ng-value .ng-value-label {
-      font-style: italic !important;
-      color: #6c757d !important;
-      opacity: 0.85 !important;
-      
-      &:hover {
-        opacity: 1 !important;
-        color: #495057 !important;
-      }
-    }
-  }
-  
-  // Области компетенции
+  .speciality-item-wrapper,
+  .specialization-item-wrapper,
   .area-item-wrapper {
     ::ng-deep .ng-select.ng-select-opened .ng-value-container .ng-value .ng-value-label {
-      font-style: italic !important;
-      color: #6c757d !important;
-      opacity: 0.85 !important;
+      font-style: italic;
+      color: #6c757d;
+      opacity: 0.85;
       
       &:hover {
-        opacity: 1 !important;
-        color: #495057 !important;
+        opacity: 1;
+        color: #495057;
       }
     }
   }
@@ -424,34 +374,14 @@
   // Увеличение z-index для всех ng-select (организация, специальности, специализации, области компетенции)
   // Применяем только когда ng-select открыт
   // Устанавливаем очень высокий z-index, чтобы dropdown был выше всех input полей и других элементов
-  .user-org-dropdown,
-  .speciality-item-wrapper,
-  .specialization-item-wrapper,
-  .area-item-wrapper {
+  .user-org-dropdown {
     position: relative;
-    overflow: visible !important;
+    overflow: visible;
     
     // Увеличиваем z-index для wrapper, когда внутри открыт ng-select
     // Это гарантирует, что открытый dropdown не будет перекрыт следующими элементами
     &:has(.ng-select.ng-select-opened) {
-      z-index: 10001 !important;
-    }
-    
-    .ng-select.ng-select-opened {
-      z-index: 10000 !important;
-      position: relative;
-      
-      .ng-dropdown-panel {
-        z-index: 10000 !important;
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: absolute !important;
-      }
-    }
-    
-    .ng-select {
-      overflow: visible !important;
+      z-index: 10001;
     }
   }
   
@@ -466,11 +396,11 @@
   // Применяем только когда ng-select открыт
   .modal.show {
     .ng-select.ng-select-opened .ng-dropdown-panel {
-      z-index: 10000 !important;
-      display: block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      position: absolute !important;
+      z-index: 10000;
+      display: block;
+      visibility: visible;
+      opacity: 1;
+      position: absolute;
     }
   }
 }
@@ -484,29 +414,29 @@
     min-width: 400px; // Увеличиваем ширину
     
     .ng-select-container {
-      font-size: 0.875rem !important; // Уменьшаем шрифт
+      font-size: 0.875rem; // Уменьшаем шрифт
     }
     
     .ng-value-container {
-      font-size: 0.875rem !important; // Уменьшаем шрифт
+      font-size: 0.875rem; // Уменьшаем шрифт
       
       .ng-value {
-        font-size: 0.875rem !important;
+        font-size: 0.875rem;
       }
     }
     
     .ng-input {
-      font-size: 0.875rem !important; // Уменьшаем шрифт
+      font-size: 0.875rem; // Уменьшаем шрифт
       
       input {
-        font-size: 0.875rem !important;
+        font-size: 0.875rem;
       }
     }
   }
   
   ::ng-deep .ng-dropdown-panel {
     .ng-option {
-      font-size: 0.875rem !important; // Уменьшаем шрифт в выпадающем списке
+      font-size: 0.875rem; // Уменьшаем шрифт в выпадающем списке
     }
   }
 }
