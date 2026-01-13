@@ -1,52 +1,123 @@
 <div class="form-container">
-  <form (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="startDate">Дата начала:</label>
-      <input type="date" id="startDate" [(ngModel)]="startDate" name="startDate" required>
-    </div>
-    <div class="form-group">
-      <label for="endDate">Дата конца:</label>
-      <input type="date" id="endDate" [(ngModel)]="endDate" name="endDate" required>
-    </div>
-    <div class="button-container">
-      <button type="submit">Подтвердить</button>
-    </div>
-  </form>
+    <form (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="startDate">Дата начала:</label>
+            <input type="date" id="startDate" [(ngModel)]="startDate" name="startDate" required>
+        </div>
+        <div class="form-group">
+            <label for="endDate">Дата конца:</label>
+            <input type="date" id="endDate" [(ngModel)]="endDate" name="endDate" required>
+        </div>
+        <div class="form-group">
+            <label for="expertsCount">Количество экспертов:</label>
+            <input type="number" min="1" max="10" id="expertsCount" [(ngModel)]="expertsCount" name="expertsCount"
+                   required>
+        </div>
+        <div class="button-container">
+            <button type="submit">Подтвердить</button>
+        </div>
+    </form>
 </div>
 
 @if (loading()) {
-  <div class="spinner"></div>
+    <div class="spinner"></div>
 }
 
 @if (expertsList().length > 0) {
-  <div>
-    <table class="experts-table">
-      <thead>
-        <tr>
-          <th>Контактные данные</th>
-          <th>Области компетенции</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (expert of expertsList(); track trackByExpert($index, expert)) {
-          <tr>
-            <td>
-              <div>{{ expert|fullName }}</div>
-              <div class="text-sm italic text-muted">{{ expert.personInfo | academicInfo }}</div>
-              <div class="text-sm italic">{{ expert.email }}</div>
-              <div class="text-sm italic">{{ expert.phones | phones }}</div>
-            </td>
-            <td class="text-sm">
-              @if (expert.org?.name) {
-                <div> Организация:&nbsp;<span class="italic">{{ expert.org?.name }}</span> </div>
-              }
-              @if (expert.post) {
-                <div> Должность:&nbsp;<span class="italic">{{ expert.post }}</span> </div>
-              }
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+    <div class="list-group">
+        <table class="experts-table">
+            <thead>
+            <tr>
+                <th>Участник конкурса</th>
+                <th>Ученая степень</th>
+                <th>Количество экспертных заключений</th>
+                <th>Рейтинг, баллы</th>
+            </tr>
+            </thead>
+            <tbody>
+                @for (expert of expertsList(); track trackByExpert($index, expert)) {
+                    <tr class="list-group-item-action selectable"
+                        (click)="expert.isExtandable = !expert.isExtandable">
+                        <td>
+                            {{ expert.person|fullName }}
+                        </td>
+                        <td>
+                            {{ expert.person.personInfo.fullDegrees?.length == 0 ? 'отсутствует' : expert.person.personInfo|fullDegreeType }}
+                        </td>
+                        <td>
+                            {{ expert.reviewsCount }}
+                        </td>
+                        <td>
+                            {{ expert.total.toFixed(2) }}
+                        </td>
+                    </tr>
+                    @if (expert.isExtandable) {
+                        <tr>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <td>
+                                        порядковый номер
+                                    </td>
+                                    <td>
+                                        технический номер
+                                    </td>
+                                    <td>
+                                        трудоемкость объекта
+                                        экспертизы (V)
+                                    </td>
+                                    <td>
+                                        совпадение экспертного заключения с заключением экспертного совета (W)
+                                    </td>
+                                    <td>
+                                        полнота сведений экспертного заключения (X)
+                                    </td>
+                                    <td>
+                                        оперативность подготовки экспертного заключения (Y)
+                                    </td>
+                                    <td>
+                                        наличие у эксперта ученой степени (Z)
+                                    </td>
+                                    <td>
+                                        баллы
+                                    </td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    @for (review of expert.reviews; track review.reviewId; let i = $index) {
+                                        <tr>
+                                            <td>
+                                                {{ i + 1 }}
+                                            </td>
+                                            <td>
+                                                {{ review.reviewId }}
+                                            </td>
+                                            <td>
+                                                {{ getCoefficient(review.items, 'LABOR_2') }}
+                                            </td>
+                                            <td>
+                                                {{ getCoefficient(review.items, 'MATCH_ACCEPT') }}
+                                            </td>
+                                            <td>
+                                                {{ getCoefficient(review.items, 'NOTES_PRESENT') }}
+                                            </td>
+                                            <td>
+                                                {{ getCoefficient(review.items, 'TIME_0_1') }}
+                                            </td>
+                                            <td>
+                                                {{ getCoefficient(review.items, 'DEG_NONE') }}
+                                            </td>
+                                            <td>
+                                                {{ review.total.toFixed(2) }}
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 }

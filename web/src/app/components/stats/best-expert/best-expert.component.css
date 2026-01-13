@@ -16,6 +16,7 @@ form input {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    table-layout: fixed;
 }
 
 .experts-table th, .experts-table td {
@@ -24,6 +25,7 @@ form input {
 }
 
 .experts-table td {
+    width: 25%;
     vertical-align: top;
 }
 
