@@ -26,6 +26,7 @@ export class BestExpertComponent {
     private readonly _endDate = signal<string>('');
     readonly expertsList = signal<PersonDto[]>([]);
     readonly loading = signal<boolean>(false);
+    readonly _expertsCount = signal<number>(0);
 
     get startDate(): string {
         return this._startDate();
@@ -43,20 +44,40 @@ export class BestExpertComponent {
         this._endDate.set(value);
     }
 
+    get expertsCount(): number {
+        return this._expertsCount();
+    }
+
+    set expertsCount(value: number) {
+        this._expertsCount.set(value);
+    }
+
     onSubmit() {
         const startDateValue = this._startDate();
         const endDateValue = this._endDate();
+        const expertsCountValue = this._expertsCount();
         
         if (!startDateValue || !endDateValue) {
-            console.error('Не установлены даты');
-            return;
+            throw 'Не установлены даты.';
+        }
+        if (startDateValue > endDateValue) {
+            throw 'Дата начала не может быть позже даты конца'
+        }
+        if (!expertsCountValue) {
+            throw 'Не выбрано количество экспертов';
+        }
+        if (expertsCountValue > 10) {
+            throw 'Максимальное количество экспертов - 10'
+        }
+        if (expertsCountValue < 1) {
+            throw 'Минимальное количество экспертов - 1'
         }
 
-        console.log('Отправка с датами:', startDateValue, endDateValue);
         const url = '/examination-api/stats/best-expert';
         const params = new HttpParams()
             .set('startDate', startDateValue)
-            .set('endDate', endDateValue);
+            .set('endDate', endDateValue)
+            .set('expertsCount', expertsCountValue);
 
         this.loading.set(true);
 
