@@ -6,4 +6,5 @@ export class PersonRatingRowDto {
     total: number;
     reviewsCount: number;
     reviews: ReviewScoreRowDto[];
+    isExtandable: boolean = false;
 }

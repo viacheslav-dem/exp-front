@@ -7,6 +7,8 @@ import { catchError, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { PersonDto } from "@app/dto/PersonDto";
 import { CustomPipesModule } from "@app/pipes/custom-pipes.module";
+import {PersonRatingRowDto} from "@app/dto/PersonRatingRowDto";
+import {ScoreItemDto} from "@app/dto/ScoreItemDto";
 
 @Component({
     selector: 'app-best-expert',
@@ -24,9 +26,11 @@ export class BestExpertComponent {
 
     private readonly _startDate = signal<string>('');
     private readonly _endDate = signal<string>('');
-    readonly expertsList = signal<PersonDto[]>([]);
+    readonly expertsList = signal<PersonRatingRowDto[]>([]);
     readonly loading = signal<boolean>(false);
     readonly _expertsCount = signal<number>(0);
+
+    test: boolean = false;
 
     get startDate(): string {
         return this._startDate();
@@ -81,8 +85,8 @@ export class BestExpertComponent {
 
         this.loading.set(true);
 
-        this.http.post<PersonDto[]>(url, {}, { params }).pipe(
-            tap((response: PersonDto[]) => {
+        this.http.post<PersonRatingRowDto[]>(url, {}, { params }).pipe(
+            tap((response: PersonRatingRowDto[]) => {
                 console.log('Получен ответ:', response);
                 this.loading.set(false);
                 if (Array.isArray(response)) {
@@ -102,7 +106,11 @@ export class BestExpertComponent {
         ).subscribe();
     }
 
-    trackByExpert(_index: number, expert: PersonDto): number | string {
-        return expert.id ?? _index;
+    trackByExpert(_index: number, expert: PersonRatingRowDto): number | string {
+        return expert.person.id ?? _index;
+    }
+
+    getCoefficient(items: ScoreItemDto[], coefficientType: string): number {
+        return items.find(item => item.ruleCode == coefficientType)?.points || 1.0;
     }
 }
