@@ -1,18 +1,13 @@
-.table-wrapper {
-  overflow-x: visible;
-  overflow-y: visible;
-}
-
-.table-responsive {
-  overflow-x: visible !important;
-}
-
 table {
   font-size: 0.9375rem;
   background-color: white;
   margin-bottom: 0;
   table-layout: auto;
   width: 100%;
+}
+
+.table-wrapper {
+  overflow-x: hidden; // Убираем горизонтальную прокрутку
 }
 
 thead th {
@@ -23,13 +18,6 @@ thead th {
   font-size: 0.8125rem;
   border-bottom: 2px solid #dee2e6;
   white-space: nowrap;
-}
-
-// Bootstrap задаёт "светлую" шапку через .table-light.
-// Для списка пользователей хотим, чтобы фон страницы/таблицы оставался белым.
-thead.table-light,
-thead.table-light th {
-  background-color: #fff !important;
 }
 
 tbody td, tbody th {
@@ -60,7 +48,7 @@ tbody td, tbody th {
 }
 
 // Ограничение ширины колонки ролей
-td:nth-child(3) {
+tbody td:nth-child(3) {
   max-width: 180px;
   
   .badge {
@@ -70,11 +58,11 @@ td:nth-child(3) {
 }
 
 .user-table-row {
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .user-table-row:hover {
-  background-color: #f8f9fa !important;
+  background-color: #f8f9fa;
   transform: scale(1.01);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -85,7 +73,7 @@ td:nth-child(3) {
 }
 
 .user-table-row.alert-danger:hover {
-  background-color: #f1aeb5 !important;
+  background-color: #f1aeb5;
 }
 
 .user-table-row.alert-dark {
@@ -101,10 +89,6 @@ td:nth-child(3) {
   cursor: pointer;
 }
 
-.cursor-pointer:hover {
-  color: #0d6efd !important;
-}
-
 .badge {
   font-size: 0.7rem;
   padding: 0.35rem 0.65rem;
@@ -112,7 +96,7 @@ td:nth-child(3) {
 
 .btn-link {
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .btn-link:hover {
@@ -120,12 +104,16 @@ td:nth-child(3) {
 }
 
 .btn-link.text-primary:hover {
-  color: #0b5ed7 !important;
+  color: #0b5ed7;
 }
 
 .btn-link.text-danger:hover {
-  color: #bb2d3b !important;
+  color: #bb2d3b;
 }
+
+// ============================================
+// МЕДИА-ЗАПРОСЫ - Оптимизированная структура
+// ============================================
 
 // Старые мониторы (992px - 1600px) - не Full HD
 @media (min-width: 992px) and (max-width: 1600px) {
@@ -145,7 +133,7 @@ td:nth-child(3) {
     max-width: 160px;
   }
 
-  td:nth-child(3) {
+  tbody td:nth-child(3) {
     max-width: 160px;
   }
 
@@ -160,8 +148,9 @@ td:nth-child(3) {
   }
 }
 
-// Планшеты в портретной ориентации (768px - 991.98px)
+// Планшеты и мобильные устройства (до 991.98px)
 @media (max-width: 991.98px) {
+  // Общие стили для таблицы
   table {
     font-size: 0.85rem;
   }
@@ -178,71 +167,87 @@ td:nth-child(3) {
     max-width: 140px;
   }
 
-  td:nth-child(3) {
+  tbody td:nth-child(3) {
     max-width: 140px;
   }
 
   .actions-column {
-    min-width: 100px !important;
-    width: 100px !important;
+    min-width: 100px;
+    width: 100px;
   }
 
   .badge {
     font-size: 0.65rem;
     padding: 0.3rem 0.5rem;
   }
-}
-
-// Маленькие планшеты и большие телефоны (576px - 767.98px)
-@media (max-width: 767.98px) {
-  table {
-    font-size: 0.8rem;
+  
+  // Z-index для карточек (решает проблему перекрытия dropdown)
+  .col-12.d-lg-none .card {
+    position: relative;
+    z-index: 10001;
+    overflow: visible !important; // Предотвращает обрезание ng-select dropdown
+  }
+  
+  .card.user-card {
+    position: relative;
+    z-index: 0;
+  }
+  
+  ::ng-deep .ng-dropdown-panel {
+    z-index: 10002 !important;
   }
 
-  thead th, tbody td, tbody th {
-    padding: 0.5rem 0.4rem;
-  }
+  // Маленькие планшеты и большие телефоны (576px - 767.98px)
+  @media (max-width: 767.98px) {
+    table {
+      font-size: 0.8rem;
+    }
 
-  .user-name-cell {
-    max-width: 120px;
-  }
+    thead th, tbody td, tbody th {
+      padding: 0.5rem 0.4rem;
+    }
 
-  .user-email-cell {
-    max-width: 110px;
-  }
+    .user-name-cell {
+      max-width: 120px;
+    }
 
-  td:nth-child(3) {
-    max-width: 110px;
-  }
+    .user-email-cell {
+      max-width: 110px;
+    }
 
-  .actions-column {
-    min-width: 90px !important;
-    width: 90px !important;
-  }
+    tbody td:nth-child(3) {
+      max-width: 110px;
+    }
 
-  .btn-link {
-    padding: 0.25rem !important;
-  }
+    .actions-column {
+      min-width: 90px;
+      width: 90px;
+    }
 
-  .badge {
-    font-size: 0.6rem;
-    padding: 0.25rem 0.4rem;
+    .btn-link {
+      padding: 0.25rem;
+    }
+
+    .badge {
+      font-size: 0.6rem;
+      padding: 0.25rem 0.4rem;
+    }
   }
 }
 
 // Mobile card styles (applied via d-lg-none class in HTML)
 .card.user-card {
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card.user-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .card.user-card.alert-danger {
   background-color: #f8d7da;
-  border-left: 3px solid #dc3545 !important;
+  border-left: 3px solid #dc3545;
 }
 
 .card.user-card.alert-dark {
@@ -265,51 +270,55 @@ td:nth-child(3) {
 
 // Маленькие телефоны (до 575.98px)
 @media (max-width: 575.98px) {
-  // Таблица скрыта на таких экранах, используется карточный вид
-  // Но на всякий случай оптимизируем, если таблица все же отображается
-  table {
-    font-size: 0.75rem;
-  }
+  // Таблица скрыта на таких экранах через d-none d-lg-block, используется карточный вид
+  // Стили для карточек пользователей на маленьких экранах
+  .card.user-card {
+    &.h-100 {
+      height: auto;
+      min-height: auto;
+    }
 
-  thead th, tbody td, tbody th {
-    padding: 0.4rem 0.3rem;
-  }
+    .card-body {
+      padding: 0.75rem;
+    }
 
-  .user-name-cell {
-    max-width: 100px;
-  }
+    .d-flex.justify-content-between.align-items-start {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
 
-  .user-email-cell {
-    max-width: 90px;
-  }
+    .flex-grow-1 {
+      flex-grow: 0;
+      flex-shrink: 1;
+      flex-basis: auto;
+      min-width: 0;
+      max-width: 100%;
+    }
 
-  td:nth-child(3) {
-    max-width: 90px;
-  }
+    .d-flex.gap-1 {
+      align-self: flex-start;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
 
-  .actions-column {
-    min-width: 80px !important;
-    width: 80px !important;
-  }
+    .d-flex.align-items-center.gap-2 {
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
 
-  .btn-link {
-    padding: 0.2rem !important;
-  }
+    .badge {
+      font-size: 0.65rem;
+      padding: 0.25rem 0.5rem;
+      flex-shrink: 0;
+    }
 
-  .badge {
-    font-size: 0.55rem;
-    padding: 0.2rem 0.35rem;
-  }
-
-  // Стили для карточек пользователей
-  // Переопределяем h-100 для очень маленьких экранов
-  .card.user-card.h-100 {
-    height: auto !important;
-    min-height: auto;
-  }
-
-  .card.user-card .card-body {
-    padding: 0.75rem !important; // Уменьшаем padding
+    h6 {
+      margin-bottom: 0;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
   }
 
   // Исправляем растягивание фамилии
@@ -322,7 +331,7 @@ td:nth-child(3) {
     text-overflow: clip;
     max-width: 100%;
     display: block;
-    flex: 0 1 auto; // Не растягивается
+    flex: 0 1 auto;
   }
 
   // Исправляем отображение email
@@ -332,50 +341,6 @@ td:nth-child(3) {
     overflow-wrap: break-word;
     max-width: 100%;
     display: block;
-  }
-
-  // Исправляем layout контейнера с именем и кнопками
-  .card.user-card .d-flex.justify-content-between.align-items-start {
-    flex-direction: column;
-    align-items: stretch !important;
-    gap: 0.75rem;
-  }
-
-  // Контейнер с именем не должен растягиваться
-  .card.user-card .flex-grow-1 {
-    flex-grow: 0;
-    flex-shrink: 1;
-    flex-basis: auto;
-    min-width: 0; // Позволяет shrink
-    max-width: 100%;
-  }
-
-  // Кнопки действий
-  .card.user-card .d-flex.gap-1 {
-    align-self: flex-start;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
-
-  // Исправляем контейнер с badge и именем
-  .card.user-card .d-flex.align-items-center.gap-2 {
-    gap: 0.5rem !important;
-    flex-wrap: wrap;
-    align-items: flex-start !important;
-  }
-
-  // Уменьшаем размер badge
-  .card.user-card .badge {
-    font-size: 0.65rem;
-    padding: 0.25rem 0.5rem;
-    flex-shrink: 0;
-  }
-
-  // Уменьшаем размер h6
-  .card.user-card h6 {
-    margin-bottom: 0;
-    flex: 1 1 auto;
-    min-width: 0;
   }
 }
 
@@ -389,10 +354,6 @@ td:nth-child(3) {
   transition: height 0.35s ease;
 }
 
-.collapse.show {
-  display: block !important;
-}
-
 .filter-toggle-btn {
   color: #212529;
   transition: color 0.2s ease;
@@ -401,18 +362,13 @@ td:nth-child(3) {
 }
 
 .filter-toggle-btn:hover {
-  color: #0d6efd !important;
-  background: transparent !important;
-  transform: none !important;
+  color: #0d6efd;
+  background: transparent;
 }
 
 .filter-toggle-btn:focus {
   box-shadow: none;
   outline: none;
-}
-
-.filter-toggle-btn:active {
-  transform: none !important;
 }
 
 .filter-chevron {
@@ -424,11 +380,6 @@ td:nth-child(3) {
   justify-content: center;
   min-width: 1.25rem;
   flex-shrink: 0;
-}
-
-.filter-toggle-btn:hover .filter-chevron {
-  transform: none;
-  color: inherit;
 }
 
 .filter-toggle-btn .filter-chevron svg {

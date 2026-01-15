@@ -312,8 +312,7 @@ span.badge.bg-primary,
   background-color: #dfe3e4;
 }
 
-// Закомментировано: использование !important без необходимости
-// Можно использовать более специфичные селекторы
+
 .input-group.separated {
   input.form-control {
     border-radius: 0.25rem;
@@ -338,24 +337,6 @@ span.badge.bg-primary,
 .list-left-menu {
   padding-right: 0;
 }
-
-// Закомментировано: дублирование (определено также на строке 907)
-// Оставляем только одно определение ниже с улучшенными стилями
-// .card {
-//   padding: 1.5rem 2rem;
-//   border-radius: 1rem;
-//   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-//   
-//   h5 {
-//     margin-bottom: 1.25rem;
-//     line-height: 1.75;
-//     font-weight: 700;
-//   }
-//   
-//   &:hover {
-//     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-//   }
-// }
 
 .form-sub-group:not(:last-child) {
   margin-bottom: 1rem;
@@ -490,11 +471,6 @@ span.badge.bg-primary,
   margin-bottom: 0.3rem;
 }
 
-// Закомментировано: устаревшее свойство text-align-last с плохой поддержкой браузерами
-// Рекомендуется использовать flexbox или grid для выравнивания
-// .card-cap {
-//   text-align-last: justify;
-// }
 
 .completer-input {
   @extend .form-control;
@@ -520,11 +496,6 @@ span.badge.bg-primary,
   border-bottom: 0;
 }
 
-// Закомментировано: устаревшее свойство text-align-last с плохой поддержкой браузерами
-// Рекомендуется использовать flexbox или grid для выравнивания
-// .card-cap {
-//   text-align-last: justify;
-// }
 
 // Bootstrap 5 compatibility
 .fade.show {
@@ -615,8 +586,13 @@ span.badge.bg-primary,
   margin-bottom: 1rem;
 }
 .ng-select .ng-value-label {
-  white-space: normal;
-  word-wrap: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2; // Оставляем 2 строки текста
+  overflow: hidden;
+  line-height: 1.5;
+  white-space: normal; // Позволяет переносить текст на новую строку
 }
 /* строка фильтра: сортировка + поле (в т.ч. ng-select) - Bootstrap 5 */
 .filter .input-group,
@@ -651,12 +627,6 @@ app-filter ng-select {
   min-width: 0;
 }
 
-/* контейнер внутри ng-select тоже на всю ширину */
-.filter ng-select .ng-select-container,
-app-filter ng-select .ng-select-container {
-  width: 100%;
-}
-
 /* Убираем двойную обводку для ng-select в input-group */
 .input-group ng-select.form-control {
   border: none;
@@ -686,8 +656,6 @@ app-filter .input-group .form-control:not(:first-child) {
 .ng-select .ng-value-icon.left {
   font-size: 16px;      // сделать символ больше
   line-height: 1;       // чтобы не было лишних отступов по вертикали
-  //width: 16px;          // опционально — увеличить "кликабельную" область
-  //height: 16px;
 }
 
 .ng-select .ng-value-icon.left:hover {
@@ -696,8 +664,6 @@ app-filter .input-group .form-control:not(:first-child) {
 
 // Стили для ng-select с border
 // Убираем border от form-control для ng-select, так как border есть у контейнера
-// Закомментировано: использование !important без необходимости
-// Можно использовать более специфичные селекторы
 .ng-select.form-control {
   border: none;
   padding: 0;
@@ -707,8 +673,15 @@ app-filter .input-group .form-control:not(:first-child) {
 .ng-select .ng-select-container {
   border: 1px solid #ced4da;
   border-radius: 0.375rem;
-  min-height: 38px;
+  min-height: 45px; // высота ng-select по умолчанию
+  height: 100%; // Позволить растягиваться
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+// Уменьшенная высота для ng-select в фильтрах
+app-filter .input-group-sm ng-select .ng-select-container {
+  min-height: 38px; // Без !important - селектор более специфичный
+  height: auto;
 }
 
 .ng-select.ng-select-focused .ng-select-container {

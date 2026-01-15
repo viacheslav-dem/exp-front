@@ -26,7 +26,7 @@
   
   img {
     opacity: 1;
-    transition: all 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out, filter 0.3s ease-in-out;
     height: 200px;
     width: 200px;
     border-radius: 0.5rem;
@@ -95,14 +95,13 @@
     
     .dropdown-toggle {
       white-space: nowrap;
-      transition: all 0.3s ease;
+      transition: box-shadow 0.3s ease;
       height: 100%;
       display: flex;
       align-items: center;
       position: relative;
       
       &:hover {
-        transform: none;
         box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
       }
     }
@@ -110,7 +109,7 @@
   
   .btn {
     flex: 0 0 auto;
-    transition: all 0.3s ease;
+    transition: box-shadow 0.3s ease;
     white-space: nowrap;
     height: 100%;
     display: flex;
@@ -118,7 +117,6 @@
     justify-content: center;
     
     &:hover {
-      transform: none;
       box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
     }
   }
@@ -184,7 +182,7 @@
 
 .degree-entry {
   .card {
-    transition: all 0.3s ease;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
     
     &:hover {
       box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -302,14 +300,6 @@
         position: relative;
         z-index: 1;
       }
-      
-      .ng-select-container {
-        border: none;
-        min-height: 38px;
-        border-top-left-radius: 0.375rem;
-        border-bottom-left-radius: 0.375rem;
-      }
-
       .ng-arrow-wrapper {
         right: 8px;
       }
@@ -320,8 +310,7 @@
       border-left: 0;
       flex-shrink: 0;
       white-space: nowrap;
-      min-height: 38px;
-      height: 38px;
+      min-height: 45px;
     }
   }
 }
@@ -329,20 +318,8 @@
 // Увеличение z-index для dropdown меню ng-select и Bootstrap dropdown
 // Bootstrap 5 modal имеет z-index 1055, backdrop - 1050
 // ngx-bootstrap может использовать другие значения, поэтому устанавливаем z-index 1070
+// Примечание: overflow: visible для модальных окон уже задан в глобальных стилях (_common.scss)
 ::ng-deep {
-  // Убираем overflow: hidden с модального окна для корректного отображения dropdown
-  .modal-body {
-    overflow: visible;
-  }
-
-  .modal-content {
-    overflow: visible;
-  }
-  
-  .modal-dialog {
-    overflow: visible;
-  }
-  
   // Глобальные стили для ng-select в модальном окне
   // Применяем только когда ng-select открыт (ng-select-opened)
   // Устанавливаем очень высокий z-index, чтобы dropdown был выше всех input полей и других элементов
@@ -371,20 +348,6 @@
     }
   }
   
-  // Увеличение z-index для всех ng-select (организация, специальности, специализации, области компетенции)
-  // Применяем только когда ng-select открыт
-  // Устанавливаем очень высокий z-index, чтобы dropdown был выше всех input полей и других элементов
-  .user-org-dropdown {
-    position: relative;
-    overflow: visible;
-    
-    // Увеличиваем z-index для wrapper, когда внутри открыт ng-select
-    // Это гарантирует, что открытый dropdown не будет перекрыт следующими элементами
-    &:has(.ng-select.ng-select-opened) {
-      z-index: 10001;
-    }
-  }
-  
   // Увеличение z-index для Bootstrap dropdown (ученое звание, ученая степень и т.д.)
   // Применяем только когда dropdown открыт (имеет класс .show)
   .input-group .dropdown-menu.show,
@@ -408,17 +371,25 @@
 // Стили для организации
 .user-org-dropdown {
   width: 100%;
+  position: relative;
+  overflow: visible;
+  
+  // Увеличиваем z-index для wrapper, когда внутри открыт ng-select
+  // Это гарантирует, что открытый dropdown не будет перекрыт следующими элементами
+  &:has(.ng-select.ng-select-opened) {
+    z-index: 10001;
+  }
   
   ::ng-deep ng-select {
     width: 100%;
-    min-width: 400px; // Увеличиваем ширину
+    min-width: 400px;
     
     .ng-select-container {
-      font-size: 0.875rem; // Уменьшаем шрифт
+      font-size: 0.875rem;
     }
     
     .ng-value-container {
-      font-size: 0.875rem; // Уменьшаем шрифт
+      font-size: 0.875rem;
       
       .ng-value {
         font-size: 0.875rem;
@@ -426,7 +397,7 @@
     }
     
     .ng-input {
-      font-size: 0.875rem; // Уменьшаем шрифт
+      font-size: 0.875rem;
       
       input {
         font-size: 0.875rem;
@@ -436,7 +407,7 @@
   
   ::ng-deep .ng-dropdown-panel {
     .ng-option {
-      font-size: 0.875rem; // Уменьшаем шрифт в выпадающем списке
+      font-size: 0.875rem;
     }
   }
 }
