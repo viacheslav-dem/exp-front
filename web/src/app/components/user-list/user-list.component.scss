@@ -2,12 +2,29 @@ table {
   font-size: 0.9375rem;
   background-color: white;
   margin-bottom: 0;
-  table-layout: auto;
+  table-layout: fixed; // Фиксированная раскладка - предотвращает расширение колонок
   width: 100%;
 }
 
 .table-wrapper {
   overflow-x: hidden; // Убираем горизонтальную прокрутку
+  
+  // Явно переопределяем Bootstrap .table-responsive
+  &.table-responsive {
+    overflow-x: hidden;
+  }
+}
+
+// Процентные ширины колонок (сумма = 100%)
+thead th:nth-child(1) { width: 10%; }  // #ID (для 8-значных номеров)
+thead th:nth-child(2) { width: 24%; }  // ФИО
+thead th:nth-child(3) { width: 27%; }  // Роли (увеличена для длинных названий)
+thead th:nth-child(4) { width: 24%; }  // Email
+thead th:nth-child(5) { width: 15%; }  // Действия
+
+// ID колонка - не переносить на новую строку
+tbody th:first-child {
+  white-space: nowrap;
 }
 
 thead th {
@@ -18,6 +35,8 @@ thead th {
   font-size: 0.8125rem;
   border-bottom: 2px solid #dee2e6;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 tbody td, tbody th {
@@ -27,14 +46,12 @@ tbody td, tbody th {
 }
 
 .user-name-cell {
-  max-width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal; // Разрешаем перенос (отчество на новую строку)
+  word-wrap: break-word;
+  line-height: 1.4;
 }
 
 .user-email-cell {
-  max-width: 180px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -44,16 +61,23 @@ tbody td, tbody th {
 .actions-column {
   position: relative;
   white-space: nowrap;
-  flex-shrink: 0;
+  text-align: center;
 }
 
-// Ограничение ширины колонки ролей
+// Колонка ролей - бейджи с переносом
 tbody td:nth-child(3) {
-  max-width: 180px;
+  .d-flex {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
   
   .badge {
-    font-size: 0.65rem;
-    padding: 0.3rem 0.6rem;
+    font-size: 0.6rem; // Уменьшен размер шрифта
+    padding: 0.25rem 0.5rem; // Уменьшен padding
+    white-space: normal; // Разрешаем перенос текста внутри бейджа
+    line-height: 1.3;
+    text-align: center;
+    word-break: break-word; // Переносим длинные слова
   }
 }
 
@@ -125,23 +149,6 @@ tbody td:nth-child(3) {
     padding: 0.875rem 0.625rem;
   }
 
-  .user-name-cell {
-    max-width: 180px;
-  }
-
-  .user-email-cell {
-    max-width: 160px;
-  }
-
-  tbody td:nth-child(3) {
-    max-width: 160px;
-  }
-
-  .actions-column {
-    min-width: 110px !important;
-    width: 110px !important;
-  }
-
   .badge {
     font-size: 0.65rem;
     padding: 0.3rem 0.55rem;
@@ -157,23 +164,6 @@ tbody td:nth-child(3) {
 
   thead th, tbody td, tbody th {
     padding: 0.75rem 0.5rem;
-  }
-
-  .user-name-cell {
-    max-width: 150px;
-  }
-
-  .user-email-cell {
-    max-width: 140px;
-  }
-
-  tbody td:nth-child(3) {
-    max-width: 140px;
-  }
-
-  .actions-column {
-    min-width: 100px;
-    width: 100px;
   }
 
   .badge {
@@ -205,23 +195,6 @@ tbody td:nth-child(3) {
 
     thead th, tbody td, tbody th {
       padding: 0.5rem 0.4rem;
-    }
-
-    .user-name-cell {
-      max-width: 120px;
-    }
-
-    .user-email-cell {
-      max-width: 110px;
-    }
-
-    tbody td:nth-child(3) {
-      max-width: 110px;
-    }
-
-    .actions-column {
-      min-width: 90px;
-      width: 90px;
     }
 
     .btn-link {
