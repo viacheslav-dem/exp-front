@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
 
 @Component({
@@ -50,6 +50,5 @@ export class DeadlinesComplianceBlockComponent {
     deadlinesComplianceText: string;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 }

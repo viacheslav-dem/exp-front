@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 import {EconomicActivityBlockComponent} from "@app/components/document-form/document-blocks/economic-activity-block";
 
 @Component({
@@ -40,6 +40,5 @@ export class BasedOnHighTechBlockComponent {
     basedOnHighTechText: string;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 }

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output, ChangeDetectionStrategy, ChangeDetectorRef, effect, input} from '@angular/core';
+import {Component, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, effect, input, output} from '@angular/core';
 import {getAllPhoneTypes} from "@app/pipes/phone-type.pipe";
 import {AutoActivatedRole, Role, RolePipe} from "@app/pipes/role.pipe";
 import {getAllBankAccountTypes} from "@app/pipes/bank-account-type.pipe";
@@ -227,8 +227,8 @@ export class UserFormComponent implements OnInit, OnDestroy {
   }
 
 
-  @Output() onSave = new EventEmitter<PersonDto>();
-  @Output() canceled = new EventEmitter();
+  readonly onSave = output<PersonDto>();
+  readonly canceled = output<void>();
 
   ngOnInit() {
     this.allRoles = this._rolePipe.getAllNotAutoActivatedRoles();

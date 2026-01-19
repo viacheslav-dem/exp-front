@@ -3,7 +3,7 @@
  */
 
 import {TermsViolationDto} from "app/dto/ViolationDto";
-import {Component, EventEmitter, Input, OnInit, Output, input} from "@angular/core";
+import {Component, OnInit, effect, input, signal, output} from "@angular/core";
 import {Chart} from "app/components/highchart/highchart.builder";
 import {MonthYearPipe} from "app/pipes/mdate.pipe";
 import {blueClr, noViolationClr, redClr, yellowClr} from "@app/components/stats/colors";
@@ -17,11 +17,17 @@ import dayjs from 'dayjs';
 })
 export class ViolationChart implements OnInit {
 
-  chart: any = Chart.chart().loading().options;
+  private readonly chartState = signal<any>(Chart.chart().loading().options);
+  get chart(): any {
+    return this.chartState();
+  }
+  set chart(value: any) {
+    this.chartState.set(value);
+  }
   readonly title = input<string>('Отслеживание сроков');
   readonly date = input<number>(new Date().getTime());
   readonly filterKeyPrefix = input<string>('');
-  @Output() onClick: EventEmitter<any> = new EventEmitter();
+  readonly onClick = output<any>();
 
   constructor(private monthYear: MonthYearPipe) {
   }
@@ -29,7 +35,10 @@ export class ViolationChart implements OnInit {
   ngOnInit(): void {
   }
 
-  @Input() set violation(violation: TermsViolationDto) {
+  readonly violation = input<TermsViolationDto>(undefined);
+
+  private readonly violationEffect = effect(() => {
+    const violation = this.violation();
     if (!violation) {
       return;
     }
@@ -49,7 +58,7 @@ export class ViolationChart implements OnInit {
       .series(Chart.pieOptions(this.title())
         .cursorPointer()
         .data(this.violationAsSeries(violation)));
-  }
+  });
 
   violationAsSeries(violation: TermsViolationDto) {
     return [{

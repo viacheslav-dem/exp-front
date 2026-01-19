@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-percentage-of-export-to-import',
@@ -23,6 +23,5 @@ export class PercentageOfExportToImportBlockComponent {
     percentageOfExportToImport: string;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 }

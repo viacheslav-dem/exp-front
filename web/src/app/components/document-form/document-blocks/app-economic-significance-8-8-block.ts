@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
@@ -167,7 +167,6 @@ export class EconomicSignificance_8_8_BlockComponent {
     isUseOfIntellectualProperty: boolean;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 }
 

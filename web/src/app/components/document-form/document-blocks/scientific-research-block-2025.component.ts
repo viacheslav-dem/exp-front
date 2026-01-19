@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from "@angular/core";
+import {Component, input, output} from "@angular/core";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectDto} from "@app/dto/ProjectDto";
 
@@ -67,8 +67,7 @@ export class ScientificResearchBlock2025Component {
 
     readonly isTextRequired = input<boolean>(false);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 
     showTarget8_3() {
         return this.project().code.code.startsWith('8.3');

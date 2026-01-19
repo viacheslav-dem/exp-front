@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Output, ViewChild} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, output} from "@angular/core";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {
     Direction,
@@ -35,7 +35,7 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
 
     SortClass = SortClass;
     sortDirection = Direction.ASC;
-    @Output() selected = new EventEmitter<ProjectDto>();
+    readonly selected = output<ProjectDto>();
     @ViewChild('searchModal', { static: false }) searchProjectModal: ModalComponent;
 
     constructor(protected service: ProjectService,

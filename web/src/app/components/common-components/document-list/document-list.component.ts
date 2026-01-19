@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, computed, input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, computed, input, output} from '@angular/core';
 import {FileEditorComponent} from "../file-editor/file-editor.component";
 import {DocumentService} from "@app/services/document.service";
 import {DocumentDto} from "@app/dto/DocumentDto";
@@ -23,8 +23,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   readonly canDelete = input<boolean>(false);
   readonly canUpdate = input<boolean>(false);
   readonly url = input<string>('document');
-  @Output() onUpdate: EventEmitter<DocumentDto> = new EventEmitter();
-  @Output() onDelete: EventEmitter<any> = new EventEmitter();
+  readonly onUpdate = output<DocumentDto>();
+  readonly onDelete = output<any>();
   @ViewChild(FileEditorComponent) fileEditor: FileEditorComponent;
   @ViewChild("fileViewerModal") fileViewerModal: ModalComponent;
   private subscriptions: Subscription[] = [];

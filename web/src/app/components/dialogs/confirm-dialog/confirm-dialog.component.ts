@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input, ChangeDetectionStrategy} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy, output} from '@angular/core';
 import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/ConfirmDialogField";
 import {environment} from "../../../../environments/environment";
 
@@ -34,8 +34,8 @@ export class ConfirmDialogComponent {
   readonly cancelBtnMessage = input<string>('Отмена');
   readonly fields = input<ConfirmDialogField<any>[]>([]);
 
-  @Output() onSave = new EventEmitter<any>();
-  @Output() canceled = new EventEmitter();
+  readonly onSave = output<any>();
+  readonly canceled = output<null>();
 
   confirm() {
     let result = {};
@@ -43,10 +43,10 @@ export class ConfirmDialogComponent {
     if (fieldsValue != null && Array.isArray(fieldsValue)) {
       fieldsValue.forEach(field => result[field.name] = field.value);
     }
-    this.onSave.next(result);
+    this.onSave.emit(result);
   }
 
   cancel() {
-    this.canceled.next(null);
+    this.canceled.emit(null);
   }
 }

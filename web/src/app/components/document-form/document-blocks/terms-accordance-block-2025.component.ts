@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, effect, input} from "@angular/core";
+import {Component, effect, input, output} from "@angular/core";
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
 import {PeriodDto} from "@app/dto/PeriodDto";
 
@@ -47,8 +47,7 @@ export class TermsAccordanceBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 
     readonly form = input<{ termsAccordance: boolean, termsSuggestion: PeriodDto, termsAccordanceText: string }>(undefined);
 

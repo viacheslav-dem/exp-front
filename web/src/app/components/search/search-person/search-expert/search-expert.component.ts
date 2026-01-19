@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, ViewChild, ChangeDetectorRef} from '@angular/core';
+import {Component, ViewChild, ChangeDetectorRef, output} from '@angular/core';
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {PersonService} from "@app/services/person.service";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
@@ -22,7 +22,7 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
   SortClass = SortClass;
   experts: PersonExpertDto[] = [];
   sortDirection = Direction.ASC;
-  @Output() selected = new EventEmitter<PersonExpertDto>();
+  readonly selected = output<PersonExpertDto>();
   @ViewChild('searchModal', { static: false }) searchPersonModal: ModalComponent;
 
   constructor(protected _service: PersonService, private _cdr: ChangeDetectorRef) {

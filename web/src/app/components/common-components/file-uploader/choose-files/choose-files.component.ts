@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, input} from "@angular/core";
+import {ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, input, output} from "@angular/core";
 import {DocType} from "@app/components/common-components/file-uploader/doc-type";
 import {environment} from "../../../../../environments/environment";
 
@@ -12,7 +12,7 @@ import {environment} from "../../../../../environments/environment";
 })
 export class ChooseFilesComponent implements OnInit {
 
-  @Output() onFilesChosen = new EventEmitter();
+  readonly onFilesChosen = output<FileList>();
   readonly controlClass = input<any>(undefined);
   readonly typesAccept = input<string>([
     DocType.DOCX.extension, DocType.DOC.extension,

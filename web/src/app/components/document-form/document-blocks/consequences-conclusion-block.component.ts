@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-consequences-conclusion-block',
@@ -60,6 +60,5 @@ export class ConsequencesConclusionBlockComponent {
     consequencesText: string;
 }>(undefined);
 
-  @Output()
-  onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+  readonly onConditionsChanged = output<boolean>();
 }

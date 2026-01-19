@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, effect, input, output} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from "@angular/router";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
@@ -31,7 +31,7 @@ export class LifecycleInfoComponent implements OnInit, OnDestroy {
 
   readonly role = input<string>(undefined);
   readonly project = input<ProjectDto>(undefined);
-  @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
+  readonly onChanged = output<any>();
 
   @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
 
@@ -44,10 +44,13 @@ export class LifecycleInfoComponent implements OnInit, OnDestroy {
   ngOnInit() {
   }
 
-  @Input() set lifecycle(lifecycle: ProjectLifecycleDto) {
+  readonly lifecycle = input<ProjectLifecycleDto>(undefined);
+
+  private readonly lifecycleEffect = effect(() => {
+    const lifecycle = this.lifecycle();
     if (!lifecycle) return;
     this._lifecycle = lifecycle;
-  }
+  });
 
   showTransitionHistoryModal() {
     this.transitionHistoryModal.show();

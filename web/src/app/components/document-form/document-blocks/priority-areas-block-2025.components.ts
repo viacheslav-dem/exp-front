@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output, input} from "@angular/core";
+import {Component, OnInit, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-priority_areas-block-2025',
@@ -62,8 +62,7 @@ export class PriorityAreasBlock2025Components implements OnInit{
     priorityAreasText: string;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 
 
     stateButton(flag: boolean) {

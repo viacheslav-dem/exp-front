@@ -5,14 +5,13 @@ import {
   Component,
   DestroyRef,
   ElementRef,
-  EventEmitter,
   OnDestroy,
   OnInit,
-  Output,
   ViewChild,
   input,
   inject,
-  signal
+  signal,
+  output
 } from '@angular/core';
 import {ModalDirective, ModalOptions} from "ngx-bootstrap/modal";
 import {environment} from "../../../../environments/environment";
@@ -58,7 +57,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
 
   readonly title = input<string>(undefined);
   readonly modalClasses = input<string>('modal-lg');
-  @Output() onClose: EventEmitter<any> = new EventEmitter();
+  readonly onClose = output<void>();
   readonly closePermission = input<boolean>(true);
   config: ModalOptions = new ModalOptions();
 

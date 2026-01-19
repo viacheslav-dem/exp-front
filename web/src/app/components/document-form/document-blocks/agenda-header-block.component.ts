@@ -1,4 +1,4 @@
-import {Component, EventEmitter, HostListener, Output, input} from '@angular/core';
+import {Component, HostListener, input, output} from '@angular/core';
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {DecisionStateBadge} from "@app/pipes/decision.pipe";
 import {AgendaNewFormContent} from "@app/components/document-form/meeting-protocol-form/AgendaNewFormContent";
@@ -32,8 +32,7 @@ export class AgendaHeaderBlockComponent {
 
   readonly expanded = input<boolean>(false);
 
-  @Output()
-  toggle = new EventEmitter<void>();
+  readonly toggle = output<void>();
 
   targetId(): string {
     const id = this.project()?.id;
@@ -42,6 +41,7 @@ export class AgendaHeaderBlockComponent {
 
   @HostListener('click')
   onClick() {
+    // TODO: The 'emit' function requires a mandatory void argument
     this.toggle.emit();
   }
 
@@ -49,6 +49,7 @@ export class AgendaHeaderBlockComponent {
   @HostListener('keydown.space', ['$event'])
   onKeydown(ev: KeyboardEvent) {
     ev.preventDefault();
+    // TODO: The 'emit' function requires a mandatory void argument
     this.toggle.emit();
   }
 }

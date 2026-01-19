@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {NewVoteResults} from "@app/components/document-form/meeting-protocol-form/NewVoteResults";
 import {DecisionStateBadge} from "@app/pipes/decision.pipe";
@@ -54,6 +54,5 @@ export class ConclusionSectionBlockComponent {
 
   readonly allParticipants = input<number>(undefined);
 
-  @Output()
-  onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+  readonly onConditionsChanged = output<boolean>();
 }

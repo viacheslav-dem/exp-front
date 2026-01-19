@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, forwardRef, output} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {environment} from "../../../../environments/environment";
@@ -28,7 +28,7 @@ export const CHECKBOX_VALUE_ACCESSOR: any = {
 })
 export class CheckboxComponent extends ControlComponent<boolean> {
 
-  @Output() onChecked: EventEmitter<boolean> = new EventEmitter<boolean>();
+  readonly onChecked = output<boolean>();
 
   check() {
     this.value = !this.value;

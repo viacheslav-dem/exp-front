@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, output} from '@angular/core';
 import {ModalDirective} from "ngx-bootstrap/modal";
 import dayjs from 'dayjs';
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
@@ -25,7 +25,7 @@ export class MeetingFormComponent {
   place: string;
   isEdit: boolean;
   @ViewChild('modal', { static: false }) modal: ModalDirective;
-  @Output() onAdd: EventEmitter<MeetingDto> = new EventEmitter<MeetingDto>();
+  readonly onAdd = output<MeetingDto>();
 
   constructor(private _meetingService: MeetingService,
               private _projectService: ProjectService,

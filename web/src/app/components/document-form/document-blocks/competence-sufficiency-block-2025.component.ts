@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-competence-sufficiency-block-2025',
@@ -75,8 +75,7 @@ export class CompetenceSufficiencyBlock2025Component {
 
     readonly isExpertReview = input<boolean>(true);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 }
 
 export const competenceSufficiencyOptions: string[] = [

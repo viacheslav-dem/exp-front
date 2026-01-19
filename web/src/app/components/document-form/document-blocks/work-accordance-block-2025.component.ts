@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from "@angular/core";
+import {Component, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-work-accordance-block-2025',
@@ -37,8 +37,7 @@ export class WorkAccordanceBlock2025Component {
     workAccordanceText: string;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 
     stateButton(flag: boolean){
         if(flag){

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-export-orientation-block',
@@ -35,6 +35,5 @@ export class ExportOrientationBlockComponent {
     exportOrientationText: string;
 }>(undefined);
 
-  @Output()
-  onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+  readonly onConditionsChanged = output<boolean>();
 }

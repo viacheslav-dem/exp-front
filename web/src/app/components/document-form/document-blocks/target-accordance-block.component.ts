@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-target-accordance-block',
@@ -44,6 +44,5 @@ export class TargetAccordanceBlockComponent {
     targetAccordanceText: string;
 }>(undefined);
 
-  @Output()
-  onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+  readonly onConditionsChanged = output<boolean>();
 }

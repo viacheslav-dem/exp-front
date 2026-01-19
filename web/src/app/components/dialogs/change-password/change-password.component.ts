@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output, input, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {Component, OnInit, input, ChangeDetectionStrategy, ChangeDetectorRef, output} from '@angular/core';
 import {PasswordDto} from "@app/dto/PasswordDto";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {StorageService} from "@app/services/storage.service";
@@ -51,21 +51,22 @@ export class ChangePasswordComponent implements OnInit {
   ngOnInit() {
   }
 
-  @Output() onSave = new EventEmitter<number>();
-  @Output() canceled = new EventEmitter();
+  readonly onSave = output<number>();
+  readonly canceled = output<number>();
 
   changePassword() {
     this._authService.changePassword(this.userId(), this.password).subscribe(() => {
       this.toasty.success('Пароль успешно изменён.');
       this.password = new PasswordDto();
-      this.onSave.next(this.userId());
+      this.onSave.emit(this.userId());
       this.cdr?.markForCheck?.();
     });
   }
 
   cancel() {
     this.password = new PasswordDto();
-    this.canceled.next(this.userId());
-    this.cdr?.markForCheck?.();
+    this.canceled.emit(this.userId());
+    // markForCheck не нужен: синхронный вызов из (click) автоматически триггерит change detection,
+    // а signal output автоматически обновляет родительский компонент
   }
 }

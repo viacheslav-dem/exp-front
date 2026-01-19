@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from "@angular/core";
+import {Component, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-construction-work-block-2025',
@@ -57,8 +57,7 @@ export class ConstructionWorkBlock2025Component {
     constructionWorksText: string;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 
     stateButton(flag: boolean){
         if(flag){

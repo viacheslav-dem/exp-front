@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, output} from '@angular/core';
 import {ModalDirective} from "ngx-bootstrap/modal";
 import {DataService} from "app/services/data.service";
 import {SectionPlainDto} from "@app/dto/SectionPlainDto";
@@ -13,7 +13,7 @@ import {environment} from "../../../../environments/environment";
 export class SearchSectionComponent implements OnInit {
 
   public data: SectionPlainDto[];
-  @Output() selected = new EventEmitter<SectionPlainDto>();
+  readonly selected = output<SectionPlainDto>();
   @ViewChild('searchModal', { static: false }) public searchModal: ModalDirective;
 
   constructor(private _dataService: DataService,

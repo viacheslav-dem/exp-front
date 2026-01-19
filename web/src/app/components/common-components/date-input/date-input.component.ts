@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, OnChanges, Output, ViewChild, forwardRef, input} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnChanges, ViewChild, forwardRef, input, output} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import dayjs from 'dayjs';
@@ -45,7 +45,7 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
   readonly placement = input<string>('bottom');
 
   dateValue: Date;
-  @Output() onSelect: EventEmitter<number> = new EventEmitter<number>();
+  readonly onSelect = output<number>();
 
   @ViewChild('dateInput', { static: false }) dateInput: ElementRef<HTMLInputElement>;
   bsConfig: any;

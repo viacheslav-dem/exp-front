@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, computed, effect, input, signal} from "@angular/core";
+import {ChangeDetectionStrategy, Component, OnInit, computed, effect, input, signal, output} from "@angular/core";
 import {
   CheckboxField,
   MultiCheck,
@@ -93,7 +93,7 @@ export class FilterComponent implements OnInit {
   
   readonly fieldClass = input<string>('');
   readonly filterClass = input<string>('');
-  @Output() onFilterChanged = new EventEmitter<Filter<any>[]>();
+  readonly onFilterChanged = output<Filter<any>[]>();
 
   constructor(
     private dataService: DataService

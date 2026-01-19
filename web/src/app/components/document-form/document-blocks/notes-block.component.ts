@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 import {Text} from "@app/components/document-form/form-model/Text";
 
 @Component({
@@ -40,8 +40,7 @@ export class NotesBlockComponent {
     wrappedNotes: Text[];
 }>(undefined);
 
-  @Output()
-  onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+  readonly onConditionsChanged = output<boolean>();
 
   deleteNote(i) {
     this._form().wrappedNotes.splice(i, 1);

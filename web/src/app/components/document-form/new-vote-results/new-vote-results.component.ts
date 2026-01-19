@@ -1,4 +1,4 @@
-import {Component, EventEmitter, forwardRef, Output, input, ChangeDetectionStrategy} from '@angular/core';
+import {Component, forwardRef, input, ChangeDetectionStrategy, output} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {NewVoteResults} from "@app/components/document-form/meeting-protocol-form/NewVoteResults";
@@ -99,8 +99,7 @@ export class NewVoteResultsComponent extends ControlComponent<NewVoteResults> {
 
   readonly all = input<number>(undefined);
 
-  @Output()
-  onChanged: EventEmitter<NewVoteResults> = new EventEmitter<NewVoteResults>();
+  readonly onChanged = output<NewVoteResults>();
 
   constructor(private _decisionPipe: DecisionPipe) {
     super();

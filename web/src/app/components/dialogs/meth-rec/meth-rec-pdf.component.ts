@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, NgZone} from "@angular/core";
+import {Component, input, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, output} from "@angular/core";
 import {StorageService} from "@app/services/storage.service";
 import {SERVER_URL} from "@app/config";
 import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/ConfirmDialogField";
@@ -69,8 +69,8 @@ export class MethRecPdfComponent implements OnInit, OnDestroy {
     readonly cancelBtnMessage = input<string>('Отмена');
     readonly fields = input<ConfirmDialogField<any>[]>([]);
 
-    @Output() onSave = new EventEmitter<any>();
-    @Output() canceled = new EventEmitter();
+    readonly onSave = output<any>();
+    readonly canceled = output<void>();
 
     pdfSrc: string | Uint8Array | ArrayBuffer;
     private subscription: Subscription;
@@ -115,11 +115,11 @@ export class MethRecPdfComponent implements OnInit, OnDestroy {
         if (fieldsValue != null && Array.isArray(fieldsValue)) {
             fieldsValue.forEach(field => result[field.name] = field.value);
         }
-        this.onSave.next(result);
+        this.onSave.emit(result);
     }
 
     cancel() {
-        this.canceled.next(null);
+        this.canceled.emit(null);
     }
 
     private loadPdf(): void {

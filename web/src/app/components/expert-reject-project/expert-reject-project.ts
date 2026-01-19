@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input, ChangeDetectionStrategy, ChangeDetectorRef} from "@angular/core";
+import {Component, input, ChangeDetectionStrategy, ChangeDetectorRef, output} from "@angular/core";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {DatePipe} from "@angular/common";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
@@ -18,8 +18,8 @@ import {environment} from "../../../environments/environment";
 export class ExpertRejectProject {
 
   readonly project = input<ProjectDto>(undefined);
-  @Output() cancel = new EventEmitter();
-  @Output() confirm = new EventEmitter<string>();
+  readonly cancel = output<void>();
+  readonly confirm = output<string>();
   ExpertRejectionReason = ExpertRejectionReason;
   variants = [ExpertRejectionReason.COMPETENCE, ExpertRejectionReason.TIME, ExpertRejectionReason.OTHER];
   selectReason: string;

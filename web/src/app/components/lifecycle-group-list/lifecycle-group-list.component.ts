@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef, computed, effect, signal} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef, computed, effect, signal, output} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {PersonService} from "@app/services/person.service";
 import {Router} from "@angular/router";
@@ -34,8 +34,8 @@ export class LifecycleGroupListComponent implements OnInit, OnDestroy {
 
   private _lastGroupsRef: LifecycleGroupDto[] | undefined;
 
-  @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
-  @Output() onReplyChanged: EventEmitter<ProjectDto> = new EventEmitter<ProjectDto>();
+  readonly onChanged = output<any>();
+  readonly onReplyChanged = output<ProjectDto>();
 
   @ViewChild(SearchCouncilComponent, { static: false }) searchCouncilComponent: SearchCouncilComponent;
 

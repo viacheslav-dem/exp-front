@@ -1,4 +1,4 @@
-import {Directive, EventEmitter, Input, OnDestroy, OnInit, Output, input} from "@angular/core";
+import {Directive, OnDestroy, OnInit, effect, input, output} from "@angular/core";
 import {FormContent} from "@app/components/document-form/form-model/FormContent";
 import {DraftService} from "@app/components/document-form/draft.service";
 import {IdDto} from "@app/dto/IdDto";
@@ -10,8 +10,8 @@ import {deepClone} from "@app/support/utils";
 export class DocumentForm<Form extends FormContent> implements OnInit, OnDestroy {
 
   _form: Form = this.createNewForm();
-  @Output() onSave = new EventEmitter<Form>();
-  @Output() onClose = new EventEmitter();
+  readonly onSave = output<Form>();
+  readonly onClose = output<Form>();
   readonly draftService = input<DraftService<Form>>(undefined);
   readonly draftOwner = input<IdDto>(undefined);
   _draftAutoSaveAlive: boolean = false;
@@ -21,10 +21,15 @@ export class DocumentForm<Form extends FormContent> implements OnInit, OnDestroy
   ngOnInit() {
   }
 
-  @Input()
-  set form(form: Form) {
+  readonly form = input<Form>(undefined);
+
+  private readonly formEffect = effect(() => {
+    const form = this.form();
+    if (!form) {
+      return;
+    }
     this.setForm(form);
-  }
+  });
 
   startAutoSave() {
     const draftService = this.draftService();

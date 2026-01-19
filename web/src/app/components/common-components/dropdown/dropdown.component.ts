@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, forwardRef, HostListener, Output, input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, HostListener, input, output} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {environment} from "../../../../environments/environment";
@@ -55,7 +55,7 @@ export class DropdownComponent<T> extends ControlComponent<T> {
   readonly notSelected = input<string>('Ничего не выбрано');
   readonly emptyOptionsLabel = input<string>('Данные отсутствуют');
   readonly optionToString = input<Function>(undefined);
-  @Output() onSelected: EventEmitter<T> = new EventEmitter<T>();
+  readonly onSelected = output<T>();
 
   isOpen: boolean = false;
 

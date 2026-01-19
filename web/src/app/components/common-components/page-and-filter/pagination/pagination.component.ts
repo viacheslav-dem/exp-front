@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Inject, OnDestroy, OnInit, Output, PLATFORM_ID, input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, PLATFORM_ID, input, output} from '@angular/core';
 import {Page} from "app/components/common-components/page-and-filter/model/Page";
 import {Pagination} from "app/components/common-components/page-and-filter/model/Pagination";
 import {PageRequest} from "@app/components/common-components/page-and-filter/model/PageRequest";
@@ -26,7 +26,7 @@ export class PaginationComponent implements OnInit, OnDestroy {
   readonly firstText = input<string>('Первая');
   readonly lastText = input<string>('Последняя');
   readonly maxSize = input<number>(10);
-  @Output() onPageChanged = new EventEmitter<PageRequest>();
+  readonly onPageChanged = output<PageRequest>();
 
   private isMobile = false;
   private resizeSubscription?: Subscription;

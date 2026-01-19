@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from "@angular/core";
+import {Component, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-balance-block-2025',
@@ -53,6 +53,5 @@ export class BalanceBlock2025Component {
     balanceText: string;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 }

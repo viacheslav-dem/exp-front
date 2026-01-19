@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from "@angular/core";
+import {Component, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-sufficiency-block-2025',
@@ -46,8 +46,7 @@ export class SufficiencyBlock2025Component {
     sufficiencySuggestion: string;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 
     stateButton(flag: boolean){
         if(flag){

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from "@angular/core";
+import {Component, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-technology-type-block-2025',
@@ -69,8 +69,7 @@ export class TechnologyTypeBlock2025Component {
     technologyTypeText: string;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 
     stateButtonTechnologyType5(flag: boolean) {
         if(flag){

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 import {IndustryDto} from "@app/dto/IndustryDto";
 import {Catalog} from "@app/services/data.service";
 
@@ -59,6 +59,5 @@ export class SectionBlockComponent {
     sectionText: string;
 }>(undefined);
 
-  @Output()
-  onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+  readonly onConditionsChanged = output<boolean>();
 }

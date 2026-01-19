@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, effect, input} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, effect, input, output} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {ProjectLifecycleState, ProjectLifecycleStateBadge} from "@app/pipes/lifecycle-state.pipe";
 import {Router} from "@angular/router";
@@ -58,9 +58,9 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
     return this._project ?? this.project();
   }
 
-  @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
-  @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
-  @Output() onReplyChanged: EventEmitter<any> = new EventEmitter<any>();
+  readonly onChanged = output<any>();
+  readonly onDeleted = output<any>();
+  readonly onReplyChanged = output<any>();
 
   @ViewChild(CouncilConclusionFormContainerComponent, { static: false }) conclusionForm: CouncilConclusionFormContainerComponent;
   @ViewChild('searchSection', { static: false }) searchSectionListComponent: SearchSectionComponent;

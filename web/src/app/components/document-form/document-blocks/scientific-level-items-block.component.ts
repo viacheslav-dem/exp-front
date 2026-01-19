@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, effect, input} from '@angular/core';
+import {Component, effect, input, output} from '@angular/core';
 import {Text} from "@app/components/document-form/form-model/Text";
 
 @Component({
@@ -37,8 +37,7 @@ export class ScientificLevelItemsBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  @Output()
-  onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+  readonly onConditionsChanged = output<boolean>();
 
   readonly form = input<{ scientificLevelItems: Text[], scientificLevelItemsText: string }>(undefined);
 

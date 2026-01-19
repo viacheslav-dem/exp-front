@@ -2,14 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  EventEmitter,
-  Output,
   computed,
   effect,
   inject,
   input,
   signal,
-  viewChild
+  viewChild,
+  output
 } from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActionButtonMetadata} from "@app/components/project-info/action-button-metadata";
@@ -117,7 +116,7 @@ export class BasicProjectInfoComponent {
   readonly role = input<string>(undefined);
   readonly lifecycleGroup = input<LifecycleGroupDto>(undefined);
   readonly visibleDocsForExpert = input<boolean>(undefined);
-  @Output() onChanged = new EventEmitter<ProjectDto>();
+  readonly onChanged = output<ProjectDto>();
 
   decisionFormModal = viewChild<ModalComponent>('decisionFormModal');
   transitionHistoryModal = viewChild<ModalComponent>('transitionHistoryModal');

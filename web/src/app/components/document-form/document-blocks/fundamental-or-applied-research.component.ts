@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output, input} from "@angular/core";
+import {Component, OnInit, input, output} from "@angular/core";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectDto} from "@app/dto/ProjectDto";
 
@@ -54,8 +54,7 @@ export class FundamentalOrAppliedResearchComponent implements OnInit{
     fundamentalOrAppliedResearchText: string;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 
 
     stateButton(flag: boolean) {

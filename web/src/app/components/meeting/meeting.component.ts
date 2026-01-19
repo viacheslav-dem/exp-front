@@ -357,7 +357,12 @@ export class MeetingComponent implements OnInit {
   }
 
   closeProtocolForm() {
-    this.protocolForm()?.close();
+    // Практичный вариант без рекурсии:
+    // - НЕ вызываем `protocolForm.close()` (она эмитит onClose и может зациклить closeProtocolForm)
+    // - но сохраняем черновик и останавливаем автосейв (поведение close() нам важно)
+    const form = this.protocolForm();
+    form?.saveDraft();
+    form?.stopAutoSave();
     this.protocolFormModal()?.hide();
   }
 }

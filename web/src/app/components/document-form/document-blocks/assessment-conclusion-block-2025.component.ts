@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-assessment-conclusion-block-2025',
@@ -49,8 +49,7 @@ export class AssessmentConclusionBlock2025Component {
     assessmentText: string;
 }>(undefined);
 
-  @Output()
-  onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+  readonly onConditionsChanged = output<boolean>();
 
   stateButton(flag: boolean){
     this._form().assessment = flag;

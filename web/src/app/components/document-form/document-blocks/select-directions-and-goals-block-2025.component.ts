@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, effect, input} from '@angular/core';
+import {Component, effect, input, output} from '@angular/core';
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {IdNameDto} from "@app/dto/IdNameDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
@@ -77,8 +77,7 @@ export class SelectDirectionsAndGoalsBlock2025Component {
 
   readonly full = input<boolean>(true);
 
-  @Output()
-  onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+  readonly onConditionsChanged = output<boolean>();
 
   readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 

@@ -1,5 +1,5 @@
 import {map} from 'rxjs/operators';
-import {Component, EventEmitter, OnInit, Output} from "@angular/core";
+import {Component, OnInit, output} from "@angular/core";
 import {PersonService} from "app/services/person.service";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import {sortByName} from "@app/components/common-components/page-and-filter/model/SortOrder";
@@ -35,7 +35,7 @@ export class SearchPersonAutocompleteComponent implements OnInit {
   loading: boolean = false;
   searchInput$ = new Subject<string>();
 
-  @Output() public selected = new EventEmitter();
+  public readonly selected = output<any>();
 
   constructor(private _service: PersonService) {
     this.searchInput$

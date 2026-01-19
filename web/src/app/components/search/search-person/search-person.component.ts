@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Output, ViewChild, effect, input} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, effect, input, output} from "@angular/core";
 import {PersonService} from "app/services/person.service";
 import {ModalComponent} from "app/components/common-components/modal/modal.component";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
@@ -16,7 +16,7 @@ import {environment} from "../../../../environments/environment";
 })
 export class SearchPersonComponent extends FilterAndPages<PersonPlainDto> {
 
-  @Output() selected = new EventEmitter<PersonPlainDto>();
+  readonly selected = output<PersonPlainDto>();
   @ViewChild('searchModal', { static: false }) searchPersonModal: ModalComponent;
 
   constructor(protected _service: PersonService, protected cdr: ChangeDetectorRef) {

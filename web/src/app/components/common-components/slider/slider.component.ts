@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, OnChanges, SimpleChanges, input} from "@angular/core";
+import {ChangeDetectionStrategy, Component, OnInit, OnChanges, SimpleChanges, input, output} from "@angular/core";
 import {Options} from '@angular-slider/ngx-slider';
 import {environment} from "../../../../environments/environment";
 
@@ -12,7 +12,7 @@ import {environment} from "../../../../environments/environment";
 })
 export class SliderComponent implements OnInit, OnChanges {
 
-  @Output() onChange = new EventEmitter();
+  readonly onChange = output<{from: number | null, to: number | null}>();
 
   public readonly slider = input<any>(undefined);
 

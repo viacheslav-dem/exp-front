@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Output, input} from "@angular/core";
+import {ChangeDetectionStrategy, Component, input, output} from "@angular/core";
 import {RemarkDto} from "@app/dto/RemarkDto";
 import {environment} from "../../../environments/environment";
 
@@ -14,8 +14,8 @@ export class RemarkResponseComponent {
   readonly remarks = input<RemarkDto[]>([]);
   readonly isEdit = input<boolean>(false);
   readonly isExpired = input<boolean>(false);
-  @Output() onSave: EventEmitter<RemarkDto[]> = new EventEmitter<RemarkDto[]>();
-  @Output() onReply: EventEmitter<RemarkDto[]> = new EventEmitter<RemarkDto[]>();
+  readonly onSave = output<RemarkDto[]>();
+  readonly onReply = output<RemarkDto[]>();
 
   save() {
     this.onSave.emit(this.remarks());

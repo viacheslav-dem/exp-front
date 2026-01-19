@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input, ChangeDetectionStrategy} from "@angular/core";
+import {Component, input, ChangeDetectionStrategy, output} from "@angular/core";
 import {RemarkDto} from "@app/dto/RemarkDto";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {DialogService} from "@app/components/dialogs/dialog.service";
@@ -36,7 +36,7 @@ export class MeetingRemarkComponent {
   isEdit: boolean = false;
   indexForEdit: number;
   remarkForEdit: RemarkDto = new RemarkDto();
-  @Output() onSave = new EventEmitter<RemarksContainerDto>();
+  readonly onSave = output<RemarksContainerDto>();
 
   addRemark(remark: RemarkDto) {
     if (remark.question == null || remark.question.length < 1) {

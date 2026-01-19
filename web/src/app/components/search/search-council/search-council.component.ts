@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, output} from '@angular/core';
 import {ModalDirective} from "ngx-bootstrap/modal";
 import {DataService} from "app/services/data.service";
 import {environment} from "../../../../environments/environment";
@@ -12,7 +12,7 @@ import {environment} from "../../../../environments/environment";
 export class SearchCouncilComponent implements OnInit {
 
   public data: any[];
-  @Output() selected = new EventEmitter();
+  readonly selected = output<any>();
   @ViewChild('searchModal', { static: false }) public searchModal: ModalDirective;
 
   constructor(private _dataService: DataService, private cdr: ChangeDetectorRef) {

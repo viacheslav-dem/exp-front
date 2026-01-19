@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output, input} from "@angular/core";
+import {Component, OnInit, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-availability-of-documents-block-2025',
@@ -67,8 +67,7 @@ export class AvailabilityOfDocumentsBlock2025Component implements OnInit{
     availabilityDocText: string;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 
 
     stateButton(flag: boolean) {

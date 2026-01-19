@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input} from "@angular/core";
+import {Component, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-competitiveness-block-agenda-2025',
@@ -54,8 +54,7 @@ export class CompetitivenessBlockAgenda2025Component {
     competitivenessText: string;
 }>(undefined);
 
-    @Output()
-    onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
+    readonly onConditionsChanged = output<boolean>();
 
     stateButton(flag: boolean) {
         this._form().competitiveness = flag;

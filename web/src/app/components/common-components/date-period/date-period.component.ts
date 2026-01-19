@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, OnChanges, Output, ViewChild, forwardRef, input} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnChanges, ViewChild, forwardRef, input, output} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
 import dayjs from 'dayjs';
@@ -44,7 +44,7 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
   readonly dateFormat = input<string>('DD.MM.YYYY');
   bsRangeValue: any[] = [];
   readonly label = input<string>(undefined);
-  @Output() onSelect: EventEmitter<DateRange> = new EventEmitter<DateRange>();
+  readonly onSelect = output<DateRange>();
 
   bsConfig: any;
 

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Output, input} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, input, output} from "@angular/core";
 import {AuthService} from "app/services/auth.service";
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {UploadHelper} from "app/components/common-components/file-uploader/upload-helper";
@@ -18,7 +18,7 @@ export class SilentFileUploaderComponent extends UploadHelper {
   readonly url = input(undefined);
   readonly typesAccept = input<string>(undefined);
   readonly controlClass = input<any>(undefined);
-  @Output() saved = new EventEmitter();
+  readonly saved = output<any>();
   isDragOver: boolean = false;
 
   constructor(private _toasty: GlobalToastyService,

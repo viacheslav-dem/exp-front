@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Output, effect, input, signal} from "@angular/core";
+import {ChangeDetectionStrategy, Component, effect, input, signal, output} from "@angular/core";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ListItem} from "@app/components/common-components/checkbox-list/checkbox-list";
 import {isEmptyOrNull} from "@app/support/utils";
@@ -18,8 +18,8 @@ export class ProjectCopyComponent {
   _project: ProjectDto;
   readonly docs = signal<ListItem[]>([]);
   selectedDocs = [];
-  @Output() save = new EventEmitter();
-  @Output() cancel = new EventEmitter();
+  readonly save = output<ProjectDto>();
+  readonly cancel = output<void>();
 
   private _lastProjectRef: ProjectDto | undefined;
 

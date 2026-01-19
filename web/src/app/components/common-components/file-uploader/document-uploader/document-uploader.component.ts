@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Output, ViewChild, input} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, input, output} from "@angular/core";
 import {AuthService} from "app/services/auth.service";
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {ModalComponent} from "app/components/common-components/modal/modal.component";
@@ -26,7 +26,7 @@ export class DocumentUploaderComponent extends UploadHelper {
   readonly url = input<string>(undefined);
   readonly idDto = input<IdDto>(undefined);
   readonly typesAccept = input<string>(undefined);
-  @Output() saved = new EventEmitter();
+  readonly saved = output<any>();
 
   @ViewChild('fileLoaderModal') fileLoaderModal: ModalComponent;
 
@@ -67,7 +67,7 @@ export class DocumentUploaderComponent extends UploadHelper {
     this.onSuccess = (item: any, response: string) => {
       this.fileLoaderModal.hide();
       this._toasty.success("Файл успешно загружен.");
-      this.saved.next(JSON.parse(response));
+      this.saved.emit(JSON.parse(response));
       // callbacks загрузчика могут приходить вне angular zone/из стороннего кода
       this.cdr.markForCheck();
     };

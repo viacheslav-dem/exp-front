@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewContainerRef} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewContainerRef, effect, input, output} from '@angular/core';
 import {Catalog, DataService} from "@app/services/data.service";
 import {CatalogDto} from "@app/dto/CatalogDto";
 import {PeriodDto} from "@app/dto/PeriodDto";
@@ -36,8 +36,8 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         return this.optionToStringInput();
     }
 
-    @Output() save = new EventEmitter();
-    @Output() cancel = new EventEmitter();
+    readonly save = output<ProjectDto>();
+    readonly cancel = output<void>();
 
     directions: DirectionDto[] = [];
     Catalog = Catalog;
@@ -105,7 +105,10 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         }))
     }
 
-    @Input() set project(project: ProjectDto) {
+    readonly project = input<ProjectDto>(undefined);
+
+    private readonly projectEffect = effect(() => {
+        let project = this.project();
         if (!project) project = new ProjectDto();
         if (!project.period) project.period = new PeriodDto();
         if (!project.projectSpecialization) project.projectSpecialization = [];
@@ -121,7 +124,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         // Инициализируем данные для специализаций
         this.initSpecializationMaps();
         this.cdr?.markForCheck?.();
-    }
+    });
 
     private initSpecializationMaps() {
         // Очищаем старые данные

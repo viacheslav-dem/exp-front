@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output, Type, ViewChild, ChangeDetectionStrategy, effect, input, signal} from "@angular/core";
+import {Component, OnInit, Type, ViewChild, ChangeDetectionStrategy, effect, input, signal, output} from "@angular/core";
 import {ExpertReviewState, ExpertReviewStateBadge} from "@app/pipes/review-state.pipe";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
@@ -88,7 +88,7 @@ export class ExpertReviewComponent implements OnInit {
     @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
     @ViewChild(ExpertReviewFormContainerComponent, { static: false }) expertReviewForm: ExpertReviewFormContainerComponent<any>;
 
-    @Output() onChanged: EventEmitter<any> = new EventEmitter();
+    readonly onChanged = output<any>();
 
     constructor(private _toasty: GlobalToastyService,
                 private _formResolver: ExpertReviewFormResolver,
