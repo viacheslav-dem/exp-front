@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, Type, ViewChild, ViewContainerRef, input, ChangeDetectionStrategy, ChangeDetectorRef, signal} from "@angular/core";
+import {Component, ElementRef, Type, ViewChild, ViewContainerRef, input, ChangeDetectionStrategy, ChangeDetectorRef, signal, effect} from "@angular/core";
 import {MeetingDto} from "@app/dto/MeetingDto";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {Role} from "@app/pipes/role.pipe";
@@ -45,6 +45,24 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
 
   _meeting: MeetingDto;
   readonly role = input<string>(undefined);
+  readonly meeting = input<MeetingDto | undefined>(undefined);
+  private readonly _meetingEffect = effect(() => {
+    const meeting = this.meeting();
+    if (!meeting) return;
+
+    this._meeting = meeting;
+    // При смене заседания сбрасываем открытый проект, чтобы не "залипало" состояние.
+    this.openedAgendaProjectId.set(null);
+    this._form.endDate = this._form.endDate || this._meeting.period.end;
+    this._meetingService.getMeetingAssessors(this._meeting).subscribe(res => {
+      sortPersonsByName(res);
+      this.assessors = res;
+      this.assessors.forEach(ass => ass.isChecked = this._form.participants.some(selected => selected.id == ass.id));
+      this.cdr?.markForCheck?.();
+    });
+    this.prepareAgendaForms();
+    this.cdr?.markForCheck?.();
+  });
   // Управляемое состояние загрузки (прокидывается из контейнера, где выполняется HTTP)
   readonly loading = input<boolean>(false);
   currentPerson: PersonPlainDto;
@@ -90,21 +108,6 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
 
   createNewForm(): MeetingProtocolNewFormContent {
     return new MeetingProtocolNewFormContent();
-  }
-
-  @Input() set meeting(meeting: MeetingDto) {
-    this._meeting = meeting;
-    // При смене заседания сбрасываем открытый проект, чтобы не "залипало" состояние.
-    this.openedAgendaProjectId.set(null);
-    this._form.endDate = this._form.endDate || this._meeting.period.end;
-    this._meetingService.getMeetingAssessors(this._meeting).subscribe(res => {
-      sortPersonsByName(res);
-      this.assessors = res;
-      this.assessors.forEach(ass => ass.isChecked = this._form.participants.some(selected => selected.id == ass.id));
-      this.cdr?.markForCheck?.();
-    });
-    this.prepareAgendaForms();
-    this.cdr?.markForCheck?.();
   }
 
   toggleAgendaProject(projectId: number | undefined | null) {

@@ -1,4 +1,4 @@
-import {Directive, ElementRef, Input} from '@angular/core';
+import {Directive, ElementRef, effect, input} from '@angular/core';
 
 @Directive({
     selector: '[accordianShow]',
@@ -7,7 +7,6 @@ import {Directive, ElementRef, Input} from '@angular/core';
 export class AccordionDirective {
 
   constructor(private el: ElementRef) {
-    console.log('elements', el);
   }
 
   hide(){
@@ -20,9 +19,11 @@ export class AccordionDirective {
     this.el.nativeElement.classList.add('show');
   }
 
-  @Input('accordianShow') set isShow(isShow: boolean){
+  readonly isShow = input<boolean>(false, { alias: 'accordianShow' });
+  private readonly _isShowEffect = effect(() => {
+    const isShow = this.isShow();
     this.el.nativeElement.classList.add('accordion');
     isShow ? this.show() : this.hide();
-  }
+  });
 
 }

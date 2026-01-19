@@ -1,4 +1,4 @@
-import {Directive, Input, TemplateRef, ViewContainerRef} from '@angular/core';
+import {Directive, TemplateRef, ViewContainerRef, effect, input} from '@angular/core';
 import {AuthService} from "@app/services/auth.service";
 
 @Directive({
@@ -11,13 +11,13 @@ export class IfRoleDirective {
                 private viewContainer: ViewContainerRef) {
     }
 
-    @Input()
-    set ifRole(roles: string[] | string) {
+    readonly ifRole = input<string[] | string>([]);
+    private readonly _ifRoleEffect = effect(() => {
+        const roles = this.ifRole();
+        this.viewContainer.clear();
         if (this._authService.inRole(roles)) {
             this.viewContainer.createEmbeddedView(this.templateRef);
-        } else {
-            this.viewContainer.clear();
         }
-    }
+    });
 
 }

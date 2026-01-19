@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, effect, input} from "@angular/core";
 import {ProjectTransitionHistoryDto} from "app/dto/ProjectTransitionHistoryDto";
 import {ProjectState, ProjectStateBadge} from "app/pipes/project-state.pipe";
 import {TransitionDto} from "@app/dto/TransitionDto";
@@ -20,13 +20,9 @@ export class ProjectTransitionHistoryComponent implements OnInit {
   transitionsCount: number = 0;
   hasOnExpertExaminationTransition: boolean = false;
 
-  constructor(private cdr: ChangeDetectorRef) {
-  }
-
-  ngOnInit(): void {
-  }
-
-  @Input() set history(history: ProjectTransitionHistoryDto) {
+  readonly history = input<ProjectTransitionHistoryDto | undefined>(undefined);
+  private readonly _historyEffect = effect(() => {
+    const history = this.history();
     if (!history) return;
     this._history = history;
     this.hasOnExaminationTransition = !!this._history.transitions
@@ -35,6 +31,12 @@ export class ProjectTransitionHistoryComponent implements OnInit {
       .find(transition => transition.newState == ProjectState.ON_EXPERT_EXAMINATION);
     this.transitionsCount = this._history.transitions.length;
     this.cdr?.markForCheck?.();
+  });
+
+  constructor(private cdr: ChangeDetectorRef) {
+  }
+
+  ngOnInit(): void {
   }
 
   showGroupHistories(transition: TransitionDto) {

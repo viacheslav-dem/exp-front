@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, effect, input} from "@angular/core";
 import {LifecycleGroupState, LifecycleGroupStateBadge} from "@app/pipes/lifecycle-group-state.pipe";
 import {LifecycleGroupTransitionHistoryDto} from "@app/dto/LifecycleGroupTransitionHistoryDto";
 import {TransitionDto} from "@app/dto/TransitionDto";
@@ -18,19 +18,21 @@ export class GroupTransitionHistoryComponent implements OnInit {
   hasInProcessingTransition: boolean = false;
   transitionsCount: number = 0;
 
-  constructor(private cdr: ChangeDetectorRef) {
-  }
-
-  ngOnInit(): void {
-  }
-
-  @Input() set history(history: LifecycleGroupTransitionHistoryDto) {
+  readonly history = input<LifecycleGroupTransitionHistoryDto | undefined>(undefined);
+  private readonly _historyEffect = effect(() => {
+    const history = this.history();
     if (!history) return;
     this._history = history;
     this.hasInProcessingTransition = !!(this._history.transitions || [])
       .find(transition => transition.newState == LifecycleGroupState.IN_PROCESSING);
     this.transitionsCount = (this._history.transitions || []).length;
     this.cdr?.markForCheck?.();
+  });
+
+  constructor(private cdr: ChangeDetectorRef) {
+  }
+
+  ngOnInit(): void {
   }
 
   showLifecycleHistories(transition: TransitionDto) {

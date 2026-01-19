@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input} from "@angular/core";
+import {ChangeDetectionStrategy, Component, effect, input} from "@angular/core";
 import {Role} from "app/pipes/role.pipe";
 import {SearchPersonComponent} from "app/components/search/search-person/search-person.component";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
@@ -13,16 +13,18 @@ import {environment} from "../../../../environments/environment";
 export class SearchGkntWorkerComponent extends SearchPersonComponent {
 
   _gkntDepartmentId: number;
+  readonly gkntDepartmentId = input<number | undefined>(undefined);
+  private readonly _gkntDepartmentIdEffect = effect(() => {
+    const id = this.gkntDepartmentId();
+    if (id == null) return;
+    this._gkntDepartmentId = id;
+    this.update();
+    this.cdr?.markForCheck?.();
+  });
 
   ngOnInit() {
     super.ngOnInit();
     this.enableFilterCache("search-gknt-worker");
-  }
-
-  @Input() set gkntDepartmentId(id: number) {
-    this._gkntDepartmentId = id;
-    this.update();
-    this.cdr?.markForCheck?.();
   }
 
   getFilters() {

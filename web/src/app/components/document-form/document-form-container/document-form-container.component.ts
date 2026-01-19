@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, Input, Type, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef} from "@angular/core";
+import {Component, ComponentFactoryResolver, Type, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, effect, input} from "@angular/core";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {FormContent} from "@app/components/document-form/form-model/FormContent";
 import {environment} from "../../../../environments/environment";
@@ -18,6 +18,13 @@ export class DocumentFormContainerComponent<Form extends FormContent> extends Do
   formComponent: DocumentForm<Form>;
   @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
 
+  readonly formRenderer = input<Type<DocumentForm<Form>> | undefined>(undefined);
+  private readonly _formRendererEffect = effect(() => {
+    const formRenderer = this.formRenderer();
+    if (!formRenderer) return;
+    this.updateFormComponent(formRenderer);
+  });
+
   constructor(private resolver: ComponentFactoryResolver,
               protected cdr: ChangeDetectorRef) {
     super();
@@ -25,11 +32,6 @@ export class DocumentFormContainerComponent<Form extends FormContent> extends Do
 
   createNewForm(): Form {
     return null;
-  }
-
-  @Input()
-  set formRenderer(formRenderer) {
-    this.updateFormComponent(formRenderer);
   }
 
   updateFormComponent(formRenderer) {

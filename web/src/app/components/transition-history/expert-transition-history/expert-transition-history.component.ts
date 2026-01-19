@@ -1,7 +1,6 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, effect, input} from "@angular/core";
 import {ProjectLifecycleTransitionHistoryDto} from "@app/dto/ProjectLifecycleTransitionHistoryDto";
 import {ExpertReviewStateBadge} from "@app/pipes/review-state.pipe";
-import {ExpertTransitionHistoryDto} from "@app/dto/ExpertTransitionHistoryDto";
 import {environment} from "../../../../environments/environment";
 
 @Component({
@@ -14,7 +13,15 @@ import {environment} from "../../../../environments/environment";
 export class ExpertTransitionHistoryComponent implements OnInit {
 
   ExpertReviewStateBadge = ExpertReviewStateBadge;
-  _history: ExpertTransitionHistoryDto;
+  _history: ProjectLifecycleTransitionHistoryDto;
+
+  readonly history = input<ProjectLifecycleTransitionHistoryDto | undefined>(undefined);
+  private readonly _historyEffect = effect(() => {
+    const history = this.history();
+    if (!history) return;
+    this._history = history;
+    this.cdr?.markForCheck?.();
+  });
 
   constructor(private cdr: ChangeDetectorRef) {
   }
@@ -22,9 +29,5 @@ export class ExpertTransitionHistoryComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  @Input() set history(history: ProjectLifecycleTransitionHistoryDto) {
-    if (!history) return;
-    this._history = history;
-    this.cdr?.markForCheck?.();
-  }
+
 }

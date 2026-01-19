@@ -1,4 +1,4 @@
-import {Component, Input, ChangeDetectionStrategy, signal, ChangeDetectorRef} from "@angular/core";
+import {Component, ChangeDetectionStrategy, signal, ChangeDetectorRef, effect, input} from "@angular/core";
 import {ExpertReviewService} from "@app/services/expert-review.service";
 import {ExpertPayInfoDto} from "@app/dto/ExpertPayInfoDto";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
@@ -22,7 +22,13 @@ export class ExpertPayInfoComponent extends FilterAndPages<ExpertPayInfoDto> {
     expertInfoDtos = signal<ExpertPayInfoDto[]>([]);
     private _expertId = signal<number | undefined>(undefined);
 
-    @Input() set expert(expert: number) {
+    readonly expert = input<number | undefined>(undefined);
+    private readonly _expertEffect = effect(() => {
+        const expert = this.expert();
+        if (expert == null) {
+            this._expertId.set(undefined);
+            return;
+        }
         this.expertInfoDtos.set([]);
         this._page.page = 0;
         this._pagination.page = 0;
@@ -30,7 +36,7 @@ export class ExpertPayInfoComponent extends FilterAndPages<ExpertPayInfoDto> {
         this._searchRequest = new SearchPageRequest(this._pagination);
         this._expertId.set(expert);
         this.loadPage();
-    }
+    });
 
     get expertId(): number | undefined {
         return this._expertId();

@@ -1,7 +1,7 @@
 /**
  * Created by belous.dmitri on 08.02.2017.
  */
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, OnInit, effect, input} from "@angular/core";
 import {Chart} from "@app/components/highchart/highchart.builder";
 import {MonthYearPipe} from "@app/pipes/mdate.pipe";
 import {StatsDto} from "@app/dto/StatsDto";
@@ -17,6 +17,12 @@ import {TermsStatsDto} from "@app/dto/TermsStatsDto";
 export class CouncilsExaminationViolationChart implements OnInit {
 
   chart: any = Chart.chart().loading().options;
+  readonly stats = input<StatsDto[] | undefined>(undefined);
+  private readonly _statsEffect = effect(() => {
+    const stats = this.stats();
+    if (!stats) return;
+    this.render(stats);
+  });
 
   constructor(private monthYear: MonthYearPipe,
               private numberPipe: NumberPipe) {
@@ -25,10 +31,7 @@ export class CouncilsExaminationViolationChart implements OnInit {
   ngOnInit(): void {
   }
 
-  @Input() set stats(stats: StatsDto[]) {
-    if (!stats) {
-      return;
-    }
+  private render(stats: StatsDto[]) {
     let numberFormat = this.numberPipe;
     this.chart = Chart.chart('Контроль времени экспертизы в ГЭС')
       .xAxis(Chart.axis().categories(stats.map(stats => this.monthYear.transform(stats.startDate))))

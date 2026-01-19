@@ -1,7 +1,7 @@
 /**
  * Created by belous.dmitri on 08.02.2017.
  */
-import {Component, Input, OnInit, input} from "@angular/core";
+import {Component, OnInit, effect, input} from "@angular/core";
 import {Chart} from "@app/components/highchart/highchart.builder";
 import {MonthYearPipe} from "@app/pipes/mdate.pipe";
 import {blueClr, red05Clr} from "@app/components/stats/colors";
@@ -21,6 +21,12 @@ export class ReviewsViolationSparklineChart implements OnInit {
   chart: any = Chart.chart().size(null, this.height()).loading();
 
   _stats: ExpertStatsDto[] = [];
+  readonly stats = input<ExpertStatsDto[] | undefined>(undefined);
+  private readonly _statsEffect = effect(() => {
+    const stats = this.stats();
+    if (!stats) return;
+    this.render(stats);
+  });
 
   constructor(
     private monthYear: MonthYearPipe,
@@ -34,13 +40,10 @@ export class ReviewsViolationSparklineChart implements OnInit {
   }
 
   updateChart() {
-    this.stats = this._stats;
+    this.render(this._stats);
   }
 
-  @Input() set stats(stats: ExpertStatsDto[]) {
-    if (!stats) {
-      return;
-    }
+  private render(stats: ExpertStatsDto[]) {
     this._stats = stats;
     let numberFormat = this.numberFormat;
     this.chart = Chart.chart()

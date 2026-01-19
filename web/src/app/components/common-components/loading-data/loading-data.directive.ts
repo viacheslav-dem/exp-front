@@ -1,4 +1,4 @@
-import {Directive, ElementRef, Input} from "@angular/core";
+import {Directive, ElementRef, effect, input} from "@angular/core";
 @Directive({
     selector: '[loadingData]',
     standalone: false
@@ -10,9 +10,17 @@ export class LoadingDataDirective {
   constructor(private el: ElementRef) {
   }
 
-  @Input('loadingData') set isLoading(isLoading: boolean){
-    if(isLoading) {
-      const host: HTMLElement = this.el.nativeElement;
+  readonly isLoading = input<boolean>(false, { alias: 'loadingData' });
+  private readonly _loadingEffect = effect(() => {
+    const isLoading = this.isLoading();
+    const host: HTMLElement = this.el.nativeElement;
+
+    if (isLoading) {
+      // Защита от повторного “append” при повторных срабатываниях эффекта.
+      if (this.spinnerBg || this.spinnerLocal) {
+        return;
+      }
+
       host.style.position = 'relative';
 
       this.spinnerBg = document.createElement('div');
@@ -31,19 +39,16 @@ export class LoadingDataDirective {
       spinner.appendChild(bounce2);
       this.spinnerLocal.appendChild(spinner);
       host.appendChild(this.spinnerLocal);
-    } else {
-      if(this.spinnerBg){
-        const host: HTMLElement = this.el.nativeElement;
-        if (this.spinnerBg.parentNode === host) {
-          host.removeChild(this.spinnerBg);
-        }
-      }
-      if(this.spinnerLocal){
-        const host: HTMLElement = this.el.nativeElement;
-        if (this.spinnerLocal.parentNode === host) {
-          host.removeChild(this.spinnerLocal);
-        }
-      }
+      return;
     }
-  }
+
+    if (this.spinnerBg && this.spinnerBg.parentNode === host) {
+      host.removeChild(this.spinnerBg);
+    }
+    if (this.spinnerLocal && this.spinnerLocal.parentNode === host) {
+      host.removeChild(this.spinnerLocal);
+    }
+    this.spinnerBg = null;
+    this.spinnerLocal = null;
+  });
 }

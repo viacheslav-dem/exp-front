@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, effect, input} from "@angular/core";
 import {StorageService} from "app/services/storage.service";
 import {SERVER_URL} from "app/config";
 import {DocumentDto} from "@app/dto/DocumentDto";
@@ -42,7 +42,18 @@ import {environment} from "../../../../environments/environment";
 export class PdfViewerComponent implements OnInit, OnDestroy {
 
   pdfSrc: string | Uint8Array | ArrayBuffer;
-  @Input() url: string = 'document';
+  readonly url = input<string>('document');
+  readonly doc = input<DocumentDto | undefined>(undefined);
+  private readonly _docEffect = effect(() => {
+    const doc = this.doc();
+    if (doc) {
+      this.loadPdf(doc);
+      return;
+    }
+    this.cleanup();
+    this.pdfSrc = null;
+    this.cdr.markForCheck();
+  });
   private subscription: Subscription;
 
   constructor(private _storage: StorageService,
@@ -52,16 +63,6 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Worker для PDF.js настроен глобально в main.ts
-  }
-
-  @Input() set doc(doc: DocumentDto) {
-    if (doc) {
-      this.loadPdf(doc);
-    } else {
-      this.cleanup();
-      this.pdfSrc = null;
-      this.cdr.markForCheck();
-    }
   }
 
   private loadPdf(doc: DocumentDto): void {
@@ -79,7 +80,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
     
     let filename = encodeURIComponent(doc.name + '.pdf');
-    let url = `${SERVER_URL}/${this.url}?convert=true&id=${doc.id}&filename=${filename}`;
+    let url = `${SERVER_URL}/${this.url()}?convert=true&id=${doc.id}&filename=${filename}`;
     
     // Загружаем PDF через HttpClient с авторизацией
     this.subscription = this._http.getBlock<Blob>(url, {

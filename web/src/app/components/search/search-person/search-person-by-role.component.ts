@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, input} from '@angular/core';
 import {SearchPersonComponent} from "app/components/search/search-person/search-person.component";
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import {environment} from "../../../../environments/environment";
@@ -12,19 +12,20 @@ import {environment} from "../../../../environments/environment";
 export class SearchPersonByRolesComponent extends SearchPersonComponent {
 
   _roles: string[];
+  readonly roles = input<string[] | string | undefined>(undefined);
+  private readonly _rolesEffect = effect(() => {
+    const roles = this.roles();
+    const normalized = (typeof roles === 'string')
+      ? [roles]
+      : (roles ?? []);
+    this._roles = normalized;
+    this.update();
+    this.cdr?.markForCheck?.();
+  });
 
   ngOnInit() {
     super.ngOnInit();
     this.enableFilterCache("search-person-by-roles");
-  }
-
-  @Input() set roles(roles: string[] | string) {
-    if (typeof roles === 'string') {
-      roles = [roles];
-    }
-    this._roles = roles;
-    this.update();
-    this.cdr?.markForCheck?.();
   }
 
   getFilters() {

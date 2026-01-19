@@ -1,7 +1,7 @@
 /**
  * Created by belous.dmitri on 08.02.2017.
  */
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, OnInit, effect, input} from "@angular/core";
 import {Chart} from "@app/components/highchart/highchart.builder";
 import {MonthYearPipe} from "@app/pipes/mdate.pipe";
 import {StatsDto} from "@app/dto/StatsDto";
@@ -15,6 +15,12 @@ import {blueClr} from "@app/components/stats/colors";
 export class FinishedReviewsChart implements OnInit {
 
   chart: any = Chart.chart().loading().options;
+  readonly stats = input<StatsDto[] | undefined>(undefined);
+  private readonly _statsEffect = effect(() => {
+    const stats = this.stats();
+    if (!stats) return;
+    this.render(stats);
+  });
 
   constructor(private monthYear: MonthYearPipe) {
   }
@@ -22,10 +28,7 @@ export class FinishedReviewsChart implements OnInit {
   ngOnInit(): void {
   }
 
-  @Input() set stats(stats: StatsDto[]) {
-    if (!stats) {
-      return;
-    }
+  private render(stats: StatsDto[]) {
     let allFinishedReviews = stats
       .map(s => s.finishedExpertReviews)
       .reduce((prev, curr) => prev + curr, 0);

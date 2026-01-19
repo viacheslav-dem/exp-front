@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, input, ChangeDetectionStrategy, ChangeDetectorRef, ComponentFactoryResolver} from "@angular/core";
+import {Component, ElementRef, input, ChangeDetectionStrategy, ChangeDetectorRef, ComponentFactoryResolver, effect} from "@angular/core";
 import {DocumentFormContainerComponent} from "@app/components/document-form/document-form-container/document-form-container.component";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ExpertReviewFormContent} from "@app/components/document-form/form-model/ExpertReviewFormContent";
@@ -55,11 +55,13 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
   readonly draftService = input<DraftService<Form>>(undefined);
   readonly draftOwner = input<IdDto>(undefined);
 
-  @Input()
-  set project(project) {
+  readonly project = input<ProjectDto | undefined>(undefined);
+  private readonly _projectEffect = effect(() => {
+    const project = this.project();
+    if (!project) return;
     this._project = project;
     this.update();
-  }
+  });
 
   updateFormComponent(formRenderer) {
     super.updateFormComponent(formRenderer);

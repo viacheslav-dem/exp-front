@@ -1,7 +1,7 @@
 /**
  * Created by belous.dmitri on 08.02.2017.
  */
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, OnInit, effect, input} from "@angular/core";
 import {Chart} from "@app/components/highchart/highchart.builder";
 import {MonthYearPipe} from "@app/pipes/mdate.pipe";
 import {acceptedClr, blueClr, rejectedClr, returnedClr} from "@app/components/stats/colors";
@@ -17,16 +17,19 @@ import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO
 export class CouncilProjectsChart implements OnInit {
 
     chart: any = Chart.chart().loading().options;
+    readonly stats = input<CouncilStatsResponseDTO[] | undefined>(undefined);
+    private readonly _statsEffect = effect(() => {
+        const stats = this.stats();
+        if (!stats) return;
+        this.render(stats);
+    });
 
     constructor(private monthYear: MonthYearPipe,
                 public councilStatsComponent: CouncilStatsComponent) { }
 
     ngOnInit(): void { }
 
-    @Input() set stats(stats: CouncilStatsResponseDTO[]) {
-        if (!stats) {
-            return;
-        }
+    private render(stats: CouncilStatsResponseDTO[]) {
         this.chart = Chart.chart('Объекты экспертизы в ГЭС по месяцам')
             .xAxis(Chart.axis()
                 .categories(stats.map(stats => this.monthYear.transform(stats.startDate))))
