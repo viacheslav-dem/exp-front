@@ -17,7 +17,7 @@ import {
 import {ModalDirective, ModalOptions} from "ngx-bootstrap/modal";
 import {environment} from "../../../../environments/environment";
 import {fromEvent} from "rxjs";
-import {auditTime, distinctUntilChanged, map} from "rxjs/operators";
+import {auditTime, distinctUntilChanged, map, startWith} from "rxjs/operators";
 
 @Component({
     selector: 'app-modal',
@@ -90,6 +90,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const sub = fromEvent(el, 'scroll').pipe(
       auditTime(100),
+      startWith(null), // Проверяем начальное состояние при загрузке
       map(() => el.scrollTop > this.thresholdPx),
       distinctUntilChanged(),
     ).subscribe(value => {
@@ -138,7 +139,21 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
     this.modal.show();
     this.lockBodyScroll();
     // Удобство: открываем модалку всегда сверху.
-    setTimeout(() => this.scrollModalToTop(false), 0);
+    setTimeout(() => {
+      this.scrollModalToTop(false);
+      // Проверяем состояние скролла после загрузки контента
+      this.checkScrollState();
+    }, 0);
+  }
+
+  private checkScrollState(): void {
+    const el = this.modalRoot?.nativeElement ?? this.modalBody?.nativeElement;
+    if (!el) {
+      return;
+    }
+    const shouldShow = el.scrollTop > this.thresholdPx;
+    this.showBackToTop.set(shouldShow);
+    this.cdr.markForCheck();
   }
 
   public hide(): void {

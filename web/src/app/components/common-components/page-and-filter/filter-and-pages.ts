@@ -39,7 +39,7 @@ export abstract class FilterAndPages<T> implements OnInit {
       if (hadSavedState) {
         this._initialLoadDone = true;
         // Создаем новый массив полей для immutable обновления
-        // Это триггерит @Input() set fields в FilterComponent, который обновит сигнал
+        // Это триггерит input() fields в FilterComponent, который обновит сигнал
         this._searchFields = [...this._searchFields];
         // Вызываем update() после загрузки значений из кэша
         setTimeout(() => this.update(), 0);

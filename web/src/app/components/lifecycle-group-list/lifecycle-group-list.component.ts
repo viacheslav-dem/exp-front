@@ -1,10 +1,9 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef, computed, effect, signal} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {PersonService} from "@app/services/person.service";
 import {Router} from "@angular/router";
 import {Role} from "@app/pipes/role.pipe";
 import {SearchCouncilComponent} from "../search/search-council/search-council.component";
-import {ProjectLifecycleDto} from "@app/dto/ProjectLifecycleDto";
 import {LifecycleGroupDto} from "@app/dto/LifecycleGroupDto";
 import {ProjectService} from "@app/services/project.service";
 import {ProjectDto} from "@app/dto/ProjectDto";
@@ -29,6 +28,12 @@ export class LifecycleGroupListComponent implements OnInit, OnDestroy {
   readonly project = input<ProjectDto>(new ProjectDto());
   private subscriptions: Subscription[] = [];
 
+  // Локальное состояние списка групп.
+  // Важно: НЕ мутируем входной `groups()` (signal input), иначе возможны побочные эффекты у родителя/циклы.
+  readonly groupsState = signal<LifecycleGroupDto[]>([]);
+
+  private _lastGroupsRef: LifecycleGroupDto[] | undefined;
+
   @Output() onChanged: EventEmitter<any> = new EventEmitter<any>();
   @Output() onReplyChanged: EventEmitter<ProjectDto> = new EventEmitter<ProjectDto>();
 
@@ -43,25 +48,35 @@ export class LifecycleGroupListComponent implements OnInit, OnDestroy {
   ngOnInit() {
   }
 
+  private readonly groupsEffect = effect(() => {
+    const groups = this.groups();
+    if (Object.is(this._lastGroupsRef, groups)) {
+      return;
+    }
+    this._lastGroupsRef = groups;
+    // Делаем копию массива, чтобы дальнейшие изменения были локальными и иммутабельными.
+    this.groupsState.set([...(groups ?? [])]);
+  });
+
   changed() {
-    this.onChanged.emit(this.groups());
+    this.onChanged.emit(this.groupsState());
   }
 
   replyChanged(project: ProjectDto){
     this.onReplyChanged.emit(project);
   }
 
-  canEditGroups() {
+  readonly canEditGroups = computed(() => {
     const project = this.project();
     const role = this.role();
     return (project.state === 'ON_CHECKING' && role === Role.GKNT_WORKER) ||
       (project.state === 'ON_DEPARTMENT_SIGNING' && role === Role.GKNT_DEPARTMENT_CHAIRMAN);
-  }
+  });
 
   onSelectedCouncil($event) {
     this.subscriptions.push(
       this._projectService.attachCouncil(this.project(), $event.id).subscribe(res => {
-        this.groups().push(res);
+        this.groupsState.set([...this.groupsState(), res]);
         this.searchCouncilComponent.hide();
         this.changed();
         this.cdr?.markForCheck?.();
@@ -75,7 +90,8 @@ export class LifecycleGroupListComponent implements OnInit, OnDestroy {
   }
 
   deleteGroup(group) {
-    this.groups().splice(this.groups().indexOf(group), 1);
+    const next = this.groupsState().filter(g => g !== group);
+    this.groupsState.set(next);
     this.changed();
     this.cdr?.markForCheck?.();
   }

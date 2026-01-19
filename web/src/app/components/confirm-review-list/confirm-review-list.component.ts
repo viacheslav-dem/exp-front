@@ -93,11 +93,29 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
       this._reviewService.acceptExpert(review).subscribe(res => {
         // Обновляем статус review - он останется в списке, но с новым статусом (ON_EXPERT_CONFIRMATION)
         review.state = res.state;
-        // Сразу обновляем UI - кнопки исчезнут, появится бейдж "Ожидание эксперта"
+        // Проверяем, остались ли в проекте эксперты со статусом ON_GKNT_CONFIRMATION
+        // Если нет - проект должен исчезнуть из списка, так как он больше не подходит под фильтр
+        const hasReviewsOnConfirmation = project.expertReviews.some(r => r.state === ExpertReviewState.ON_GKNT_CONFIRMATION);
+        if (!hasReviewsOnConfirmation) {
+          // Удаляем проект из списка, так как все эксперты подтверждены или отклонены
+          const projectIndex = this.projects.findIndex(p => p.id === project.id);
+          if (projectIndex !== -1) {
+            this.projects.splice(projectIndex, 1);
+            // Обновляем пагинацию: уменьшаем общее количество элементов
+            if (this._page) {
+              this._page.totalElements = Math.max(0, this._page.totalElements - 1);
+              // Пересчитываем общее количество страниц
+              if (this._page.size > 0) {
+                this._page.totalPages = Math.ceil(this._page.totalElements / this._page.size);
+              }
+              // Обновляем content в объекте пагинации для синхронизации
+              this._page.content = this.projects;
+            }
+          }
+        }
+        // Сразу обновляем UI
         this.cdr?.markForCheck?.();
         this._toasty.success("Подтвержден.");
-        // Фоново синхронизируем с сервером для обновления других данных
-        this.loadPage();
       });
     });
   }
@@ -120,11 +138,31 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
         this._reviewService.rejectExpert(review, reason).subscribe(res => {
           // Обновляем статус review - он останется в списке, но с новым статусом (REJECTED)
           review.state = res.state;
-          // Сразу обновляем UI - кнопки исчезнут, появится бейдж "Отклонён"
+          // Обновляем причину отклонения
+          review.rejectionReason = res.rejectionReason;
+          // Проверяем, остались ли в проекте эксперты со статусом ON_GKNT_CONFIRMATION
+          // Если нет - проект должен исчезнуть из списка, так как он больше не подходит под фильтр
+          const hasReviewsOnConfirmation = project.expertReviews.some(r => r.state === ExpertReviewState.ON_GKNT_CONFIRMATION);
+          if (!hasReviewsOnConfirmation) {
+            // Удаляем проект из списка, так как все эксперты подтверждены или отклонены
+            const projectIndex = this.projects.findIndex(p => p.id === project.id);
+            if (projectIndex !== -1) {
+              this.projects.splice(projectIndex, 1);
+              // Обновляем пагинацию: уменьшаем общее количество элементов
+              if (this._page) {
+                this._page.totalElements = Math.max(0, this._page.totalElements - 1);
+                // Пересчитываем общее количество страниц
+                if (this._page.size > 0) {
+                  this._page.totalPages = Math.ceil(this._page.totalElements / this._page.size);
+                }
+                // Обновляем content в объекте пагинации для синхронизации
+                this._page.content = this.projects;
+              }
+            }
+          }
+          // Сразу обновляем UI
           this.cdr?.markForCheck?.();
           this._toasty.success("Отклонен.");
-          // Фоново синхронизируем с сервером для обновления других данных
-          this.loadPage();
         });
       })
   }
@@ -132,6 +170,18 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
 
   getSortOrders() {
     return [new SortOrder("registerDate", Direction.DESC)];
+  }
+
+  trackByProject(index: number, project: ProjectReviewsExpertsDto): any {
+    return project.id;
+  }
+
+  trackByReview(index: number, review: ExpertReviewAndExpertDto): any {
+    return review.id;
+  }
+
+  trackByGroup(index: number, group: any): any {
+    return group.id;
   }
 
   showExpertInfoDialog(expert: PersonExpertDto) {

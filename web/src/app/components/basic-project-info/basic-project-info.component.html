@@ -3,7 +3,7 @@
 @if (!checkVisibleForBureau()) {
   <div class="mb-2">
     <span (click)="showTransitionHistoryModal()" class="selectable"
-      [ngClass]="['badge', ProjectStateBadge[project.state]]">
+      [ngClass]="['badge', ProjectStateBadge[project?.state] || '']">
       {{project.state | projectState}}
     </span>
     <span class="text-muted"> Объект экспертизы</span>
@@ -12,7 +12,14 @@
 <!--ACTIONS-->
 <div class="mb-3">
   @for (meta of buttons(); track (meta.title ?? $index)) {
-    <button [ngClass]="meta.styleClass" class="me-3 my-1" (click)="meta.onclick()">
+    <button
+      [ngClass]="meta.styleClass || ''"
+      class="me-3 my-1"
+      [disabled]="meta.isDisabled ? meta.isDisabled() : false"
+      (click)="meta.onclick()">
+      @if (meta.isLoading && meta.isLoading()) {
+        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+      }
       {{meta.title}}
     </button>
   }
@@ -129,7 +136,7 @@
         Приоритетное направление научных исследований и (или) научно-технической деятельности:
       </span>
       <ul class="mb-0 ps-4 mt-1">
-        @for (dir of displayedDirections; track (dir.id ?? $index)) {
+        @for (dir of displayedDirections(); track (dir.id ?? $index)) {
           <li>
             <span class="italic">{{dir.name}}</span>
             @if (dir.subDirectionDtos.length != 0) {
@@ -349,14 +356,14 @@
         <div class="mt-2 mb-1 text-sm text-muted">
           Документы заказчика экспертизы
         </div>
-        <app-document-list #projectDocumentsComponent [documents]="isCustomer()"
+        <app-document-list #customerDocumentsComponent [documents]="customerDocuments()"
           [canDelete]="canEditProjectDocuments()" [canUpdate]="canEditProjectDocuments()"
           (onDelete)="deleteProjectDocument($event)" (onUpdate)="updateProjectDocument($event)">
         </app-document-list>
         <div class="mt-2 mb-1 text-sm text-muted">
           Остальные документы
         </div>
-        <app-document-list #projectDocumentsComponent [documents]="isNotCustomer()"
+        <app-document-list #notCustomerDocumentsComponent [documents]="notCustomerDocuments()"
           [canDelete]="canEditProjectDocuments()" [canUpdate]="canEditProjectDocuments()"
           (onDelete)="deleteProjectDocument($event)" (onUpdate)="updateProjectDocument($event)">
         </app-document-list>
@@ -371,7 +378,7 @@
             </div>
             @if (canEditDecision() || canEditDecisionWithRemarks()) {
               <div class="btn-right-sm">
-                <button class="btn btn-sm btn-primary" (click)="decisionFormModal.show()">
+                <button class="btn btn-sm btn-primary" (click)="showDecisionModal()">
                   Создать
                 </button>
               </div>
@@ -389,14 +396,14 @@
       @if (canEditDecision() || canEditDecisionWithRemarks()) {
         <app-modal #decisionFormModal
           [title]="'Письмо о возврате без рассмотрения'">
-          <app-decision-document-form [project]="project" (onSave)="generateDecisionDocument($event)"
-            (onClose)="decisionFormModal.hide()">
+          <app-decision-document-form [project]="project" [loading]="decisionDocumentLoading()" (onSave)="generateDecisionDocument($event)"
+            (onClose)="hideDecisionModal()">
           </app-decision-document-form>
         </app-modal>
       }
 
       <app-modal #transitionHistoryModal [title]="'Информация о ходе проведения экспертизы'" [modalClasses]="'modal-xl'">
         <div class="transition-history">
-          <app-project-transition-history [history]="transitionHistory"></app-project-transition-history>
+          <app-project-transition-history [history]="transitionHistory()"></app-project-transition-history>
         </div>
       </app-modal>

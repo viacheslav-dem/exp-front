@@ -1,10 +1,10 @@
-@if (meeting) {
+@if (meeting(); as currentMeeting) {
   <div>
     <div class="row">
       <div class="col-6">
         <div class="mb-2">
           <span class="text-muted">Заседание</span>
-          @if (meeting.state == 'READY') {
+          @if (currentMeeting.state == 'READY') {
             <div class="btn-right">
               <button class="btn btn-sm btn-primary" (click)="editMeeting()">Редактировать</button>
             </div>
@@ -12,50 +12,50 @@
         </div>
         <div class="card card-block">
           <div>
-            <span [ngClass]="['badge', MeetingStateBadge[meeting.state]]">{{ meeting.state | meetingState }}</span>
-            {{meeting.description}}
+            <span [ngClass]="['badge', MeetingStateBadge[currentMeeting.state]]">{{ currentMeeting.state | meetingState }}</span>
+            {{currentMeeting.description}}
           </div>
-          @if (meeting.state == 'CANCELED') {
+          @if (currentMeeting.state == 'CANCELED') {
             <div class="italic text-sm">
-              <b>Причина отмены:</b> {{meeting.cancelReason | orElse: 'не указана'}}
+              <b>Причина отмены:</b> {{currentMeeting.cancelReason | orElse: 'не указана'}}
             </div>
           }
           <div class="text-sm">
-            <div>Время проведения заседания: <i>{{meeting.period.start | mtime}}
-            -{{meeting.period.end | mtime}}</i></div>
-            <div>Место проведения заседания: <i>{{meeting.place | orElse: 'не указано'}}</i></div>
+            <div>Время проведения заседания: <i>{{currentMeeting.period.start | mtime}}
+            -{{currentMeeting.period.end | mtime}}</i></div>
+            <div>Место проведения заседания: <i>{{currentMeeting.place | orElse: 'не указано'}}</i></div>
           </div>
         </div>
       </div>
       <div class="col-6">
         <div class="mb-2">
           <div class="d-inline-block text-muted">Протокол заседания</div>
-          @if (meeting.state=='READY') {
+          @if (currentMeeting.state=='READY') {
             <div class="btn-right">
               <button class="btn btn-sm btn-primary" (click)="showProtocolForm()">Создать</button>
             </div>
           }
         </div>
         <app-document-list
-          [canDelete]="meeting.state=='READY'"
-          [documents]="meeting.report" (onDelete)="deleteProtocol()">
+          [canDelete]="currentMeeting.state=='READY'"
+          [documents]="currentMeeting.report" (onDelete)="deleteProtocol()">
         </app-document-list>
         <div class="mt-2 mb-2">
           <div class="text-muted text-sm mb-1">Приложение (расчёт выплаты членам секции и экспертам)</div>
           <app-document-list
-            [canDelete]="meeting.state=='READY'" (onDelete)="deleteProtocolAppendix()"
-            [documents]="meeting.paymentDocument">
+            [canDelete]="currentMeeting.state=='READY'" (onDelete)="deleteProtocolAppendix()"
+            [documents]="currentMeeting.paymentDocument">
           </app-document-list>
         </div>
       </div>
     </div>
     <div class="mt-2 mb-2">
       <div class="d-inline-block text-muted">Повестки дня</div>
-      @if (meeting.state=='READY') {
+      @if (currentMeeting.state=='READY') {
         <div class="btn-right">
-          <button class="btn btn-sm btn-secondary me-2" (click)="cancelAgendaDecisions()" [disabled]="isFinishingMeeting">Отменить заседание</button>
-          <button class="btn btn-sm btn-primary" (click)="saveAgendaDecisions()" [disabled]="isFinishingMeeting">
-            @if (isFinishingMeeting) {
+          <button class="btn btn-sm btn-secondary me-2" (click)="cancelAgendaDecisions()" [disabled]="isFinishingMeeting()">Отменить заседание</button>
+          <button class="btn btn-sm btn-primary" (click)="saveAgendaDecisions()" [disabled]="isFinishingMeeting()">
+            @if (isFinishingMeeting()) {
               <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
               Завершение...
             } @else {
@@ -66,7 +66,7 @@
       }
     </div>
     <div class="list-group">
-      @for (agenda of agendas; track agenda.id) {
+      @for (agenda of agendas(); track agenda.id) {
         <div class="list-group-item">
           <div>
             <app-decision-tag [decision]="agenda.decision"></app-decision-tag>
@@ -82,7 +82,7 @@
                 <fa-icon class="m-auto fa" [icon]="agenda.isCollapsed?'chevron-up':'chevron-down'"></fa-icon>
               </span>
               <ng-container *ifRole="[Role.SECTION_CHAIRMAN]">
-                @if (!agenda.project.isRescheduleSection && meeting.state!='FINISHED') {
+                @if (!agenda.project.isRescheduleSection && currentMeeting.state!='FINISHED') {
                   <button
                     class="btn btn-sm btn-outline-secondary btn-right"
                     (click)="generateSectionRemark(agenda.project)">
@@ -134,16 +134,16 @@
   }
 
   <!--REVIEW FORM-->
-  @if (meeting?.state == 'READY') {
+  @if (meeting()?.state == 'READY') {
     <app-modal #protocolFormModal [title]="'Протокол заседания'"
       (onClose)="closeProtocolForm()">
       <app-meeting-protocol-form
-        [meeting]="meeting"
-        [draftOwner]="meeting"
+        [meeting]="meeting()!"
+        [draftOwner]="meeting()!"
         [draftService]="_meetingService"
-        [loading]="isCreatingProtocol"
+        [loading]="isCreatingProtocol()"
         (onSave)="generateMeetingProtocol($event)"
-        (onClose)="protocolFormModal.hide()" [role]="role">
+        (onClose)="closeProtocolForm()" [role]="role">
       </app-meeting-protocol-form>
     </app-modal>
   }
@@ -152,20 +152,20 @@
 
   <!--REMARKS FOR SECTION-->
   <app-modal #sectionRemarks [title]="'Замечания секции'">
-    <app-meeting-remark [allRemarks]="remarks" (onSave)="saveSectionRemarks($event)"
+    <app-meeting-remark [allRemarks]="remarks()" (onSave)="saveSectionRemarks($event)"
     [role]="role"></app-meeting-remark>
   </app-modal>
 
   <!--REMARKS FOR BUREAU-->
   <app-modal #bureauRemarks [title]="'Замечания бюро'">
-    <app-meeting-remark [allRemarks]="remarks" (onSave)="saveBureauRemarks($event)"
+    <app-meeting-remark [allRemarks]="remarks()" (onSave)="saveBureauRemarks($event)"
     [role]="role"></app-meeting-remark>
   </app-modal>
 
   <app-modal #remarkResponseForSection [title]="'Ответы на замечания секции'">
-    <app-remark-response [remarks]="remarks.sectionMeetingRemark" [isEdit]="false"></app-remark-response>
+    <app-remark-response [remarks]="remarks().sectionMeetingRemark" [isEdit]="false"></app-remark-response>
   </app-modal>
 
   <app-modal #remarkResponseForBureau [title]="'Ответы на замечания бюро'">
-    <app-remark-response [remarks]="remarks.bureauMeetingRemark" [isEdit]="false"></app-remark-response>
+    <app-remark-response [remarks]="remarks().bureauMeetingRemark" [isEdit]="false"></app-remark-response>
   </app-modal>

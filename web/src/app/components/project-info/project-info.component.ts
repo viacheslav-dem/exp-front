@@ -1,4 +1,5 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, signal, computed} from "@angular/core";
+import {finalize} from "rxjs";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "@app/services/auth.service";
@@ -44,7 +45,7 @@ import {environment} from "../../../environments/environment";
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
-export class ProjectInfoComponent implements OnInit {
+export class ProjectInfoComponent implements OnInit, OnDestroy {
 
   Role = Role; // enum for template
 
@@ -69,14 +70,21 @@ export class ProjectInfoComponent implements OnInit {
   // for section chairman
   lifecycle: any;
 
+  // Signals для computed values
+  private readonly _roleSignal = signal<string | undefined>(undefined);
+  private readonly _lifecycleGroupSignal = signal<LifecycleGroupDto | undefined>(undefined);
+  private readonly _lifecycleSignal = signal<any | undefined>(undefined);
+  private readonly _projectSignal = signal<ProjectDto | undefined>(undefined);
+  private readonly _lifecycleGroupsSignal = signal<any[]>([]);
+  private readonly _expertReviewSignal = signal<ExpertReviewDto | undefined>(undefined);
+  readonly sameProjectsLoading = signal<boolean>(false);
+
   // for gknt, customer and belisa
   lifecycleGroups: any[] = [];
 
   // for expert
   expertReview: ExpertReviewDto;
   visibleDocsForExpert: boolean = false;
-
-  buttons: ActionButtonMetadata[] = [];
 
   @ViewChild(SearchExpertComponent, { static: false }) public searchExpertComponent: SearchExpertComponent;
   @ViewChild(SearchGkntWorkerComponent, { static: false }) searchGkntWorkerComponent: SearchGkntWorkerComponent;
@@ -108,51 +116,66 @@ export class ProjectInfoComponent implements OnInit {
               private cdr: ChangeDetectorRef) {
   }
 
+  private paramsSubscription: any;
+  private _lastLoadedProjectId: number | undefined;
+
   ngOnInit() {
     this.role = this._authService.getCurrRole();
+    this._roleSignal.set(this.role);
     this._personService.getCurrentPerson().subscribe(res => {
       this.currentUser = res;
       this.cdr?.markForCheck?.();
     });
-    this.route.params.subscribe(params => {
+    this.paramsSubscription = this.route.params.subscribe(params => {
+      const projectId = parseInt(params['id'], 10);
+      // Защита от повторных вызовов loadProject с тем же id
+      if (this._lastLoadedProjectId === projectId && this.project && this.project.id === projectId) {
+        return;
+      }
+      this._lastLoadedProjectId = projectId;
       this.agenda = params['agendaId'] ? new IdDto(params['agendaId']) : null;
       this.loadProject(new IdDto(params['id']), params['group']);
-      this.cdr?.markForCheck?.();
     });
+  }
+
+  ngOnDestroy() {
+    if (this.paramsSubscription) {
+      this.paramsSubscription.unsubscribe();
+    }
   }
 
   loadLifecycle() {
     this._projectService.getLifecycle(this.project).subscribe(res => {
-      this.lifecycle = res;
-      this.initActionButtons();
-      this.cdr?.markForCheck?.();
+      this.updateLifecycleSignal(res);
+      // markForCheck не нужен: computed signal visibleForSection автоматически триггерит change detection
     });
   }
 
   loadLifecycleGroups() {
     this._projectService.getLifecycleGroups(this.project).subscribe(res => {
-      this.lifecycleGroups = res;
-      this.initActionButtons();
-      this.cdr?.markForCheck?.();
+      this.updateLifecycleGroupsSignal(res);
+      // computed signal buttons пересчитается автоматически
     });
   }
 
   loadLifecycleGroup() {
     this._projectService.getLifecycleGroup(this.project).subscribe(res => {
-      this.lifecycleGroup = res;
-      this.initActionButtons();
-      this.cdr?.markForCheck?.();
+      this.updateLifecycleGroupSignal(res);
+      // markForCheck не нужен: computed signal visibleForBureau автоматически триггерит change detection
     });
   }
 
   loadProject(idDto: IdDto, group: string) {
     this._projectService.getProject(idDto).subscribe({
       next: (res) => {
-        this.project = res;
+        // Проверяем, действительно ли объект изменился, чтобы избежать ненужных обновлений
+        if (this.project && this.project.id === res.id && this.project === res) {
+          return;
+        }
+        this.updateProjectSignal(res);
         if (group != null && group != 'null' && typeof group === 'string' && !group.includes('=>')) {
           this._projectService.markViewed(this.project, group).subscribe();
         }
-        this.initActionButtons();
         this.showProjectDocuments();
         if (this.role == Role.BUREAU_ASSESSOR) {
           this.loadAnonymousExpertReviews();
@@ -175,7 +198,7 @@ export class ProjectInfoComponent implements OnInit {
         } else if (this.role == Role.EXPERT) {
           this.loadExpertReview();
         }
-        this.cdr?.markForCheck?.();
+        // computed signal buttons пересчитается автоматически после загрузки данных
       },
       error: (err) => {
         // Error is already handled by HttpClientSecure.handleError which shows toast
@@ -188,10 +211,8 @@ export class ProjectInfoComponent implements OnInit {
 
   loadExpertReview() {
     this._projectService.getReview(this.project).subscribe(res => {
-      this.expertReview = res;
-      this.initActionButtons();
+      this.updateExpertReviewSignal(res);
       this.showProjectDocuments();
-      this.cdr?.markForCheck?.();
     });
   }
 
@@ -209,16 +230,217 @@ export class ProjectInfoComponent implements OnInit {
     });
   }
 
-  checkVisibleForBureau(): boolean {
-    return (anyMatch(this.role, Role.BUREAU_CHAIRMAN, Role.BUREAU_ASSESSOR) && this.lifecycleGroup != null
-      && this.lifecycleGroup.state == ProjectLifecycleState.RETURNED) ||
-      (anyMatch(this.role, Role.BUREAU_CHAIRMAN, Role.BUREAU_ASSESSOR) && this.lifecycleGroup == null);
+  // Computed signals для видимости блоков
+  readonly visibleForBureau = computed(() => {
+    const role = this._roleSignal();
+    const lifecycleGroup = this._lifecycleGroupSignal();
+    return (anyMatch(role, Role.BUREAU_CHAIRMAN, Role.BUREAU_ASSESSOR) && lifecycleGroup != null
+      && lifecycleGroup.state == ProjectLifecycleState.RETURNED) ||
+      (anyMatch(role, Role.BUREAU_CHAIRMAN, Role.BUREAU_ASSESSOR) && lifecycleGroup == null);
+  });
+
+  readonly visibleForSection = computed(() => {
+    const role = this._roleSignal();
+    const lifecycle = this._lifecycleSignal();
+    const notSection: boolean = !anyMatch(role, Role.SECTION_CHAIRMAN, Role.SECTION_ASSESSOR);
+    const isLifecycleState: boolean = lifecycle != null && lifecycle.state != ProjectLifecycleState.RETURNED_WITHOUT_EXPERTISE;
+    return notSection || isLifecycleState;
+  });
+
+  readonly canChooseExperts = computed(() => {
+    const project = this._projectSignal();
+    const role = this._roleSignal();
+    const lifecycle = this._lifecycleSignal();
+    return project != null && (
+      (project.state == ProjectState.ON_EXPERT_EXAMINATION &&
+        anyMatch(role, Role.GKNT_DEPARTMENT_CHAIRMAN, Role.BUREAU_CHAIRMAN)) ||
+      (lifecycle && lifecycle.state == ProjectLifecycleState.ON_EXPERT_EXAMINATION &&
+        role == Role.SECTION_CHAIRMAN)
+    );
+  });
+
+  // Computed signal для кнопок действий
+  readonly buttons = computed(() => {
+    // Читаем все зависимости для установления реактивных связей
+    const project = this._projectSignal();
+    const role = this._roleSignal();
+    const lifecycleGroup = this._lifecycleGroupSignal();
+    const lifecycle = this._lifecycleSignal();
+    const lifecycleGroups = this._lifecycleGroupsSignal();
+    const expertReview = this._expertReviewSignal();
+    if (!project) return [];
+
+    const buttons: ActionButtonMetadata[] = [];
+
+    // Схожие объекты для BELISA и GKNT ролей
+    if (role == Role.BELISA_EDIT || role == Role.BELISA_READ || role == Role.GKNT_CHAIRMAN
+      || role == Role.GKNT_DEPARTMENT_CHAIRMAN || role == Role.GKNT_WORKER) {
+      buttons.push(new ActionButtonMetadata(
+        'Схожие объекты',
+        () => this.findTheSameProjects(project.title),
+        'btn-primary',
+        {
+          key: 'same-projects',
+          isLoading: () => this.sameProjectsLoading(),
+          isDisabled: () => this.sameProjectsLoading()
+        }
+      ));
+    }
+
+    // CUSTOMER и SUB_CUSTOMER
+    if (role == Role.CUSTOMER || role == Role.SUB_CUSTOMER) {
+      buttons.push(new ActionButtonMetadata('Копировать', () => this.copyProject(), 'btn-primary'));
+    }
+
+    if ((role == Role.CUSTOMER || role == Role.SUB_CUSTOMER) && project.state == ProjectState.ROUGH) {
+      buttons.push(new ActionButtonMetadata('Редактировать', () => this.editProject(), 'btn-primary'));
+      if (project.documents.length != 0 && role == Role.CUSTOMER) {
+        buttons.push(new ActionButtonMetadata('На экспертизу', () => this.sendOnExamination(), 'btn-primary'));
+      }
+      if (project.documents.length != 0 && role == Role.SUB_CUSTOMER) {
+        buttons.push(new ActionButtonMetadata('На утверждение', () => this.sendToHeadOrg(), 'btn-primary'));
+      }
+      buttons.push(new ActionButtonMetadata('Удалить', () => this.deleteProject(), 'btn-danger'));
+    }
+
+    if (project.documents.length != 0 && role == Role.CUSTOMER && project.state == ProjectState.FOR_APPROVAL) {
+      buttons.push(new ActionButtonMetadata('На экспертизу', () => this.sendOnExamination(), 'btn-primary'));
+      buttons.push(new ActionButtonMetadata('Вернуть инициатору экспертизы', () => this.sendToSubCustomer(), 'btn-danger'));
+    }
+
+    // BUREAU_CHAIRMAN
+    if (lifecycleGroup && role == Role.BUREAU_CHAIRMAN) {
+      if (lifecycleGroup.state == 'ON_CHECKING' && lifecycleGroup.lifecycles.length > 0) {
+        buttons.push(new ActionButtonMetadata('Отправить в секции', () => this.sendBySections(), 'btn-primary'));
+      }
+      if (lifecycleGroup.state == 'ON_CONCLUSION') {
+        buttons.push(new ActionButtonMetadata('Завершить экспертизу', () => this.finishLifecycleGroup(), 'btn-primary'));
+      }
+      if (project.state == ProjectState.ON_EXPERT_EXAMINATION && project.expertReviews.length == 0) {
+        buttons.push(new ActionButtonMetadata('Вернуть в ГКНТ', () => this.showReturnFromCouncilModal(), 'btn-secondary'));
+      }
+      if (this.checkPossibleToReturnToGKNT(lifecycleGroup, project, role)) {
+        buttons.push(new ActionButtonMetadata('Вернуть в ГКНТ без рассмотрения', () => this.returnFromBureauToGKNTWithoutExamination(), 'btn-secondary'));
+      }
+    }
+
+    // SECTION_CHAIRMAN
+    if (role == Role.SECTION_CHAIRMAN && lifecycle && lifecycle.state == ProjectLifecycleState.ON_EXPERT_EXAMINATION) {
+      buttons.push(new ActionButtonMetadata('Перейти к рассмотрению в секции', () => this.finishChoosingExperts(), 'btn-primary'));
+      buttons.push(new ActionButtonMetadata('Вернуть в бюро ГЭС', () => this.returnFromSectionToCouncil(), 'btn-secondary'));
+    }
+
+    if (role == Role.SECTION_CHAIRMAN && lifecycle
+      && lifecycle.state == ProjectLifecycleState.ON_WAITING_RESPONSE
+      && !lifecycle.isAnswerReceived && project.isRescheduleSection
+      && project.isSectionRemarksExpired) {
+      buttons.push(new ActionButtonMetadata('Вернуть в бюро ГЭС без рассмотрения', () => this.returnFromSectionToCouncilWithoutExamination(), 'btn-secondary'));
+    }
+
+    // EXPERT
+    if (expertReview && role == Role.EXPERT) {
+      if (expertReview.state == 'ON_EXPERT_CONFIRMATION') {
+        buttons.push(new ActionButtonMetadata('Принять', () => this.acceptProject(), 'btn-primary'));
+        buttons.push(new ActionButtonMetadata('Отклонить', () => this.expertRejectProject.show(), 'btn-secondary'));
+      }
+      if (expertReview.state == 'ON_EXAMINATION' && expertReview.documents.length > 0) {
+        buttons.push(new ActionButtonMetadata('Завершить', () => this.finishExpertExamination(), 'btn-primary'));
+      }
+    }
+
+    // GKNT_CHAIRMAN
+    if (role == Role.GKNT_CHAIRMAN) {
+      if (project.state == 'ON_SIGNING') {
+        buttons.push(new ActionButtonMetadata('Вернуть в подразделение', () => this.returnOnDepartmentSigning(), 'btn-primary'));
+
+        if (project.decisionDocument) {
+          buttons.push(new ActionButtonMetadata('Подписать и отправить письмо заказчику', () => this.returnProjectWithSign(), 'btn-primary'));
+          buttons.push(new ActionButtonMetadata('Отправить письмо заказчику без ЭЦП', () => this.returnProjectWithoutSign(), 'btn-warning'));
+        }
+        if (this.hasReferralsForAllActiveGroups(lifecycleGroups)) {
+          buttons.push(new ActionButtonMetadata('Подписать и отправить в ГЭС', () => this.sendOnExaminationToCouncilsWithSign(), 'btn-primary'));
+          buttons.push(new ActionButtonMetadata('Отправить в ГЭС без ЭЦП', () => this.sendOnExaminationToCouncilsWithoutSign(), 'btn-warning'));
+        }
+      }
+      if (project.state == 'ON_FINAL_SIGNING') {
+        buttons.push(new ActionButtonMetadata('Вернуть в подразделение', () => this.returnOnDepartmentFinalSigning(), 'btn-primary'));
+        buttons.push(new ActionButtonMetadata('Подписать и отправить письма заказчику', () => this.finishProjectWithSign(), 'btn-primary'));
+        buttons.push(new ActionButtonMetadata('Отправить письма заказчику без ЭЦП', () => this.finishProjectWithoutSign(), 'btn-warning'));
+      }
+    }
+
+    // GKNT_DEPARTMENT_CHAIRMAN
+    if (role == Role.GKNT_DEPARTMENT_CHAIRMAN) {
+      if (!anyMatch(project.state, ProjectState.ACCEPTED, ProjectState.REJECTED, ProjectState.RETURNED)) {
+        buttons.push(new ActionButtonMetadata('Назначить сотрудника', () => this.searchGkntWorkerComponent.show(), 'btn-primary'));
+      }
+      if (project.state == 'ON_DEPARTMENT_SIGNING') {
+        buttons.push(new ActionButtonMetadata('Вернуть назначенному сотруднику', () => this.returnOnChecking(), 'btn-primary'));
+
+        if (this.hasReferralsForAllActiveGroups(lifecycleGroups)) {
+          buttons.push(new ActionButtonMetadata('Подписать направления в ГЭС', () => this.sendOnSigningWithSignReferrals(), 'btn-primary'));
+          buttons.push(new ActionButtonMetadata('Отправить направления в ГЭС без ЭЦП', () => this.sendOnSigningWithoutSign(), 'btn-warning'));
+        }
+        if (project.decisionDocument) {
+          buttons.push(new ActionButtonMetadata('Подписать письмо заказчику', () => this.sendOnSigningWithSignDecision(), 'btn-primary'));
+          buttons.push(new ActionButtonMetadata('Передать письмо на визирование без ЭЦП', () => this.sendOnSigningWithoutSign(), 'btn-warning'));
+        }
+      }
+      if (project.state == 'ON_DEPARTMENT_FINAL_SIGNING' && this.hasAllLifecycleGroupDecisions(lifecycleGroups)) {
+        buttons.push(new ActionButtonMetadata('Подписать письма заказчику', () => this.sendOnFinalSigningWithSign(), 'btn-primary'));
+        buttons.push(new ActionButtonMetadata('Передать письма на визирование без ЭЦП', () => this.sendOnFinalSigningWithoutSign(), 'btn-warning'));
+      }
+    }
+
+    // GKNT_WORKER
+    if (role == Role.GKNT_WORKER && project.state == 'ON_CHECKING') {
+      if (this.hasReferralsForAllActiveGroups(lifecycleGroups)) {
+        buttons.push(new ActionButtonMetadata('Отправить на визирование направлений в ГЭС', () => this.sendOnDepartmentSigning(), 'btn-primary'));
+      }
+      if (project.decisionDocument) {
+        buttons.push(new ActionButtonMetadata('Вернуть без рассмотрения', () => this.sendOnDepartmentSigning(), 'btn-primary'));
+      }
+    }
+
+    return buttons;
+  });
+
+  // Вспомогательные методы для обновления signals
+  // Signals отслеживают изменения по ссылкам (reference equality).
+  // Копирование необходимо только там, где объекты/массивы могут быть мутированы.
+  
+  private updateProjectSignal(project: ProjectDto) {
+    // Объект приходит из API или дочерних компонентов, уже новый - копирование не требуется
+    this.project = project;
+    this._projectSignal.set(project);
   }
 
-  checkVisibleForSection(): boolean {
-    let notSection: boolean = !anyMatch(this.role, Role.SECTION_CHAIRMAN, Role.SECTION_ASSESSOR);
-    let isLifecycleState: boolean = this.lifecycle != null && this.lifecycle.state != ProjectLifecycleState.RETURNED_WITHOUT_EXPERTISE;
-    return notSection || isLifecycleState;
+  private updateLifecycleGroupSignal(lifecycleGroup: LifecycleGroupDto) {
+    // ВАЖНО: lifecycle-group.component мутирует _group.lifecycles.push(res) перед эмитом
+    // Поэтому создаем новый объект с новым массивом lifecycles для триггера обновления signal
+    const updatedGroup = { ...lifecycleGroup, lifecycles: [...(lifecycleGroup.lifecycles ?? [])] };
+    this.lifecycleGroup = updatedGroup;
+    this._lifecycleGroupSignal.set(updatedGroup);
+  }
+
+  private updateLifecycleSignal(lifecycle: any) {
+    // Объект приходит из API или дочерних компонентов, уже новый - копирование не требуется
+    this.lifecycle = lifecycle;
+    this._lifecycleSignal.set(lifecycle);
+  }
+
+  private updateLifecycleGroupsSignal(groups: any[]) {
+    // ВАЖНО: lifecycle-group-list.component может мутировать массив перед эмитом
+    // Поэтому создаем новый массив для триггера обновления signal
+    const updatedGroups = [...(groups ?? [])];
+    this.lifecycleGroups = updatedGroups;
+    this._lifecycleGroupsSignal.set(updatedGroups);
+  }
+
+  private updateExpertReviewSignal(review: ExpertReviewDto) {
+    // Объект приходит из API или дочерних компонентов, уже новый - копирование не требуется
+    this.expertReview = review;
+    this._expertReviewSignal.set(review);
   }
 
   showProjectDocuments() {
@@ -237,8 +459,8 @@ export class ProjectInfoComponent implements OnInit {
     ).subscribe(() => {
       this._lifecycleService.finishExpertExamination(this.lifecycle).subscribe({
         next: (res) => {
-          this.lifecycle = res;
-          this.loadProject(this.project, null);
+          this.updateLifecycleSignal(res);
+          this.loadProject(new IdDto(this.project.id), null);
           this._toasty.success("Эксперты утверждены.");
           this.cdr?.markForCheck?.();
         },
@@ -260,7 +482,7 @@ export class ProjectInfoComponent implements OnInit {
         this._lifecycleService.returnFromSectionToCouncil(this.lifecycle, reason)
           .subscribe((res) => {
             this._toasty.success("Вы вернули объект экспертизы.");
-            this.lifecycle = res;
+            this.updateLifecycleSignal(res);
             // this.loadProject(this.project, null);
             this.cdr?.markForCheck?.();
             this.router.navigateByUrl('/projects');
@@ -275,8 +497,8 @@ export class ProjectInfoComponent implements OnInit {
       .subscribe(() => {
         this._lifecycleService.returnFromSectionToCouncilWithoutExamination(this.lifecycle).subscribe((res) => {
           this._toasty.success('Вы вернули объект экспертизы');
-          this.lifecycle = res;
-          this.loadProject(this.project, null);
+          this.updateLifecycleSignal(res);
+          this.loadProject(new IdDto(this.project.id), null);
           this.cdr?.markForCheck?.();
         })
       })
@@ -289,8 +511,8 @@ export class ProjectInfoComponent implements OnInit {
       .subscribe(() => {
         this._groupService.returnFromBureauToGKNTlWithoutExamination(this.lifecycleGroup).subscribe((res) => {
           this._toasty.success('Вы вернули объект экспертизы');
-          this.lifecycleGroup = res;
-          this.loadProject(this.project, null);
+          this.updateLifecycleGroupSignal(res);
+          this.loadProject(new IdDto(this.project.id), null);
           this.cdr?.markForCheck?.();
         })
       })
@@ -300,10 +522,8 @@ export class ProjectInfoComponent implements OnInit {
     this._dialogService.showConfirmDialog('Утверждение секций',
       `Утвердить текущий список секций для объекта экспертизы "${this.project.title}"?`).subscribe(() => {
       this._groupService.sendBySections(this.lifecycleGroup).subscribe(res => {
-        this.lifecycleGroup = res;
+        this.updateLifecycleGroupSignal(res);
         this._toasty.success('Отправлен в секции.');
-        this.initActionButtons();
-        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -315,21 +535,17 @@ export class ProjectInfoComponent implements OnInit {
       'Вы соглашаетесь с методическими рекомендациями и будете обязаны завершить экспертизу в течение установленного нормативными актами срока.'
     ).subscribe(() => {
       this._reviewService.acceptProject(this.expertReview).subscribe(res => {
-        this.expertReview = res;
+        this.updateExpertReviewSignal(res);
         this._toasty.success("Вы приняли объект на экспертизу.");
-        this.initActionButtons();
         this.showProjectDocuments();
-        this.cdr?.markForCheck?.();
       });
     });
   }
 
   rejectProject(reason: string) {
     this._reviewService.rejectProject(this.expertReview, reason).subscribe(res => {
-      this.expertReview = res;
+      this.updateExpertReviewSignal(res);
       this._toasty.success("Вы отклонили экспертизу объекта.");
-      this.initActionButtons();
-      this.cdr?.markForCheck?.();
       this.router.navigateByUrl('projects');
     });
   }
@@ -340,10 +556,8 @@ export class ProjectInfoComponent implements OnInit {
       `Завершить экспертизу объекта "${this.project.title}"?`
     ).subscribe(() => {
       this._reviewService.finishReview(this.expertReview).subscribe(res => {
-        this.expertReview = res;
+        this.updateExpertReviewSignal(res);
         this._toasty.success("Вы завершили экспертизу объекта.");
-        this.initActionButtons();
-        this.cdr?.markForCheck?.();
       })
     });
   }
@@ -355,10 +569,8 @@ export class ProjectInfoComponent implements OnInit {
       'После выполнения операции редактировать данные станет невозможно.'
     ).subscribe(() => {
       this._projectService.sendOnExaminationToGknt(this.project).subscribe((res) => {
-        this.project = res;
+        this.updateProjectSignal(res);
         this._toasty.success("Отправлен на экспертизу.");
-        this.initActionButtons();
-        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -387,10 +599,8 @@ export class ProjectInfoComponent implements OnInit {
       'После выполнения операции редактировать данные станет невозможно.'
     ).subscribe(() => {
       this._projectService.sendForApproval(this.project).subscribe((res) => {
-        this.project = res;
+        this.updateProjectSignal(res);
         this._toasty.success("Отправлен на утверждение.");
-        this.initActionButtons();
-        this.cdr?.markForCheck?.();
       })
     })
   }
@@ -405,10 +615,8 @@ export class ProjectInfoComponent implements OnInit {
       ''
     ).subscribe(() => {
       this._projectService.sendOnDepartmentSigning(this.project).subscribe(res => {
-        this.project = res;
+        this.updateProjectSignal(res);
         this._toasty.success("Вы отправили документы начальнику подраделения.");
-        this.initActionButtons();
-        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -421,10 +629,8 @@ export class ProjectInfoComponent implements OnInit {
       ''
     ).subscribe(() => {
       this._projectService.returnOnChecking(this.project).subscribe(res => {
-        this.project = res;
+        this.updateProjectSignal(res);
         this._toasty.success("Объект экспертизы возвращён на доработку.");
-        this.initActionButtons();
-        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -432,10 +638,8 @@ export class ProjectInfoComponent implements OnInit {
   returnOnDepartmentSigning() {
     this.returnOnDepartmentSigningConfirmDialog().subscribe(() => {
       this._projectService.returnOnDepartmentSigning(this.project).subscribe(res => {
-        this.project = res;
+        this.updateProjectSignal(res);
         this._toasty.success("Объект экспертизы возвращён на доработку.");
-        this.initActionButtons();
-        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -443,10 +647,8 @@ export class ProjectInfoComponent implements OnInit {
   returnOnDepartmentFinalSigning() {
     this.returnOnDepartmentSigningConfirmDialog().subscribe(() => {
       this._projectService.returnOnDepartmentFinalSigning(this.project).subscribe(res => {
-        this.project = res;
+        this.updateProjectSignal(res);
         this._toasty.success("Объект экспертизы возвращён на доработку.");
-        this.initActionButtons();
-        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -461,10 +663,8 @@ export class ProjectInfoComponent implements OnInit {
 
   private finishProject() {
     this._projectService.finishProject(this.project).subscribe(res => {
-      this.project = res;
+      this.updateProjectSignal(res);
       this._toasty.success("Вы завершили экспертизу объекта.");
-      this.initActionButtons();
-      this.cdr?.markForCheck?.();
     });
   }
 
@@ -494,10 +694,8 @@ export class ProjectInfoComponent implements OnInit {
 
   private returnProject() {
     this._projectService.returnProject(this.project).subscribe(res => {
-      this.project = res;
+      this.updateProjectSignal(res);
       this._toasty.success("Вы вернули объект экспертизы заказчику без дальнейшего рассмотрения.");
-      this.initActionButtons();
-      this.cdr?.markForCheck?.();
     });
   }
 
@@ -527,10 +725,8 @@ export class ProjectInfoComponent implements OnInit {
 
   private sendOnSigning() {
     this._projectService.sendOnSigning(this.project).subscribe(res => {
-      this.project = res;
+      this.updateProjectSignal(res);
       this._toasty.success("Вы отправили документы зам. Председателя ГКНТ.");
-      this.initActionButtons();
-      this.cdr?.markForCheck?.();
     });
   }
 
@@ -580,10 +776,8 @@ export class ProjectInfoComponent implements OnInit {
 
   private sendOnFinalSigning() {
     this._projectService.sendOnFinalSigning(this.project).subscribe((dto) => {
-      this.project = dto;
+      this.updateProjectSignal(dto);
       this._toasty.success("Вы отправили документы зам. Председателя ГКНТ.");
-      this.initActionButtons();
-      this.cdr?.markForCheck?.();
     });
   }
 
@@ -608,11 +802,9 @@ export class ProjectInfoComponent implements OnInit {
 
   private sendOnExaminationToCouncils() {
     this._projectService.sendOnExaminationToCouncils(this.project).subscribe((res) => {
-      this.project = res;
+      this.updateProjectSignal(res);
       this.loadLifecycleGroups();
       this._toasty.success("Отправлен на экспертизу в ГЭС.");
-      this.initActionButtons();
-      this.cdr?.markForCheck?.();
     })
   }
 
@@ -647,10 +839,8 @@ export class ProjectInfoComponent implements OnInit {
       `Назначить сотрудника "${this._personPipe.transform(person)}" на объект экспертизы "${this.project.title}"?`
     ).subscribe(() => {
       this._projectService.attachWorker(this.project, person.id).subscribe((res) => {
-        this.project = res;
+        this.updateProjectSignal(res);
         this._toasty.success(`На этот объект экспертизы назначен ${this._personPipe.transform(person)}.`);
-        this.initActionButtons();
-        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -661,12 +851,23 @@ export class ProjectInfoComponent implements OnInit {
   }
 
   findTheSameProjects(title: string) {
+    if (this.sameProjectsLoading()) {
+      return;
+    }
+    this.sameProjectsLoading.set(true);
     this.sameProjectList.titleValue = title;
-    this._projectService.getTheSameProjectsByTitle(title).subscribe(value => {
-      this.listSameProjects = value;
-      this.listProjects.show();
-      this.cdr?.markForCheck?.();
-    })
+    this._projectService.getTheSameProjectsByTitle(title)
+      .pipe(finalize(() => this.sameProjectsLoading.set(false)))
+      .subscribe({
+        next: (value) => {
+          this.listSameProjects = value;
+          this.listProjects.show();
+          this.cdr?.markForCheck?.();
+        },
+        error: () => {
+          this.cdr?.markForCheck?.();
+        }
+      });
   }
 
 
@@ -686,12 +887,6 @@ export class ProjectInfoComponent implements OnInit {
     this.editProjectModal.show();
   }
 
-  canChooseExperts() {
-    return this.project.state == ProjectState.ON_EXPERT_EXAMINATION &&
-      anyMatch(this.role, Role.GKNT_DEPARTMENT_CHAIRMAN, Role.BUREAU_CHAIRMAN) ||
-      this.lifecycle && this.lifecycle.state == ProjectLifecycleState.ON_EXPERT_EXAMINATION &&
-      this.role == Role.SECTION_CHAIRMAN
-  }
 
   finishLifecycleGroup() {
     this._dialogService.showConfirmDialog(
@@ -699,11 +894,9 @@ export class ProjectInfoComponent implements OnInit {
       `Утвердить заключение ГЭС и завершить экспертизу объекта "${this.project.title}"?`
     ).subscribe(() => {
       this._groupService.finishLifecycleGroup(this.lifecycleGroup).subscribe(res => {
-        this.lifecycleGroup = res;
+        this.updateLifecycleGroupSignal(res);
         this.loadProject(this.project, null);
         this._toasty.success("Вы завершили экспертизу объекта.");
-        this.initActionButtons();
-        this.cdr?.markForCheck?.();
       });
     });
   }
@@ -715,23 +908,19 @@ export class ProjectInfoComponent implements OnInit {
   returnFromCouncil(formContent: ReturnFromCouncilWithoutExpertiseFormContent) {
       this._groupService.returnToGknt(this.lifecycleGroup, formContent)
         .subscribe(res => {
-          this.lifecycleGroup = res;
+          this.updateLifecycleGroupSignal(res);
           this.returnFromCouncilWithoutExpertiseModal.hide();
-          this.loadProject(this.project, null);
+          this.loadProject(new IdDto(this.project.id), null);
           this._toasty.success("Вы отклонили экспертизу объекта.");
-          this.initActionButtons();
-          this.cdr?.markForCheck?.();
         });
   }
 
   onUpdate(project) {
     this._projectService.updateProject(this.project, project)
       .subscribe(res => {
-        this.project = res;
+        this.updateProjectSignal(res);
         this._toasty.success("Сохранено.");
         this.editProjectModal.hide();
-        this.initActionButtons();
-        this.cdr?.markForCheck?.();
       });
   }
 
@@ -740,7 +929,8 @@ export class ProjectInfoComponent implements OnInit {
     this.editedProject.id = this.project.id;
     this.copiedProject = new ProjectCopyDto();
     this.copiedProject.title = this.editedProject.title;
-    this.copiedProject.documents = this.editedProject.documents;
+    // Преобразуем DocumentDto[] в number[] (ID документов) для ProjectCopyDto
+    this.copiedProject.documents = (this.editedProject.documents || []).map(doc => doc.id).filter(id => id != null);
     this.copiedProject.id = this.editedProject.id;
     // 1) Создаём копию (контракт ProjectCopyDto определяет, что можно редактировать при копировании)
     // 2) Сразу "докидываем" остальные поля из project-form через update/{newId}
@@ -767,15 +957,18 @@ export class ProjectInfoComponent implements OnInit {
         }
 
         this._projectService.updateProject({ id: newId } as any, fullProjectToSave)
-          .subscribe(updated => {
-            this.copyProjectModal.hide();
-            this.router.navigate(['/projects', updated?.id || newId]);
-          }, () => {
-            // Если update по какой-то причине не прошёл (валидации/права/состояние),
-            // всё равно оставляем созданную копию, чтобы операция была обратимой.
-            this.copyProjectModal.hide();
-            this._toasty?.warn?.("Копия создана, но часть полей не удалось перенести автоматически. Проверьте данные в созданном объекте.");
-            this.router.navigate(['/projects', newId]);
+          .subscribe({
+            next: (updated) => {
+              this.copyProjectModal.hide();
+              this.router.navigate(['/projects', updated?.id || newId]);
+            },
+            error: () => {
+              // Если update по какой-то причине не прошёл (валидации/права/состояние),
+              // всё равно оставляем созданную копию, чтобы операция была обратимой.
+              this.copyProjectModal.hide();
+              this._toasty?.warn?.("Копия создана, но часть полей не удалось перенести автоматически. Проверьте данные в созданном объекте.");
+              this.router.navigate(['/projects', newId]);
+            }
           });
       });
   }
@@ -784,245 +977,86 @@ export class ProjectInfoComponent implements OnInit {
     return this.lifecycleGroups.map(group => group.referral).filter(doc => doc);
   }
 
-  hasAllLifecycleGroupDecisions() {
+  private hasReferralsForAllActiveGroups(groups?: any[]): boolean {
+    const activeGroups = this.getActiveGroups(groups);
+    return activeGroups.length > 0 && activeGroups.every(g => !!g.referral);
+  }
+
+  hasAllLifecycleGroupDecisions(groups?: any[]) {
     if (this.project.isSectionRemarksExpired || this.project.isBureauRemarksExpired) {
       return this.project.decisionDocument != null;
     } else
-      return !this.getActiveGroups().find(group => !group.decisionDocument);
+      return !this.getActiveGroups(groups).find(group => !group.decisionDocument);
   }
 
-  getActiveGroups() {
-    return this.lifecycleGroups.filter(group => group.state != LifecycleGroupState.RETURNED_WITHOUT_EXPERTISE);
+  getActiveGroups(groups?: any[]) {
+    const source = groups ?? this.lifecycleGroups;
+    return source.filter(group => group.state != LifecycleGroupState.RETURNED_WITHOUT_EXPERTISE);
+  }
+
+  onLifecycleGroupsChanged(groups: any) {
+    // LifecycleGroupListComponent эмитит свой внутренний массив (groupsState).
+    // Обновляем signal — computed buttons пересчитается автоматически.
+    this.updateLifecycleGroupsSignal((groups ?? []) as any);
   }
 
   onExpertReviewsChanged(reviews: ExpertReviewDto[]) {
     if (!this.project) {
       return;
     }
-    // Обновляем список экспертных оценок в проекте
-    // Создаем новый объект для триггера change detection
-    this.project = { ...this.project, expertReviews: reviews };
-    // Инициализируем кнопки действий
-    this.initActionButtons();
-    this.cdr?.markForCheck?.();
+    // Создаем новый объект проекта с новым массивом expertReviews для триггера обновления computed signal
+    // (signals отслеживают изменения по ссылкам, поэтому мутации объекта не видны)
+    const updatedProject = { ...this.project, expertReviews: [...reviews] };
+    this.project = updatedProject;
+    this._projectSignal.set(updatedProject);
   }
 
-  initActionButtons(review?: ExpertReviewDto) {
-    if (!this.project)
-      return;
-    if (review != null) {
-      this.expertReview = review;
-    }
-    this.buttons = [];
-    if (this.role == Role.BELISA_EDIT || this.role == Role.BELISA_READ || this.role == Role.GKNT_CHAIRMAN
-      || this.role == Role.GKNT_DEPARTMENT_CHAIRMAN || this.role == Role.GKNT_WORKER) {
-      this.buttons.push(new ActionButtonMetadata('Схожие объекты', () => this.findTheSameProjects(this.project.title), 'btn-primary'))
-    }
-    if (this.role == Role.CUSTOMER || this.role == Role.SUB_CUSTOMER) {
-      this.buttons.push(new ActionButtonMetadata(
-        'Копировать', () => this.copyProject(), 'btn-primary'
-      ));
-    }
-    if ((this.role == Role.CUSTOMER || this.role == Role.SUB_CUSTOMER) && this.project.state == ProjectState.ROUGH) {
-      this.buttons.push(new ActionButtonMetadata(
-        'Редактировать',
-        () => this.editProject(), 'btn-primary'));
-      if (this.project.documents.length != 0 && this.role == Role.CUSTOMER) {
-        this.buttons.push(new ActionButtonMetadata(
-          'На экспертизу',
-          () => this.sendOnExamination(), 'btn-primary'));
-      }
-      if (this.project.documents.length != 0 && this.role == Role.SUB_CUSTOMER) {
-        this.buttons.push(new ActionButtonMetadata(
-          'На утверждение',
-          () => this.sendToHeadOrg(), 'btn-primary'));
-      }
-      this.buttons.push(new ActionButtonMetadata(
-        'Удалить', () => this.deleteProject(), 'btn-danger'
-      ));
-    }
-    if (this.project.documents.length != 0 && this.role == Role.CUSTOMER && this.project.state == ProjectState.FOR_APPROVAL) {
-      this.buttons.push(new ActionButtonMetadata(
-        'На экспертизу',
-        () => this.sendOnExamination(), 'btn-primary'));
-      this.buttons.push(new ActionButtonMetadata(
-        'Вернуть инициатору экспертизы',
-        () => this.sendToSubCustomer(), 'btn-danger'));
-    }
-    if (this.lifecycleGroup && this.role == Role.BUREAU_CHAIRMAN) {
-      if (this.lifecycleGroup.state == 'ON_CHECKING' && this.lifecycleGroup.lifecycles.length > 0) {
-        this.buttons.push(new ActionButtonMetadata(
-          'Отправить в секции',
-          () => this.sendBySections(), 'btn-primary'));
-      }
-      if (this.lifecycleGroup.state == 'ON_CONCLUSION') {
-        this.buttons.push(new ActionButtonMetadata(
-          'Завершить экспертизу',
-          () => this.finishLifecycleGroup(), 'btn-primary'));
-      }
-      if (this.project.state == ProjectState.ON_EXPERT_EXAMINATION && this.project.expertReviews.length == 0) {
-        this.buttons.push(new ActionButtonMetadata(
-          'Вернуть в ГКНТ',
-          () => this.showReturnFromCouncilModal(), 'btn-secondary'));
-      }
-      if (this.checkPossibleToReturnToGKNT()) {
-        this.buttons.push(new ActionButtonMetadata(
-          'Вернуть в ГКНТ без рассмотрения',
-          () => this.returnFromBureauToGKNTWithoutExamination(), 'btn-secondary'));
-      }
-    }
-    if (this.role == Role.SECTION_CHAIRMAN && this.lifecycle && this.lifecycle.state == ProjectLifecycleState.ON_EXPERT_EXAMINATION
-      // this.project.expertReviews.every(review => anyMatch(review.state,
-      //   ExpertReviewState.PROJECT_ACCEPTED, ExpertReviewState.PROJECT_REJECTED, ExpertReviewState.REJECTED))
-    ) {
-      this.buttons.push(new ActionButtonMetadata(
-        'Перейти к рассмотрению в секции',
-        () => this.finishChoosingExperts(), 'btn-primary'));
-      this.buttons.push(new ActionButtonMetadata(
-        'Вернуть в бюро ГЭС',
-        () => this.returnFromSectionToCouncil(), 'btn-secondary'));
-    }
-    if (this.role == Role.SECTION_CHAIRMAN && this.lifecycle
-      && this.lifecycle.state == ProjectLifecycleState.ON_WAITING_RESPONSE
-      && !this.lifecycle.isAnswerReceived && this.project.isRescheduleSection
-      && this.project.isSectionRemarksExpired) {
-      this.buttons.push(new ActionButtonMetadata(
-        'Вернуть в бюро ГЭС без рассмотрения',
-        () => this.returnFromSectionToCouncilWithoutExamination(), 'btn-secondary'));
-    }
-    if (this.expertReview && this.role == Role.EXPERT) {
-      if (this.expertReview.state == 'ON_EXPERT_CONFIRMATION') {
-          this.buttons.push(new ActionButtonMetadata(
-              'Принять',
-              () => this.acceptProject(), 'btn-primary'));
-          this.buttons.push(new ActionButtonMetadata(
-              'Отклонить',
-              () => this.expertRejectProject.show(), 'btn-secondary'));
-      }
-      if (this.expertReview.state == 'ON_EXAMINATION' && this.expertReview.documents.length > 0) {
-        this.buttons.push(new ActionButtonMetadata(
-          'Завершить',
-          () => this.finishExpertExamination(), 'btn-primary'));
-      }
-    }
-    if (this.role == Role.GKNT_CHAIRMAN) {
-      if (this.project.state == 'ON_SIGNING') {
-        this.buttons.push(new ActionButtonMetadata(
-          'Вернуть в подразделение',
-          () => this.returnOnDepartmentSigning(), 'btn-primary'));
-
-        if (this.project.decisionDocument) {
-          this.buttons.push(new ActionButtonMetadata(
-            'Подписать и отправить письмо заказчику',
-            () => this.returnProjectWithSign(), 'btn-primary'));
-
-          this.buttons.push(new ActionButtonMetadata(
-            'Отправить письмо заказчику без ЭЦП',
-            () => this.returnProjectWithoutSign(), 'btn-warning'));
-        }
-        if (this.getAllReferrals().length == this.lifecycleGroups.length && this.getActiveGroups().length > 0) {
-          this.buttons.push(new ActionButtonMetadata(
-            'Подписать и отправить в ГЭС',
-            () => this.sendOnExaminationToCouncilsWithSign(), 'btn-primary'));
-
-          this.buttons.push(new ActionButtonMetadata(
-            'Отправить в ГЭС без ЭЦП',
-            () => this.sendOnExaminationToCouncilsWithoutSign(), 'btn-warning'));
-        }
-      }
-      if (this.project.state == 'ON_FINAL_SIGNING') {
-        this.buttons.push(new ActionButtonMetadata(
-          'Вернуть в подразделение',
-          () => this.returnOnDepartmentFinalSigning(), 'btn-primary'));
-
-        this.buttons.push(new ActionButtonMetadata(
-          'Подписать и отправить письма заказчику',
-          () => this.finishProjectWithSign(), 'btn-primary'));
-
-        this.buttons.push(new ActionButtonMetadata(
-          'Отправить письма заказчику без ЭЦП',
-          () => this.finishProjectWithoutSign(), 'btn-warning'));
-      }
-    }
-    if (this.role == Role.GKNT_DEPARTMENT_CHAIRMAN) {
-      if (!anyMatch(this.project.state, ProjectState.ACCEPTED, ProjectState.REJECTED, ProjectState.RETURNED)) {
-        this.buttons.push(new ActionButtonMetadata(
-          'Назначить сотрудника',
-          () => this.searchGkntWorkerComponent.show(), 'btn-primary'));
-      }
-      if (this.project.state == 'ON_DEPARTMENT_SIGNING') {
-        this.buttons.push(new ActionButtonMetadata(
-          'Вернуть назначенному сотруднику',
-          () => this.returnOnChecking(), 'btn-primary'));
-
-        if (this.getAllReferrals().length == this.lifecycleGroups.length && this.getActiveGroups().length > 0) {
-          this.buttons.push(new ActionButtonMetadata(
-            'Подписать направления в ГЭС',
-            () => this.sendOnSigningWithSignReferrals(), 'btn-primary'));
-
-          this.buttons.push(new ActionButtonMetadata(
-            'Отправить направления в ГЭС без ЭЦП',
-            () => this.sendOnSigningWithoutSign(), 'btn-warning'));
-        }
-        if (this.project.decisionDocument) {
-          this.buttons.push(new ActionButtonMetadata(
-            'Подписать письмо заказчику',
-            () => this.sendOnSigningWithSignDecision(), 'btn-primary'));
-
-          this.buttons.push(new ActionButtonMetadata(
-            'Передать письмо на визирование без ЭЦП',
-            () => this.sendOnSigningWithoutSign(), 'btn-warning'));
-        }
-      }
-      if (this.project.state == 'ON_DEPARTMENT_FINAL_SIGNING' && this.hasAllLifecycleGroupDecisions()) {
-        this.buttons.push(new ActionButtonMetadata(
-          'Подписать письма заказчику',
-          () => this.sendOnFinalSigningWithSign(), 'btn-primary'));
-
-        this.buttons.push(new ActionButtonMetadata(
-          'Передать письма на визирование без ЭЦП',
-          () => this.sendOnFinalSigningWithoutSign(), 'btn-warning'));
-      }
-    }
-    if (this.role == Role.GKNT_WORKER && this.project.state == 'ON_CHECKING') {
-      if (this.getAllReferrals().length == this.lifecycleGroups.length && this.getActiveGroups().length > 0) {
-        this.buttons.push(new ActionButtonMetadata(
-          'Отправить на визирование направлений в ГЭС',
-          () => this.sendOnDepartmentSigning(), 'btn-primary'));
-      }
-      if (this.project.decisionDocument) {
-        this.buttons.push(new ActionButtonMetadata(
-          'Вернуть без рассмотрения',
-          () => this.sendOnDepartmentSigning(), 'btn-primary'));
-      }
-    }
-    // В OnPush/zoneless режиме пересборка массива buttons сама по себе может не отрисоваться
-    // без явного триггера CD (особенно если изменения пришли из subscribe/Promise).
-    this.cdr?.markForCheck?.();
+  // Обработчики событий от дочерних компонентов для обновления signals
+  onProjectChanged(project: ProjectDto) {
+    this.updateProjectSignal(project);
   }
+
+  onLifecycleGroupChanged(group: LifecycleGroupDto) {
+    this.updateLifecycleGroupSignal(group);
+  }
+
+  onLifecycleChanged(lifecycle: any) {
+    this.updateLifecycleSignal(lifecycle);
+  }
+
+  onExpertReviewChanged(review: ExpertReviewDto) {
+    this.updateExpertReviewSignal(review);
+  }
+
 
   reloadProject(project: ProjectDto) {
     this._projectService.getProject(project).subscribe(value => {
-      this.project = value;
-      this.initActionButtons();
+      this.updateProjectSignal(value);
+      // Перезагружаем lifecycleGroups для CUSTOMER, чтобы обновить состояние lifecycle'ов после ответа на замечания
+      if (this.role == Role.CUSTOMER) {
+        this.loadLifecycleGroups();
+      }
       this.cdr?.markForCheck?.();
     });
   }
 
-  checkPossibleToReturnToGKNT(): boolean {
-    let returnFromSection: boolean;
-    for (const lc of this.lifecycleGroup.lifecycles) {
+  checkPossibleToReturnToGKNT(lifecycleGroup?: LifecycleGroupDto, project?: ProjectDto, role?: string): boolean {
+    if (!lifecycleGroup || !project || !role) {
+      return false;
+    }
+    let returnFromSection: boolean = false;
+    for (const lc of lifecycleGroup.lifecycles) {
       if (lc.state == ProjectLifecycleState.RETURNED_WITHOUT_EXPERTISE) {
         returnFromSection = true;
       }
     }
-    return (this.role == Role.BUREAU_CHAIRMAN && this.lifecycleGroup
-      && this.lifecycleGroup.state == LifecycleGroupState.ON_WAITING_RESPONSE
-      && !this.lifecycleGroup.isAnswerReceived && this.project.isRescheduleBureau
-      && this.project.isBureauRemarksExpired)
-      || (this.role == Role.BUREAU_CHAIRMAN && returnFromSection
-        && this.lifecycleGroup.state != LifecycleGroupState.RETURNED_WITHOUT_EXPERTISE
-        && this.lifecycleGroup.state != LifecycleGroupState.ACCEPTED);
+    return (role == Role.BUREAU_CHAIRMAN && lifecycleGroup
+      && lifecycleGroup.state == LifecycleGroupState.ON_WAITING_RESPONSE
+      && !lifecycleGroup.isAnswerReceived && project.isRescheduleBureau
+      && project.isBureauRemarksExpired)
+      || (role == Role.BUREAU_CHAIRMAN && returnFromSection
+        && lifecycleGroup.state != LifecycleGroupState.RETURNED_WITHOUT_EXPERTISE
+        && lifecycleGroup.state != LifecycleGroupState.ACCEPTED);
   }
 
   viewDocument(doc: DocumentDto) {
@@ -1040,8 +1074,6 @@ export class ProjectInfoComponent implements OnInit {
 
   private geAcquainted() {
     this.agreement = true;
-    this.initActionButtons();
-    this.cdr?.markForCheck?.();
   }
 }
 

@@ -1,4 +1,4 @@
-import {Component, forwardRef, input, Input, ChangeDetectionStrategy} from '@angular/core';
+import {Component, forwardRef, input, ChangeDetectionStrategy, effect} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {VoteResults} from "@app/components/document-form/meeting-protocol-form/VoteResults";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
@@ -81,14 +81,18 @@ export class VoteResultsComponent extends ControlComponent<VoteResults> {
 
   readonly all = input<number>(undefined);
   readonly displayInput = input<boolean>(false);
+  readonly displaySignal = input<boolean | null>(null, { alias: 'display' });
   _display: boolean | null = null;
 
-  @Input()
-  set display(value: boolean) {
-    this._display = value;
-  }
+  private readonly displayEffect = effect(() => {
+    this._display = this.displaySignal();
+  });
 
   get display(): boolean {
     return this._display !== null ? this._display : this.displayInput();
+  }
+
+  set display(value: boolean) {
+    this._display = value;
   }
 }

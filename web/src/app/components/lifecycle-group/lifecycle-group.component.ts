@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, effect, input} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {ProjectLifecycleState, ProjectLifecycleStateBadge} from "@app/pipes/lifecycle-state.pipe";
 import {Router} from "@angular/router";
@@ -83,15 +83,19 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this._project = this.project();
   }
 
-  @Input() set group(group) {
+  private readonly projectEffect = effect(() => {
+    this._project = this.project();
+  });
+
+  readonly group = input<LifecycleGroupDto>(undefined);
+
+  private readonly groupEffect = effect(() => {
+    const group = this.group();
     if (!group) return;
-    this._lifecycleGroupService.prepareGroup(group);
-    this._group = group;
-    this.cdr?.markForCheck?.();
-  }
+    this.applyGroup(group);
+  });
 
   showTransitionHistoryModal() {
     this.transitionHistoryModal.show();
@@ -117,7 +121,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
 
   changed() {
     this.onChanged.emit(this._group);
-    this.cdr?.markForCheck?.();
+    // Убираем markForCheck здесь - родительский компонент сам вызовет его при необходимости
   }
 
   showSearchSectionModal() {
@@ -267,7 +271,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
       this._lifecycleGroupService.changeSection(this._lifecycle, this._group, $event.id).subscribe(value => {
         this._toasty.success("Секция переназначена.");
         this.changeSectionListComponent.hide();
-        this.group = value;
+        this.applyGroup(value);
       })
     );
   }
@@ -410,5 +414,10 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
 
   trackByLifecycle(index: number, lifecycle: ProjectLifecycleDto): any {
     return lifecycle?.id || index;
+  }
+
+  private applyGroup(group: LifecycleGroupDto) {
+    this._lifecycleGroupService.prepareGroup(group);
+    this._group = group;
   }
 }

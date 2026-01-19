@@ -1,5 +1,5 @@
 import {timer as observableTimer} from 'rxjs';
-import {Component, ElementRef, Input, ChangeDetectionStrategy} from "@angular/core";
+import {Component, ElementRef, ChangeDetectionStrategy, effect, input} from "@angular/core";
 import {Chart, ChartBuilder} from "./highchart.builder";
 import {environment} from "../../../environments/environment";
 
@@ -128,7 +128,13 @@ export class HighchartComponent {
     }
   }
 
-  @Input() set options(options: any) {
+  readonly options = input<any>(undefined);
+
+  private readonly optionsEffect = effect(() => {
+    let options = this.options();
+    if (!options) {
+      return;
+    }
     try {
       if (options instanceof ChartBuilder) {
         options = options.options;
@@ -141,5 +147,5 @@ export class HighchartComponent {
     } catch (e) {
       console.error(e);
     }
-  }
+  });
 }

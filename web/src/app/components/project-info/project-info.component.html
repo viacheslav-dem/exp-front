@@ -6,11 +6,11 @@
         [setProject]="project" [role]="role"
         [lifecycleGroup]="lifecycleGroup"
         [visibleDocsForExpert]="visibleDocsForExpert"
-        [buttons]="buttons"
-        (onChanged)="initActionButtons()">
+        [buttons]="buttons()"
+        (onChanged)="onProjectChanged($event)">
       </app-basic-project-info>
     </div>
-    @if (!checkVisibleForBureau()) {
+    @if (!visibleForBureau()) {
       <div class="col-md-6">
         <!--ASSESSORS-->
         <div *ifRole="[Role.BUREAU_ASSESSOR,Role.SECTION_ASSESSOR]">
@@ -30,21 +30,21 @@
             <div class="mb-2"><span class="text-muted">Информация</span></div>
             <app-lifecycle-group
               [group]="lifecycleGroup" [project]="project"
-              [role]="role" (onChanged)="initActionButtons()">
+              [role]="role" (onChanged)="onLifecycleGroupChanged($event)">
             </app-lifecycle-group>
           </div>
         }
         <!--SECTION_CHAIRMAN-->
         <app-lifecycle-info
           *ifRole="Role.SECTION_CHAIRMAN" [role]="role"
-          [lifecycle]="lifecycle" [project]="project" (onChanged)="initActionButtons()">
+          [lifecycle]="lifecycle" [project]="project" (onChanged)="onLifecycleChanged($event)">
         </app-lifecycle-info>
         <!--GKNT, CUSTOMER and BELISA-->
             <div *ifRole="[Role.GKNT_WORKER,Role.GKNT_CHAIRMAN,Role.GKNT_DEPARTMENT_CHAIRMAN,
       Role.CUSTOMER,Role.BELISA_READ,Role.BELISA_EDIT]">
           <app-lifecycle-group-list
             [groups]="lifecycleGroups" [project]="project"
-            [role]="role" (onChanged)="initActionButtons()"
+            [role]="role" (onChanged)="onLifecycleGroupsChanged($event)"
             (onReplyChanged)="reloadProject($event)">
           </app-lifecycle-group-list>
         </div>
@@ -57,13 +57,13 @@
           <div class="mb-2"><span class="text-muted">Экспертная оценка</span></div>
           <app-expert-review
             [review]="expertReview" [project]="project"
-            (onChanged)="initActionButtons($event)" [role]="role">
+            (onChanged)="onExpertReviewChanged($event)" [role]="role">
           </app-expert-review>
         </div>
         <!--EXPERT_REVIEWS-->
             <div class="mt-3" *ifRole="[Role.GKNT_WORKER,Role.GKNT_CHAIRMAN,Role.GKNT_DEPARTMENT_CHAIRMAN,Role.BELISA_READ,
       Role.BELISA_EDIT, Role.BUREAU_CHAIRMAN,Role.SECTION_CHAIRMAN]">
-          @if (checkVisibleForSection()) {
+          @if (visibleForSection()) {
             <app-expert-review-list
               [expertReviews]="project.expertReviews" [project]="project"
               [role]="role" (onChanged)="onExpertReviewsChanged($event)"

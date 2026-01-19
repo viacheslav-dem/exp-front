@@ -1,4 +1,4 @@
-import {Observable, throwError as observableThrowError} from 'rxjs';
+import {Observable, throwError} from 'rxjs';
 
 import {catchError, tap} from 'rxjs/operators';
 import {Injectable} from "@angular/core";
@@ -76,7 +76,7 @@ export class HttpClientSecure {
     const shouldIgnore = err.url && ignoredUrls.some(url => err.url.includes(url));
     if (shouldIgnore && err.status === 404) {
       // Не показываем ошибку для игнорируемых URL при 404
-      return observableThrowError(err);
+      return throwError(() => err);
     }
     
     if (err.status == 412) {
@@ -116,7 +116,7 @@ export class HttpClientSecure {
     } else {
       this.toasty.err(err.status, err.error || "Произошла ошибка");
     }
-    return observableThrowError(err);
+    return throwError(() => err);
   }
 
   get<T>(url: string, options?: any): Observable<T> {
@@ -128,7 +128,7 @@ export class HttpClientSecure {
         const ignoredUrls = ['/get/meth_rec', '/system-notification/get'];
         if (err.status === 404 && err.url && ignoredUrls.some(ignoredUrl => err.url.includes(ignoredUrl))) {
           // Не обрабатываем ошибку, просто пробрасываем дальше
-          return observableThrowError(err);
+          return throwError(() => err);
         }
         return this.handleError(err);
       }));
@@ -162,7 +162,7 @@ export class HttpClientSecure {
       catchError(err => {
         // Для refresh-token запросов не обрабатываем ошибки здесь, чтобы они обрабатывались в interceptor'е
         if (isRefreshTokenRequest) {
-          return observableThrowError(err);
+          return throwError(() => err);
         }
         return this.handleError(err);
       }),);
@@ -183,10 +183,23 @@ export class HttpClientSecure {
   }
 
   delete<T>(url: string, options?: any): Observable<T> {
-    let opts = this.buildHeaders(options);
+    const skipStatuses: number[] = options?.skipErrorHandlingForStatuses || [];
+    const opts = this.buildHeaders(this.stripErrorHandlingOptions(options));
     return this.http.delete<T>(url, opts).pipe(
       tap(res => this.log('delete', url, null, opts, res)),
-      catchError(err => this.handleError(err)),);
+      catchError(err => {
+        if (skipStatuses.includes(err.status)) {
+          return throwError(() => err);
+        }
+        return this.handleError(err);
+      }),);
+  }
+
+  private stripErrorHandlingOptions(options: any): any {
+    if (!options) return options;
+    const cleaned = {...options};
+    delete cleaned.skipErrorHandlingForStatuses;
+    return cleaned;
   }
 
   getBlock<T>(url: string, options?: any): Observable<T> {
@@ -211,7 +224,7 @@ export class HttpClientSecure {
       tap(() => this.progress.hide()),
       catchError(err => {
         this.progress.hide();
-        return observableThrowError(err);
+        return throwError(() => err);
       }),);
   }
 }

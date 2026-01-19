@@ -6,7 +6,7 @@
   @if (role != Role.BUREAU_CHAIRMAN) {
     <div class="mb-05">
       <app-dropdown
-        [options]="allCouncils" [notSelected]="'ГЭС не выбран'"
+        [options]="allCouncils()" [notSelected]="'ГЭС не выбран'"
         [(ngModel)]="_council" [emptyOptionsLabel]="'Данные об ГЭСах отсутствуют'"
         (onSelected)="update()" [resetEnabled]="false"
         [optionToString]="councilToString"
@@ -35,12 +35,12 @@
       </div>
       <div class="row">
         <div class="col-lg-12">
-          <app-council-projects-chart [stats]="statsV2"></app-council-projects-chart>
+          <app-council-projects-chart [stats]="statsV2()"></app-council-projects-chart>
         </div>
       </div>
       <div class="row">
         <div class="col-lg-12">
-          <app-council-results-chart [stats]="statsV2"></app-council-results-chart>
+          <app-council-results-chart [stats]="statsV2()"></app-council-results-chart>
         </div>
       </div>
       <br>
@@ -52,6 +52,6 @@
         }
       </div>
 
-      <project-list-from-stats (cancel)="listProjectsFromStats.hide()"></project-list-from-stats>
+      <project-list-from-stats (cancel)="hideListProjectsFromStats()"></project-list-from-stats>
 
 

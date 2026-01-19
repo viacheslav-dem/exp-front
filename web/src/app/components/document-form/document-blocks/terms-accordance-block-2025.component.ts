@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, input} from "@angular/core";
+import {Component, EventEmitter, Output, effect, input} from "@angular/core";
 import {DateRange} from "@app/components/common-components/page-and-filter/model/Range";
 import {PeriodDto} from "@app/dto/PeriodDto";
 
@@ -50,11 +50,16 @@ export class TermsAccordanceBlock2025Component {
     @Output()
     onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-    @Input()
-    set form(_form: { termsAccordance: boolean, termsSuggestion: PeriodDto, termsAccordanceText: string }) {
+    readonly form = input<{ termsAccordance: boolean, termsSuggestion: PeriodDto, termsAccordanceText: string }>(undefined);
+
+    private readonly formEffect = effect(() => {
+        const _form = this.form();
+        if (!_form) {
+            return;
+        }
         this._form = _form;
         this._terms = new DateRange(this._form.termsSuggestion.start, _form.termsSuggestion.end);
-    }
+    });
 
     onTermsChanged() {
         this._form.termsSuggestion = new PeriodDto(this._terms.start, this._terms.end);

@@ -1,6 +1,6 @@
 <div class="list-group">
   <div [loadingData]="_loading">
-    @for (project of projects; track project) {
+    @for (project of projects; track trackByProject($index, project)) {
       <div class="card card-block mb-3">
         <a class="h5 bold" target="_blank" [routerLink]="['/projects/',project.id]">{{project |
         titleAndCode}}</a>
@@ -13,7 +13,7 @@
           <span class="italic">{{project.registerDate | date:'dd.MM.yyyy'}} г.</span>
         </div>
         <div class="text-sm">
-          @for (group of project.groups; track group) {
+            @for (group of project.groups; track trackByGroup($index, group)) {
             <span>
               ГЭС: <span class="italic">№{{group.council.code}} {{group.council.name}}</span></span>
             }
@@ -39,7 +39,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (review of project.expertReviews; track review) {
+                @for (review of project.expertReviews; track trackByReview($index, review)) {
                   <tr class="list-group-item-action">
                     <td>
                       <div class="cursor-pointer"

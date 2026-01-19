@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, input} from '@angular/core';
+import {Component, EventEmitter, Output, effect, input} from '@angular/core';
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {IdNameDto} from "@app/dto/IdNameDto";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
@@ -80,21 +80,24 @@ export class SelectDirectionsAndGoalsBlock2025Component {
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  @Input()
-  set project(project: ProjectPlainDto | ProjectDto) {
-    this._project = project;
-    this.update();
-  }
+  readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-  @Input()
-  set form(form: {
+  readonly form = input<{
     selectedDirections: IdNameDto[],
     selectedSocialEconomicGoals: IdNameDto[],
     directionsAndGoalsText: string
-  }) {
+  }>(undefined);
+
+  private readonly inputsEffect = effect(() => {
+    const project = this.project();
+    const form = this.form();
+    this._project = project;
     this._form = form;
+    if (!project || !form) {
+      return;
+    }
     this.update();
-  }
+  });
 
   showTarget8_4() {
     return this._project.code.code.startsWith('8.4');

@@ -39,7 +39,7 @@ export class LifecycleGroupService extends HasStateService implements DraftServi
     return this._http.postBlock(`${this.url}/attach/${idDto.id}/section/${sectionId}`, null);
   }
 
-  changeSection(idLifecycle: IdDto, idGroup: IdDto, sectionId): Observable<ProjectLifecycleDto> {
+  changeSection(idLifecycle: IdDto, idGroup: IdDto, sectionId): Observable<LifecycleGroupDto> {
     return this._http.postBlock(`${this.url}/change/${idLifecycle.id}/${idGroup.id}/section/${sectionId}`, null);
   }
 

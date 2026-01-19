@@ -9,9 +9,15 @@ import {AuthService} from "@app/services/auth.service";
 import {UserCredentials} from "@app/dto/UserCredentials";
 import {Router} from "@angular/router";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
+import {TokenRefreshCoordinatorService} from "@app/services/token-refresh-coordinator.service";
 
 @Injectable()
 export class AuthErrorInterceptor implements HttpInterceptor {
+
+  private static readonly HTTP_STATUS_UNAUTHORIZED = 401;
+  private static readonly HTTP_STATUS_FORBIDDEN = 403;
+  private static readonly HTTP_STATUS_PRECONDITION_FAILED = 412;
+  private static readonly HTTP_STATUS_INTERNAL_SERVER_ERROR = 500;
 
   private isRefreshing = false;
   private isRefreshTokenInvalid = false; // Флаг для предотвращения повторных попыток обновления после 412/401
@@ -22,7 +28,8 @@ export class AuthErrorInterceptor implements HttpInterceptor {
       private storage: StorageService,
       private authService: AuthService,
       private router: Router,
-      private toasty: GlobalToastyService
+      private toasty: GlobalToastyService,
+      private refreshCoordinator: TokenRefreshCoordinatorService
   ) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler) {
@@ -68,10 +75,10 @@ export class AuthErrorInterceptor implements HttpInterceptor {
                                authReq.url.includes('/system-notification/get');
       
       if (error instanceof HttpErrorResponse && !isPublicEndpoint) {
-        if (error.status === 401){
+        if (error.status === AuthErrorInterceptor.HTTP_STATUS_UNAUTHORIZED) {
           return this.handle401Error(authReq, next);
         }
-        if (error.status === 403){
+        if (error.status === AuthErrorInterceptor.HTTP_STATUS_FORBIDDEN) {
           // 403 может означать как ошибку доступа, так и проблему с аутентификацией
           // Spring Security может вернуть AccessDeniedException (403) когда токен истек
           // Пытаемся обновить токен, если refresh token есть
@@ -83,75 +90,86 @@ export class AuthErrorInterceptor implements HttpInterceptor {
   }
 
   private handle403Error(request: HttpRequest<any>, next: HttpHandler, error?: HttpErrorResponse) {
-    // 403 может означать как ошибку доступа, так и проблему с аутентификацией
-    // Spring Security может вернуть AccessDeniedException (403) когда токен истек или невалиден
-    // Проверяем наличие refresh token - если он есть, пытаемся обновить токен
-    // Если обновление успешно - повторяем запрос, если нет - делаем logout
-    
+    const accessToken = this.storage.getAccessToken();
     const refreshToken = this.storage.getRefreshToken();
+    const isAccessTokenValid = this.storage.isAccessTokenValidNow();
     
-    // Если refresh token есть, пытаемся обновить токен (возможно, access token истек)
-    if (refreshToken) {
-      // Если уже идет обновление токена, ждем его завершения
-      if (this.isRefreshing) {
-        return race(
-          this.refreshTokenSubject.pipe(
-            filter(token => token !== null),
-            take(1),
-            switchMap((token) => {
-              if (!token) {
-                // Если токен null, обновление не удалось - это ошибка доступа
-                return throwError(error || new HttpErrorResponse({
-                  error: 'Доступ запрещён.',
-                  status: 403,
-                  statusText: 'Forbidden'
-                }));
-              }
-              return next.handle(this.addTokenHeader(request, token));
-            })
-          ),
-          this.refreshErrorSubject.pipe(
-            filter(error => error !== null),
-            take(1),
-            switchMap((refreshError) => {
-              // Если обновление токена не удалось (412 или 401), logout уже был выполнен в handle401Error
-              // Возвращаем EMPTY, чтобы остановить цепочку обработки ошибок
-              return EMPTY;
-            })
-          )
-        );
-      }
-      
-      // Если обновление не идет, вызываем handle401Error
-      return this.handle401Error(request, next).pipe(
-        catchError((refreshError) => {
-          // Если обновление токена не удалось, logout уже был выполнен в handle401Error
-          // Возвращаем EMPTY, чтобы остановить цепочку обработки ошибок
-          return EMPTY;
-        })
-      );
+    // Если access token валиден, это реальная ошибка доступа, а не проблема с токеном
+    // Spring Security должен возвращать 401 для истекших токенов, а не 403
+    if (isAccessTokenValid) {
+      return this.createForbiddenError(error);
     }
     
-    // Если refresh token отсутствует, проверяем наличие access token
-    // Если access token тоже отсутствует - это проблема авторизации, делаем logout
-    // Если access token есть - это реальная ошибка доступа, просто показываем ошибку
-    const accessToken = this.storage.getAccessToken();
+    // Если access token невалиден и есть refresh token - пробуем обновить
+    if (refreshToken) {
+      return this.attemptTokenRefresh(request, next, error);
+    }
+    
+    // Если refresh token отсутствует и access token тоже отсутствует - пользователь не авторизован
     if (!accessToken) {
       // Нет ни access token, ни refresh token - пользователь не авторизован
-      this.storage.resetCredentials();
-      this.storage.clear();
-      this.toasty.err(403, "Сессия истекла. Пожалуйста, выполните вход.");
-      this.redirectToLoginIfNeeded();
+      this.logoutAndRedirect("Сессия истекла. Пожалуйста, выполните вход.");
       return EMPTY;
-    } else {
-      // Access token есть, но refresh token отсутствует - это реальная ошибка доступа
-      // Не делаем logout, просто показываем ошибку
-      return throwError(error || new HttpErrorResponse({
-        error: 'Доступ запрещён.',
-        status: 403,
-        statusText: 'Forbidden'
-      }));
     }
+    
+    // Access token есть, но refresh token отсутствует и access token невалиден
+    // Показываем ошибку доступа без попытки обновления
+    return this.createForbiddenError(error);
+  }
+
+  private createForbiddenError(originalError?: HttpErrorResponse) {
+    return throwError(originalError || new HttpErrorResponse({
+      error: 'Доступ запрещён.',
+      status: AuthErrorInterceptor.HTTP_STATUS_FORBIDDEN,
+      statusText: 'Forbidden'
+    }));
+  }
+
+  private attemptTokenRefresh(request: HttpRequest<any>, next: HttpHandler, originalError?: HttpErrorResponse) {
+    // Если уже идет обновление токена, ждем его завершения
+    if (this.isRefreshing) {
+      return this.waitForTokenRefresh(request, next, originalError);
+    }
+    
+    // Если обновление не идет, вызываем handle401Error
+    return this.handle401Error(request, next).pipe(
+      catchError((refreshError) => {
+        // Если обновление токена вернуло 403, это означает проблему с правами доступа
+        // Пробрасываем оригинальную ошибку 403, чтобы её можно было обработать правильно
+        if (refreshError?.status === AuthErrorInterceptor.HTTP_STATUS_FORBIDDEN) {
+          return throwError(() => originalError || refreshError);
+        }
+        // Если обновление токена не удалось (412 или 401), logout уже был выполнен в handle401Error
+        return EMPTY;
+      })
+    );
+  }
+
+  private waitForTokenRefresh(request: HttpRequest<any>, next: HttpHandler, originalError?: HttpErrorResponse) {
+    return race(
+      this.refreshTokenSubject.pipe(
+        filter(token => token !== null),
+        take(1),
+        switchMap((token) => {
+          if (!token) {
+            return this.createForbiddenError(originalError);
+          }
+          return next.handle(this.addTokenHeader(request, token));
+        })
+      ),
+      this.refreshErrorSubject.pipe(
+        filter(error => error !== null),
+        take(1),
+        switchMap(() => EMPTY) // Logout уже выполнен в handle401Error
+      )
+    );
+  }
+
+  private logoutAndRedirect(message: string) {
+    this.storage.resetCredentials();
+    this.storage.clear();
+    this.toasty.err(AuthErrorInterceptor.HTTP_STATUS_FORBIDDEN, message);
+    this.redirectToLoginIfNeeded();
   }
 
 
@@ -178,7 +196,7 @@ export class AuthErrorInterceptor implements HttpInterceptor {
       this.refreshErrorSubject.next(null);
 
       if (refreshToken) {
-        return this.authService.refreshToken(refreshToken)
+        return this.refreshCoordinator.refreshOnce(() => this.authService.refreshToken(refreshToken))
             .pipe(
             switchMap((credentials: UserCredentials) => {
               // Проверяем, что accessToken существует
@@ -219,6 +237,8 @@ export class AuthErrorInterceptor implements HttpInterceptor {
               
               // Затем сохраняем в localStorage
               this.authService.updateCredentials(credentials);
+              // Сообщаем другим вкладкам, что refresh завершился успешно (после записи в localStorage)
+              this.refreshCoordinator.notifyRefreshSucceeded();
               
               // И только после этого сбрасываем флаг isRefreshing
               // Это предотвращает race condition: новые запросы будут ждать через race(),
@@ -244,12 +264,13 @@ export class AuthErrorInterceptor implements HttpInterceptor {
               
               // Критические ошибки, связанные с токенами (412, 401)
               // Эти ошибки означают, что refresh token невалиден или истек
-              if (error.status === 412 || error.status === 401) {
+              if (error.status === AuthErrorInterceptor.HTTP_STATUS_PRECONDITION_FAILED || 
+                  error.status === AuthErrorInterceptor.HTTP_STATUS_UNAUTHORIZED) {
                 // Устанавливаем флаг, чтобы предотвратить повторные попытки обновления токена
                 this.isRefreshTokenInvalid = true;
                 
                 // Показываем понятное сообщение пользователю
-                if (error.status === 412) {
+                if (error.status === AuthErrorInterceptor.HTTP_STATUS_PRECONDITION_FAILED) {
                   // 412 обычно означает, что refresh token был отозван (например, из-за входа с другого устройства)
                   let errorMessage = "Сессия была завершена. Возможно, вы вошли с другого устройства или браузера.";
                   if (error.error) {
@@ -261,10 +282,13 @@ export class AuthErrorInterceptor implements HttpInterceptor {
                       errorMessage = error.error.error;
                     }
                   }
-                  this.toasty.err(412, errorMessage);
+                  this.toasty.err(AuthErrorInterceptor.HTTP_STATUS_PRECONDITION_FAILED, errorMessage);
                 } else {
                   // 401 при обновлении токена означает, что refresh token истек или невалиден
-                  this.toasty.err(401, "Время сессии истекло. Пожалуйста, выполните вход.");
+                  this.toasty.err(
+                    AuthErrorInterceptor.HTTP_STATUS_UNAUTHORIZED,
+                    "Время сессии истекло. Пожалуйста, выполните вход."
+                  );
                 }
                 
                 this.storage.resetCredentials();
@@ -294,13 +318,15 @@ export class AuthErrorInterceptor implements HttpInterceptor {
                 return EMPTY;
               }
               
+              // Ошибка 403 при обновлении токена - пробрасываем ошибку, не делаем logout
+              // Это позволит оригинальному запросу (например, DELETE) обработать ошибку доступа
+              if (error.status === AuthErrorInterceptor.HTTP_STATUS_FORBIDDEN) {
+                return throwError(() => error);
+              }
+              
               // Для других неизвестных ошибок тоже перенаправляем на login
               // но не устанавливаем флаг (на случай, если это временная проблема)
-              this.toasty.err(error.status || 500, "Ошибка при обновлении сессии. Пожалуйста, выполните вход.");
-              
-              this.storage.resetCredentials();
-              this.storage.clear();
-              this.redirectToLoginIfNeeded();
+              this.logoutAndRedirect("Ошибка при обновлении сессии. Пожалуйста, выполните вход.");
               return EMPTY;
             })
         );

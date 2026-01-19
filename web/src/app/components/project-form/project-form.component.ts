@@ -30,7 +30,11 @@ import {FormValidationScrollService} from "@app/services/form-validation-scroll.
 })
 export class ProjectFormComponent implements OnInit, OnDestroy {
 
-    @Input() optionToString: Function;
+    readonly optionToStringInput = input<Function | undefined>(undefined, { alias: 'optionToString' });
+
+    get optionToString(): Function | undefined {
+        return this.optionToStringInput();
+    }
 
     @Output() save = new EventEmitter();
     @Output() cancel = new EventEmitter();
@@ -469,15 +473,6 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     //   console.log(option);
     //   this.subDirection = option;
     // }
-
-    getSubDirectionName() {
-        return this.newDirection.subDirectionDtos;
-    }
-
-  displayDirection(){
-    return this.directions;
-  }
-
 
   display(dir: DirectionDto, indexSubDir: number, indexDir) {
     dir.subDirectionDtos.splice(indexSubDir, 1);

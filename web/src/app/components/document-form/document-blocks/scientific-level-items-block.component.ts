@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, input} from '@angular/core';
+import {Component, EventEmitter, Output, effect, input} from '@angular/core';
 import {Text} from "@app/components/document-form/form-model/Text";
 
 @Component({
@@ -40,11 +40,16 @@ export class ScientificLevelItemsBlockComponent {
   @Output()
   onConditionsChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  @Input()
-  set form(_form: { scientificLevelItems: Text[], scientificLevelItemsText: string }) {
+  readonly form = input<{ scientificLevelItems: Text[], scientificLevelItemsText: string }>(undefined);
+
+  private readonly formEffect = effect(() => {
+    const _form = this.form();
+    if (!_form) {
+      return;
+    }
     this._form = _form;
     this.scientificLevelItems.forEach(item => item.isChecked = _form.scientificLevelItems.some(checked => checked.text == item.text));
-  }
+  });
 
   onChecked() {
     this._form.scientificLevelItems = this.scientificLevelItems

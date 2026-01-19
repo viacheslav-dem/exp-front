@@ -5,8 +5,9 @@
 bs-daterangepicker-container,
 bs-datepicker-container {
   // Ensure proper z-index - выше модального окна Bootstrap 5 (z-index: 1055)
-  // Используем такой же высокий z-index как у ng-select для консистентности
-  z-index: 10000 !important;
+  // ВАЖНО: вне модалки держим ниже мобильного меню (z-index: 1000),
+  // в модалке поднимаем чуть выше Bootstrap modal (см. override ниже).
+  z-index: 970 !important;
   
   // When transform is missing (bug on re-open), the element stays at top:0 left:0
   // This is a fallback - not ideal but better than invisible calendar
@@ -18,4 +19,11 @@ bs-datepicker-container {
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
   }
+}
+
+// Если открыт Bootstrap modal, datepicker должен быть выше модального контента (modal: 1055)
+// Используем body.modal-open, чтобы не поднимать datepicker в обычных страницах (мобильное меню z-index: 1000)
+body.modal-open bs-daterangepicker-container,
+body.modal-open bs-datepicker-container {
+  z-index: 1070 !important;
 }

@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, ElementRef, Input, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, input} from '@angular/core';
+import {Component, ElementRef, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, effect, input, Type} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {SearchPersonByRolesComponent} from "@app/components/search/search-person/search-person-by-role.component";
 import {Role} from "@app/pipes/role.pipe";
@@ -60,7 +60,6 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
 
   constructor(private _personService: PersonService,
-              private resolver: ComponentFactoryResolver,
               private _formTypeResolver: CouncilConclusionFormResolver,
               private cdr: ChangeDetectorRef,
               private readonly hostRef: ElementRef<HTMLElement>,
@@ -87,37 +86,44 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     return this._project;
   }
 
-  @Input()
-  set project(project: ProjectDto) {
+  readonly projectInput = input<ProjectDto>(undefined, { alias: 'project' });
+
+  private readonly projectEffect = effect(() => {
+    const project = this.projectInput();
+    if (!project) {
+      return;
+    }
     this._project = project;
     this.updateFormComponent(this._formTypeResolver.getFormRenderer(this._project.code.code));
     this.cdr?.markForCheck?.();
-  }
+  });
 
   get group() {
     return this._group;
   }
 
-  @Input()
-  set group(group: LifecycleGroupDto) {
+  readonly groupInput = input<LifecycleGroupDto>(undefined, { alias: 'group' });
+
+  private readonly groupEffect = effect(() => {
+    const group = this.groupInput();
+    if (!group) {
+      return;
+    }
     this._group = group;
     this._form.chairman = this._form.chairman || this._group.bureauChairman;
     if (this.formComponent) {
       this.formComponent.group = this._group;
     }
     this.cdr?.markForCheck?.();
-  }
+  });
 
-  updateFormComponent(_formRenderer) {
+  updateFormComponent(_formRenderer: Type<CouncilConclusionForm>) {
     if (!_formRenderer) {
       return;
     }
-    while (this.formContainer.length > 0) {
-      this.formContainer.get(0).destroy();
-    }
-    let componentFactory = this.resolver.resolveComponentFactory(_formRenderer);
-    const componentRef = this.formContainer.createComponent(componentFactory);
-    this.formComponent = componentRef.instance as CouncilConclusionForm;
+    this.formContainer.clear();
+    const componentRef = this.formContainer.createComponent(_formRenderer);
+    this.formComponent = componentRef.instance;
     this.formComponent.parent = this;
     this.formComponent.project = this.project;
     this.formComponent.group = this.group;

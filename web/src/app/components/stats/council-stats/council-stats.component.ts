@@ -1,10 +1,10 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Injectable, Input, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Injectable, OnInit, ElementRef, AfterViewInit, effect, input, viewChild, signal} from "@angular/core";
+import {toSignal} from "@angular/core/rxjs-interop";
 import {StatsService} from "@app/services/stats.service";
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {BsDatepickerConfig} from 'ngx-bootstrap/datepicker';
-import {CouncilStatsDto} from "@app/dto/CouncilStatsDto";
 import {CouncilPlainDto} from "@app/dto/CouncilPlainDto";
 import {DataService} from "@app/services/data.service";
 import {Role} from "@app/pipes/role.pipe";
@@ -16,7 +16,6 @@ import {
 import {DialogService} from "@app/components/dialogs/dialog.service";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO";
-import {FormControl} from "@angular/forms";
 import {environment} from "../../../../environments/environment";
 
 @Component({
@@ -29,7 +28,7 @@ import {environment} from "../../../../environments/environment";
 export class CouncilStatsComponent implements OnInit, AfterViewInit {
 
   Role = Role;
-  role: Role;
+  role: Role | undefined;
 
   dateFrom: number = dayjs().subtract(1, 'year').valueOf();
   dateTo: number = dayjs().valueOf();
@@ -37,8 +36,8 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
   dateFromValue: Date = new Date(this.dateFrom);
   dateToValue: Date = new Date(this.dateTo);
   
-  @ViewChild('dateFromInput', { static: false }) dateFromInput: ElementRef<HTMLInputElement>;
-  @ViewChild('dateToInput', { static: false }) dateToInput: ElementRef<HTMLInputElement>;
+  dateFromInput = viewChild<ElementRef<HTMLInputElement>>('dateFromInput');
+  dateToInput = viewChild<ElementRef<HTMLInputElement>>('dateToInput');
   
   datePickerConfig: Partial<BsDatepickerConfig> = {
     minMode: 'month',
@@ -48,11 +47,10 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
   };
 
   _council: CouncilPlainDto;
-  allCouncils: CouncilPlainDto[];
-  stats: CouncilStatsDto[];
-  statsV2: CouncilStatsResponseDTO[];
+  allCouncils = toSignal(this.councilService.getCouncils(), { initialValue: [] as CouncilPlainDto[] });
+  statsV2 = signal<CouncilStatsResponseDTO[]>([]);
 
-  @ViewChild(ProjectListFromStatsComponent, { static: false }) public listProjectsFromStats: ProjectListFromStatsComponent;
+  listProjectsFromStats = viewChild(ProjectListFromStatsComponent);
 
   councilToString: Function;
 
@@ -67,16 +65,46 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
     this.councilToString = council => councilPipe.transform(council);
   }
 
-  ngOnInit(): void {
+  private _councilsProcessed = false;
 
+  private readonly councilsEffect = effect(() => {
+    const councils = this.allCouncils();
+    // Ждем загрузки советов и инициализации роли
+    if (councils.length === 0 || this.role === undefined) {
+      return;
+    }
+
+    // Обрабатываем только один раз после загрузки
+    if (this._councilsProcessed) {
+      return;
+    }
+
+    // Для BUREAU_CHAIRMAN не нужно устанавливать совет
+    if (this.role === Role.BUREAU_CHAIRMAN) {
+      this._councilsProcessed = true;
+      return;
+    }
+
+    // Устанавливаем первый совет по умолчанию, если не установлен
+    if (this._council == null && councils.length > 0) {
+      this.council = councils[0];
+    }
+
+    // Загружаем данные если совет установлен
+    if (this._council) {
+      this._councilsProcessed = true;
+      this.update();
+    }
+    this.cdr?.markForCheck?.();
+  });
+
+  ngOnInit(): void {
     this.role = this.authService.getCurrRole();
-    this.councilService.getCouncils().subscribe(res => {
-      this.allCouncils = res;
-      if (this._council == null) {
-        this.council = this.allCouncils[0];
-      }
-      this.cdr?.markForCheck?.();
-    });
+
+    // Для BUREAU_CHAIRMAN можно загрузить данные сразу: данные не зависят от выбора совета.
+    if (this.role == Role.BUREAU_CHAIRMAN) {
+      this.update();
+    }
   }
 
   ngAfterViewInit(): void {
@@ -88,16 +116,18 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
   }
 
   private updateInputDisplay(): void {
-    if (this.dateFromInput?.nativeElement && this.dateFromValue) {
+    const dateFromInputEl = this.dateFromInput();
+    if (dateFromInputEl?.nativeElement && this.dateFromValue) {
       const formatted = dayjs(this.dateFromValue).locale('ru').format('MM.YYYY');
-      if (this.dateFromInput.nativeElement.value !== formatted) {
-        this.dateFromInput.nativeElement.value = formatted;
+      if (dateFromInputEl.nativeElement.value !== formatted) {
+        dateFromInputEl.nativeElement.value = formatted;
       }
     }
-    if (this.dateToInput?.nativeElement && this.dateToValue) {
+    const dateToInputEl = this.dateToInput();
+    if (dateToInputEl?.nativeElement && this.dateToValue) {
       const formatted = dayjs(this.dateToValue).locale('ru').format('MM.YYYY');
-      if (this.dateToInput.nativeElement.value !== formatted) {
-        this.dateToInput.nativeElement.value = formatted;
+      if (dateToInputEl.nativeElement.value !== formatted) {
+        dateToInputEl.nativeElement.value = formatted;
       }
     }
   }
@@ -105,16 +135,50 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
   update() {
     let dateToExclusive = dayjs(this.dateTo).add(1, 'month').valueOf();
     if (this.role == Role.BUREAU_CHAIRMAN) {
-      this.statsService.getCouncilStatsForBureauChairman(this.dateFrom, dateToExclusive).subscribe(res => {
-        this.stats = res;
-        this.cdr?.markForCheck?.();
+      this.statsService.getCouncilStatsForBureauChairman(this.dateFrom, dateToExclusive).subscribe({
+        next: (res) => {
+          // Convert CouncilStatsDto[] to CouncilStatsResponseDTO[] for compatibility with charts
+          const convertedStats = res.map(dto => {
+            const responseDto = new CouncilStatsResponseDTO();
+            responseDto.id = dto.id;
+            responseDto.startDate = dto.startDate;
+            responseDto.council = dto.council;
+            responseDto.finishedProjects = dto.finishedProjects;
+            responseDto.projectsAccepted = dto.projectsAccepted;
+            responseDto.projectsRejected = dto.projectsRejected;
+            responseDto.projectsReceived = dto.projectsReceived;
+            responseDto.projectsNotFinished = dto.projectsNotFinished;
+            responseDto.projectsReturned = dto.projectsReturned;
+            responseDto.projectsReturnedWithoutExpertise = dto.projectsReturnedWithoutExpertise;
+            responseDto.projectsOverdue = dto.projectsOverdue;
+            responseDto.examinationTermsStats = dto.examinationTermsStats;
+            responseDto.overdueDaysProject = 0; // Default value, not available in CouncilStatsDto
+            return responseDto;
+          });
+          this.statsV2.set(convertedStats);
+          this.cdr?.markForCheck?.();
+        },
+        error: (err) => {
+          console.error('Ошибка при загрузке статистики для председателя бюро:', err);
+          this.toasty.err(err.status || 500, err.error?.message || 'Не удалось загрузить статистику. Проверьте, что у вас есть связанное бюро.');
+          this.statsV2.set([]); // Очищаем статистику при ошибке
+          this.cdr?.markForCheck?.();
+        }
       });
     } else if (this._council) {
       // this.statsService.getCouncilStats(this._council, this.dateFrom, dateToExclusive).subscribe(res => {
       //   this.stats = res
-      this.statsService.getCouncilStats(this._council, this.dateFrom, dateToExclusive).subscribe(res => {
-        this.statsV2 = res;
-        this.cdr?.markForCheck?.();
+      this.statsService.getCouncilStats(this._council, this.dateFrom, dateToExclusive).subscribe({
+        next: (res) => {
+          this.statsV2.set(res);
+          this.cdr?.markForCheck?.();
+        },
+        error: (err) => {
+          console.error('Ошибка при загрузке статистики по ГЭС:', err);
+          this.toasty.err(err.status || 500, err.error?.message || 'Не удалось загрузить статистику.');
+          this.statsV2.set([]); // Очищаем статистику при ошибке
+          this.cdr?.markForCheck?.();
+        }
       });
     }
   }
@@ -126,9 +190,10 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
       this.update();
       // Обновляем отображение после изменения даты
       requestAnimationFrame(() => {
-        if (this.dateToInput?.nativeElement) {
+        const dateToInputEl = this.dateToInput();
+        if (dateToInputEl?.nativeElement) {
           const formatted = dayjs(date).locale('ru').format('MM.YYYY');
-          this.dateToInput.nativeElement.value = formatted;
+          dateToInputEl.nativeElement.value = formatted;
         }
         this.cdr?.markForCheck?.();
       });
@@ -142,31 +207,59 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
       this.update();
       // Обновляем отображение после изменения даты
       requestAnimationFrame(() => {
-        if (this.dateFromInput?.nativeElement) {
+        const dateFromInputEl = this.dateFromInput();
+        if (dateFromInputEl?.nativeElement) {
           const formatted = dayjs(date).locale('ru').format('MM.YYYY');
-          this.dateFromInput.nativeElement.value = formatted;
+          dateFromInputEl.nativeElement.value = formatted;
           this.cdr?.markForCheck?.();
         }
       });
     }
   }
 
-  @Input() set council(council: CouncilPlainDto) {
-    this._council = council;
-    this.update();
+  readonly councilInput = input<CouncilPlainDto>(undefined, { alias: 'council' });
+
+  get council(): CouncilPlainDto {
+    return this._council;
   }
 
+  set council(value: CouncilPlainDto) {
+    this._council = value;
+  }
+
+  private readonly councilEffect = effect(() => {
+    const council = this.councilInput();
+    if (!council) {
+      return;
+    }
+    this._council = council;
+    this.update();
+  });
+
   showListProjectsFromStats(type, month) {
-    let monthValue = dayjs(month).valueOf();
-    let startOfMonthDate = dayjs(monthValue).startOf('month');
-    let endOfMonthDate = dayjs(monthValue).endOf('month');
-    let startOfMonthStr = startOfMonthDate.locale('ru').format('DD-MMMM-YYYY HH:mm');
-    let endOfMonthStr = endOfMonthDate.locale('ru').format('DD-MMMM-YYYY HH:mm');
+    const listComponent = this.listProjectsFromStats();
+    if (!listComponent) {
+      console.warn('ProjectListFromStatsComponent не найден');
+      return;
+    }
+    if (!this._council?.id) {
+      console.warn('ГЭС не выбран');
+      return;
+    }
+    const monthValue = dayjs(month).valueOf();
+    const startOfMonthDate = dayjs(monthValue).startOf('month');
+    const endOfMonthDate = dayjs(monthValue).endOf('month');
+    const startOfMonthStr = startOfMonthDate.locale('ru').format('DD-MMMM-YYYY HH:mm');
+    const endOfMonthStr = endOfMonthDate.locale('ru').format('DD-MMMM-YYYY HH:mm');
 
-    let startOfMonthValue = dayjs(startOfMonthStr, 'DD-MMMM-YYYY HH:mm', 'ru').valueOf();
-    let endOfMonthValue = dayjs(endOfMonthStr, 'DD-MMMM-YYYY HH:mm', 'ru').valueOf();
+    const startOfMonthValue = dayjs(startOfMonthStr, 'DD-MMMM-YYYY HH:mm', 'ru').valueOf();
+    const endOfMonthValue = dayjs(endOfMonthStr, 'DD-MMMM-YYYY HH:mm', 'ru').valueOf();
 
-    this.listProjectsFromStats.show(type, this._council.id, startOfMonthValue, endOfMonthValue);
+    listComponent.show(type, this._council.id, startOfMonthValue, endOfMonthValue);
+  }
+
+  hideListProjectsFromStats(): void {
+    this.listProjectsFromStats()?.hide();
   }
 
   updateCouncilStatsForLastYear() {

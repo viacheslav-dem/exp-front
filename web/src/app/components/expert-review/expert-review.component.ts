@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, Type, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef} from "@angular/core";
+import {Component, EventEmitter, OnInit, Output, Type, ViewChild, ChangeDetectionStrategy, effect, input, signal} from "@angular/core";
 import {ExpertReviewState, ExpertReviewStateBadge} from "@app/pipes/review-state.pipe";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
@@ -44,17 +44,45 @@ export class ExpertReviewComponent implements OnInit {
     SERVER_URL = SERVER_URL;
     DocType = DocType;
 
-    expertReview: ExpertReviewDto = new ExpertReviewDto();
-    transitionHistory: ExpertTransitionHistoryDto;
+    private readonly expertReviewState = signal<ExpertReviewDto>(new ExpertReviewDto());
+    private readonly transitionHistoryState = signal<ExpertTransitionHistoryDto>(undefined);
+    private readonly formRendererState = signal<Type<ExpertReviewForm<any>>>(null);
+    private readonly isCreatingReviewDocumentState = signal(false);
+    readonly refreshContractLoading = signal(false);
+    readonly refreshActLoading = signal(false);
+
+    get expertReview(): ExpertReviewDto {
+        return this.expertReviewState();
+    }
+    set expertReview(value: ExpertReviewDto) {
+        this.expertReviewState.set(value);
+    }
+
+    get transitionHistory(): ExpertTransitionHistoryDto {
+        return this.transitionHistoryState();
+    }
+    set transitionHistory(value: ExpertTransitionHistoryDto) {
+        this.transitionHistoryState.set(value);
+    }
 
     readonly role = input<string>(undefined);
     // Важно: дефолт не должен быть {}, иначе `project()` truthy и шаблон/логика могут пойти по ветке,
     // где ожидается полноценно загруженный ProjectDto (с `code.expertReviewType`).
     readonly project = input<any>(undefined);
 
-    formRenderer: Type<ExpertReviewForm<any>>;
+    get formRenderer(): Type<ExpertReviewForm<any>> {
+        return this.formRendererState();
+    }
+    set formRenderer(value: Type<ExpertReviewForm<any>>) {
+        this.formRendererState.set(value);
+    }
 
-    isCreatingReviewDocument = false;
+    get isCreatingReviewDocument(): boolean {
+        return this.isCreatingReviewDocumentState();
+    }
+    set isCreatingReviewDocument(value: boolean) {
+        this.isCreatingReviewDocumentState.set(value);
+    }
 
     @ViewChild('reviewFormModal', { static: false }) reviewFormModal: ModalComponent;
     @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
@@ -68,20 +96,24 @@ export class ExpertReviewComponent implements OnInit {
                 private _transitionHistoryService: TransitionHistoryService,
                 private _accountingService: AccountingService,
                 private _dialogService: DialogService,
-                private _personPipe: PersonFullNamePipe,
-                private cdr: ChangeDetectorRef) {
+                private _personPipe: PersonFullNamePipe) {
     }
 
     ngOnInit(): void {
     }
 
-    @Input() set review(review: ExpertReviewDto) {
+    readonly review = input<ExpertReviewDto>(undefined);
+
+    private readonly reviewEffect = effect(() => {
+        const review = this.review();
         if (!review) return;
-        this._reviewService.prepareReview(review);
-        review.badge = ExpertReviewStateBadge[review.state];
-        review.expectedBadge = ExpertReviewStateBadge[review.expectedState];
-        this.expertReview = review;
-    }
+        // Создаём копию чтобы не мутировать входящий объект
+        const reviewCopy = { ...review };
+        this._reviewService.prepareReview(reviewCopy);
+        reviewCopy.badge = ExpertReviewStateBadge[reviewCopy.state];
+        reviewCopy.expectedBadge = ExpertReviewStateBadge[reviewCopy.expectedState];
+        this.expertReview = reviewCopy;
+    });
 
     showTransitionHistoryModal() {
         this.transitionHistoryModal.show();
@@ -89,12 +121,10 @@ export class ExpertReviewComponent implements OnInit {
             .subscribe({
                 next: (res) => {
                     this.transitionHistory = res;
-                    this.cdr?.markForCheck?.();
                 },
                 error: (error) => {
                     const errorMessage = error?.error || error?.message || 'Произошла ошибка при загрузке истории переходов';
                     this._toasty.error(errorMessage);
-                    this.cdr?.markForCheck?.();
                 }
             });
     }
@@ -131,9 +161,11 @@ export class ExpertReviewComponent implements OnInit {
     }
 
     reviewScanLoaded(doc) {
-        this.expertReview.reviewScan = doc;
+        this.updateExpertReview((review) => ({
+            ...review,
+            reviewScan: doc
+        }));
         this.changed();
-        this.cdr?.markForCheck?.();
     }
 
     canReadReviewScan() {
@@ -153,16 +185,20 @@ export class ExpertReviewComponent implements OnInit {
                  `Пересоздать договор в соответствии с изменившимися данными в системе?`,
                  'Дата договора при этом останется неизменной'
         ).subscribe(() => {
+            this.refreshContractLoading.set(true);
             this._accountingService.refreshContract(this.expertReview.accounting).subscribe({
                 next: (res) => {
-                    this.expertReview.accounting = <AccountingPlainDto>res;
+                    this.updateExpertReview((review) => ({
+                        ...review,
+                        accounting: res as AccountingPlainDto
+                    }));
                     this._toasty.success("Документ успешно обновлён.");
-                    this.cdr?.markForCheck?.();
+                    this.refreshContractLoading.set(false);
                 },
                 error: (error) => {
                     const errorMessage = error?.error || error?.message || 'Произошла ошибка при обновлении договора';
                     this._toasty.error(errorMessage);
-                    this.cdr?.markForCheck?.();
+                    this.refreshContractLoading.set(false);
                 }
             });
         });
@@ -174,16 +210,20 @@ export class ExpertReviewComponent implements OnInit {
             `Пересоздать акт в соответствии с изменившимися данными в системе?`,
             'Дата акта и сумма выплат при этом останутся неизменными'
         ).subscribe(() => {
+            this.refreshActLoading.set(true);
             this._accountingService.refreshAct(this.expertReview.accounting).subscribe({
                 next: (res) => {
-                    this.expertReview.accounting = <AccountingPlainDto>res;
+                    this.updateExpertReview((review) => ({
+                        ...review,
+                        accounting: res as AccountingPlainDto
+                    }));
                     this._toasty.success("Документ успешно обновлён.");
-                    this.cdr?.markForCheck?.();
+                    this.refreshActLoading.set(false);
                 },
                 error: (error) => {
                     const errorMessage = error?.error || error?.message || 'Произошла ошибка при обновлении акта';
                     this._toasty.error(errorMessage);
-                    this.cdr?.markForCheck?.();
+                    this.refreshActLoading.set(false);
                 }
             });
         });
@@ -194,43 +234,43 @@ export class ExpertReviewComponent implements OnInit {
             return;
         }
         this.isCreatingReviewDocument = true;
-        this.cdr?.markForCheck?.();
 
         this._reviewService.generateReviewDocument(this.expertReview, reviewForm).subscribe({
             next: (res) => {
                 this.isCreatingReviewDocument = false;
                 this.closeForm();
-                this.review = res;
+                this.applyReview(res);
                 this.changed();
-                this.cdr?.markForCheck?.();
             },
             error: () => {
                 this.isCreatingReviewDocument = false;
                 this._toasty.error('Ошибка при создании документа');
-                this.cdr?.markForCheck?.();
             }
         });
     }
 
     deleteReviewDocument(doc) {
         this._reviewService.deleteReviewDocument(this.expertReview, doc, () => {
-            this.expertReview.documents = this.expertReview.documents.filter(d => d.id != doc.id);
+            this.updateExpertReview((review) => ({
+                ...review,
+                documents: (review.documents || []).filter(d => d.id != doc.id)
+            }));
             this.changed();
-            this.cdr?.markForCheck?.();
         });
     }
 
     deleteReviewScan() {
         this._reviewService.deleteReviewScan(this.expertReview).subscribe({
             next: () => {
-                this.expertReview.reviewScan = null;
+                this.updateExpertReview((review) => ({
+                    ...review,
+                    reviewScan: null
+                }));
                 this.changed();
-                this.cdr?.markForCheck?.();
             },
             error: (error) => {
                 const errorMessage = error?.error || error?.message || 'Произошла ошибка при удалении скана';
                 this._toasty.error(errorMessage);
-                this.cdr?.markForCheck?.();
             }
         });
     }
@@ -244,10 +284,9 @@ export class ExpertReviewComponent implements OnInit {
         ).subscribe(() => {
             this._reviewService.acceptProject(this.expertReview).subscribe({
                 next: (res) => {
-                    this.review = res;
+                    this.applyReview(res);
                     this._toasty.success("Вы подтвердили согласие эксперта.");
                     this.changed();
-                    this.cdr?.markForCheck?.();
                 },
                 error: (error) => {
                     // При ошибке 400 (невозможный переход) обновляем данные с сервера
@@ -260,7 +299,6 @@ export class ExpertReviewComponent implements OnInit {
                     } else {
                         this._toasty.error(errorMessage);
                     }
-                    this.cdr?.markForCheck?.();
                 }
             });
         });
@@ -280,10 +318,9 @@ export class ExpertReviewComponent implements OnInit {
         ).subscribe(() => {
             this._reviewService.reassignExpert(this.expertReview).subscribe({
                 next: (res) => {
-                    this.review = res;
+                    this.applyReview(res);
                     this._toasty.success("Эксперт переназначен.");
                     this.changed();
-                    this.cdr?.markForCheck?.();
                 },
                 error: (error) => {
                     const errorMessage = error?.error || error?.message || 'Произошла ошибка при переназначении';
@@ -293,7 +330,6 @@ export class ExpertReviewComponent implements OnInit {
                     } else {
                         this._toasty.error(errorMessage);
                     }
-                    this.cdr?.markForCheck?.();
                 }
             });
         });
@@ -310,11 +346,9 @@ export class ExpertReviewComponent implements OnInit {
                     reason = dlgResult.value.reason;
                 this._reviewService.rejectProject(this.expertReview, reason).subscribe({
                     next: (res) => {
-                        // Обновляем review через сеттер, который автоматически обновит badge и другие поля
-                        this.review = res;
+                        this.applyReview(res);
                         this._toasty.success("Вы подтвердили отказ эксперта.");
                         this.changed();
-                        this.cdr?.markForCheck?.();
                     },
                     error: (error) => {
                         const errorMessage = error?.error || error?.message || 'Произошла ошибка при отклонении';
@@ -324,7 +358,6 @@ export class ExpertReviewComponent implements OnInit {
                         } else {
                             this._toasty.error(errorMessage);
                         }
-                        this.cdr?.markForCheck?.();
                     }
                 });
             });
@@ -345,10 +378,9 @@ export class ExpertReviewComponent implements OnInit {
         ).subscribe(() => {
             this._reviewService.finishReview(this.expertReview).subscribe({
                 next: (res) => {
-                    this.review = res;
+                    this.applyReview(res);
                     this._toasty.success("Вы завершили экспертизу объекта.");
                     this.changed();
-                    this.cdr?.markForCheck?.();
                 },
                 error: (error) => {
                     const errorMessage = error?.error || error?.message || 'Произошла ошибка при завершении экспертизы';
@@ -358,7 +390,6 @@ export class ExpertReviewComponent implements OnInit {
                     } else {
                         this._toasty.error(errorMessage);
                     }
-                    this.cdr?.markForCheck?.();
                 }
             });
         });
@@ -371,10 +402,9 @@ export class ExpertReviewComponent implements OnInit {
         ).subscribe(() => {
             this._reviewService.rollbackReview(this.expertReview).subscribe({
                 next: (res) => {
-                    this.review = res;
+                    this.applyReview(res);
                     this._toasty.success("Отправили заключение на доработку.");
                     this.changed();
-                    this.cdr?.markForCheck?.();
                 },
                 error: (error) => {
                     const errorMessage = error?.error || error?.message || 'Произошла ошибка при отправке на доработку';
@@ -384,7 +414,6 @@ export class ExpertReviewComponent implements OnInit {
                     } else {
                         this._toasty.error(errorMessage);
                     }
-                    this.cdr?.markForCheck?.();
                 }
             });
         });
@@ -400,5 +429,22 @@ export class ExpertReviewComponent implements OnInit {
         if (this.reviewFormModal) {
             this.reviewFormModal.hide();
         }
+    }
+
+    private applyReview(review: ExpertReviewDto) {
+        // Создаём копию чтобы не мутировать входящий объект
+        const reviewCopy = { ...review };
+        this._reviewService.prepareReview(reviewCopy);
+        reviewCopy.badge = ExpertReviewStateBadge[reviewCopy.state];
+        reviewCopy.expectedBadge = ExpertReviewStateBadge[reviewCopy.expectedState];
+        this.expertReview = reviewCopy;
+    }
+
+    private updateExpertReview(update: (review: ExpertReviewDto) => ExpertReviewDto) {
+        const current = this.expertReview;
+        if (!current) {
+            return;
+        }
+        this.expertReview = update({ ...current });
     }
 }

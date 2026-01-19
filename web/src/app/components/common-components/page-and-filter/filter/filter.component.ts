@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, input, signal, computed} from "@angular/core";
+import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, computed, effect, input, signal} from "@angular/core";
 import {
   CheckboxField,
   MultiCheck,
@@ -96,15 +96,17 @@ export class FilterComponent implements OnInit {
   @Output() onFilterChanged = new EventEmitter<Filter<any>[]>();
 
   constructor(
-    private dataService: DataService,
-    private cdr: ChangeDetectorRef
+    private dataService: DataService
   ) {
   }
 
   ngOnInit() {
   }
 
-  @Input() set fields(fields: SearchField[]) {
+  readonly fields = input<SearchField[]>(undefined);
+
+  private readonly fieldsEffect = effect(() => {
+    const fields = this.fields();
     if (!fields) {
       return;
     }
@@ -123,11 +125,9 @@ export class FilterComponent implements OnInit {
           }
           // Обновляем сигнал после загрузки каталога для реактивного обновления
           this._fieldsSignal.set([...this._fields]);
-          // Важно для OnPush/zoneless: обновление пришло асинхронно
-          this.cdr.markForCheck();
         });
     });
-  }
+  });
 
   filterChanged() {
     this.onFilterChanged.emit(this._fields);

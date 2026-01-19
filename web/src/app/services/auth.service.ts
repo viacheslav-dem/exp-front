@@ -14,6 +14,7 @@ import {PersonService} from "@app/services/person.service";
 import {DocumentDto} from "@app/dto/DocumentDto";
 import {TokenDto} from "@app/dto/TokenDto";
 import {catchError, finalize, map as rxMap, shareReplay} from "rxjs/operators";
+import {TokenRefreshCoordinatorService} from "@app/services/token-refresh-coordinator.service";
 
 @Injectable()
 export class AuthService implements OnInit {
@@ -25,7 +26,8 @@ export class AuthService implements OnInit {
               private router: Router,
               private toasty: GlobalToastyService,
               private dialogService: DialogService,
-              private personService: PersonService) {
+              private personService: PersonService,
+              private refreshCoordinator: TokenRefreshCoordinatorService) {
     this.defaultRedirectUrl();
   }
 
@@ -66,7 +68,9 @@ export class AuthService implements OnInit {
     }
 
     this.restoreSessionInFlight$ = defer(() =>
-      this.refreshToken(refreshToken).pipe(
+      // ВАЖНО: используем тот же межвкладочный координатор, что и interceptor.
+      // Иначе возможно два параллельных refresh-а: один из guard (здесь) и один из interceptor на первых 401.
+      this.refreshCoordinator.refreshOnce(() => this.refreshToken(refreshToken)).pipe(
         rxMap((credentials: UserCredentials) => {
           // На всякий случай: если сервер вернул некорректный ответ, считаем восстановление неуспешным
           if (!credentials?.accessToken) return false;
@@ -186,16 +190,29 @@ export class AuthService implements OnInit {
   }
 
   updateCredentials(credentials: UserCredentials) {
-    let username = credentials.personName.lastName + ' ' + credentials.personName.firstName + ' ' + credentials.personName.middleName;
-    // Если refreshToken не пришёл (null) — сохраняем существующий (для /info/groups который теперь не выдаёт refresh)
-    const refreshToken = credentials.refreshToken ?? this.storage.getRefreshToken();
+    // Делаем метод адаптированным к "частичным" credentials (например, когда другая вкладка обновила токены,
+    // а эта вкладка только подхватила новый access/refresh из localStorage).
+    const personName: any = (credentials as any)?.personName;
+    const usernameFromResponse =
+      personName?.lastName && personName?.firstName && personName?.middleName
+        ? `${personName.lastName} ${personName.firstName} ${personName.middleName}`
+        : null;
+
+    const username = usernameFromResponse ?? this.storage.getUsername() ?? '';
+
+    // Если refreshToken не пришёл (null/undefined) — сохраняем существующий
+    // (для /info/groups который теперь не выдаёт refresh и для межвкладочного refresh).
+    const refreshToken = (credentials as any)?.refreshToken ?? this.storage.getRefreshToken();
+    const roles = (credentials as any)?.roles ?? this.storage.getRoles();
+    const rolesInfo = (credentials as any)?.rolesInfo ?? this.storage.getRolesInfo();
+    const id = (credentials as any)?.id ?? this.storage.getUserId();
     this.storage.saveCredentials(
         credentials.accessToken,
         refreshToken,
-        credentials.roles,
-        credentials.id,
+        roles,
+        id,
         username,
-        credentials.rolesInfo
+        rolesInfo
     );
   }
 

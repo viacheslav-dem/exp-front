@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, effect, input} from '@angular/core';
 import {ProjectStateBadge} from "@app/pipes/project-state.pipe";
 import {ProjectService} from "@app/services/project.service";
 import {ProjectLiDto} from "@app/dto/ProjectLiDto";
@@ -37,10 +37,6 @@ export class ProjectLiComponent implements OnInit {
 
   ngOnInit() {
     this.role = this._authService.getCurrRole();
-    if (this.role == Role.EXPERT || this.role == Role.GKNT_WORKER || this.role == Role.GKNT_CHAIRMAN
-      || this.role == Role.GKNT_DEPARTMENT_CHAIRMAN || this.role == Role.BELISA_EDIT) {
-      this.getBelisaContacts(this.project);
-    }
   }
 
   onNumberClick($event) {
@@ -56,10 +52,23 @@ export class ProjectLiComponent implements OnInit {
   }
 
 
-  @Input() set item(project: ProjectLiDto) {
+  readonly item = input<ProjectLiDto>(undefined);
+
+  private readonly itemEffect = effect(() => {
+    const project = this.item();
+    if (!project) {
+      return;
+    }
     this._projectService.prepareProject(project);
     this.project = project;
-  }
+    
+    // Загружаем контакты когда проект установлен и роль соответствует условиям
+    const currentRole = this._authService.getCurrRole();
+    if (currentRole == Role.EXPERT || currentRole == Role.GKNT_WORKER || currentRole == Role.GKNT_CHAIRMAN
+      || currentRole == Role.GKNT_DEPARTMENT_CHAIRMAN || currentRole == Role.BELISA_EDIT) {
+      this.getBelisaContacts(project);
+    }
+  });
 
   getBelisaContacts(project: ProjectLiDto) {
     this._projectService.getBelisaContacts(project).subscribe(res => {

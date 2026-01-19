@@ -1,13 +1,23 @@
+// Карточка фильтра должна быть выше карточек экспертов
+.card.border-info-subtle {
+  position: relative;
+  z-index: 1;
+}
+
 .expert-card {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  position: relative;
+  z-index: 0;
+  backdrop-filter: none !important;
 }
 
 .expert-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   border-color: rgba(13, 110, 253, 0.25);
+  z-index: 0;
 }
 
 .expert-card .card-body {
@@ -56,7 +66,25 @@
 }
 
 @media (max-width: 991.98px) {
-  .expert-card .col-lg-3 {
-    margin-bottom: 1rem;
+  // ВАЖНО: .row — flex-контейнер. Класс .col-lg-3 задаёт ширину только на lg+,
+  // а на мобилке элемент остаётся "обычным" flex-item без ширины и сжимается до контента.
+  // Делаем поведение как у `col-12` для мобильных.
+  .expert-card .row > .col-lg-3 {
+    flex: 0 0 100%;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  // Убираем hyphens: auto, чтобы слова не ломались по слогам
+  .expert-card .text-break {
+    hyphens: none;
+  }
+
+  // Разрешаем перенос текста в кнопках на мобилке
+  .expert-card .btn-link {
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.4;
   }
 }

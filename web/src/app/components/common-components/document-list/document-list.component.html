@@ -1,5 +1,6 @@
 <div class="list-group w-100 documents">
-  @if (!_documents.length) {
+  @let docs = documentsForTemplate();
+  @if (!docs.length) {
     <div class="list-group-item">
       <div style="width: 100%;">
         <span class="text-sm text-muted">Документы отсутствуют</span><br><span></span>
@@ -7,7 +8,7 @@
       <div></div>
     </div>
   }
-  @for (doc of _documents; track (doc?.id ?? doc?.name ?? $index)) {
+  @for (doc of docs; track (doc?.id ?? doc?.name ?? $index)) {
     <div class="list-group-item list-group-item-action selectable">
       <table style="width: 100%">
         <tr>

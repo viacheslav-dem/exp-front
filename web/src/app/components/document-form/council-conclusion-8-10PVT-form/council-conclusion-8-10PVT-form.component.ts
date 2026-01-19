@@ -15,7 +15,8 @@ export class CouncilConclusion_8_10PVT_FormComponent extends CouncilConclusionFo
     // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
     // Проверка highTech оставлена через throw, так как это бизнес-логика, не связанная с template-driven валидацией
-    if (!this._form.highTech) {
+    // Ошибка должна выбрасываться только если highTech = false И заключение положительное (ACCEPTED)
+    if (!this._form.highTech && this.group.finalAgendaState == DecisionState.ACCEPTED) {
       throw 'Недопустимо положительное заключение при наличии отрицательной оценки ' +
       'в пункте 7. Проект: ' + this.project.title;
     }

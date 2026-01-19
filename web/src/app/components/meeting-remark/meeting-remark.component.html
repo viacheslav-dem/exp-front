@@ -1,8 +1,9 @@
+@let remarks = allRemarks();
 @if (role()==Role.SECTION_CHAIRMAN || role()==Role.SECTION_ASSESSOR) {
   <div class="row">
     <div class="col-6">
       <div class="bold mb-2">Замечания экспертов</div>
-      @for (remark of allRemarks().expertRemarks; track trackRemark(remark)) {
+      @for (remark of remarks?.expertRemarks; track trackRemark(remark)) {
         <div>
           @if (role() == Role.SECTION_CHAIRMAN) {
             <div
@@ -19,7 +20,7 @@
     @if (role() == Role.SECTION_CHAIRMAN) {
       <div class="col-6">
         <div class="bold mb-2">Сформированные замечания</div>
-        @for (remark of allRemarks().sectionMeetingRemark; track trackRemark(remark); let i = $index) {
+        @for (remark of remarks?.sectionMeetingRemark; track trackRemark(remark); let i = $index) {
           <div>
             @if (i!=indexForEdit) {
               <div class="list-group-item list-group-item-action selectable"
@@ -54,7 +55,7 @@
     }
     @if (role() == Role.SECTION_ASSESSOR || role() == Role.BUREAU_ASSESSOR) {
       <div class="col-6">
-        @for (remark of allRemarks().sectionMeetingRemark; track trackRemark(remark)) {
+        @for (remark of remarks?.sectionMeetingRemark; track trackRemark(remark)) {
           <div>
             @if (role() == Role.SECTION_ASSESSOR || role() == Role.BUREAU_ASSESSOR) {
               <div
@@ -71,15 +72,15 @@
   <div class="row">
     <div class="col-12">
       <div class="bold mb-2">Замечания экспертов</div>
-      @for (remark of allRemarks().expertRemarks; track trackRemark(remark)) {
+      @for (remark of remarks?.expertRemarks; track trackRemark(remark)) {
         <div>
           <div class="list-group-item list-group-item-action" style="white-space: pre-wrap">{{remark.question}}</div>
         </div>
       }
       <div class="bold mb-2 mt-2">Замечания секции и ответы заказчика</div>
-      <app-remark-response [isEdit]="false" [remarks]="allRemarks().sectionMeetingRemark"></app-remark-response>
+      <app-remark-response [isEdit]="false" [remarks]="remarks?.sectionMeetingRemark"></app-remark-response>
       <div class="bold mb-2 mt-2">Сформированные замечания</div>
-      @for (remark of allRemarks().bureauMeetingRemark; track trackRemark(remark); let i = $index) {
+      @for (remark of remarks?.bureauMeetingRemark; track trackRemark(remark); let i = $index) {
         <div>
           @if (i!=indexForEdit) {
             <div class="list-group-item list-group-item-action selectable"

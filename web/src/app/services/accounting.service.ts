@@ -10,7 +10,6 @@ import {AccountingTermsMessages} from "@app/pipes/accounting.pipe";
 import {AuthService} from "@app/services/auth.service";
 import {IdDto} from "@app/dto/IdDto";
 import {Filter} from "@app/components/common-components/page-and-filter/model/Filter";
-import {PeriodDto} from "@app/dto/PeriodDto";
 import {PaymentDto} from "@app/dto/request/PaymentDto";
 import { HttpResponse } from "@angular/common/http";
 import {map} from "rxjs/operators";

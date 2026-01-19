@@ -279,7 +279,8 @@
   
   // Увеличиваем z-index для открытого элемента, чтобы его dropdown не перекрывался следующими элементами
   &:has(.ng-select.ng-select-opened) {
-    z-index: 10001;
+    // Важно: не перекрывать мобильное меню (z-index: 1000).
+    z-index: 2;
   }
   
   .input-group {
@@ -324,7 +325,8 @@
   // Применяем только когда ng-select открыт (ng-select-opened)
   // Устанавливаем очень высокий z-index, чтобы dropdown был выше всех input полей и других элементов
   .ng-select.ng-select-opened .ng-dropdown-panel {
-    z-index: 10000 !important;
+    // Вне модалки держим ниже мобильного меню; для модалки есть override ниже (1070)
+    z-index: 970 !important;
     display: block;
     visibility: visible;
     opacity: 1;
@@ -359,7 +361,7 @@
   // Применяем только когда ng-select открыт
   .modal.show {
     .ng-select.ng-select-opened .ng-dropdown-panel {
-      z-index: 10000;
+      z-index: 1070;
       display: block;
       visibility: visible;
       opacity: 1;
@@ -377,7 +379,7 @@
   // Увеличиваем z-index для wrapper, когда внутри открыт ng-select
   // Это гарантирует, что открытый dropdown не будет перекрыт следующими элементами
   &:has(.ng-select.ng-select-opened) {
-    z-index: 10001;
+    z-index: 2;
   }
   
   ::ng-deep ng-select {

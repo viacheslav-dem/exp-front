@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output} from "@angular/core";
+import {ChangeDetectionStrategy, Component, EventEmitter, Output, effect, input, signal} from "@angular/core";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ListItem} from "@app/components/common-components/checkbox-list/checkbox-list";
 import {isEmptyOrNull} from "@app/support/utils";
@@ -16,22 +16,31 @@ import {NumberPipe} from "@app/pipes/number.pipe";
 export class ProjectCopyComponent {
 
   _project: ProjectDto;
-  docs: ListItem[] = [];
+  readonly docs = signal<ListItem[]>([]);
   selectedDocs = [];
   @Output() save = new EventEmitter();
   @Output() cancel = new EventEmitter();
 
-  constructor(private cdr: ChangeDetectorRef) {
-  }
+  private _lastProjectRef: ProjectDto | undefined;
 
-  @Input() set project(project: ProjectDto) {
+  readonly project = input<ProjectDto>(undefined);
+
+  private readonly projectEffect = effect(() => {
+    const project = this.project();
+    if (Object.is(this._lastProjectRef, project)) {
+      return;
+    }
+    this._lastProjectRef = project;
+
     this.selectedDocs = [];
-    if (!project) project = new ProjectDto();
-    this._project = project;
-    this.docs = [];
-    this._project.documents.forEach(d => this.docs.push(new ListItem(d.name, d.id)));
-    this.cdr?.markForCheck?.();
-  }
+
+    const effectiveProject = project ?? new ProjectDto();
+    this._project = effectiveProject;
+
+    const nextDocs: ListItem[] = [];
+    (effectiveProject.documents ?? []).forEach(d => nextDocs.push(new ListItem(d.name, d)));
+    this.docs.set(nextDocs);
+  });
 
   onCancel() {
     this.cancel.emit();

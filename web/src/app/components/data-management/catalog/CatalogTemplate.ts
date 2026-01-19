@@ -1,6 +1,6 @@
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {CatalogDto} from "@app/dto/CatalogDto";
-import { ChangeDetectorRef, Directive, inject, input, Input } from "@angular/core";
+import { ChangeDetectorRef, Directive, effect, inject, input } from "@angular/core";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {Catalog, DataService} from "@app/services/data.service";
 import * as _ from "lodash";
@@ -18,13 +18,15 @@ export abstract class CatalogTemplate<T extends CatalogDto> extends FilterAndPag
   selectedItem: T;
   editedItem: T;
 
-  readonly typeInput = input<Catalog>(undefined);
+  readonly typeInput = input<Catalog>(undefined, { alias: 'type' });
   protected _type: Catalog;
 
-  @Input()
-  set type(value: Catalog) {
-    this._type = value;
-  }
+  private readonly typeEffect = effect(() => {
+    const value = this.typeInput();
+    if (value !== undefined) {
+      this._type = value;
+    }
+  });
 
   get type(): Catalog {
     return this._type ?? this.typeInput();

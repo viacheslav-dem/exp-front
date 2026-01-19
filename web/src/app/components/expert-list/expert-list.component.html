@@ -31,7 +31,7 @@
             <div class="expert-card card shadow-sm rounded-4 mb-3">
               <div class="card-body p-4">
                 <div class="row g-4">
-            <div class="col-lg-3">
+            <div class="col-12 col-lg-3">
                     <h6 class="fw-bold mb-2 text-dark">{{expert|fullName}}</h6>
                     <div class="text-body-secondary small mb-2">
                       <i class="fas fa-graduation-cap me-1"></i>{{expert.personInfo | academicInfo}}
@@ -44,7 +44,7 @@
                       <i class="fas fa-phone me-1"></i>{{expert.phones | phones}}
                     </div>
             </div>
-                  <div class="col-lg-3 text-sm">
+                  <div class="col-12 col-lg-3 text-sm">
               @if (expert.areas.length > 0) {
                       <div class="mb-3">
                         <div class="fw-semibold small text-dark mb-1">Области компетенции:</div>
@@ -70,7 +70,7 @@
                 </div>
               }
             </div>
-                  <div class="col-lg-3 text-sm">
+                  <div class="col-12 col-lg-3 text-sm">
               @if (expert.org?.name) {
                       <div class="mb-3">
                         <div class="fw-semibold small text-dark mb-1">Организация:</div>
@@ -84,7 +84,7 @@
                 </div>
               }
             </div>
-            <div class="col-lg-3 text-sm">
+            <div class="col-12 col-lg-3 text-sm">
                     <div class="d-flex flex-column gap-2">
                       <button class="btn btn-link text-start p-0 text-primary text-decoration-none fw-medium" 
                               (click)="showProjectsOnExpertExamination(expert)">

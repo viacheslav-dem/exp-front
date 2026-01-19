@@ -167,7 +167,7 @@ export class ProjectService extends HasStateService {
   }
 
   updateDocument(idDto: IdDto, doc: DocumentDto): Observable<DocumentDto> {
-    return this._http.putBlock(`${this.url}/update/${idDto.id}/document`, doc, HttpClientSecure);
+    return this._http.putBlock(`${this.url}/update/${idDto.id}/document`, doc);
   }
 
   deleteDocument(idDto: IdDto, doc: DocumentDto, onDelete: Function = noop) {

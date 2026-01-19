@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Output, ViewChild, effect, input} from "@angular/core";
 import {PersonService} from "app/services/person.service";
 import {ModalComponent} from "app/components/common-components/modal/modal.component";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
@@ -28,19 +28,53 @@ export class SearchPersonComponent extends FilterAndPages<PersonPlainDto> {
   ngOnInit() {
   }
 
-  @Input() set searchFields(searchFields: SearchField[]) {
-    if (!searchFields) return;
-    this._searchFields = searchFields;
-    this.cdr?.markForCheck?.();
-  }
+  readonly searchFields = input<SearchField[]>(undefined);
+  readonly filters = input<Filter<any>[] | Filter<any>>(undefined);
 
-  @Input() set filters(filters: Filter<any>[] | Filter<any>) {
+  private _lastSearchFieldsRef: SearchField[] | undefined;
+  private _lastFiltersRef: Filter<any>[] | Filter<any> | undefined;
+  private _filterRefreshScheduled = false;
+
+  private readonly searchFieldsEffect = effect(() => {
+    const searchFields = this.searchFields();
+    if (!searchFields) return;
+    if (Object.is(this._lastSearchFieldsRef, searchFields)) {
+      return;
+    }
+    this._lastSearchFieldsRef = searchFields;
+    this._searchFields = searchFields;
+  });
+
+  private readonly filtersEffect = effect(() => {
+    const inputFilters = this.filters();
+    if (Object.is(this._lastFiltersRef, inputFilters)) {
+      return;
+    }
+    this._lastFiltersRef = inputFilters;
+
+    let filters = inputFilters;
+    if (!filters) {
+      // Явно поддерживаем сброс фильтров (zoneless/OnPush friendly).
+      this._filters = [];
+      this.scheduleFilterRefresh();
+      return;
+    }
     if (!Array.isArray(filters)) {
       filters = [filters];
     }
     this._filters = filters;
-    this.onFilterChanged();
-    this.cdr?.markForCheck?.();
+    this.scheduleFilterRefresh();
+  });
+
+  private scheduleFilterRefresh(): void {
+    if (this._filterRefreshScheduled) {
+      return;
+    }
+    this._filterRefreshScheduled = true;
+    queueMicrotask(() => {
+      this._filterRefreshScheduled = false;
+      this.onFilterChanged();
+    });
   }
 
   onSelected(user) {

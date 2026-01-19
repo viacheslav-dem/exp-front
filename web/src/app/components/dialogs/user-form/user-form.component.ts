@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, Output, ChangeDetectionStrategy, ChangeDetectorRef, effect, input} from '@angular/core';
 import {getAllPhoneTypes} from "@app/pipes/phone-type.pipe";
 import {AutoActivatedRole, Role, RolePipe} from "@app/pipes/role.pipe";
 import {getAllBankAccountTypes} from "@app/pipes/bank-account-type.pipe";
@@ -298,8 +298,10 @@ export class UserFormComponent implements OnInit, OnDestroy {
     return value;
   }
 
-  @Input()
-  set user(value: PersonDto) {
+  readonly userInput = input<PersonDto>(undefined, { alias: 'user' });
+
+  private readonly userEffect = effect(() => {
+    const value = this.userInput();
     this._originalUser = this.prepareUser(value);
     if (!value) {
       this._user = this.prepareUser();
@@ -380,7 +382,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
     }
     
     this.cdr?.markForCheck?.();
-  };
+  });
 
   isExpert() {
     return this.hasRole(Role.EXPERT);

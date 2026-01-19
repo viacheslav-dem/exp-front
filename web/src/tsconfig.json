@@ -2,7 +2,6 @@
   "compilerOptions": {
     "declaration": false,
     "experimentalDecorators": true,
-    "mapRoot": "./",
     "module": "es2020",
     "baseUrl": ".",
     "paths": {

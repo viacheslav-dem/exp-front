@@ -18,6 +18,7 @@ export class DecisionDocumentFormComponent extends DocumentForm<any> {
   readonly needCauses = input<boolean>(true);
   readonly project = input<any>({});
   readonly council = input<CouncilPlainDto>(undefined);
+  readonly loading = input<boolean>(false);
   causes: {name: string}[] = [];
 
   getForm() {

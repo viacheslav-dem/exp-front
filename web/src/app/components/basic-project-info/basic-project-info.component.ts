@@ -1,4 +1,17 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild, input} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  EventEmitter,
+  Output,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  viewChild
+} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActionButtonMetadata} from "@app/components/project-info/action-button-metadata";
 import {ProjectState, ProjectStateBadge} from "@app/pipes/project-state.pipe";
 import {Role} from "@app/pipes/role.pipe";
@@ -19,8 +32,6 @@ import {DocumentService} from "@app/services/document.service";
 import {LifecycleGroupDto} from "@app/dto/LifecycleGroupDto";
 import {LifecycleGroupState} from "@app/pipes/lifecycle-group-state.pipe";
 import {DirectionDto} from "@app/dto/DirectionDto";
-import {Catalog, DataService} from "@app/services/data.service";
-import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 import {environment} from "../../../environments/environment";
 
 @Component({
@@ -29,7 +40,7 @@ import {environment} from "../../../environments/environment";
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
-export class BasicProjectInfoComponent implements OnInit {
+export class BasicProjectInfoComponent {
 
   ProjectStateBadge = ProjectStateBadge;
   LifecycleGroupState = LifecycleGroupState;
@@ -37,57 +48,157 @@ export class BasicProjectInfoComponent implements OnInit {
   SERVER_URL = SERVER_URL;
   DocType = DocType;
 
-  project: ProjectDto = new ProjectDto();
-  transitionHistory: ProjectTransitionHistoryDto;
-  // Precomputed directions for display to avoid mutating project.directions during change detection
-  displayedDirections: DirectionDto[] = [];
+  private readonly _project = signal<ProjectDto>(new ProjectDto());
+  get project(): ProjectDto {
+    return this._project();
+  }
+
+  readonly transitionHistory = signal<ProjectTransitionHistoryDto | null>(null);
+
+  // computed signals (вместо precomputed полей) — пересчитываются только при изменении зависимостей,
+  // а не на каждый прогон CD, что особенно важно для zoneless.
+  readonly displayedDirections = computed<DirectionDto[]>(() => {
+    const project = this._project();
+    const projectDirections = (project?.directions ?? []) as unknown as DirectionDto[];
+    const projectSubDirections = project?.subDirections ?? [];
+
+    if (!projectDirections.length) {
+      return [];
+    }
+
+    const directionsToDisplay: DirectionDto[] = [];
+    const directionById = new Map<number, DirectionDto>();
+    for (let i = 0; i < projectDirections.length; i++) {
+      const dir = projectDirections[i];
+      if (!dir) continue;
+      // clone object to avoid mutating original project.directions
+      const proDir = { ...dir, subDirectionDtos: [] } as DirectionDto;
+      directionsToDisplay.push(proDir);
+      if (proDir.id != null) {
+        directionById.set(proDir.id, proDir);
+      }
+    }
+
+    if (projectSubDirections.length) {
+      for (let i = 0; i < projectSubDirections.length; i++) {
+        const proSubDir = projectSubDirections[i];
+        const dirId = proSubDir?.direction?.id;
+        if (!dirId) continue;
+        const dirToDis = directionById.get(dirId);
+        if (!dirToDis) continue;
+        dirToDis.subDirectionDtos.push(proSubDir);
+      }
+    }
+
+    return directionsToDisplay;
+  });
+
+  private readonly documentBuckets = computed(() => {
+    const docs = this._project()?.documents ?? [];
+    const customer: DocumentDto[] = [];
+    const notCustomer: DocumentDto[] = [];
+
+    for (let i = 0; i < docs.length; i++) {
+      const d = docs[i];
+      if (!d) continue;
+      if (d.isCustomer === true) {
+        customer.push(d);
+      } else {
+        notCustomer.push(d);
+      }
+    }
+
+    return { customer, notCustomer };
+  });
+
+  readonly customerDocuments = computed(() => this.documentBuckets().customer);
+  readonly notCustomerDocuments = computed(() => this.documentBuckets().notCustomer);
   readonly buttons = input<ActionButtonMetadata[]>([]);
   readonly role = input<string>(undefined);
   readonly lifecycleGroup = input<LifecycleGroupDto>(undefined);
   readonly visibleDocsForExpert = input<boolean>(undefined);
-  @Output() onChanged: EventEmitter<any> = new EventEmitter();
+  @Output() onChanged = new EventEmitter<ProjectDto>();
 
-  @ViewChild('decisionFormModal') decisionFormModal: ModalComponent;
-  @ViewChild('transitionHistoryModal') transitionHistoryModal: ModalComponent;
-  @ViewChild('projectDocumentsComponent') projectDocumentsComponent: DocumentListComponent;
-  @ViewChild('projectDocumentsComponent') projectDocumentsComponent1: DocumentListComponent;
+  decisionFormModal = viewChild<ModalComponent>('decisionFormModal');
+  transitionHistoryModal = viewChild<ModalComponent>('transitionHistoryModal');
+  customerDocumentsComponent = viewChild<DocumentListComponent>('customerDocumentsComponent');
+  notCustomerDocumentsComponent = viewChild<DocumentListComponent>('notCustomerDocumentsComponent');
+
+  private readonly _destroyRef = inject(DestroyRef);
 
   constructor(private _personService: PersonService,
               private _projectService: ProjectService,
               private _transitionHistoryService: TransitionHistoryService,
               private _toasty: GlobalToastyService,
               private authService: AuthService,
-              private _documentService: DocumentService,
-              private _dataService: DataService,
-              private cdr: ChangeDetectorRef) {
+              private _documentService: DocumentService) {
   }
 
-  ngOnInit() {
-  }
+  readonly setProject = input<ProjectDto>(undefined);
 
-  @Input() set setProject(project) {
-    if (project.returnReason) {
-      project.red = true;
+  private _processingProject = false; // Флаг для предотвращения повторных вызовов effect'а
+  private _lastProjectRef: ProjectDto | undefined;
+
+  // Effect создаётся для side effects, значение не используется напрямую
+  private readonly _setProjectEffect = effect(() => {
+    // Защита если эффект повторно вызывается пока мы ещё в обработке — пропускаем.
+    if (this._processingProject) {
+      return;
     }
-    this._projectService.prepareProject(project);
-    this.project = project;
-    this.updateDisplayedDirections();
-    this.cdr?.markForCheck?.();
-  }
 
-  changed() {
-    this.onChanged.emit(this.project);
+    const project = this.setProject();
+    if (!project) {
+      return;
+    }
+
+    // Best practice для signal inputs: пропускаем только если входной объект тот же по ссылке.
+    // ВАЖНО: не блокируем обновления для того же `id`, если пришла новая reference (например, после reload/save).
+    if (Object.is(this._lastProjectRef, project)) {
+      return;
+    }
+
+    this._processingProject = true;
+    this._lastProjectRef = project;
+    try {
+      // ВСЕГДА создаём копию, так как prepareProject мутирует объект (устанавливает red/yellow/blue/termsMessage)
+      // Это предотвращает мутацию исходного объекта из input signal, что может вызвать цикл
+      const projectCopy = { ...project };
+      if (project.returnReason) {
+        projectCopy.red = true;
+      }
+      this._projectService.prepareProject(projectCopy);
+
+      // Нормализация массивов: в шаблоне активно используются `.length`, поэтому защищаемся от `undefined`
+      // (частая причина runtime-ошибок после "spread-copy" DTO).
+      const normalized = { ...new ProjectDto(), ...projectCopy } as ProjectDto;
+      normalized.financing = normalized.financing ?? [];
+      normalized.directions = normalized.directions ?? [];
+      normalized.subDirections = normalized.subDirections ?? [];
+      normalized.socialEconomicGoals = normalized.socialEconomicGoals ?? [];
+      normalized.documents = normalized.documents ?? [];
+      normalized.commercializationMethods = normalized.commercializationMethods ?? [];
+      normalized.projectSpecialization = normalized.projectSpecialization ?? [];
+
+      // Присваиваем напрямую - в effect() запись в state разрешена; signal гарантирует обновление view и в zoneless.
+      this._project.set(normalized);
+    } finally {
+      this._processingProject = false;
+    }
+  });
+
+  changed(): void {
+    this.onChanged.emit(this._project());
   }
 
   showTransitionHistoryModal() {
     if (anyMatch(this.authService.getCurrRole(), Role.EXPERT, Role.BUREAU_ASSESSOR, Role.SECTION_ASSESSOR)) {
       return;
     }
-    this.transitionHistoryModal.show();
+    this.transitionHistoryModal()?.show();
     this._transitionHistoryService.getProjectHistory(this.project)
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(res => {
-        this.transitionHistory = res;
-        this.cdr?.markForCheck?.();
+        this.transitionHistory.set(res);
       });
   }
 
@@ -95,28 +206,55 @@ export class BasicProjectInfoComponent implements OnInit {
     return this.project.state == ProjectState.ROUGH || this.role() == Role.BELISA_EDIT;
   }
 
-  addProjectDocument(doc) {
+  addProjectDocument(doc: DocumentDto): void {
     if (this.role() == Role.CUSTOMER) {
       doc.isCustomer = true;
     }
-    this.project.documents = this.project.documents.concat([doc]);
+    this._project.update(p => ({
+      ...p,
+      documents: (p?.documents ?? []).concat([doc])
+    } as ProjectDto));
     this.changed();
   }
 
-  deleteProjectDocument(doc) {
+  deleteProjectDocument(doc: DocumentDto): void {
     this._projectService.deleteDocument(this.project, doc, () => {
-      // reassigning allows DocumentListComponent to detect the change
-      this.project.documents = this.project.documents.filter(d => d.id != doc.id);
+      const docId = doc?.id;
+      // переназначаем массив, позволяет DocumentListComponent обнаружить изменение
+      this._project.update(p => ({
+        ...p,
+        documents: (p?.documents ?? []).filter(d => d?.id != docId)
+      } as ProjectDto));
       this.changed();
     });
   }
 
-  updateProjectDocument(doc: DocumentDto) {
-    this._projectService.updateDocument(this.project, doc).subscribe(res => {
-      Object.assign(this.project.documents.find(d => d.id == doc.id), res);
+  updateProjectDocument(doc: DocumentDto): void {
+    this._projectService.updateDocument(this.project, doc)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(res => {
+      const docId = doc?.id;
+      this._project.update(p => {
+        const docs = p?.documents ?? [];
+        const index = docs.findIndex(d => d?.id == docId);
+        if (index < 0) {
+          return p;
+        }
+        return {
+          ...p,
+          documents: [
+            ...docs.slice(0, index),
+            res,
+            ...docs.slice(index + 1),
+          ]
+        } as ProjectDto;
+      });
+      this.changed();
       this._toasty.success("Документ успешно обновлён.");
-      this.projectDocumentsComponent.hideEditor();
-    })
+      // В шаблоне два списка документов — закрываем редактор в обоих (кто открыт, тот и закроется).
+      this.customerDocumentsComponent()?.hideEditor?.();
+      this.notCustomerDocumentsComponent()?.hideEditor?.();
+    });
   }
 
   canEditDecision() {
@@ -148,23 +286,36 @@ export class BasicProjectInfoComponent implements OnInit {
       (this.project.isBureauRemarksExpired || this.project.isSectionRemarksExpired));
   }
 
+  readonly decisionDocumentLoading = signal(false);
+
   generateDecisionDocument(form: any) {
-    this._projectService.generateDecisionDocument(this.project, form).subscribe(res => {
-      this.project.decisionDocument = res;
-      this.decisionFormModal.hide();
-      this.changed();
-    });
+    this.decisionDocumentLoading.set(true);
+    this._projectService.generateDecisionDocument(this.project, form)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (res) => {
+          this._project.update(p => ({ ...p, decisionDocument: res } as ProjectDto));
+          this.decisionFormModal()?.hide();
+          this.changed();
+          this.decisionDocumentLoading.set(false);
+        },
+        error: () => {
+          this.decisionDocumentLoading.set(false);
+        }
+      });
   }
 
   deleteDecisionDocument() {
     this._projectService.deleteDecisionDocument(this.project, this.project.decisionDocument, () => {
-      this.project.decisionDocument = null;
+      this._project.update(p => ({ ...p, decisionDocument: null } as ProjectDto));
       this.changed();
     });
   }
 
   downloadAllDocuments(project: ProjectDto) {
-    this._documentService.downloadAllDocuments(project).subscribe();
+    this._documentService.downloadAllDocuments(project)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe();
   }
 
   checkVisibleForBureau(): boolean {
@@ -174,89 +325,14 @@ export class BasicProjectInfoComponent implements OnInit {
         // ProjectLifecycleState.RETURNED
     );
   }
-  isCustomer(): DocumentDto[] {
-    let documents = [];
-    for (let i = 0; i < this.project.documents.length; i++) {
-      if (this.project.documents[i].isCustomer == true) {
-        documents.push(this.project.documents[i]);
-      }
-    }
-    return documents;
-  }
-  isNotCustomer(): DocumentDto[] {
-    let documents = [];
-    for (let i = 0; i < this.project.documents.length; i++) {
-      if (!this.project.documents[i].isCustomer == true) {
-        documents.push(this.project.documents[i]);
-      }
-    }
-    return documents;
+
+  // Методы-обертки для использования в шаблоне (viewChild возвращает сигнал)
+  showDecisionModal(): void {
+    this.decisionFormModal()?.show();
   }
 
-  displayDirection() {
-    let subDirections = this.project.subDirections;
-    // let directions = this.project.directions;
-    let catalogDirections: DirectionDto[];
-    this._dataService.getCatalog(Catalog.DIRECTION).subscribe(res => {
-      catalogDirections = res as DirectionDto[];
-    });
-    let newDirections: DirectionDto[] = [];
-    for (let i = 0; i < catalogDirections.length; i++) {
-      for (let j = 0; j < catalogDirections[i].subDirectionDtos.length; j++) {
-        for (let k = 0; k < subDirections.length; k++) {
-          if(catalogDirections[i].subDirectionDtos[j].directionName === subDirections[k].directionName){
-            let newDir = catalogDirections[i];
-            let flag = false;
-            for (let l = 0; l < newDirections.length; l++) {
-              if(newDirections[l].name === newDir.name){
-                newDirections[l].subDirectionDtos.push(subDirections[k]);
-                flag = true;
-                break;
-              }
-            }
-            if(!flag) {
-              newDir.subDirectionDtos.push(subDirections[k]);
-              newDirections.push(newDir);
-            }
-          }
-        }
-      }
-    }
-    return newDirections;
-  }
-
-  updateDisplayedDirections() {
-    if (!this.project || !this.project.directions) {
-      this.displayedDirections = [];
-      return;
-    }
-
-    const directionsToDisplay: DirectionDto[] = [];
-    const projectDirections = this.project.directions;
-
-    for (let i = 0; i < projectDirections.length; i++) {
-      // clone object to avoid mutating original project.directions
-      const proDir = { ...projectDirections[i] } as DirectionDto;
-      proDir.subDirectionDtos = [];
-      directionsToDisplay.push(proDir);
-    }
-
-    if (this.project.subDirections != null) {
-      const projectSubDirections = this.project.subDirections;
-      for (let i = 0; i < projectSubDirections.length; i++) {
-        const proSubDir = projectSubDirections[i];
-        for (let j = 0; j < directionsToDisplay.length; j++) {
-          const dirToDis = directionsToDisplay[j];
-          const proDirId = proSubDir.direction.id;
-          const dirToDisId = dirToDis.id;
-          if (proDirId == dirToDisId) {
-            dirToDis.subDirectionDtos.push(proSubDir);
-          }
-        }
-      }
-    }
-
-    this.displayedDirections = directionsToDisplay;
+  hideDecisionModal(): void {
+    this.decisionFormModal()?.hide();
   }
 
 }

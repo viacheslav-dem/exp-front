@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, input, ChangeDetectionStrategy, ChangeDetectorRef} from "@angular/core";
+import {Component, EventEmitter, Output, input, ChangeDetectionStrategy} from "@angular/core";
 import {RemarkDto} from "@app/dto/RemarkDto";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {DialogService} from "@app/components/dialogs/dialog.service";
@@ -20,8 +20,7 @@ import {environment} from "../../../environments/environment";
 export class MeetingRemarkComponent {
 
   constructor(private _toasty: GlobalToastyService,
-              private _dialogService: DialogService,
-              private cdr: ChangeDetectorRef) {
+              private _dialogService: DialogService) {
   }
 
   private readonly _trackKey = createTrackKeyStore<object>('meeting-remark:');
@@ -43,14 +42,32 @@ export class MeetingRemarkComponent {
     if (remark.question == null || remark.question.length < 1) {
       throw 'Поле замечание не может быть пустым'
     }
-    let rem = new RemarkDto();
-    rem.question = remark.question;
     const role = this.role();
+    const remarks = this.allRemarks();
+    
+    // Проверяем, не добавлено ли уже это замечание
+    let targetArray: RemarkDto[] = [];
     if (role == Role.SECTION_CHAIRMAN) {
-      this.allRemarks().sectionMeetingRemark.push(rem);
+      targetArray = remarks.sectionMeetingRemark;
     }
     if (role == Role.BUREAU_CHAIRMAN) {
-      this.allRemarks().bureauMeetingRemark.push(rem);
+      targetArray = remarks.bureauMeetingRemark;
+    }
+    
+    // Проверяем по тексту вопроса, чтобы избежать дубликатов
+    const alreadyExists = targetArray.some(r => r.question === remark.question);
+    if (alreadyExists) {
+      this._toasty.warn('Это замечание уже добавлено');
+      return;
+    }
+    
+    let rem = new RemarkDto();
+    rem.question = remark.question;
+    if (role == Role.SECTION_CHAIRMAN) {
+      remarks.sectionMeetingRemark.push(rem);
+    }
+    if (role == Role.BUREAU_CHAIRMAN) {
+      remarks.bureauMeetingRemark.push(rem);
     }
     this.newRemark = new RemarkDto();
   }

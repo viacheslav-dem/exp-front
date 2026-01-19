@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, input} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, computed, input} from '@angular/core';
 import {FileEditorComponent} from "../file-editor/file-editor.component";
 import {DocumentService} from "@app/services/document.service";
 import {DocumentDto} from "@app/dto/DocumentDto";
@@ -19,8 +19,7 @@ import {environment} from "../../../../environments/environment";
 })
 export class DocumentListComponent implements OnInit, OnDestroy {
 
-  _documents: any[];
-  public selectedDocument: any;
+  public selectedDocument: any = null;
   readonly canDelete = input<boolean>(false);
   readonly canUpdate = input<boolean>(false);
   readonly url = input<string>('document');
@@ -40,19 +39,18 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   ngOnInit() {
   }
 
-  @Input()
-  set documents(documents) {
+  readonly documents = input<any[] | any>(undefined);
+
+  readonly documentsForTemplate = computed(() => {
+    const documents = this.documents();
     if (documents == null) {
-      documents = [];
+      return [];
     }
-    if (documents instanceof Array)
-      this._documents = documents.filter(d => d);
-    else {
-      this._documents = [documents];
+    if (documents instanceof Array) {
+      return documents.filter(d => d);
     }
-    // Важно для OnPush/zoneless: входные данные могли обновиться асинхронно у родителя
-    this.cdr.markForCheck();
-  }
+    return [documents];
+  });
 
   viewDocument(doc) {
     this.subscriptions.push(

@@ -13,10 +13,12 @@
   // Исправление z-index для выпадающих списков в форме проекта
   // Чтобы они не перекрывались следующей карточкой
   &.show .dropdown-menu {
-    z-index: 10000 !important;
+    // ВАЖНО: не поднимаем выше мобильного меню (z-index: 1000).
+    // Для модалок z-index поднимается в глобальных стилях (_common.scss).
+    z-index: 970 !important;
   }
   
   .dropdown-menu.show {
-    z-index: 10000 !important;
+    z-index: 970 !important;
   }
 }

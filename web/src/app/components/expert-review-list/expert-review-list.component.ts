@@ -52,6 +52,8 @@ export class ExpertReviewListComponent {
   // Убрали _previousRejectedIds, так как отклонение обрабатывается бэкендом
   private _previousExpiredIds = new Set<number>();
 
+  private _autoSelectScheduled = false;
+
   constructor() {
     // Отслеживаем изменения списка экспертных оценок для автоматического выбора при истечении срока
     // НЕ отслеживаем отклонение через rejectProject, так как бэкенд сам обрабатывает это через reAssignExpert
@@ -72,8 +74,14 @@ export class ExpertReviewListComponent {
         // Проверяем, появились ли новые просроченные эксперты (истечение срока подтверждения)
         const hasNewExpired = Array.from(currentExpiredIds).some(id => !this._previousExpiredIds.has(id));
         
-        if (hasNewExpired) {
-          this.checkAndAutoSelectExpert(reviews);
+        // Используем флаг для предотвращения множественных вызовов
+        if (hasNewExpired && !this._autoSelectScheduled) {
+          this._autoSelectScheduled = true;
+          // Отложенный вызов вне контекста effect чтобы избежать циклов
+          queueMicrotask(() => {
+            this._autoSelectScheduled = false;
+            this.checkAndAutoSelectExpert(reviews);
+          });
         }
         
         this._previousExpiredIds = currentExpiredIds;

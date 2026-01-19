@@ -1,4 +1,4 @@
-import {Component, ChangeDetectionStrategy, inject, signal, computed, ChangeDetectorRef} from '@angular/core';
+import {Component, ChangeDetectionStrategy, inject, signal, computed} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {CommonModule} from '@angular/common';
 import {Subject, switchMap, catchError, of} from 'rxjs';
@@ -22,7 +22,6 @@ export class ResultFunComponent {
   readonly months: readonly string[] = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
   
   private readonly statsService = inject(StatsService);
-  private readonly cdr = inject(ChangeDetectorRef);
   private readonly refreshTrigger$ = new Subject<void>();
 
   private readonly _monthIndex = signal<number>(new Date().getMonth());
@@ -91,14 +90,12 @@ export class ResultFunComponent {
   updateResFunMonth(i: number) {
     this._monthIndex.set(i);
     this._isButtonDisabled.set(true);
-    this.cdr.markForCheck();
     this.refreshTrigger$.next();
   }
 
   updateResFunYear(y: number) {
     this._year.set(y);
     this._isButtonDisabled.set(true);
-    this.cdr.markForCheck();
     this.refreshTrigger$.next();
   }
 
@@ -112,7 +109,6 @@ export class ResultFunComponent {
       this._isButtonMonthDisabled.set(false);
       this._isButtonDisabled.set(true);
     }
-    this.cdr.markForCheck();
     this.refreshTrigger$.next();
   }
 
@@ -122,7 +118,6 @@ export class ResultFunComponent {
     const dateToExclusive = Date.UTC(this._year(), this._monthIndex(), 1);
     
     this._isLoading.set(true);
-    this.cdr.markForCheck();
     
     return this.statsService.getResFunMonth(dateToExclusive).pipe(
       tap((res: CouncilStatsResponseDTO[]) => {
@@ -130,14 +125,12 @@ export class ResultFunComponent {
         this.updateResultStats(res);
         this._isButtonDisabled.set(false);
         this._isLoading.set(false);
-        this.cdr.detectChanges(); // Принудительное обновление view при OnPush стратегии
       }),
       catchError((err: HttpErrorResponse) => {
         console.error('Error loading month data:', err);
         this.showStatus500(err);
         this._isButtonDisabled.set(false);
         this._isLoading.set(false);
-        this.cdr.detectChanges();
         return of([]);
       })
     );
@@ -152,7 +145,6 @@ export class ResultFunComponent {
     const dateTo = Date.UTC(this._year() + 1, 0, 1);
     
     this._isLoading.set(true);
-    this.cdr.markForCheck();
     
     return this.statsService.getResFunYear(dateFrom, dateTo).pipe(
       tap((res: CouncilStatsResponseDTO[]) => {
@@ -160,14 +152,12 @@ export class ResultFunComponent {
         this.updateResultStats(res);
         this._isButtonDisabled.set(false);
         this._isLoading.set(false);
-        this.cdr.detectChanges(); // Принудительное обновление view при OnPush стратегии
       }),
       catchError((err: HttpErrorResponse) => {
         console.error('Error loading year data:', err);
         this.showStatus500(err);
         this._isButtonDisabled.set(false);
         this._isLoading.set(false);
-        this.cdr.detectChanges();
         return of([]);
       })
     );
@@ -193,7 +183,6 @@ export class ResultFunComponent {
     if (err.status === 500) {
       this.councilStatsResponseDTOs.set([]);
       this.resultCouncilStatsResponseDTO.set(this.createEmptyStats());
-      this.cdr.markForCheck();
     }
   }
 }

@@ -1,4 +1,5 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, inject, signal, viewChild} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {AuthService} from "@app/services/auth.service";
 import {Role} from "@app/pipes/role.pipe";
@@ -24,9 +25,23 @@ export class MeetingListComponent extends FilterAndPages<MeetingDto> {
   Role = Role; // for template, don't remove!
 
   role: string;
-  meetings: MeetingDto[] = [];
+  readonly meetings = signal<MeetingDto[]>([]);
+  
+  // Computed для добавления routerLink без мутации исходных данных
+  readonly meetingsWithLinks = computed(() => {
+    const meetingsList = this.meetings();
+    if (anyMatch(this.role, Role.BUREAU_CHAIRMAN, Role.SECTION_CHAIRMAN)) {
+      return meetingsList.map(meeting => ({
+        ...meeting,
+        routerLink: ['/meetings', meeting.id]
+      }));
+    }
+    return meetingsList;
+  });
 
-  @ViewChild(MeetingFormComponent, { static: false }) createMeetingModal: MeetingFormComponent;
+  createMeetingModal = viewChild<MeetingFormComponent>(MeetingFormComponent);
+
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(private _toasty: GlobalToastyService,
               private _authService: AuthService,
@@ -47,30 +62,33 @@ export class MeetingListComponent extends FilterAndPages<MeetingDto> {
     ];
     this.enableFilterCache("meetings");
     // Если нет сохранённого состояния фильтров, загружаем данные явно
-    setTimeout(() => {
-      const hasCachedFilters = localStorage.getItem('filter_cache_meetings');
-      if (!hasCachedFilters) {
-        this.update();
-      }
-    }, 100);
+    const hasCachedFilters = localStorage.getItem('filter_cache_meetings');
+    if (!hasCachedFilters) {
+      // update() сам использует setTimeout для setLoading, поэтому прямой вызов безопасен
+      this.update();
+    }
   }
 
   loadPage() {
-    this._meetingService.getPage(this._searchRequest).subscribe(res => {
-      this._page = res;
-      this.meetings = res.content;
-      this.setLoading(false);
-      if (anyMatch(this.role, Role.BUREAU_CHAIRMAN, Role.SECTION_CHAIRMAN)) {
-        this.meetings.forEach(meeting => meeting.routerLink = ['/meetings', meeting.id]);
-      }
-      this.cdr?.markForCheck?.();
-    }, () => {
-      this.setLoading(false);
-      this.cdr?.markForCheck?.();
-    });
+    this.setLoading(true);
+    this._meetingService.getPage(this._searchRequest)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this._page = res;
+          this.meetings.set(res.content);
+          this.setLoading(false);
+          // routerLink добавляется через computed, не нужно мутировать исходные данные
+          this.cdr?.markForCheck?.();
+        },
+        error: () => {
+          this.setLoading(false);
+          this.cdr?.markForCheck?.();
+        }
+      });
   }
 
   showCreateMeetingModal() {
-    this.createMeetingModal.show(null);
+    this.createMeetingModal()?.show(null);
   }
 }

@@ -662,6 +662,36 @@ app-filter .input-group .form-control:not(:first-child) {
   font-size: 20px;      // если хочешь эффект увеличения при наведении
 }
 
+// =====================================================================
+// FIX: позиционирование "крестиков" удаления в фильтрах (ng-select внутри app-filter)
+// =====================================================================
+app-filter .ng-select .ng-value {
+  display: inline-flex;
+  align-items: center;
+}
+
+app-filter .ng-select .ng-value-icon.left {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+// Убеждаемся, что контейнер ng-select имеет position: relative для правильного позиционирования дочерних элементов
+// Используем flexbox для центрирования всех дочерних элементов по вертикали
+app-filter .ng-select .ng-select-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+app-filter .ng-select .ng-clear-wrapper {
+  // В фильтрах используем flexbox для центрирования вместо абсолютного позиционирования.
+  position: relative;
+  right: auto;
+  transform: none;
+  margin-right: 30px;
+  display: flex;
+}
+
 // Стили для ng-select с border
 // Убираем border от form-control для ng-select, так как border есть у контейнера
 .ng-select.form-control {
@@ -681,7 +711,7 @@ app-filter .input-group .form-control:not(:first-child) {
 // Уменьшенная высота для ng-select в фильтрах
 app-filter .input-group-sm ng-select .ng-select-container {
   min-height: 38px; // Без !important - селектор более специфичный
-  height: auto;
+  height: auto; // Flexbox работает с auto высотой
 }
 
 .ng-select.ng-select-focused .ng-select-container {
@@ -877,7 +907,10 @@ app-filter .input-group-sm ng-select .ng-select-container {
   backdrop-filter: blur(10px);
   border: none;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  z-index: 1050; // Выше карточек, но ниже модальных окон
+  // ВАЖНО: на мобильных меню имеет z-index: 1000 (см. menu.component.scss).
+  // Поэтому dropdown вне модалок должен быть НИЖЕ 1000, чтобы не перекрывать мобильное меню.
+  // Для модалок z-index переопределяем ниже (см. .modal.show .dropdown-menu.show).
+  z-index: 970; // Выше карточек/контента, но ниже мобильного меню
   
   .dropdown-item {
     transition: all 0.2s ease;
@@ -893,7 +926,8 @@ app-filter .input-group-sm ng-select .ng-select-container {
 
 // Исправление z-index для выпадающих списков в форме проекта
 // Чтобы они не перекрывались следующей карточкой
-// Используем очень высокий z-index, как у ng-select, чтобы гарантировать отображение поверх всех карточек
+// Раньше использовался z-index: 10000, но это ломало перекрытия (например, мобильное меню).
+// Держим dropdown выше карточек, но ниже мобильного меню; для модалок есть отдельный override.
 .card-block {
   .dropdown,
   app-dropdown .dropdown {
@@ -901,14 +935,14 @@ app-filter .input-group-sm ng-select .ng-select-container {
     
     &.show .dropdown-menu,
     .show .dropdown-menu {
-      z-index: 10000 !important;
+      z-index: 970 !important;
       position: absolute;
     }
   }
   
   .dropdown-menu.show,
   app-dropdown .dropdown-menu.show {
-    z-index: 10000 !important;
+    z-index: 970 !important;
     position: absolute;
   }
 }
@@ -938,26 +972,33 @@ app-project-form {
     
     .dropdown.show .dropdown-menu,
     app-dropdown .dropdown.show .dropdown-menu {
-      z-index: 10000 !important;
+      z-index: 970 !important;
       position: absolute !important;
     }
     
     .dropdown-menu.show {
-      z-index: 10000 !important;
+      z-index: 970 !important;
       position: absolute !important;
     }
     
     app-dropdown {
       .dropdown.show .dropdown-menu {
-        z-index: 10000 !important;
+        z-index: 970 !important;
         position: absolute !important;
       }
       
       .dropdown-menu.show {
-        z-index: 10000 !important;
+        z-index: 970 !important;
         position: absolute !important;
       }
     }
+  }
+}
+
+// В модалках dropdown должен быть выше модального контента (Bootstrap modal z-index: 1055)
+.modal.show {
+  .dropdown-menu.show {
+    z-index: 1070 !important;
   }
 }
 
@@ -1016,15 +1057,17 @@ app-project-form {
 
 // Исправление z-index для ng-select dropdown в модальных окнах
 // Bootstrap 5 modal имеет z-index 1055, backdrop - 1050
-// Устанавливаем очень высокий z-index, чтобы dropdown был выше всех input полей и модального окна
+// Вне модалок держим ниже меню, в модалке поднимаем чуть выше modal.
 .ng-dropdown-panel {
-  z-index: 10000 !important;
+  z-index: 970 !important;
   position: absolute !important;
 }
 
 // Убеждаемся, что dropdown виден поверх модального окна и всех input полей
 .modal.show ~ .ng-dropdown-panel,
-body > .ng-dropdown-panel {
-  z-index: 10000 !important;
+// Bootstrap добавляет класс modal-open на body при открытой модалке.
+// Это важно: НЕ поднимать dropdown в обычных страницах (иначе снова перекрывается мобильное меню).
+body.modal-open > .ng-dropdown-panel {
+  z-index: 1070 !important;
   position: absolute !important;
 }

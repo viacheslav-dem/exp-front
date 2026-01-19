@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input} from "@angular/core";
+import {ChangeDetectionStrategy, Component, effect, input, signal} from "@angular/core";
 import {PersonDto} from "@app/dto/PersonDto";
 import {UserFormComponent} from "@app/components/dialogs/user-form/user-form.component";
 import {environment} from "../../../environments/environment";
@@ -24,15 +24,18 @@ import {environment} from "../../../environments/environment";
 
 
 export class UserInfoReadComponent extends UserFormComponent {
-  _user: PersonDto;
   photo: string = 'assets/abstract_profile.jpg';
 
-  @Input() set user(user: PersonDto) {
+  readonly userInput = input<PersonDto>(undefined, { alias: 'user' });
+
+  private readonly userInputEffect = effect(() => {
+    const user = this.userInput();
     if (user) {
-      this._user = this.prepareUser(user);
-      this.cdr?.markForCheck?.();
+      const preparedUser = this.prepareUser(user);
+      this._user = preparedUser;
+      this._originalUser = preparedUser;
     }
-  }
+  });
 
 
 }

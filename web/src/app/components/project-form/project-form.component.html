@@ -242,7 +242,7 @@
                 <div class="form-sub-group italic">
                     @if (directions.length != 0) {
                         <div>
-                            @for (dir of displayDirection(); track (dir?.id ?? i); let i = $index) {
+                            @for (dir of directions; track (dir?.id ?? i); let i = $index) {
                                 <div>
                                     {{ dir.name }}
                                     <a class="btn btn-icon btn-icon-sm" (click)="deleteDirection(dir, i)">
@@ -290,7 +290,7 @@
                 @if (newDirection) {
                     <div class="row  m-1">
                     <app-dropdown [(ngModel)]="subDirection" [notSelected]="'Ничего не выбрано'"
-                                  [options]="getSubDirectionName()"
+                                  [options]="newDirection.subDirectionDtos"
                                   [resetEnabled]="true" [optionToString]="optionToString"></app-dropdown>
                     <!--          <div class="dropdown" >-->
                     <!--              <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown">-->
