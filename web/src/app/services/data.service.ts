@@ -54,6 +54,14 @@ export class DataService {
     return this._http.getBlock<T[]>(`${this.url}/${type}`);
   }
 
+  /**
+   * Публичная пагинация справочника (для ролей без доступа к /admin/page).
+   * Используется там, где справочник большой (например, specialization ~7200 записей).
+   */
+  getCatalogPage<T extends CatalogDto>(type: string | Catalog, request: SearchPageRequest): Observable<Page<T>> {
+    return this._http.post<Page<T>>(`${this.url}/${type}/page`, request);
+  }
+
   getCatalogAdminPage<T extends CatalogDto>(type: string | Catalog, request: SearchPageRequest): Observable<Page<T>> {
     return this._http.post<Page<T>>(`${this.url}/${type}/admin/page`, request);
   }

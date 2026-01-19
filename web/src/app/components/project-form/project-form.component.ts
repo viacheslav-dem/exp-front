@@ -722,7 +722,8 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
 
         const request = new SearchPageRequest(pagination, filter, [new SortOrder('name', Direction.ASC)]);
         
-        return this._dataService.getCatalogAdminPage<CatalogDto>(Catalog.SPECIALIZATION, request).pipe(
+        // Используем публичный пагинируемый endpoint: CUSTOMER не имеет доступа к /admin/page
+        return this._dataService.getCatalogPage<CatalogDto>(Catalog.SPECIALIZATION, request).pipe(
             switchMap((page) => {
                 const items = this.getSpecializationItems(index);
                 if (reset) {
