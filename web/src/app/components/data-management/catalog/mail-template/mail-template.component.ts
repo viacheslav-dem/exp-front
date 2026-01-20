@@ -48,6 +48,14 @@ export class MailTemplateComponent extends CatalogTemplate<MailTemplateDto> {
     ];
     this.mailPriorityToString = p => this._mailPriorityPipe.transform(p);
 
+    // ВАЖНО: шаблон использует @for (.. of items) без защитного @if,
+    // поэтому items должен быть инициализирован до первого рендера.
+    if (!this.items) {
+      this.items = [];
+    }
+
+    // Стартовая загрузка данных.
+    this.update();
   }
 
   create(): MailTemplateDto {

@@ -18,18 +18,35 @@ import {environment} from "../../../environments/environment";
     templateUrl: './audit.component.html',
     styles: [`
       table {
-          font-size: 0.875rem;
+          font-size: 0.9375rem;
           background-color: white;
           margin-bottom: 0;
+          table-layout: fixed;
+          width: 100%;
       }
+
+      /* Bootstrap CSS-переменные для белого фона таблицы */
+      table.table {
+          --bs-table-bg: #ffffff;
+          --bs-table-hover-bg: rgba(0, 0, 0, 0.03);
+      }
+
+      /* Ширины колонок */
+      thead th:nth-child(1) { width: 15%; }  /* Дата */
+      thead th:nth-child(2) { width: 25%; }  /* Пользователь */
+      thead th:nth-child(3) { width: 15%; }  /* Тип */
+      thead th:nth-child(4) { width: 45%; }  /* Сообщение */
 
       thead th {
           padding: 1rem 0.75rem;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.5px;
-          font-size: 0.75rem;
+          font-size: 0.8125rem;
           border-bottom: 2px solid #dee2e6;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
       }
 
       tbody td {
@@ -39,13 +56,17 @@ import {environment} from "../../../environments/environment";
       }
 
       .audit-table-row {
-          transition: all 0.2s ease;
+          transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
       }
 
       .audit-table-row:hover {
-          background-color: #f8f9fa !important;
+          background-color: #e9ecef;
           transform: scale(1.01);
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .audit-table-row:hover > td {
+          background-color: #f8f9fa !important;
       }
 
       .cursor-pointer {
@@ -54,6 +75,33 @@ import {environment} from "../../../environments/environment";
 
       .cursor-pointer:hover {
           color: #0d6efd !important;
+      }
+
+      .badge {
+          font-size: 0.7rem;
+          padding: 0.35rem 0.65rem;
+          white-space: normal;
+          word-break: break-word;
+          max-width: 100%;
+          display: inline-block;
+          text-align: center;
+          line-height: 1.3;
+      }
+
+      /* Колонка "Тип" — ограничиваем ширину содержимого */
+      tbody td:nth-child(3) {
+          overflow: hidden;
+      }
+
+      /* Выравнивание колонок Дата и Пользователь по центру */
+      tbody td:nth-child(1),
+      tbody td:nth-child(2) {
+          text-align: center;
+      }
+
+      thead th:nth-child(1),
+      thead th:nth-child(2) {
+          text-align: center;
       }
   `],
     standalone: false,

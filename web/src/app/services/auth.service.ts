@@ -75,6 +75,10 @@ export class AuthService implements OnInit {
           // На всякий случай: если сервер вернул некорректный ответ, считаем восстановление неуспешным
           if (!credentials?.accessToken) return false;
           this.updateCredentials(credentials);
+          // ВАЖНО: если лидером стал guard (а не interceptor), без этого уведомления
+          // ожидающие ветки внутри той же вкладки/в других вкладках могут дождаться только таймаута.
+          // Также это освобождает lock (releaseLock внутри notifyRefreshSucceeded).
+          this.refreshCoordinator.notifyRefreshSucceeded();
           return true;
         }),
         catchError(() => of(false)),

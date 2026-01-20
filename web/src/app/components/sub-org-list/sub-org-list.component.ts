@@ -7,6 +7,23 @@ import {DataService} from "@app/services/data.service";
 @Component({
     selector: 'app-sub-org-list',
     templateUrl: 'sub-org-list.component.html',
+    styles: [`
+      .card-body {
+        font-size: 0.9rem;
+      }
+      
+      h5 {
+        font-size: 1rem;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+      
+      .fst-italic {
+        font-size: 0.875rem;
+      }
+    `],
     standalone: false,
     changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -116,12 +116,26 @@ import {PageRequest} from "@app/components/common-components/page-and-filter/mod
       </div>
       `,
     styles: [`
+      table {
+        background-color: white;
+      }
+
+      /* Bootstrap CSS-переменные для белого фона таблицы */
+      table.table {
+        --bs-table-bg: #ffffff;
+        --bs-table-hover-bg: rgba(0, 0, 0, 0.03);
+      }
+
       .user-session-row {
         transition: background-color 0.2s ease;
       }
       
       .user-session-row:hover {
         background-color: #f8f9fa;
+      }
+
+      .user-session-row:hover > td {
+        background-color: #f8f9fa !important;
       }
       
       .avatar-circle-small {

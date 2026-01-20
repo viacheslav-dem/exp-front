@@ -7,6 +7,7 @@ import {removeFileSuffix} from "app/support/utils";
 import {IdDto} from "@app/dto/IdDto";
 import { HttpBackend } from "@angular/common/http";
 import {environment} from "../../../../../environments/environment";
+import {ChooseFilesComponent} from "@app/components/common-components/file-uploader/choose-files/choose-files.component";
 
 @Component({
     selector: 'app-document-uploader',
@@ -29,6 +30,7 @@ export class DocumentUploaderComponent extends UploadHelper {
   readonly saved = output<any>();
 
   @ViewChild('fileLoaderModal') fileLoaderModal: ModalComponent;
+  @ViewChild(ChooseFilesComponent) chooseFilesComponent: ChooseFilesComponent;
 
   constructor(private _toasty: GlobalToastyService,
               protected _authService: AuthService,
@@ -107,5 +109,9 @@ export class DocumentUploaderComponent extends UploadHelper {
 
   saveFile() {
     super.saveFile();
+  }
+
+  openFileDialog() {
+    this.chooseFilesComponent?.fileInput?.nativeElement?.click();
   }
 }

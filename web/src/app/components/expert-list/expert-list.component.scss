@@ -4,6 +4,31 @@
   z-index: 1;
 }
 
+// Компактный фильтр в справочнике экспертов (локально для страницы)
+.expert-filter-card {
+  // меньше «воздуха» внутри карточки фильтра
+  .expert-filter {
+    // у app-filter каждый field обёрнут в .mb-3 — делаем компактнее
+    .mb-3 {
+      margin-bottom: 0.5rem !important;
+    }
+
+    // label у полей
+    .form-label {
+      margin-bottom: 0.25rem !important;
+      font-size: 0.75rem;
+      line-height: 1.2;
+    }
+
+    // контролы и плейсхолдеры чуть компактнее по высоте/типографике
+    .input-group-sm > .form-control,
+    .input-group-sm > .ng-select,
+    .input-group-sm > app-date-period.form-control {
+      font-size: 0.875rem;
+    }
+  }
+}
+
 .expert-card {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(0, 0, 0, 0.08);

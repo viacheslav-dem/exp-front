@@ -6,6 +6,13 @@ table {
   width: 100%;
 }
 
+// Bootstrap задаёт фон на уровне ячеек через CSS-переменные.
+// Делаем базовый фон таблицы максимально светлым, чтобы статусы (серый/красный) читались.
+table.table {
+  --bs-table-bg: #ffffff;
+  --bs-table-hover-bg: rgba(0, 0, 0, 0.03);
+}
+
 .table-wrapper {
   overflow-x: hidden; // Убираем горизонтальную прокрутку
   
@@ -57,11 +64,16 @@ tbody td, tbody th {
   text-overflow: ellipsis;
 }
 
-// Колонка действий - всегда видна
+// Колонка действий - всегда видна и выровнена по центру
 .actions-column {
   position: relative;
   white-space: nowrap;
   text-align: center;
+  vertical-align: middle;
+  
+  .d-flex {
+    justify-content: center;
+  }
 }
 
 // Колонка ролей - бейджи с переносом
@@ -85,23 +97,57 @@ tbody td:nth-child(3) {
   transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.user-table-row:hover {
-  background-color: #f8f9fa;
+.user-table-row:not(.alert-danger):not(.alert-dark):hover {
+  background-color: #e9ecef;
   transform: scale(1.01);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  > th,
+  > td {
+    background-color: #f8f9fa !important;
+  }
 }
 
 .user-table-row.alert-danger {
   background-color: #f8d7da;
   border-left: 3px solid #dc3545;
+
+  > th,
+  > td {
+    background-color: #f8d7da !important;
+  }
 }
 
 .user-table-row.alert-danger:hover {
   background-color: #f1aeb5;
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  > th,
+  > td {
+    background-color: #f1aeb5 !important;
+  }
 }
 
 .user-table-row.alert-dark {
-  background-color: #d1d3d4;
+  // «Неактивные» — мягкий серый, но заметный на белом фоне
+  background-color: #e2e3e5;
+
+  > th,
+  > td {
+    background-color: #e2e3e5 !important;
+  }
+}
+
+.user-table-row.alert-dark:hover {
+  background-color: #d3d6d8;
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  > th,
+  > td {
+    background-color: #d3d6d8 !important;
+  }
 }
 
 .user-table-row.alert-deleted {

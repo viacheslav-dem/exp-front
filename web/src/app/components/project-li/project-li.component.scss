@@ -21,9 +21,10 @@ a:hover {
 
 .project-list-item {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 1rem 1.25rem;
+  padding: 0.75rem 1.25rem;
   background-color: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.08);
+  line-height: 1.1;
 }
 
 // Эффект при наведении курсора на карточку
@@ -84,7 +85,7 @@ a:hover {
   word-break: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
-  line-height: 1.4;
+  line-height: 1.1;
 }
 
 // Блок с номерами проектов (справа в карточке)
@@ -102,6 +103,8 @@ a:hover {
   text-align: left;
 }
 
+// Заголовок и badge теперь задаются глобально в _list-group.scss
+
 .project-list-item .flex-grow-1 > div.mb-1 {
   text-align: left;
 }
@@ -115,7 +118,7 @@ a:hover {
   display: flex;
   align-items: flex-start; // Выравнивание по верху для корректного отображения многострочного текста
   min-height: 1rem; // Минимальная высота для выравнивания строк
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   padding-left: 0;
   margin-left: 0;
 }
@@ -139,8 +142,8 @@ a:hover {
 
 .project-list-item .flex-grow-1 > div.mb-1:has(.fa-clock),
 .project-list-item .flex-grow-1 > div:has(.fa-clock) {
-  margin-top: 0.75rem !important; // Уменьшенный отступ сверху
-  margin-bottom: 0.5rem !important; // Уменьшенный отступ снизу
+  margin-top: 0.25rem;
+  margin-bottom: 0.15rem;
   width: 100%;
   min-width: 0;
   overflow: visible;
@@ -149,8 +152,8 @@ a:hover {
 // Альтернативный селектор (если :has не поддерживается браузером)
 // Блок с датой - третий div после badge и заголовка
 .project-list-item .flex-grow-1 > div:nth-of-type(3) {
-  margin-top: 0.75rem !important;
-  margin-bottom: 0.5rem !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.15rem !important;
   width: 100%;
   min-width: 0;
   overflow: visible;

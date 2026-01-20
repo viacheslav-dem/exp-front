@@ -20,17 +20,23 @@
   // Badge с отступом справа
   .badge {
     margin-right: 0.5rem;
-    font-size: 0.875rem;
-    padding: 0.35em 0.65em;
+    font-size: 0.95rem !important; // !important нужен для переопределения Bootstrap
+    padding: 0.4rem 0.8rem;
     white-space: nowrap;
     font-weight: 500;
     vertical-align: middle;
   }
   
+  // Заголовок проекта - увеличенный размер
+  h6 {
+    font-size: 1.1rem !important; // !important нужен для переопределения Bootstrap
+    line-height: 1.4;
+  }
+  
   // Заголовок - темно-серый, не синий
   .font-weight-bold {
-    font-weight: 700 !important;
-    color: #212529 !important;
+    font-weight: 700;
+    color: #212529;
   }
   
   .font-weight-normal {
@@ -89,8 +95,10 @@
     font-weight: 700 !important;
   }
 }
-
+//Белый фон для списков (правая часть lifycycle-group)
 .list-group-item {
+  background-color: #fff;
+  
   .text-mini, .badge {
     margin-right: 0.3rem;
   }

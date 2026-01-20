@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable, defer, fromEvent, merge, of, race, throwError, timer } from 'rxjs';
-import { catchError, filter, map, switchMap, take } from 'rxjs/operators';
+import { catchError, filter, finalize, map, shareReplay, switchMap, take } from 'rxjs/operators';
 import { StorageService } from '@app/services/storage.service';
 import { UserCredentials } from '@app/dto/UserCredentials';
 
@@ -37,6 +37,13 @@ export class TokenRefreshCoordinatorService {
   private readonly tabId: string;
   private readonly bc?: BroadcastChannel;
 
+  /**
+   * Single-flight внутри одной вкладки.
+   * Если два места в приложении одновременно инициируют refresh (guard + interceptor),
+   * второй вызов должен ждать тот же запрос, а не уходить в cross-tab ожидание с таймаутом.
+   */
+  private inFlight$?: Observable<UserCredentials>;
+
   constructor(private storage: StorageService) {
     this.tabId = this.getOrCreateTabId();
     if (typeof BroadcastChannel !== 'undefined') {
@@ -54,6 +61,11 @@ export class TokenRefreshCoordinatorService {
    */
   refreshOnce(refreshFn: () => Observable<UserCredentials>): Observable<UserCredentials> {
     return defer(() => {
+      // Если refresh уже выполняется в этой вкладке — просто ждём его результат.
+      if (this.inFlight$) {
+        return this.inFlight$;
+      }
+
       // Проверяем: может токены уже обновлены другой вкладкой?
       if (this.storage.isAccessTokenValidNow()) {
         // Токены валидны - возвращаем их из localStorage
@@ -69,12 +81,22 @@ export class TokenRefreshCoordinatorService {
       const now = Date.now();
       const lockIsActive = !!lock && lock.expiresAt > now;
 
+      // Если блокировка принадлежит этой же вкладке, но второй вызов пришёл чуть позже,
+      // возвращаем inFlight$ (если он уже установлен). Это решает кейс "guard + interceptor" в одном tab.
+      if (lockIsActive && lock?.ownerId === this.tabId && this.inFlight$) {
+        return this.inFlight$;
+      }
+
       // Если блокировки нет - пытаемся стать "лидером" и обновить токены сами
       if (!lockIsActive && this.tryAcquireLock()) {
         // Стали лидером: делаем запрос на сервер и уведомляем другие вкладки
         console.log('[TokenRefreshCoordinator] Стали лидером, отправляем refresh запрос');
         this.broadcast({ type: 'refresh-started', ownerId: this.tabId, at: Date.now() });
-        return refreshFn().pipe(
+
+        // Запоминаем "полёт" refresh внутри вкладки (single-flight).
+        // ВАЖНО: notifyRefreshSucceeded() должен вызываться после сохранения токенов в localStorage (делает caller).
+        this.inFlight$ = refreshFn().pipe(
+          shareReplay(1),
           catchError((err: any) => {
             // Если обновление не удалось - уведомляем другие вкладки и освобождаем блокировку
             this.broadcast({
@@ -86,8 +108,13 @@ export class TokenRefreshCoordinatorService {
             });
             this.releaseLock();
             return throwError(() => err);
+          }),
+          finalize(() => {
+            this.inFlight$ = undefined;
           })
         );
+
+        return this.inFlight$;
       }
 
       // Блокировка занята - ждём, пока лидер обновит токены
