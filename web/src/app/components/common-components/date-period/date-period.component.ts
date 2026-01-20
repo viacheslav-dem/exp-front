@@ -68,28 +68,16 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
   }
 
   private updateBsConfig() {
-    // ngx-bootstrap использует date-fns внутри, поэтому конвертируем формат dayjs (Moment.js) в date-fns
-    const dateFnsFormat = this.convertMomentFormatToDateFns(this.dateFormat() || 'DD.MM.YYYY');
+    // ngx-bootstrap/chronos использует Moment.js-совместимый формат (YYYY, DD, MM)
+    // НЕ конвертируем в date-fns формат, т.к. это вызывает баг с парсингом года
+    const format = this.dateFormat() || 'DD.MM.YYYY';
     this.bsConfig = {
-      rangeInputFormat: dateFnsFormat,
-      dateInputFormat: dateFnsFormat,
+      rangeInputFormat: format,
+      dateInputFormat: format,
       containerClass: 'theme-default',
       showWeekNumbers: false
     };
     this._cdr.markForCheck();
-  }
-
-  /**
-   * Конвертирует формат dayjs/Moment.js (DD.MM.YYYY) в формат date-fns (dd.MM.yyyy)
-   * для совместимости с ngx-bootstrap (который использует date-fns внутри)
-   */
-  private convertMomentFormatToDateFns(momentFormat: string): string {
-    return momentFormat
-      .replace(/DD/g, 'dd')
-      .replace(/YYYY/g, 'yyyy')
-      .replace(/MM/g, 'MM')
-      .replace(/D/g, 'd')
-      .replace(/Y/g, 'y');
   }
 
   prepareValue(): void {

@@ -33,6 +33,9 @@ export abstract class FilterAndPages<T> implements OnInit {
 
   enableFilterCache(pageName: string) {
     this._filterCachePageName = pageName;
+    // Проверяем наличие сохранённого состояния синхронно
+    const hasSavedState = !!localStorage.getItem(`filter_cache_${pageName}`);
+    
     // Загружаем состояние только один раз при инициализации
     setTimeout(() => {
       const hadSavedState = this.loadFilterState(pageName);
@@ -47,6 +50,9 @@ export abstract class FilterAndPages<T> implements OnInit {
         // Если кэша нет, помечаем что начальная загрузка завершена
         // чтобы разрешить обычную загрузку данных без фильтров
         this._initialLoadDone = true;
+        // Если кэша нет и update() ещё не вызывался — вызываем его
+        // Это нужно для случаев, когда queryParams подписка вызвала update() до нас,
+        // но он был пропущен из-за hasCachedFilters проверки
       }
     }, 50);
   }

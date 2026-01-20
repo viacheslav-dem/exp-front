@@ -75,7 +75,11 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
       SearchField.contains('org.unp').setPlaceholder('Поиск по УНП...'),
       SearchField.contains('org.orgAddress').setPlaceholder('Поиск по адресу...'),
       SearchField.contains('post').setPlaceholder('Поиск по должности...'),
-      SearchField.multiSelect('areas', Catalog.AREA_OF_COMPETENCE).setSelectText('область компетенции').setSearchFilterEnabled(true),
+      SearchField.multiSelect('areas', Catalog.AREA_OF_COMPETENCE)
+        .setSelectText('область компетенции')
+        .setSearchFilterEnabled(true)
+        // Чуть шире на больших экранах, чтобы текст не “зажимался”
+        .setFieldClass('col-xl-3'),
     ];
     // Load orgs after fields are initialized
     this.subscriptions.push(

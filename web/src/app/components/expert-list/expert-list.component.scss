@@ -6,25 +6,63 @@
 
 // Компактный фильтр в справочнике экспертов (локально для страницы)
 .expert-filter-card {
+  --expert-filter-control-min-h: 32px;
+
   // меньше «воздуха» внутри карточки фильтра
-  .expert-filter {
+  // используем ::ng-deep для проникновения в app-filter
+  ::ng-deep .expert-filter {
+    // Уменьшаем gap между колонками (Bootstrap g-2 = 0.5rem, делаем ещё меньше)
+    --bs-gutter-x: 0.5rem;
+    --bs-gutter-y: 0.35rem;
+    
     // у app-filter каждый field обёрнут в .mb-3 — делаем компактнее
     .mb-3 {
-      margin-bottom: 0.5rem !important;
+      margin-bottom: 0.35rem !important;
     }
 
-    // label у полей
+    // label у полей — ещё компактнее
     .form-label {
-      margin-bottom: 0.25rem !important;
-      font-size: 0.75rem;
-      line-height: 1.2;
+      margin-bottom: 0.1rem !important;
+      font-size: 0.72rem;
+      line-height: 1.1;
     }
 
-    // контролы и плейсхолдеры чуть компактнее по высоте/типографике
+    // контролы компактнее + единая минимальная высота
     .input-group-sm > .form-control,
     .input-group-sm > .ng-select,
     .input-group-sm > app-date-period.form-control {
-      font-size: 0.875rem;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+      min-height: var(--expert-filter-control-min-h);
+    }
+
+    .input-group-sm .input-group-text {
+      min-height: var(--expert-filter-control-min-h);
+      padding: 0 0.5rem;
+      display: flex;
+      align-items: center;
+    }
+
+    // ng-select (не фиксируем height, только min-height — чтобы не ломать мультивыбор)
+    .ng-select .ng-select-container {
+      min-height: var(--expert-filter-control-min-h) !important;
+      align-items: center;
+    }
+
+    .ng-select .ng-value-container {
+      padding: 0 0.5rem !important;
+    }
+
+    .ng-select .ng-input > input {
+      padding: 0 !important;
+    }
+
+    // В фильтре не используем hover-трансформации кнопок (иначе "прыгают" и съедают плотность)
+    .btn-outline-primary:hover,
+    .btn-primary:hover,
+    .btn-outline-secondary:hover {
+      transform: none !important;
+      box-shadow: none !important;
     }
   }
 }

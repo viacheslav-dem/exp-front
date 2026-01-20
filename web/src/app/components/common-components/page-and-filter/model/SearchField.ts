@@ -21,6 +21,12 @@ export class SearchField {
   value: any;
   operation: string;
   title: string;
+  /**
+   * Дополнительные CSS-классы для колонки поля в app-filter.
+   * Используется для точечной настройки ширины/раскладки конкретных полей,
+   * не затрагивая остальные страницы.
+   */
+  fieldClass?: string;
   sortable: boolean = false;
   sortDirection: string;
   sortProperty: string;
@@ -41,6 +47,11 @@ export class SearchField {
 
   setTitle(title: string): SearchField {
     this.title = title;
+    return this;
+  }
+
+  setFieldClass(fieldClass: string): SearchField {
+    this.fieldClass = fieldClass;
     return this;
   }
 

@@ -5,7 +5,7 @@
 
 <div class="container">
   @if (systemNotificationForAllPages.enabled) {
-    <div class="card-notification-block mt-3">
+    <div class="card-notification-block">
       <div class="card card-notification-all-pages" [ngClass]= "systemNotificationForAllPages.type">
         <div [innerHTML]="notificationToSafeHtml(systemNotificationForAllPages.message)"> </div>
       </div>

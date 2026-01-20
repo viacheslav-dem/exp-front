@@ -121,6 +121,11 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> implement
             SearchField.multiSelect('expertReviews.competenceSufficiency', competenceSufficiencyOptions).setTitle('Достаточность компетенции')
               .setPlaceholder('Выбрать достаточность компетенции'),
         ]);
+        
+        // ВАЖНО: enableFilterCache должен вызываться ДО подписки на queryParams,
+        // чтобы установить _filterCachePageName для корректной работы защиты в update()
+        this.enableFilterCache("project-list");
+        
         this.subscriptions.push(
             this._dataService.getOrgs().subscribe({
                 next: (orgs) => {
@@ -141,6 +146,7 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> implement
                 }
             }),
             // Подписка на изменения query-параметров (включая первую загрузку)
+            // Вызывается ПОСЛЕ enableFilterCache, чтобы _filterCachePageName был установлен
             this._route.queryParams.subscribe({
                 next: (params) => {
                     const pageParam = params['page'];
@@ -161,7 +167,6 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> implement
                 }
             })
         );
-        this.enableFilterCache("project-list");
     }
 
     ngOnDestroy() {

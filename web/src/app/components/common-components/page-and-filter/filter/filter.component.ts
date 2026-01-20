@@ -84,6 +84,7 @@ export class FilterComponent implements OnInit {
   SearchFieldType = SearchFieldType;
   searcherTimer: any;
   _fields: SearchField[] = [];
+  readonly maxTitleLength = 400;
   
   // Сигнал для реактивного обновления полей фильтров
   private _fieldsSignal = signal<SearchField[]>([]);
@@ -101,6 +102,50 @@ export class FilterComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  /**
+   * Title для ng-select (и подобных контролов):
+   * - если есть выбранные значения — показываем их полностью
+   * - иначе — показываем текст плейсхолдера/название поля
+   */
+  getFieldTitle(field: SearchField): string {
+    if (!field) {
+      return '';
+    }
+
+    if (field.type === SearchFieldType.MULTI_SELECT) {
+      const ms = field as unknown as MultiSelectField;
+      const selected = (ms?.selectedItems ?? [])
+        .map((x: any) => x?.itemName)
+        .filter(Boolean) as string[];
+
+      // Важно: если ничего не выбрано, НЕ показываем в title текст типа
+      // "область компетенции" — пользователь ожидает видеть названия выбранных элементов.
+      const text = selected.length > 0 ? selected.join(', ') : '';
+
+      return this.truncateTitle(text);
+    }
+
+    // Для текстовых/прочих — если есть значение, используем его, иначе placeholder/title
+    const raw =
+      (typeof field.value === 'string' ? field.value : '') ||
+      field.placeholder ||
+      field.title ||
+      '';
+
+    return this.truncateTitle(raw);
+  }
+
+  private truncateTitle(text: string): string {
+    const s = (text ?? '').toString().trim();
+    if (!s) {
+      return '';
+    }
+    if (s.length <= this.maxTitleLength) {
+      return s;
+    }
+    return s.slice(0, this.maxTitleLength - 1) + '…';
   }
 
   readonly fields = input<SearchField[]>(undefined);

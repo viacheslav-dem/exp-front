@@ -1,6 +1,8 @@
 <div [ngClass]="filterClass()">
   @for (field of fieldsForTemplate(); track field.key) {
-    <div class="mb-3" [ngClass]="fieldClass()">
+    <div
+      class="mb-3"
+      [ngClass]="field.fieldClass ? (fieldClass() + ' ' + field.fieldClass) : fieldClass()">
       <!--TITLE-->
       @if (field.title) {
         <label class="form-label fw-semibold mb-2 small text-dark">
@@ -75,6 +77,7 @@
             <!--MULTISELECT-->
             @if (field.type == SearchFieldType.MULTI_SELECT) {
               <ng-select
+                [attr.title]="getFieldTitle(field)"
                 [items]="field.allItems"
                 bindLabel="itemName"
                 [multiple]="true"
@@ -87,6 +90,9 @@
             [class.rounded-end]="!field.sortable && !field.resetEnabled"
             [class.rounded-0]="field.sortable || field.resetEnabled"
             class="form-control">
+              <ng-template ng-option-tmp let-item="item">
+                <span [attr.title]="item?.itemName">{{ item?.itemName }}</span>
+              </ng-template>
               </ng-select>
             }
             @if (field.resetEnabled && !field.isEmpty()) {

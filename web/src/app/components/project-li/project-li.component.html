@@ -10,10 +10,17 @@
      }">
     <div class="d-flex justify-content-between align-items-start gap-1">
       <div class="flex-grow-1">
-        <!-- Badge -->
-        <span [ngClass]="['badge', 'rounded-pill', 'px-3', 'py-1', 'mb-1', 'shadow-sm', 'fw-semibold', ProjectStateBadge[project.state]]">
-          {{project.state | projectState}}
-        </span>
+        <!-- Badge + статус (срок) на одной строке -->
+        <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+          <span [ngClass]="['badge', 'rounded-pill', 'px-3', 'py-1', 'shadow-sm', 'fw-semibold', ProjectStateBadge[project.state]]">
+            {{project.state | projectState}}
+          </span>
+          @if (project.termsMessage) {
+            <span class="text-body-secondary fw-semibold text-md fst-italic">
+              <i class="fas fa-clock me-1"></i>{{project.termsMessage}}
+            </span>
+          }
+        </div>
         
         <!-- Заголовок проекта -->
         <div class="mb-1">
@@ -21,15 +28,6 @@
             {{project.title}}
           </h6>
         </div>
-        
-        <!-- Дата завершения экспертизы -->
-        @if (project.termsMessage) {
-          <div class="terms-message">
-            <span class="text-body-secondary fw-semibold text-md fst-italic">
-              <i class="fas fa-clock"></i>{{project.termsMessage}}
-            </span>
-          </div>
-        }
         
         <!-- Детали проекта -->
         <div class="text-body-secondary text-md lh-base">
@@ -86,7 +84,7 @@
                   {{number.number}}
                 </div>
               </div>
-              <div class="user-select-all small text-muted" (click)="onNumberClick($event); $event.stopPropagation();">
+              <div class="user-select-all text-muted fw-semibold" style="font-size: 0.85rem;" (click)="onNumberClick($event); $event.stopPropagation();">
                 {{number.date | date:'dd.MM.yyyy HH:mm'}}
               </div>
             </div>
