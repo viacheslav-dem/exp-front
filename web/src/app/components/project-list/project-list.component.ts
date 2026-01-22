@@ -1,4 +1,5 @@
-import {Component, ChangeDetectionStrategy, OnDestroy, signal, ChangeDetectorRef} from '@angular/core';
+import {Component, ChangeDetectionStrategy, signal, ChangeDetectorRef, DestroyRef, inject} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "@app/services/auth.service";
 import {Role} from "@app/pipes/role.pipe";
@@ -19,7 +20,9 @@ import {economicSignificanceOptions} from "@app/components/document-form/documen
 import {resourcesSufficiencyOptions} from "@app/components/document-form/document-blocks/resources-sufficiency-block.component";
 import {competenceSufficiencyOptions} from "@app/components/document-form/document-blocks/competence-sufficiency-block.component";
 import {PageRequest} from "@app/components/common-components/page-and-filter/model/PageRequest";
-import {Subscription} from "rxjs";
+import {forkJoin, of, Subject} from "rxjs";
+import {catchError, switchMap} from "rxjs/operators";
+import {SectionPlainDto} from "@app/dto/SectionPlainDto";
 
 @Component({
     selector: 'app-project-list',
@@ -27,7 +30,7 @@ import {Subscription} from "rxjs";
     standalone: false,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ProjectListComponent extends FilterAndPages<ProjectLiDto> implements OnDestroy {
+export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
 
     Role = Role; // enum for template
     projects = signal<ProjectLiDto[]>([]);
@@ -36,7 +39,10 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> implement
     showGroup = signal<boolean>(false);
     showFilter = signal<boolean>(false); // Для скрытия фильтров на мобильных
     selectedGroup = signal<string | null>(null);
-    private subscriptions: Subscription[] = [];
+    availableSections = signal<SectionPlainDto[]>([]);
+    
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly councilsChange$ = new Subject<any[]>();
 
     constructor(private _projectService: ProjectService,
                 private _authService: AuthService,
@@ -88,6 +94,9 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> implement
             SearchField.multiSelect('groups.council', [], council => this._councilPipe.transform(council))
                 .setSelectText('Выбрать ГЭС').setSearchFilterEnabled(true)
                 .setTitle('ГЭС'),
+            SearchField.multiSelect('groups.lifecycles.section', [], section => section.name)
+                .setSelectText('Выберите ГЭС').setSearchFilterEnabled(true)
+                .setTitle('Секция'),
             SearchField.datePeriod('stateStartDate').setTitle('Дата последнего изменения')
                 .setPlaceholder('Выбрать период...')
                 .setSortable(true).setSortDirection(Direction.DESC),
@@ -126,28 +135,63 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> implement
         // чтобы установить _filterCachePageName для корректной работы защиты в update()
         this.enableFilterCache("project-list");
         
-        this.subscriptions.push(
-            this._dataService.getOrgs().subscribe({
+        // Инициализируем фильтр секций
+        this.initializeSectionFilter();
+        
+        // Инициализируем подписку на изменения ГЭС для загрузки секций
+        this.initializeSectionsSubscription();
+        
+        // Используем takeUntilDestroyed для автоматической отписки
+        this._dataService.getOrgs()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
                 next: (orgs) => {
-                    this.getSearchField('customer.org').setItems(orgs);
+                    const field = this.getSearchField('customer.org');
+                    field.setItems(orgs);
+                    // Восстанавливаем выбранные значения из кэша после загрузки каталога
+                    if (field.value && Array.isArray(field.value) && field.value.length > 0) {
+                        (field as any).setSelectedValues(field.value);
+                        // Обновляем массив полей для триггера обновления в FilterComponent
+                        this._searchFields = [...this._searchFields];
+                    }
                     this.cdr.markForCheck();
                 }
-            }),
-            this._dataService.getCouncils().subscribe({
+            });
+        
+        this._dataService.getCouncils()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
                 next: (councils) => {
-                    this.getSearchField('groups.council').setItems(councils);
+                    const field = this.getSearchField('groups.council');
+                    field.setItems(councils);
+                    // Восстанавливаем выбранные значения из кэша после загрузки каталога
+                    if (field.value && Array.isArray(field.value) && field.value.length > 0) {
+                        (field as any).setSelectedValues(field.value);
+                        // Обновляем массив полей для триггера обновления в FilterComponent
+                        this._searchFields = [...this._searchFields];
+                        // Обновляем секции на основе выбранных ГЭС из кэша
+                        this.loadSectionsForCouncils(field.value);
+                    } else {
+                        // Если ГЭС не выбраны, очищаем фильтр секций
+                        this.clearSectionFilter();
+                    }
                     this.cdr.markForCheck();
                 }
-            }),
-            this._projectService.getGroups(this._authService.getCurrRole()).subscribe({
+            });
+        
+        this._projectService.getGroups(this._authService.getCurrRole())
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
                 next: (res) => {
                     this.groups.set(res);
-                    this.cdr.markForCheck();
                 }
-            }),
-            // Подписка на изменения query-параметров (включая первую загрузку)
-            // Вызывается ПОСЛЕ enableFilterCache, чтобы _filterCachePageName был установлен
-            this._route.queryParams.subscribe({
+            });
+        
+        // Подписка на изменения query-параметров (включая первую загрузку)
+        // Вызывается ПОСЛЕ enableFilterCache, чтобы _filterCachePageName был установлен
+        this._route.queryParams
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
                 next: (params) => {
                     const pageParam = params['page'];
                     const pageFromRoute = pageParam != null ? parseInt(pageParam, 10) : NaN;
@@ -165,39 +209,33 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> implement
 
                     this.update();
                 }
-            })
-        );
-    }
-
-    ngOnDestroy() {
-        this.subscriptions.forEach(sub => sub.unsubscribe());
-        this.subscriptions = [];
+            });
     }
 
     loadPage() {
         this._searchRequest.group = this.selectedGroup();
-        this.subscriptions.push(
-            this._projectService.getPage(this._searchRequest).subscribe({
+        this._projectService.getPage(this._searchRequest)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
                 next: (res) => {
-                    this._page = res;
-                    this.projects.set(res.content);
-                    this.subscriptions.push(
-                        this._projectService.getGroups(this._authService.getCurrRole()).subscribe({
+                    this._page = res; // Обычное свойство, используется в шаблоне
+                    this.projects.set(res.content); // Сигнал, автоматически триггерит change detection
+                    this._projectService.getGroups(this._authService.getCurrRole())
+                        .pipe(takeUntilDestroyed(this.destroyRef))
+                        .subscribe({
                             next: (groupsRes) => {
-                                this.groups.set(groupsRes);
-                                this.cdr.markForCheck();
+                                this.groups.set(groupsRes); // Сигнал, автоматически триггерит change detection
                             }
-                        })
-                    );
-                    this.setLoading(false);
+                        });
+                    this.setLoading(false); // Обычное свойство _loading, используется в шаблоне
+                    // markForCheck нужен: _page и _loading - обычные свойства, используются в шаблоне
                     this.cdr.markForCheck();
                 },
                 error: () => {
-                    this.setLoading(false);
+                    this.setLoading(false); // Обычное свойство _loading, используется в шаблоне
                     this.cdr.markForCheck();
                 }
-            })
-        );
+            });
     }
 
     selectGroup(id: string) {
@@ -233,5 +271,138 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> implement
         }
     }
 
+    override onFilterChanged() {
+        // Обновляем секции при изменении фильтра ГЭС
+        const councilField = this.getSearchField('groups.council');
+        const selectedCouncils = councilField?.value;
+        if (selectedCouncils && Array.isArray(selectedCouncils) && selectedCouncils.length > 0) {
+            this.loadSectionsForCouncils(selectedCouncils);
+        } else {
+            this.clearSectionFilter();
+        }
+        super.onFilterChanged();
+    }
+
+    /**
+     * Инициализирует фильтр секций: устанавливает пустой список и placeholder "Выберите ГЭС"
+     */
+    private initializeSectionFilter(): void {
+        const sectionField = this.getSearchField('groups.lifecycles.section');
+        sectionField.setItems([]);
+        sectionField.setSelectText('Выберите ГЭС');
+    }
+
+    /**
+     * Загружает секции для выбранных ГЭС и обновляет фильтр секций
+     * Использует switchMap для предотвращения race conditions при быстрой смене ГЭС
+     */
+    private loadSectionsForCouncils(councils: any[]): void {
+        // Отправляем новые выбранные ГЭС в поток для обработки
+        this.councilsChange$.next(councils);
+    }
+
+    /**
+     * Инициализирует подписку на изменения ГЭС для загрузки секций
+     */
+    private initializeSectionsSubscription(): void {
+        this.councilsChange$
+            .pipe(
+                // switchMap отменяет предыдущий запрос при новом изменении ГЭС
+                switchMap((councils: any[]) => {
+                    // Проверяем валидность входных данных
+                    if (!councils || !Array.isArray(councils) || councils.length === 0) {
+                        // Возвращаем специальный маркер для очистки фильтра
+                        return of(null);
+                    }
+
+                    // Фильтруем только валидные ГЭС с id
+                    const validCouncils = councils.filter((council: any) => 
+                        council && (typeof council.id === 'number' || typeof council.id === 'string')
+                    );
+
+                    if (validCouncils.length === 0) {
+                        // Возвращаем специальный маркер для очистки фильтра
+                        return of(null);
+                    }
+
+                    // Загружаем секции для каждого валидного ГЭС
+                    const sectionObservables = validCouncils.map((council: any) => 
+                        this._dataService.getSections(council.id).pipe(
+                            catchError(() => of([]))
+                        )
+                    );
+
+                    return forkJoin(sectionObservables);
+                }),
+                takeUntilDestroyed(this.destroyRef)
+            )
+            .subscribe({
+                next: (sectionsArrays) => {
+                    const sectionField = this.getSearchField('groups.lifecycles.section');
+                    
+                    // Если sectionsArrays === null, значит нужно очистить фильтр
+                    if (sectionsArrays === null) {
+                        this.clearSectionFilter();
+                        return;
+                    }
+                    
+                    // Объединяем все секции из выбранных ГЭС и убираем дубликаты
+                    const allSections = sectionsArrays.flat().filter((section, index, self) => 
+                        section && section.id && index === self.findIndex(s => s && s.id === section.id)
+                    );
+                    
+                    // Обновляем доступные секции и поле фильтра
+                    this.availableSections.set(allSections);
+                    sectionField.setItems(allSections);
+                    sectionField.setSelectText('Выбрать секцию');
+                    
+                    // Валидируем и восстанавливаем выбранные значения из кэша
+                    this.restoreSectionFilterFromCache(sectionField, allSections);
+                    
+                    this.cdr.markForCheck();
+                }
+            });
+    }
+
+    /**
+     * Восстанавливает выбранные значения фильтра секций из кэша
+     * По аналогии с восстановлением значений для других фильтров
+     */
+    private restoreSectionFilterFromCache(sectionField: SearchField, availableSections: SectionPlainDto[]): void {
+        const selectedSections = sectionField?.value;
+        
+        if (selectedSections && Array.isArray(selectedSections)) {
+            // Фильтруем только валидные секции (которые есть в доступных)
+            const validSections = selectedSections.filter((selected: any) =>
+                availableSections.some(s => s.id === selected.id)
+            );
+            
+            // Если некоторые секции стали невалидными, обновляем значение
+            if (validSections.length !== selectedSections.length) {
+                sectionField.value = validSections.length > 0 ? validSections : null;
+            }
+            
+            // Восстанавливаем выбранные значения из кэша после загрузки каталога
+            if (sectionField.value && Array.isArray(sectionField.value) && sectionField.value.length > 0) {
+                (sectionField as any).setSelectedValues(sectionField.value);
+                this._searchFields = [...this._searchFields];
+            }
+        }
+    }
+
+    /**
+     * Очищает фильтр секций и устанавливает начальное состояние
+     * По аналогии с очисткой других фильтров
+     */
+    private clearSectionFilter(): void {
+        const sectionField = this.getSearchField('groups.lifecycles.section');
+        sectionField.setItems([]);
+        sectionField.value = null;
+        sectionField.selectedItems = [];
+        sectionField.setSelectText('Выберите ГЭС');
+        this.availableSections.set([]);
+        this._searchFields = [...this._searchFields];
+        this.cdr.markForCheck();
+    }
 
 }

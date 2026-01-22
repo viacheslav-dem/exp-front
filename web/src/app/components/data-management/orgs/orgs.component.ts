@@ -15,6 +15,7 @@ import {environment} from "../../../../environments/environment";
 @Component({
     selector: 'app-orgs',
     templateUrl: './orgs.component.html',
+    styleUrls: ['./orgs.component.scss'],
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dataManagement) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })

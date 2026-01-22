@@ -1,0 +1,503 @@
+:host {
+  display: block;
+}
+
+// Современный UI/UX для каталога организаций (в стиле simple-catalog)
+:host ::ng-deep .simple-catalog {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  padding: 16px;
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Заголовок каталога
+  .catalog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+
+    .catalog-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #0d6efd;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+
+      .btn-add-icon {
+        font-size: 14px;
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
+        background: #0b5ed7;
+      }
+
+      &:active {
+        transform: translateY(0);
+        background: #0a58ca;
+      }
+    }
+  }
+
+  // Фильтр
+  .catalog-filter {
+    margin-bottom: 16px;
+  }
+
+  // Контент
+  .catalog-content {
+    min-height: 200px;
+  }
+
+  // Список элементов
+  .catalog-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  // Элемент каталога
+  .catalog-item {
+    background: #ffffff;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #0d6efd;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &:not(.item-editing):hover {
+      border-color: #0d6efd;
+      box-shadow: 0 4px 16px rgba(13, 110, 253, 0.12);
+      transform: translateY(-2px);
+      cursor: pointer;
+
+      &::before {
+        opacity: 1;
+      }
+
+      .btn-edit {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    &:not(.item-editing):active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(13, 110, 253, 0.1);
+    }
+
+    &.item-disabled {
+      opacity: 0.6;
+      background: #f8f9fa;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    &.item-editing {
+      border-color: #0d6efd;
+      box-shadow: 0 4px 20px rgba(13, 110, 253, 0.15);
+      cursor: default;
+      user-select: auto;
+
+      &::before {
+        opacity: 1;
+      }
+
+      .item-edit-form {
+        user-select: auto;
+      }
+    }
+  }
+
+  // Контент элемента
+  .item-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .item-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+
+  .item-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6c757d;
+  }
+
+  .item-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  // Дополнительная информация в режиме просмотра
+  .item-details {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+
+    .detail-item {
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #495057;
+      line-height: 1.6;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .detail-label {
+        font-weight: 600;
+        color: #6c757d;
+        margin-right: 8px;
+      }
+
+      .detail-value {
+        color: #1a1a1a;
+        font-style: italic;
+
+        &.link {
+          color: #0d6efd;
+          text-decoration: underline;
+          cursor: pointer;
+
+          &:hover {
+            color: #0b5ed7;
+          }
+        }
+      }
+    }
+  }
+
+  // Кнопка редактирования
+  .btn-edit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: #f8f9fa;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 8px;
+    color: #0d6efd;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+    transform: scale(0.95);
+    flex-shrink: 0;
+
+    fa-icon {
+      font-size: 14px;
+    }
+
+    &:hover {
+      background: #0d6efd;
+      color: #ffffff;
+      border-color: #0d6efd;
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+    }
+  }
+
+  // Форма редактирования
+  .item-edit-form {
+    padding-top: 14px;
+    margin-top: 14px;
+    border-top: 2px solid #f0f0f0;
+    animation: slideDown 0.3s ease;
+    
+    // Предотвращаем закрытие формы при клике внутри
+    * {
+      user-select: auto;
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .form-group-checkbox {
+    margin-bottom: 14px;
+  }
+
+  .form-group,
+  .form-sub-group {
+    margin-bottom: 14px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+    letter-spacing: 0.01em;
+  }
+
+  .form-input,
+  .form-textarea,
+  .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #1a1a1a;
+    background: #ffffff;
+    border: 2px solid #e8e8e8;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    resize: vertical;
+
+    &::placeholder {
+      color: #adb5bd;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+    }
+  }
+
+  .form-textarea {
+    min-height: 100px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  // Поля с действиями (например, выбор главы организации)
+  .form-field-with-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .form-field-value {
+      flex: 1;
+      font-style: italic;
+      color: #1a1a1a;
+    }
+
+    .btn-icon-sm {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background: #f8f9fa;
+      border: 1.5px solid #e8e8e8;
+      border-radius: 8px;
+      color: #0d6efd;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      fa-icon {
+        font-size: 12px;
+      }
+
+      &:hover {
+        background: #0d6efd;
+        color: #ffffff;
+        border-color: #0d6efd;
+      }
+    }
+  }
+
+  // Действия формы
+  .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  // Кнопки
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    .btn-icon {
+      font-size: 13px;
+    }
+
+    &.btn-cancel {
+      background: #f8f9fa;
+      color: #6c757d;
+      border: 1.5px solid #e8e8e8;
+
+      &:hover {
+        background: #e9ecef;
+        border-color: #dee2e6;
+        transform: translateY(-1px);
+      }
+    }
+
+    &.btn-save,
+    &.btn-primary {
+      background: #0d6efd;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+
+      &:hover {
+        background: #0b5ed7;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+      }
+
+      &:active {
+        background: #0a58ca;
+      }
+    }
+
+    &.btn-secondary {
+      background: #6c757d;
+      color: #ffffff;
+
+      &:hover {
+        background: #5c636a;
+        transform: translateY(-1px);
+      }
+    }
+
+    &.btn-delete,
+    &.btn-danger {
+      background: #fff5f5;
+      color: #dc3545;
+      border: 1.5px solid #fecaca;
+      margin-left: auto;
+
+      &:hover {
+        background: #fee2e2;
+        border-color: #fca5a5;
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  // Бейджи
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+
+    .badge-icon {
+      font-size: 10px;
+    }
+
+    &.badge-warning {
+      background: #fff4e6;
+      color: #d97706;
+    }
+
+    &.badge-secondary {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+  }
+
+  // Пустое состояние
+  .catalog-empty {
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .empty-state {
+    .empty-icon {
+      font-size: 64px;
+      color: #d1d5db;
+      margin-bottom: 16px;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      color: #6b7280;
+      font-style: italic;
+      margin: 0;
+    }
+  }
+
+  // Пагинация
+  .catalog-pagination {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 2px solid #f0f0f0;
+  }
+}

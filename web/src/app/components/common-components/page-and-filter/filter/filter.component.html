@@ -29,7 +29,7 @@
             class="form-control"
             [(ngModel)]="field.value"
             (ngModelChange)="onTextValueChange(field)"
-            (keyup.enter)="filterChanged()"
+            (keyup.enter)="$event.preventDefault(); filterChanged()"
             [placeholder]="field.placeholder | orElse: 'Поиск...'">
         }
         <!--DATE PERIOD-->

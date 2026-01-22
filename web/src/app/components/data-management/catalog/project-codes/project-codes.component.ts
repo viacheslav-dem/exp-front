@@ -12,6 +12,7 @@ import {environment} from "../../../../../environments/environment";
 @Component({
     selector: 'app-project-codes',
     templateUrl: './project-codes.component.html',
+    styleUrls: ['./project-codes.component.scss'],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
@@ -31,6 +32,7 @@ export class ProjectCodesComponent extends CatalogTemplate<ProjectCodeDto> {
   }
 
   ngOnInit() {
+    super.ngOnInit();
     this._dataService.getCatalog(Catalog.GKNT_DEPARTMENT).subscribe(res => {
       this.gkntDepartments = res;
       this.cdr.markForCheck();
@@ -45,6 +47,12 @@ export class ProjectCodesComponent extends CatalogTemplate<ProjectCodeDto> {
         .setSortDirection(Direction.ASC).setSortable(true),
       SearchField.checkbox('disabled', 'Показывать неактивные'),
     ];
+    // Инициализируем items как пустой массив, чтобы избежать ошибок при первом рендере
+    if (!this.items) {
+      this.items = [];
+    }
+    // Загружаем данные после инициализации
+    this.update();
   }
 
   create(): ProjectCodeDto {

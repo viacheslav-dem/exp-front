@@ -47,14 +47,14 @@
 
     <div class="col-lg-4">
       @if (role() != Role.SUB_CUSTOMER) {
-        <div class="card border-0 shadow-sm rounded-4 mb-4 transition-all"> 
-          <div class="card-body p-4">
-            <div class="card-title d-flex justify-content-between align-items-center mb-3 cursor-pointer" 
+        <div class="card border-0 shadow-sm rounded-4 mb-4 transition-all group-card" [class.group-card-collapsed]="!showGroup()"> 
+          <div class="card-body p-3">
+            <div class="card-title d-flex justify-content-between align-items-center mb-2 cursor-pointer" 
                  (click)="showGroup.set(!showGroup())"
                  role="button"
                  tabindex="0"
                  (keyup.enter)="showGroup.set(!showGroup())">
-              <h5 class="mb-0 fw-bold fs-5">Группы</h5>
+              <span class="mb-0 fw-bold">Группы</span>
               <span class="text-primary">
                 @if (!showGroup()) {
                   <fa-icon icon="angle-down" size="lg"></fa-icon>
@@ -67,7 +67,7 @@
             @if (showGroup()) {
               <div class="list-group list-group-flush">
                 @for (group of groups(); track group.idGroup) {
-                  <button class="list-group-item list-group-item-action rounded-3 mb-2 border-0 transition-all px-3 py-2"
+                  <button class="list-group-item list-group-item-action rounded-3 mb-1 border-0 transition-all px-2 py-1"
                     [class.active]="group.idGroup==selectedGroup()"
                     (click)="selectGroup(group.idGroup)">
                     <span class="fw-medium">{{group.nameGroup}}</span>

@@ -50,6 +50,10 @@ export class DataService {
     return this._http.get(`${this.url}/council/${councilId}/sections`);
   }
 
+  getAllSections(): Observable<SectionPlainDto[]> {
+    return this._http.getBlock(`${this.url}/sections`);
+  }
+
   getCatalog<T extends CatalogDto>(type: string | Catalog): Observable<T[]> {
     return this._http.getBlock<T[]>(`${this.url}/${type}`);
   }

@@ -3,6 +3,7 @@ import {HasState} from "@app/dto/HasState";
 import {PersonCustomerDto} from "@app/dto/PersonCustomerDto";
 import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
 import {CouncilReferenceDto} from "@app/dto/CouncilReferenceDto";
+import {SectionPlainDto} from "@app/dto/SectionPlainDto";
 
 export class ProjectLiDto extends HasState {
   title: string;
@@ -12,4 +13,5 @@ export class ProjectLiDto extends HasState {
   viewed: boolean;
   councilReferences: CouncilReferenceDto[] = [];
   isExpertReviewFiftyFifty: boolean;
+  sections: SectionPlainDto[];
 }

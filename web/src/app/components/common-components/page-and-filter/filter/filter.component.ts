@@ -175,6 +175,8 @@ export class FilterComponent implements OnInit {
   });
 
   filterChanged() {
+    // Очищаем таймер, чтобы избежать повторного вызова после нажатия Enter
+    clearTimeout(this.searcherTimer);
     this.onFilterChanged.emit(this._fields);
   }
 

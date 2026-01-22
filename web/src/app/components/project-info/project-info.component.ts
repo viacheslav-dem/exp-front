@@ -179,8 +179,11 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
         this.showProjectDocuments();
         if (this.role == Role.BUREAU_ASSESSOR) {
           this.loadAnonymousExpertReviews();
-          this.loadSectionReports();
           this.loadLifecycleGroup();
+          // Протоколы заседаний будут загружены из lifecycleGroup в updateLifecycleGroupSignal
+          if (this.agenda) {
+            this.loadSectionReports();
+          }
         } else if (this.role == Role.SECTION_ASSESSOR) {
           this.loadAnonymousExpertReviews();
         } else if (this.role == Role.BUREAU_CHAIRMAN) {
@@ -421,6 +424,14 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
     const updatedGroup = { ...lifecycleGroup, lifecycles: [...(lifecycleGroup.lifecycles ?? [])] };
     this.lifecycleGroup = updatedGroup;
     this._lifecycleGroupSignal.set(updatedGroup);
+    
+    // Для BUREAU_ASSESSOR собираем протоколы заседаний секций из lifecycle'ов
+    if (this.role == Role.BUREAU_ASSESSOR && !this.agenda) {
+      this.sectionReports = (lifecycleGroup.lifecycles ?? [])
+        .flatMap(lifecycle => lifecycle.meetingProtocol ?? [])
+        .filter(protocol => protocol != null);
+      this.cdr?.markForCheck?.();
+    }
   }
 
   private updateLifecycleSignal(lifecycle: any) {
@@ -444,10 +455,15 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
   }
 
   showProjectDocuments() {
-    if ((this.role == Role.EXPERT && this.expertReview == null) || this.role == Role.EXPERT && (this.expertReview.state == ExpertReviewState.ON_EXPERT_CONFIRMATION ||
+    // Члены секции и бюро (assessors) видят документы сразу после отправки объекта на заседание
+    if (this.role == Role.SECTION_ASSESSOR || this.role == Role.BUREAU_ASSESSOR) {
+      this.visibleDocsForExpert = true;
+    } else if ((this.role == Role.EXPERT && this.expertReview == null) || this.role == Role.EXPERT && (this.expertReview.state == ExpertReviewState.ON_EXPERT_CONFIRMATION ||
       this.expertReview.state == ExpertReviewState.REJECTED)) {
       this.visibleDocsForExpert = false;
-    } else this.visibleDocsForExpert = true;
+    } else {
+      this.visibleDocsForExpert = true;
+    }
     this.cdr?.markForCheck?.();
   }
 

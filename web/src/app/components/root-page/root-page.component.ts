@@ -80,6 +80,7 @@ export class RootPageComponent implements OnInit {
       case Role.BUREAU_ASSESSOR:
       case Role.SECTION_ASSESSOR:
         this.menu = [
+          {link: '/projects', title: 'Объекты экспертизы'},
           {link: '/meetings', title: 'Заседания'}
         ];
         break;

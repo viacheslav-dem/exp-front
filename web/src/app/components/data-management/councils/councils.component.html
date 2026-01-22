@@ -1,269 +1,332 @@
-<h5 class="mb-3">Справочник ГЭС</h5>
 <div class="row">
-
   <!--SELECT COUNCIL PANEL-->
   <div class="col-md-4">
-    <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
-    <ul [loadingData]="_loading" class="list-group">
-      @for (council of councils; track trackCouncil(council)) {
-        <li class="list-group-item list-group-item-action selectable"
-          [class.disabled]="council.disabled" [class.active]="council == selectedCouncil"
-          (click)="selectCouncil(council)">
-          <span>{{councilToString(council)}}</span>
-          @if (council.id == 0) {
-            <span class="text-mini font-weight-bold">(не сохранён)</span>
-          }
-          @if (council.disabled) {
-            <span class="text-mini font-weight-bold">(неактивный)</span>
-          }
-        </li>
-      }
-      <app-pagination
-        [page]="_page" [pagination]="_pagination" [maxSize]="5"
-        (onPageChanged)="onPageChanged($event)" class="border-radius-0">
-      </app-pagination>
-      <li (click)="addCouncil()" class="list-group-item selectable link background-dark-sea-green">
-        Добавить ГЭС
-      </li>
-    </ul>
-  </div>
+    <div class="councils-catalog">
+      <!-- Заголовок с кнопкой добавления -->
+      <div class="catalog-header">
+        <h2 class="catalog-title">Справочник ГЭС</h2>
+        <button type="button" class="btn-add" (click)="addCouncil()">
+          <fa-icon icon="plus" class="btn-add-icon"></fa-icon>
+          <span>Добавить ГЭС</span>
+        </button>
+      </div>
 
-  <!--SELECTED COUNCIL, BUREAU AND SECTIONS PANEL-->
-  <div [loadingData]="_loading" class="col-md-8 list-group">
+      <!-- Фильтр -->
+      <div class="catalog-filter">
+        <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
+      </div>
 
-    <!--COUNCIL-->
-    @if (selectedCouncil) {
-      <div>
-        <!--COUNCIL HEADER-->
-        <div class="list-group-item selectable background-light-blue"
-          [class.border-bottom-none]="selectedCouncil.isExpanded"
-          (click)="selectedCouncil.isExpanded=!selectedCouncil.isExpanded">
-          <div class="text-mini font-weight-bold">
-            Государственный экспертный совет
-            @if (selectedCouncil.id == 0) {
-              <span>(не сохранён)</span>
-            }
-            @if (selectedCouncil.disabled) {
-              <span>(неактивный)</span>
-            }
-          </div>
-          <div>{{councilToString(selectedCouncil)}}</div>
-        </div>
-        @if (selectedCouncil.isExpanded) {
-          <div class="list-group-item border-top-none">
-            <!--SHOW COUNCIL-->
-            @if (!selectedCouncil.isEdit) {
-              <div>
-                <a class="btn btn-icon btn-right" (click)="editCouncil()">
-                  <fa-icon icon="cog" size="lg"></fa-icon>
-                </a>
-                <span>Курирующие сотрудники БелИСА:</span>
-                @if (selectedCouncil.belisaWorkers.length > 0) {
-                  <ul class="form-sub-group italic">
-                    @for (person of selectedCouncil.belisaWorkers; track person.id) {
-                      <li>
-                        {{person | fullName}}
-                      </li>
-                    }
-                  </ul>
-                }
-                @if (selectedCouncil.belisaWorkers.length == 0) {
-                  <span class="form-sub-group italic">
-                    не указаны
-                  </span>
-                }
-                <div>
-                  <span>Приоритетные направления научных исследований и (или) научно-технической деятельности:</span>
-                  @if (selectedCouncil.directions.length > 0) {
-                    <ul class="form-sub-group italic">
-                      @for (direction of selectedCouncil.directions; track direction.id) {
-                        <li>
-                          {{direction.name}}
-                        </li>
+      <!-- Контент -->
+      <div [loadingData]="_loading" class="catalog-content">
+        @if (councils && councils.length > 0) {
+          <div class="catalog-items">
+            @for (council of councils; track trackCouncil(council)) {
+              <div class="catalog-item"
+                   [class.item-disabled]="council.disabled"
+                   [class.item-active]="council == selectedCouncil"
+                   (click)="selectCouncil(council)">
+                <div class="item-content">
+                  <div class="item-main">
+                    <div class="item-header">
+                      <span class="item-label">гэс</span>
+                      @if (council.id == 0) {
+                        <span class="badge badge-warning">
+                          не сохранён
+                        </span>
                       }
-                    </ul>
-                  }
-                  @if (selectedCouncil.directions.length == 0) {
-                    <span class="form-sub-group italic">
-                      не указаны
-                    </span>
-                  }
+                      @if (council.disabled) {
+                        <span class="badge badge-secondary">
+                          неактивный
+                        </span>
+                      }
+                    </div>
+                    <div class="item-name">{{councilToString(council)}}</div>
+                    @if (council.sections && council.sections.length > 0) {
+                      <div class="item-meta">
+                        <span class="meta-item">
+                          <fa-icon icon="sitemap" class="meta-icon"></fa-icon>
+                          <span>{{council.sections.length}} {{council.sections.length === 1 ? 'секция' : council.sections.length < 5 ? 'секции' : 'секций'}}</span>
+                        </span>
+                      </div>
+                    }
+                  </div>
                 </div>
               </div>
             }
-            <!--EDIT COUNCIL-->
-            @if (selectedCouncil.isEdit) {
-              <div>
-                @if (selectedCouncil.id != 0) {
-                  <div class="form-sub-group">
-                    <app-checkbox [(ngModel)]="editedCouncil.disabled">Неактивный (ГЭС больше не функционирует)</app-checkbox>
-                  </div>
+          </div>
+
+          <!-- Пагинация -->
+          <div class="catalog-pagination">
+            <app-pagination
+              [page]="_page" [pagination]="_pagination" [maxSize]="5"
+              (onPageChanged)="onPageChanged($event)">
+            </app-pagination>
+          </div>
+        } @else if (!_loading) {
+          <div class="catalog-empty">
+            <div class="empty-state">
+              <fa-icon icon="list" class="empty-icon"></fa-icon>
+              <p class="empty-text">Государственные экспертные советы отсутствуют</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!--SELECTED COUNCIL, BUREAU AND SECTIONS PANEL-->
+  <div [loadingData]="_loading" class="col-md-8">
+    <div class="council-details">
+      <!--COUNCIL-->
+      @if (selectedCouncil) {
+        <div class="detail-item" [class.item-expanded]="selectedCouncil.isExpanded" [class.item-disabled]="selectedCouncil.disabled">
+          <div class="detail-header" (click)="selectedCouncil.isExpanded=!selectedCouncil.isExpanded">
+            <div class="detail-header-content">
+              <div class="detail-label">
+                Государственный экспертный совет
+                @if (selectedCouncil.id == 0) {
+                  <span class="badge badge-warning">не сохранён</span>
                 }
-                <div class="form-sub-group">
-                  <div>Номер</div>
-                  <input numberInput type="text" [(ngModel)]="editedCouncil.code"
-                    placeholder="Номер ГЭСа" class="form-control" title="Номер">
+                @if (selectedCouncil.disabled) {
+                  <span class="badge badge-secondary">неактивный</span>
+                }
+              </div>
+              <div class="detail-title">{{councilToString(selectedCouncil)}}</div>
+              @if (selectedCouncil.sections && selectedCouncil.sections.length > 0) {
+                <div class="detail-meta">
+                  <span class="meta-item">
+                    <fa-icon icon="sitemap" class="meta-icon"></fa-icon>
+                    <span>{{selectedCouncil.sections.length}} {{selectedCouncil.sections.length === 1 ? 'секция' : selectedCouncil.sections.length < 5 ? 'секции' : 'секций'}}</span>
+                  </span>
+                </div>
+              }
+            </div>
+            <div class="detail-header-actions">
+              @if (!selectedCouncil.isEdit) {
+                <button type="button" class="btn-edit" (click)="editCouncil(); $event.stopPropagation()" title="Редактировать">
+                  <fa-icon icon="cog"></fa-icon>
+                </button>
+              }
+              <fa-icon icon="chevron-down" class="expand-icon" [class.expanded]="selectedCouncil.isExpanded"></fa-icon>
+            </div>
+          </div>
+          @if (selectedCouncil.isExpanded) {
+            <div class="detail-content">
+              <!--SHOW COUNCIL-->
+              @if (!selectedCouncil.isEdit) {
+                <div class="detail-info">
+                  <span class="info-label">Курирующие сотрудники БелИСА:</span>
+                  @if (selectedCouncil.belisaWorkers.length > 0) {
+                    <ul>
+                      @for (person of selectedCouncil.belisaWorkers; track person.id) {
+                        <li>{{person | fullName}}</li>
+                      }
+                    </ul>
+                  } @else {
+                    <span class="info-value">не указаны</span>
+                  }
+                </div>
+                <div class="detail-info">
+                  <span class="info-label">Приоритетные направления научных исследований и (или) научно-технической деятельности:</span>
+                  @if (selectedCouncil.directions.length > 0) {
+                    <ul>
+                      @for (direction of selectedCouncil.directions; track direction.id) {
+                        <li>{{direction.name}}</li>
+                      }
+                    </ul>
+                  } @else {
+                    <span class="info-value">не указаны</span>
+                  }
+                </div>
+              }
+              <!--EDIT COUNCIL-->
+              @if (selectedCouncil.isEdit) {
+                <div class="detail-edit-form">
+                  @if (selectedCouncil.id != 0) {
+                    <div class="form-group-checkbox">
+                      <app-checkbox [(ngModel)]="editedCouncil.disabled">Неактивный (ГЭС больше не функционирует)</app-checkbox>
+                    </div>
+                  }
+                  <div class="form-group">
+                    <label class="form-label">Номер</label>
+                    <input numberInput type="text" [(ngModel)]="editedCouncil.code"
+                      placeholder="Номер ГЭСа" class="form-control" title="Номер">
                   </div>
                   <div class="form-group">
-                    <div>Наименование</div>
+                    <label class="form-label">Наименование</label>
                     <input type="text" [(ngModel)]="editedCouncil.name"
                       placeholder="Наименование ГЭСа" class="form-control" title="Наименование">
-                    </div>
-                    <div [class.form-group]="editedCouncil.belisaWorkers.length == 0">
-                      <span>Курирующие сотрудники БелИСА:</span>
-                      @if (editedCouncil.belisaWorkers.length == 0) {
-                        <span class="form-sub-group italic">
-                          не указаны
-                        </span>
-                      }
-                      <a class="btn btn-icon btn-icon-sm" (click)="showSearchBelisaWorkerModal()">
-                        <fa-icon icon="plus"></fa-icon>
-                      </a>
-                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Курирующие сотрудники БелИСА:</label>
+                    @if (editedCouncil.belisaWorkers.length == 0) {
+                      <div class="form-field-with-action">
+                        <span class="form-field-value">не указаны</span>
+                        <button type="button" class="btn-icon-sm" (click)="showSearchBelisaWorkerModal()" title="Добавить">
+                          <fa-icon icon="plus"></fa-icon>
+                        </button>
+                      </div>
+                    }
                     @if (editedCouncil.belisaWorkers.length > 0) {
-                      <ul class="form-group italic">
+                      <ul class="form-list">
                         @for (person of editedCouncil.belisaWorkers; track person.id; let i = $index) {
                           <li>
-                            {{person | fullName}}
-                            <a class="btn btn-icon btn-icon-sm" (click)="editedCouncil.belisaWorkers.splice(i, 1)">
+                            <span>{{person | fullName}}</span>
+                            <button type="button" class="btn-icon-sm" (click)="editedCouncil.belisaWorkers.splice(i, 1)" title="Удалить">
                               <fa-icon icon="minus"></fa-icon>
-                            </a>
+                            </button>
                           </li>
                         }
                       </ul>
+                      <button type="button" class="btn-icon-sm" (click)="showSearchBelisaWorkerModal()" title="Добавить">
+                        <fa-icon icon="plus"></fa-icon>
+                      </button>
                     }
-                    <div class="form-group">
-                      <div>Приоритетные направления научных исследований и (или) научно-технической деятельности:</div>
-                      <div class="form-sub-group italic">
-                        @if (editedCouncil.directions.length != 0) {
-                          <ul class="mb-0">
-                            @for (direction of editedCouncil.directions; track direction.id; let i = $index) {
-                              <li>
-                                {{direction.name}}
-                                <a class="btn btn-icon btn-icon-sm" (click)="editedCouncil.directions.splice(i, 1)">
-                                  <fa-icon icon="minus"></fa-icon>
-                                </a>
-                              </li>
-                            }
-                          </ul>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Приоритетные направления научных исследований и (или) научно-технической деятельности:</label>
+                    @if (editedCouncil.directions.length != 0) {
+                      <ul class="form-list">
+                        @for (direction of editedCouncil.directions; track direction.id; let i = $index) {
+                          <li>
+                            <span>{{direction.name}}</span>
+                            <button type="button" class="btn-icon-sm" (click)="editedCouncil.directions.splice(i, 1)" title="Удалить">
+                              <fa-icon icon="minus"></fa-icon>
+                            </button>
+                          </li>
                         }
-                        @if (editedCouncil.directions.length == 0) {
-                          <div>направления не указаны</div>
-                        }
+                      </ul>
+                    } @else {
+                      <div class="info-value">направления не указаны</div>
+                    }
+                    <div class="row mt-2">
+                      <div class="col-10 pe-2">
+                        <app-select-catalog [catalog]="Catalog.DIRECTION" [(ngModel)]="newDirection"></app-select-catalog>
                       </div>
-                      <div class="row">
-                        <div class="col-10 pe-2">
-                          <app-select-catalog [catalog]="Catalog.DIRECTION" [(ngModel)]="newDirection"></app-select-catalog>
-                        </div>
-                        <div class="col-2 ps-2">
-                          <button class="btn btn-primary w-100" [disabled]="!newDirection" (click)="addDirection()">Добавить</button>
-                        </div>
+                      <div class="col-2 ps-2">
+                        <button class="btn btn-primary w-100" [disabled]="!newDirection" (click)="addDirection()">Добавить</button>
                       </div>
-                    </div>
-                    <div class="mt-1">
-                      <button class="btn btn-secondary me-2" (click)="cancelEditCouncil()">Отмена</button>
-                      <button class="btn btn-primary" (click)="saveEditedCouncil()">Сохранить</button>
-                      @if (selectedCouncil.id == 0) {
-                        <button class="btn btn-danger" (click)="deleteCouncil()">
-                          Удалить
-                        </button>
-                      }
                     </div>
                   </div>
-                }
-              </div>
-            }
-          </div>
-        }
+                  <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" (click)="cancelEditCouncil()">Отмена</button>
+                    <button type="button" class="btn btn-primary" (click)="saveEditedCouncil()">Сохранить</button>
+                    @if (selectedCouncil.id == 0) {
+                      <button type="button" class="btn btn-danger" (click)="deleteCouncil()">Удалить</button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
 
-        <!--BUREAU-->
+      <!--BUREAU-->
         @if (selectedBureau) {
-          <div>
-            <!--BUREAU HEADER-->
-            <div class="list-group-item list-group-item-action selectable"
-              [class.border-bottom-none]="selectedBureau.isExpanded"
-              (click)="selectedBureau.isExpanded=!selectedBureau.isExpanded">
-              <span class="text-mini font-weight-bold">бюро</span>
-              <div>Бюро Государственного экспертного совета</div>
+          <div class="detail-item detail-item-nested" [class.item-expanded]="selectedBureau.isExpanded">
+            <div class="detail-header" (click)="selectedBureau.isExpanded=!selectedBureau.isExpanded">
+              <div class="detail-header-content">
+                <div class="detail-label">бюро</div>
+                <div class="detail-title">Бюро Государственного экспертного совета</div>
+              </div>
+              <div class="detail-header-actions">
+                @if (!selectedBureau.isEdit) {
+                  <button type="button" class="btn-edit" (click)="editBureau(); $event.stopPropagation()" title="Редактировать">
+                    <fa-icon icon="cog"></fa-icon>
+                  </button>
+                }
+                <fa-icon icon="chevron-down" class="expand-icon" [class.expanded]="selectedBureau.isExpanded"></fa-icon>
+              </div>
             </div>
             @if (selectedBureau.isExpanded) {
-              <div class="list-group-item border-top-none pt-0">
+              <div class="detail-content">
                 <!--SHOW BUREAU-->
                 @if (!selectedBureau.isEdit) {
-                  <div>
-                    <a class="btn btn-icon btn-right" (click)="editBureau()">
-                      <fa-icon icon="cog" size="lg"></fa-icon>
-                    </a>
-                    <div>Председатель:
-                      <span class="italic">{{selectedBureau.chairman | fullName}}</span>
-                    </div>
-                    <div>Заместитель Председателя:
-                      <span class="italic">{{selectedBureau.deputyChairman | fullName}}</span>
-                    </div>
-                    <div class="form-sub-group">Секретарь:
-                      <span class="italic">{{selectedBureau.secretary | fullName}}</span>
-                    </div>
-                    <div>Члены бюро:
-                      @if (selectedBureau.assessors.length == 0) {
-                        <span class="form-sub-group italic">
-                          не указаны
-                        </span>
-                      }
-                    </div>
+                  <div class="detail-info">
+                    <span class="info-label">Председатель:</span>
+                    <span class="info-value">{{selectedBureau.chairman | fullName}}</span>
+                  </div>
+                  <div class="detail-info">
+                    <span class="info-label">Заместитель Председателя:</span>
+                    <span class="info-value">{{selectedBureau.deputyChairman | fullName}}</span>
+                  </div>
+                  <div class="detail-info">
+                    <span class="info-label">Секретарь:</span>
+                    <span class="info-value">{{selectedBureau.secretary | fullName}}</span>
+                  </div>
+                  <div class="detail-info">
+                    <span class="info-label">Члены бюро:</span>
                     @if (selectedBureau.assessors.length > 0) {
-                      <ul class="form-sub-group italic">
+                      <ul>
                         @for (person of selectedBureau.assessors; track person.id) {
                           <li>{{person | fullName}}</li>
                         }
                       </ul>
+                    } @else {
+                      <span class="info-value">не указаны</span>
                     }
                   </div>
                 }
                 <!--EDIT BUREAU-->
                 @if (selectedBureau.isEdit) {
-                  <div>
-                    <div>Председатель:
-                      <span class="italic">{{editedBureau.chairman | fullName}}</span>
-                      <a class="btn btn-icon btn-icon-sm" (click)="showSearchBureauChairmanModal()">
-                        <fa-icon icon="pencil-alt"></fa-icon>
-                      </a>
+                  <div class="detail-edit-form">
+                    <div class="form-group">
+                      <label class="form-label">Председатель:</label>
+                      <div class="form-field-with-action">
+                        <span class="form-field-value">{{editedBureau.chairman | fullName}}</span>
+                        <button type="button" class="btn-icon-sm" (click)="showSearchBureauChairmanModal()" title="Изменить">
+                          <fa-icon icon="pencil-alt"></fa-icon>
+                        </button>
+                      </div>
                     </div>
-                    <div>Заместитель Председателя:
-                      <span class="italic">{{editedBureau.deputyChairman | fullName}}</span>
-                      <a class="btn btn-icon btn-icon-sm" (click)="showSearchBureauDeputyChairmanModal()">
-                        <fa-icon icon="pencil-alt"></fa-icon>
-                      </a>
+                    <div class="form-group">
+                      <label class="form-label">Заместитель Председателя:</label>
+                      <div class="form-field-with-action">
+                        <span class="form-field-value">{{editedBureau.deputyChairman | fullName}}</span>
+                        <button type="button" class="btn-icon-sm" (click)="showSearchBureauDeputyChairmanModal()" title="Изменить">
+                          <fa-icon icon="pencil-alt"></fa-icon>
+                        </button>
+                      </div>
                     </div>
-                    <div class="form-sub-group">Секретарь:
-                      <span class="italic">{{editedBureau.secretary | fullName}}</span>
-                      <a class="btn btn-icon btn-icon-sm" (click)="showSearchBureauSecretaryModal()">
-                        <fa-icon icon="pencil-alt"></fa-icon>
-                      </a>
+                    <div class="form-group">
+                      <label class="form-label">Секретарь:</label>
+                      <div class="form-field-with-action">
+                        <span class="form-field-value">{{editedBureau.secretary | fullName}}</span>
+                        <button type="button" class="btn-icon-sm" (click)="showSearchBureauSecretaryModal()" title="Изменить">
+                          <fa-icon icon="pencil-alt"></fa-icon>
+                        </button>
+                      </div>
                     </div>
-                    <div [class.form-group]="editedBureau.assessors.length == 0">Члены бюро:
+                    <div class="form-group">
+                      <label class="form-label">Члены бюро:</label>
                       @if (editedBureau.assessors.length == 0) {
-                        <span class="form-group italic">
-                          не указаны
-                        </span>
+                        <div class="form-field-with-action">
+                          <span class="form-field-value">не указаны</span>
+                          <button type="button" class="btn-icon-sm" (click)="showSearchBureauAssessorModal()" title="Добавить">
+                            <fa-icon icon="plus"></fa-icon>
+                          </button>
+                        </div>
                       }
-                      <a class="btn btn-icon btn-icon-sm" (click)="showSearchBureauAssessorModal()">
-                        <fa-icon icon="plus"></fa-icon>
-                      </a>
+                      @if (editedBureau.assessors.length > 0) {
+                        <ul class="form-list">
+                          @for (assessor of editedBureau.assessors; track assessor.id; let i = $index) {
+                            <li>
+                              <span>{{assessor | fullName}}</span>
+                              <button type="button" class="btn-icon-sm" (click)="editedBureau.assessors.splice(i, 1)" title="Удалить">
+                                <fa-icon icon="minus"></fa-icon>
+                              </button>
+                            </li>
+                          }
+                        </ul>
+                        <button type="button" class="btn-icon-sm" (click)="showSearchBureauAssessorModal()" title="Добавить">
+                          <fa-icon icon="plus"></fa-icon>
+                        </button>
+                      }
                     </div>
-                    @if (editedBureau.assessors.length > 0) {
-                      <ul class="form-group italic">
-                        @for (assessor of editedBureau.assessors; track assessor.id; let i = $index) {
-                          <li>{{assessor | fullName}}
-                            <a class="btn btn-icon btn-icon-sm" (click)="editedBureau.assessors.splice(i, 1)">
-                              <fa-icon icon="minus"></fa-icon>
-                            </a>
-                          </li>
-                        }
-                      </ul>
-                    }
-                    <div class="mt-1">
-                      <button class="btn btn-secondary me-2" (click)="cancelEditBureau()">Отмена</button>
-                      <button class="btn btn-primary" (click)="saveEditedBureau()">Сохранить</button>
+                    <div class="form-actions">
+                      <button type="button" class="btn btn-secondary" (click)="cancelEditBureau()">Отмена</button>
+                      <button type="button" class="btn btn-primary" (click)="saveEditedBureau()">Сохранить</button>
                     </div>
                   </div>
                 }
@@ -274,152 +337,165 @@
 
         <!--SECTIONS-->
         @for (section of selectedCouncil?.sections; track trackSection(section); let sectionInd = $index) {
-          <div>
-            <!--SECTION HEADER-->
-            <div class="list-group-item list-group-item-action selectable"
-              [class.border-bottom-none]="section.isExpanded" [class.disabled]="section.disabled"
-              (click)="section.isExpanded=!section.isExpanded">
-              <span class="text-mini font-weight-bold">
-                {{section.sectionType | sectionType}} секция
-                @if (section.id == 0) {
-                  <span>(не сохранена)</span>
+          <div class="detail-item detail-item-nested" [class.item-expanded]="section.isExpanded" [class.item-disabled]="section.disabled">
+            <div class="detail-header" (click)="section.isExpanded=!section.isExpanded">
+              <div class="detail-header-content">
+                <div class="detail-label">
+                  {{section.sectionType | sectionType}} секция
+                  @if (section.id == 0) {
+                    <span class="badge badge-warning">не сохранена</span>
+                  }
+                  @if (section.disabled) {
+                    <span class="badge badge-secondary">неактивная</span>
+                  }
+                </div>
+                <div class="detail-title">{{section.name}}</div>
+              </div>
+              <div class="detail-header-actions">
+                @if (!section.isEdit) {
+                  <button type="button" class="btn-edit" (click)="editSection(section); $event.stopPropagation()" title="Редактировать">
+                    <fa-icon icon="cog"></fa-icon>
+                  </button>
                 }
-                @if (section.disabled) {
-                  <span>(неактивная)</span>
-                }
-              </span>
-              <div>{{section.name}}</div>
+                <fa-icon icon="chevron-down" class="expand-icon" [class.expanded]="section.isExpanded"></fa-icon>
+              </div>
             </div>
             @if (section.isExpanded) {
-              <div class="list-group-item border-top-none pt-0">
+              <div class="detail-content">
                 <!--SHOW SECTION-->
                 @if (!section.isEdit) {
-                  <div>
-                    <a class="btn btn-icon btn-right" (click)="editSection(section)">
-                      <fa-icon icon="cog" size="lg"></fa-icon>
-                    </a>
-                    <div>Руководитель секции:
-                      <span class="italic">{{section.head | fullName}}</span>
-                    </div>
-                    <div>Заместитель руководителя:
-                      <span class="italic">{{section.deputyHead | fullName}}</span>
-                    </div>
-                    <div class="form-sub-group">Секретарь:
-                      <span class="italic">{{section.secretary | fullName}}</span>
-                    </div>
-                    <div>Члены секции:
-                      @if (section.assessors.length == 0) {
-                        <span class="form-sub-group italic">
-                          не указаны
-                        </span>
-                      }
-                    </div>
+                  <div class="detail-info">
+                    <span class="info-label">Руководитель секции:</span>
+                    <span class="info-value">{{section.head | fullName}}</span>
+                  </div>
+                  <div class="detail-info">
+                    <span class="info-label">Заместитель руководителя:</span>
+                    <span class="info-value">{{section.deputyHead | fullName}}</span>
+                  </div>
+                  <div class="detail-info">
+                    <span class="info-label">Секретарь:</span>
+                    <span class="info-value">{{section.secretary | fullName}}</span>
+                  </div>
+                  <div class="detail-info">
+                    <span class="info-label">Члены секции:</span>
                     @if (section.assessors.length > 0) {
-                      <ul class="form-sub-group italic">
+                      <ul>
                         @for (person of section.assessors; track person.id) {
                           <li>{{person | fullName}}</li>
                         }
                       </ul>
+                    } @else {
+                      <span class="info-value">не указаны</span>
                     }
                   </div>
                 }
                 <!--EDIT SECTION-->
                 @if (section.isEdit) {
-                  <div>
+                  <div class="detail-edit-form">
                     @if (section.id != 0) {
-                      <div class="form-sub-group">
+                      <div class="form-group-checkbox">
                         <app-checkbox [(ngModel)]="editedSection.disabled">
                           Неактивная (секция больше не функционирует)
                         </app-checkbox>
                       </div>
                     }
-                    <div class="form-sub-group">
-                      <div>Тип</div>
+                    <div class="form-group">
+                      <label class="form-label">Тип</label>
                       <app-dropdown
                         [options]="allSectionTypes" [notSelected]="'Тип секции не выбран'"
                         [(ngModel)]="editedSection.sectionType" [optionToString]="sectionTypeToString">
                       </app-dropdown>
                     </div>
-                    <div class="form-sub-group">
-                      <div>Наименование</div>
+                    <div class="form-group">
+                      <label class="form-label">Наименование</label>
                       <input type="text" [(ngModel)]="editedSection.name"
                         placeholder="Наименование секции" class="form-control" title="Наименование">
-                      </div>
-                      <div>Руководитель секции:
-                        <span class="italic">{{editedSection.head | fullName}}</span>
-                        <a class="btn btn-icon btn-icon-sm" (click)="showSearchSectionHeadModal()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Руководитель секции:</label>
+                      <div class="form-field-with-action">
+                        <span class="form-field-value">{{editedSection.head | fullName}}</span>
+                        <button type="button" class="btn-icon-sm" (click)="showSearchSectionHeadModal()" title="Изменить">
                           <fa-icon icon="pencil-alt"></fa-icon>
-                        </a>
+                        </button>
                       </div>
-                      <div>Заместитель руководителя:
-                        <span class="italic">{{editedSection.deputyHead | fullName}}</span>
-                        <a class="btn btn-icon btn-icon-sm" (click)="showSearchSectionDeputyHeadModal()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Заместитель руководителя:</label>
+                      <div class="form-field-with-action">
+                        <span class="form-field-value">{{editedSection.deputyHead | fullName}}</span>
+                        <button type="button" class="btn-icon-sm" (click)="showSearchSectionDeputyHeadModal()" title="Изменить">
                           <fa-icon icon="pencil-alt"></fa-icon>
-                        </a>
+                        </button>
                       </div>
-                      <div class="form-sub-group">Секретарь:
-                        <span class="italic">{{editedSection.secretary | fullName}}</span>
-                        <a class="btn btn-icon btn-icon-sm" (click)="showSearchSectionSecretaryModal()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Секретарь:</label>
+                      <div class="form-field-with-action">
+                        <span class="form-field-value">{{editedSection.secretary | fullName}}</span>
+                        <button type="button" class="btn-icon-sm" (click)="showSearchSectionSecretaryModal()" title="Изменить">
                           <fa-icon icon="pencil-alt"></fa-icon>
-                        </a>
+                        </button>
                       </div>
-                      <div [class.form-group]="editedSection.assessors.length == 0">Члены секции:
-                        @if (editedSection.assessors.length == 0) {
-                          <span class="form-group italic">
-                            не указаны
-                          </span>
-                        }
-                        <a class="btn btn-icon btn-icon-sm" (click)="showSearchSectionAssessorModal()">
-                          <fa-icon icon="plus"></fa-icon>
-                        </a>
-                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Члены секции:</label>
+                      @if (editedSection.assessors.length == 0) {
+                        <div class="form-field-with-action">
+                          <span class="form-field-value">не указаны</span>
+                          <button type="button" class="btn-icon-sm" (click)="showSearchSectionAssessorModal()" title="Добавить">
+                            <fa-icon icon="plus"></fa-icon>
+                          </button>
+                        </div>
+                      }
                       @if (editedSection.assessors.length > 0) {
-                        <ul class="form-group italic">
+                        <ul class="form-list">
                           @for (assessor of editedSection.assessors; track assessor.id; let i = $index) {
-                            <li>{{assessor | fullName}}
-                              <a class="btn btn-icon btn-icon-sm" (click)="editedSection.assessors.splice(i, 1)">
+                            <li>
+                              <span>{{assessor | fullName}}</span>
+                              <button type="button" class="btn-icon-sm" (click)="editedSection.assessors.splice(i, 1)" title="Удалить">
                                 <fa-icon icon="minus"></fa-icon>
-                              </a>
+                              </button>
                             </li>
                           }
                         </ul>
+                        <button type="button" class="btn-icon-sm" (click)="showSearchSectionAssessorModal()" title="Добавить">
+                          <fa-icon icon="plus"></fa-icon>
+                        </button>
                       }
-                      <div class="mt-1">
-                        <button class="btn btn-secondary me-2" (click)="cancelEditSection()">Отмена</button>
-                        <button class="btn btn-primary me-2" (click)="saveEditedSection(sectionInd)">Сохранить</button>
-                        @if (section.id == 0) {
-                          <button class="btn btn-danger" (click)="deleteSection(sectionInd)">
-                            Удалить
-                          </button>
-                        }
-                      </div>
                     </div>
-                  }
-                </div>
-              }
-            </div>
-          }
-
-          <!--ADD SECTION-->
-          @if (canAddSection()) {
-            <div (click)="addSection()">
-              <div class="list-group-item selectable link background-dark-sea-green">
-                Добавить секцию
+                    <div class="form-actions">
+                      <button type="button" class="btn btn-secondary" (click)="cancelEditSection()">Отмена</button>
+                      <button type="button" class="btn btn-primary" (click)="saveEditedSection(sectionInd)">Сохранить</button>
+                      @if (section.id == 0) {
+                        <button type="button" class="btn btn-danger" (click)="deleteSection(sectionInd)">Удалить</button>
+                      }
+                    </div>
+                  </div>
+                }
               </div>
-            </div>
-          }
+            }
+          </div>
+        }
 
-          @if (!selectedCouncil) {
-            <div>
-              <div class="italic list-group-item background-light-blue">
-                Государственные экспертные советы отсутствуют
-              </div>
-            </div>
-          }
+        <!--ADD SECTION-->
+        @if (canAddSection()) {
+          <button type="button" class="btn-add-section" (click)="addSection()">
+            <fa-icon icon="plus"></fa-icon>
+            <span>Добавить секцию</span>
+          </button>
+        }
+
+      @if (!selectedCouncil) {
+        <div class="details-empty">
+          <div class="empty-text">Выберите ГЭС из списка</div>
         </div>
-      </div>
+      }
+    </div>
+  </div>
 
-      <app-search-person
-        [filters]="[searchPersonFilter]"
-        (selected)="selectPerson($event)">
-      </app-search-person>
+  <app-search-person
+    [filters]="[searchPersonFilter]"
+    (selected)="selectPerson($event)">
+  </app-search-person>
+</div>

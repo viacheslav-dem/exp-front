@@ -22,6 +22,7 @@ import {environment} from "../../../../environments/environment";
 @Component({
     selector: 'app-councils',
     templateUrl: './councils.component.html',
+    styleUrls: ['./councils.component.scss'],
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dataManagement) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
@@ -104,8 +105,14 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
       this.setLoading(false);
       this._page = res;
       this.councils = this._page.content;
-      this.councils.forEach(council => CouncilsComponent.sortCouncilData(council));
-      this.selectCouncil(this.councils[0]);
+      // Инициализируем UI-поля для всех элементов
+      this.councils.forEach(council => {
+        this.initializeCouncilUI(council);
+        CouncilsComponent.sortCouncilData(council);
+      });
+      if (this.councils.length > 0) {
+        this.selectCouncil(this.councils[0]);
+      }
       this.cdr?.markForCheck?.();
     }, () => {
       this.setLoading(false);
@@ -129,8 +136,14 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
     }
     this.selectedCouncil = council;
     if (council) {
+      this.initializeCouncilUI(council);
       CouncilsComponent.sortSections(this.selectedCouncil);
       this.selectedBureau = council.bureau;
+      if (this.selectedBureau) {
+        this.initializeBureauUI(this.selectedBureau);
+      }
+      // Автоматически раскрываем выбранный совет для лучшего UX
+      council.isExpanded = true;
     } else {
       this.selectedBureau = null;
     }
@@ -138,16 +151,14 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
 
   editCouncil() {
     this.selectedCouncil.isEdit = this.selectedCouncil.isExpanded = true;
-    this.editedCouncil = (this.selectedCouncil.id == 0 ?
+    this.editedCouncil = (this.selectedCouncil.id === 0 ?
       this.selectedCouncil : CouncilsComponent.copyCouncil(this.selectedCouncil));
   }
 
   showSearchBelisaWorkerModal() {
-    this.onPersonSelected = person => {
-      if (!this.editedCouncil.belisaWorkers.find(existingPerson => existingPerson.id == person.id)) {
-        this.editedCouncil.belisaWorkers.push(person);
-      }
-    };
+    this.setupPersonSelector(person => {
+      this.addPersonIfNotExists(this.editedCouncil.belisaWorkers, person);
+    });
     this.searchPersonFilter = FilterBuilder.equals('org', this.belisa);
     this.showPersonModal();
   }
@@ -157,12 +168,14 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   }
 
   getSelectedCouncilInd() {
-    return this.councils.findIndex(council => council == this.selectedCouncil);
+    return this.councils.findIndex(council => council === this.selectedCouncil);
   }
 
   saveEditedCouncil() {
     this._dataService.saveCouncil(this.editedCouncil).subscribe(res => {
       this._toasty.success("Сохранено.");
+      this.initializeCouncilUI(res);
+      res.isExpanded = true;
       this.councils[this.getSelectedCouncilInd()] = res;
       this.selectCouncil(res);
       this.selectedCouncil.isExpanded = true;
@@ -190,36 +203,24 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   }
 
   showSearchBureauChairmanModal() {
-    this.onPersonSelected = (person) => {
-      this.editedBureau.chairman = person;
-    };
-    this.searchPersonFilter = null;
+    this.setupPersonSelector(person => this.editedBureau.chairman = person);
     this.showPersonModal();
   }
 
   showSearchBureauDeputyChairmanModal() {
-    this.onPersonSelected = (person) => {
-      this.editedBureau.deputyChairman = person;
-    };
-    this.searchPersonFilter = null;
+    this.setupPersonSelector(person => this.editedBureau.deputyChairman = person);
     this.showPersonModal();
   }
 
   showSearchBureauSecretaryModal() {
-    this.onPersonSelected = (person) => {
-      this.editedBureau.secretary = person;
-    };
-    this.searchPersonFilter = null;
+    this.setupPersonSelector(person => this.editedBureau.secretary = person);
     this.showPersonModal();
   }
 
   showSearchBureauAssessorModal() {
-    this.onPersonSelected = (person) => {
-      if (!this.editedBureau.assessors.find(existingPerson => existingPerson.id == person.id)) {
-        this.editedBureau.assessors.push(person);
-      }
-    };
-    this.searchPersonFilter = null;
+    this.setupPersonSelector(person => {
+      this.addPersonIfNotExists(this.editedBureau.assessors, person);
+    });
     this.showPersonModal();
   }
 
@@ -230,8 +231,9 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   saveEditedBureau() {
     this._dataService.saveBureau(this.editedBureau).subscribe(res => {
       this._toasty.success("Сохранено.");
+      this.initializeBureauUI(res);
+      res.isExpanded = true;
       this.selectedCouncil.bureau = this.selectedBureau = res;
-      this.selectedBureau.isExpanded = true;
       sortPersonsByName(this.selectedBureau.assessors);
       this.cdr?.markForCheck?.();
     });
@@ -242,42 +244,30 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
       this.selectedSection.isEdit = false;
     }
     this.selectedSection = section;
-    this.editedSection = (section.id == 0 ?
+    this.editedSection = (section.id === 0 ?
       this.selectedSection : CouncilsComponent.copySection(this.selectedSection));
     this.selectedSection.isEdit = this.selectedSection.isExpanded = true;
   }
 
   showSearchSectionHeadModal() {
-    this.onPersonSelected = (person) => {
-      this.editedSection.head = person;
-    };
-    this.searchPersonFilter = null;
+    this.setupPersonSelector(person => this.editedSection.head = person);
     this.showPersonModal();
   }
 
   showSearchSectionDeputyHeadModal() {
-    this.onPersonSelected = (person) => {
-      this.editedSection.deputyHead = person;
-    };
-    this.searchPersonFilter = null;
+    this.setupPersonSelector(person => this.editedSection.deputyHead = person);
     this.showPersonModal();
   }
 
   showSearchSectionSecretaryModal() {
-    this.onPersonSelected = (person) => {
-      this.editedSection.secretary = person;
-    };
-    this.searchPersonFilter = null;
+    this.setupPersonSelector(person => this.editedSection.secretary = person);
     this.showPersonModal();
   }
 
   showSearchSectionAssessorModal() {
-    this.onPersonSelected = (person) => {
-      if (!this.editedSection.assessors.find(existingPerson => existingPerson.id == person.id)) {
-        this.editedSection.assessors.push(person);
-      }
-    };
-    this.searchPersonFilter = null;
+    this.setupPersonSelector(person => {
+      this.addPersonIfNotExists(this.editedSection.assessors, person);
+    });
     this.showPersonModal();
   }
 
@@ -288,8 +278,9 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   saveEditedSection(sectionInd) {
     this._dataService.saveSection(this.editedSection).subscribe(section => {
       this._toasty.success("Сохранено.");
-      this.selectedCouncil.sections[sectionInd] = section;
+      this.initializeSectionUI(section);
       section.isExpanded = true;
+      this.selectedCouncil.sections[sectionInd] = section;
       sortPersonsByName(section.assessors);
       this.cdr?.markForCheck?.();
     });
@@ -304,7 +295,7 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   }
 
   canAddSection() {
-    return this.selectedCouncil && this.selectedCouncil.id != 0;
+    return this.selectedCouncil && this.selectedCouncil.id !== 0;
   }
 
   addSection() {
@@ -339,25 +330,67 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
 
   static sortCouncilData(council: CouncilDto) {
     sortPersonsByName(council.belisaWorkers);
-    sortPersonsByName(council.bureau.assessors);
+    if (council.bureau?.assessors) {
+      sortPersonsByName(council.bureau.assessors);
+    }
     council.sections.forEach(section => sortPersonsByName(section.assessors));
   }
 
   static copyCouncil(council: CouncilDto) {
-    let newCouncil = Object.assign({}, council);
-    newCouncil.belisaWorkers = [].concat(council.belisaWorkers);
-    return newCouncil;
+    return {
+      ...council,
+      belisaWorkers: [...council.belisaWorkers],
+      isEdit: false
+    };
   }
 
   static copyBureau(bureau: BureauDto): BureauDto {
-    let newBureau = Object.assign({}, bureau);
-    newBureau.assessors = [].concat(bureau.assessors);
-    return newBureau;
+    return {
+      ...bureau,
+      assessors: [...bureau.assessors],
+      isEdit: false
+    };
   }
 
   static copySection(section: SectionDto): SectionDto {
-    let newSection = Object.assign({}, section);
-    newSection.assessors = [].concat(section.assessors);
-    return newSection;
+    return {
+      ...section,
+      assessors: [...section.assessors],
+      isEdit: false
+    };
+  }
+
+  // Вспомогательные методы для инициализации UI полей
+  private initializeCouncilUI(council: CouncilDto) {
+    council.isExpanded = council.isExpanded ?? false;
+    council.isEdit = council.isEdit ?? false;
+    if (council.bureau) {
+      this.initializeBureauUI(council.bureau);
+    }
+    if (council.sections) {
+      council.sections.forEach(section => this.initializeSectionUI(section));
+    }
+  }
+
+  private initializeBureauUI(bureau: BureauDto) {
+    bureau.isExpanded = bureau.isExpanded ?? false;
+    bureau.isEdit = bureau.isEdit ?? false;
+  }
+
+  private initializeSectionUI(section: SectionDto) {
+    section.isExpanded = section.isExpanded ?? false;
+    section.isEdit = section.isEdit ?? false;
+  }
+
+  // Вспомогательные методы для работы с модальными окнами поиска людей
+  private setupPersonSelector(handler: (person: PersonPlainDto) => void) {
+    this.onPersonSelected = handler;
+    this.searchPersonFilter = null;
+  }
+
+  private addPersonIfNotExists(people: PersonPlainDto[], person: PersonPlainDto) {
+    if (!people.find(existing => existing.id === person.id)) {
+      people.push(person);
+    }
   }
 }
