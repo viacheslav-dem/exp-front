@@ -1,24 +1,24 @@
 
-@if (expertReview && project()) {
+@if (expertReview() && project()) {
 <div class="card card-block" style="padding: 0.75rem 1rem 1rem;"
-     [ngClass]="{'alert-danger': expertReview.red,'alert-warning': expertReview.yellow,'alert-primary': expertReview.blue}">
+     [ngClass]="{'alert-danger': expertReview().red,'alert-warning': expertReview().yellow,'alert-primary': expertReview().blue}">
   <div>
-    <span (click)="showTransitionHistoryModal()" class="selectable" [ngClass]="['badge', expertReview.badge]">
-      {{expertReview.state | reviewState}}
+    <span (click)="showTransitionHistoryModal()" class="selectable" [ngClass]="['badge', expertReview().badge]">
+      {{expertReview().state | reviewState}}
     </span>
-    <span class="text-muted text-sm bold italic"> {{expertReview.termsMessage}}</span>
-    @if (expertReview.state == ExpertReviewState.ON_EXPERT_CONFIRMATION && role() == Role.BELISA_EDIT) {
+    <span class="text-muted text-sm bold italic"> {{expertReview().termsMessage}}</span>
+    @if (expertReview().state == ExpertReviewState.ON_EXPERT_CONFIRMATION && role() == Role.BELISA_EDIT) {
       <span class="float-end">
         <button class="btn-sm btn btn-primary mr-1" (click)="acceptExpertByBelisa()">Подтвердить</button>
         <button class="btn-sm btn btn-secondary" (click)="rejectExpertByBelisa()">Отклонить</button>
       </span>
     }
-    @if (expertReview.state == ExpertReviewState.ON_GKNT_CONFIRMATION && role() == Role.BELISA_EDIT) {
+    @if (expertReview().state == ExpertReviewState.ON_GKNT_CONFIRMATION && role() == Role.BELISA_EDIT) {
       <span class="float-end">
         <button class="btn-sm btn btn-secondary" (click)="rejectExpertByBelisa()">Отклонить</button>
       </span>
     }
-    @if (expertReview.state == ExpertReviewState.ON_EXAMINATION && role() == Role.BELISA_EDIT) {
+    @if (expertReview().state == ExpertReviewState.ON_EXAMINATION && role() == Role.BELISA_EDIT) {
       <span class="float-end">
         <button class="btn-sm btn btn-secondary" (click)="rejectExpertByBelisa()">Отклонить</button>
       </span>
@@ -29,14 +29,14 @@
       </span>
     }
   </div>
-  <div class="mb-2">{{expertReview.expert|fullName}}</div>
-  @if (expertReview.state == 'REJECTED') {
+  <div class="mb-2">{{expertReview().expert|fullName}}</div>
+  @if (expertReview().state == 'REJECTED') {
     <div class="italic text-sm">
-      <b>Причина отказа:</b> {{expertReview.rejectionReason | orElse: 'не указана'}}
+      <b>Причина отказа:</b> {{expertReview().rejectionReason | orElse: 'не указана'}}
     </div>
   }
 
-  @if (expertReview.state != 'REJECTED') {
+  @if (expertReview().state != 'REJECTED') {
     <div class="mb-1">
       <div class="text-muted text-sm d-inline-block">
         <span>Экспертное заключение</span>
@@ -56,8 +56,8 @@
       @if (canEditReviewDocument()) {
         <button class="btn btn-sm btn-primary btn-right-sm"
                 (click)="showReviewFormModal()"
-                [disabled]="isCreatingReviewDocument">
-          @if (isCreatingReviewDocument) {
+                [disabled]="isCreatingReviewDocument()">
+          @if (isCreatingReviewDocument()) {
             <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
             Создание...
           } @else {
@@ -66,13 +66,13 @@
         </button>
       }
     </div>
-    @if (expertReview.expectedState && canEditReviewDocument()) {
+    @if (expertReview().expectedState && canEditReviewDocument()) {
       <div class="text-sm italic">
-        Предварительный результат: <span [ngClass]="['badge', expertReview.expectedBadge]">{{expertReview.expectedState | reviewState}}</span>
+        Предварительный результат: <span [ngClass]="['badge', expertReview().expectedBadge]">{{expertReview().expectedState | reviewState}}</span>
       </div>
     }
     <app-document-list
-        [documents]="canEditReviewDocument() || expertReview.state != ExpertReviewState.ON_EXAMINATION ? expertReview.documents : []"
+        [documents]="canEditReviewDocument() || expertReview().state != ExpertReviewState.ON_EXAMINATION ? expertReview().documents : []"
         [canDelete]="canEditReviewDocument()" (onDelete)="deleteReviewDocument($event)">
     </app-document-list>
 
@@ -84,12 +84,12 @@
         @if (canEditReviewScan()) {
           <app-document-uploader
               (saved)="reviewScanLoaded($event)"
-              [url]="SERVER_URL + '/review/attach-scan/' + expertReview.id" [idDto]="expertReview"
+              [url]="SERVER_URL + '/review/attach-scan/' + expertReview().id" [idDto]="expertReview()"
               [typesAccept]="[DocType.DOCX.extension, DocType.DOC.extension, DocType.PDF.extension]">
           </app-document-uploader>
         }
         <app-document-list
-            [documents]="expertReview.reviewScan"
+            [documents]="expertReview().reviewScan"
             [canDelete]="canEditReviewScan()" (onDelete)="deleteReviewScan()">
         </app-document-list>
       </div>
@@ -99,7 +99,7 @@
       Role.EXPERT, Role.GKNT_WORKER, Role.GKNT_CHAIRMAN,
       Role.GKNT_DEPARTMENT_CHAIRMAN, Role.BELISA_READ, Role.BELISA_EDIT
     ]">
-      @if (expertReview.accounting?.contract) {
+      @if (expertReview().accounting?.contract) {
         <div class="mt-2 mb-1">
           <div class="text-muted text-sm d-inline-block">
             <span>Договор между экспертом и ГКНТ</span>
@@ -115,10 +115,10 @@
           </button>
         </div>
         <app-document-list
-            [documents]="expertReview.accounting.contract">
+            [documents]="expertReview().accounting.contract">
         </app-document-list>
       }
-      @if (expertReview.accounting?.act) {
+      @if (expertReview().accounting?.act) {
         <div class="mt-2 mb-1">
           <div class="text-muted text-sm d-inline-block">
             <span>Акт приёмки-сдачи работ</span>
@@ -134,7 +134,7 @@
           </button>
         </div>
         <app-document-list
-            [documents]="expertReview.accounting.act">
+            [documents]="expertReview().accounting.act">
         </app-document-list>
       }
     </div>
@@ -144,11 +144,11 @@
 
 <!--REVIEW FORM-->
 <app-modal #reviewFormModal [title]="'Заключение эксперта'" [closePermission]="false" (onClose)="closeForm()">
-  <app-expert-review-form [formRenderer]="formRenderer"
+  <app-expert-review-form [formRenderer]="formRenderer()"
                           [project]="project()"
                           [draftService]="_reviewService"
-                          [draftOwner]="expertReview"
-                          [loading]="isCreatingReviewDocument"
+                          [draftOwner]="expertReview()"
+                          [loading]="isCreatingReviewDocument()"
                           (onSave)="generateReviewDocument($event)"
                           (onClose)="closeModal()">
   </app-expert-review-form>
@@ -156,6 +156,6 @@
 
 <app-modal #transitionHistoryModal [title]="'Информация о ходе проведения экспертизы'" [modalClasses]="'modal-xl'">
   <div class="transition-history">
-    <app-expert-transition-history [history]="transitionHistory"></app-expert-transition-history>
+    <app-expert-transition-history [history]="transitionHistory()"></app-expert-transition-history>
   </div>
 </app-modal>

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, input, signal} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {CatalogTemplate} from "@app/components/data-management/catalog/CatalogTemplate";
@@ -12,10 +12,10 @@ import {environment} from "../../../../../environments/environment";
     template: `<div class="simple-catalog">
   <!-- Заголовок с кнопкой добавления -->
   <div class="catalog-header">
-    <h2 class="catalog-title">{{headerValue}}</h2>
+    <h2 class="catalog-title">{{headerValue()}}</h2>
     <button type="button" class="btn-add" (click)="addItem()">
       <fa-icon icon="plus" class="btn-add-icon"></fa-icon>
-      <span>{{addLabelValue}}</span>
+      <span>{{addLabelValue()}}</span>
     </button>
   </div>
 
@@ -38,7 +38,7 @@ import {environment} from "../../../../../environments/environment";
               <div class="item-content">
                 <div class="item-main">
                   <div class="item-header">
-                    <span class="item-label">{{itemLabelValue}}</span>
+                    <span class="item-label">{{itemLabelValue()}}</span>
                     @if (item.id == 0) {
                       <span class="badge badge-warning">
                         не сохранено
@@ -114,7 +114,7 @@ import {environment} from "../../../../../environments/environment";
       <div class="catalog-empty">
         <div class="empty-state">
           <fa-icon icon="list" class="empty-icon"></fa-icon>
-          <p class="empty-text">{{noItemsLabelValue}}</p>
+          <p class="empty-text">{{noItemsLabelValue()}}</p>
         </div>
       </div>
     }
@@ -139,26 +139,15 @@ export class SimpleCatalogComponent<T extends CatalogDto> extends CatalogTemplat
   readonly noItemsLabel = input<string>(undefined);
   readonly header = input<string>(undefined);
 
-  protected _addLabel: string;
-  protected _itemLabel: string;
-  protected _noItemsLabel: string;
-  protected _header: string;
+  protected _addLabel = signal<string | undefined>(undefined);
+  protected _itemLabel = signal<string | undefined>(undefined);
+  protected _noItemsLabel = signal<string | undefined>(undefined);
+  protected _header = signal<string | undefined>(undefined);
 
-  get addLabelValue(): string {
-    return this._addLabel ?? this.addLabel() ?? '';
-  }
-
-  get itemLabelValue(): string {
-    return this._itemLabel ?? this.itemLabel() ?? '';
-  }
-
-  get noItemsLabelValue(): string {
-    return this._noItemsLabel ?? this.noItemsLabel() ?? '';
-  }
-
-  get headerValue(): string {
-    return this._header ?? this.header() ?? '';
-  }
+  readonly addLabelValue = computed(() => this._addLabel() ?? this.addLabel() ?? '');
+  readonly itemLabelValue = computed(() => this._itemLabel() ?? this.itemLabel() ?? '');
+  readonly noItemsLabelValue = computed(() => this._noItemsLabel() ?? this.noItemsLabel() ?? '');
+  readonly headerValue = computed(() => this._header() ?? this.header() ?? '');
 
   ngOnInit() {
     super.ngOnInit();

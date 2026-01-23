@@ -98,7 +98,7 @@ describe('SimpleCatalogComponent', () => {
 
     fixture = TestBed.createComponent(SimpleCatalogComponent);
     component = fixture.componentInstance;
-    component.type = Catalog.SCIENCE_AREA;
+    fixture.componentRef.setInput('type', Catalog.SCIENCE_AREA);
   });
 
   it('should create', () => {
@@ -109,39 +109,39 @@ describe('SimpleCatalogComponent', () => {
     it('should handle addLabel input signal', () => {
       fixture.componentRef.setInput('addLabel', 'Добавить элемент');
       fixture.detectChanges();
-      expect(component.addLabelValue).toBe('Добавить элемент');
+      expect(component.addLabelValue()).toBe('Добавить элемент');
     });
 
     it('should handle itemLabel input signal', () => {
       fixture.componentRef.setInput('itemLabel', 'Элемент');
       fixture.detectChanges();
-      expect(component.itemLabelValue).toBe('Элемент');
+      expect(component.itemLabelValue()).toBe('Элемент');
     });
 
     it('should handle noItemsLabel input signal', () => {
       fixture.componentRef.setInput('noItemsLabel', 'Нет элементов');
       fixture.detectChanges();
-      expect(component.noItemsLabelValue).toBe('Нет элементов');
+      expect(component.noItemsLabelValue()).toBe('Нет элементов');
     });
 
     it('should handle header input signal', () => {
       fixture.componentRef.setInput('header', 'Заголовок');
       fixture.detectChanges();
-      expect(component.headerValue).toBe('Заголовок');
+      expect(component.headerValue()).toBe('Заголовок');
     });
 
     it('should return empty string when input signals are undefined', () => {
-      expect(component.addLabelValue).toBe('');
-      expect(component.itemLabelValue).toBe('');
-      expect(component.noItemsLabelValue).toBe('');
-      expect(component.headerValue).toBe('');
+      expect(component.addLabelValue()).toBe('');
+      expect(component.itemLabelValue()).toBe('');
+      expect(component.noItemsLabelValue()).toBe('');
+      expect(component.headerValue()).toBe('');
     });
 
     it('should prioritize protected fields over input signals', () => {
-      component['_addLabel'] = 'Protected Label';
+      component['_addLabel'].set('Protected Label');
       fixture.componentRef.setInput('addLabel', 'Signal Label');
       fixture.detectChanges();
-      expect(component.addLabelValue).toBe('Protected Label');
+      expect(component.addLabelValue()).toBe('Protected Label');
     });
   });
 
@@ -226,7 +226,7 @@ describe('SimpleCatalogComponent', () => {
       const item = { id: 1, name: 'Item 1', isEdit: true } as CatalogDto;
       component.selectedItem = item;
       component.editedItem = { id: 1, name: 'Updated Item', isEdit: true } as CatalogDto;
-      component.type = Catalog.SCIENCE_AREA;
+      fixture.componentRef.setInput('type', Catalog.SCIENCE_AREA);
 
       component.saveEditedItem();
       fixture.detectChanges();
@@ -258,7 +258,7 @@ describe('SimpleCatalogComponent', () => {
 
   describe('Data loading', () => {
     it('should load page data when update is called', fakeAsync(() => {
-      component.type = Catalog.SCIENCE_AREA;
+      fixture.componentRef.setInput('type', Catalog.SCIENCE_AREA);
       component.ngOnInit();
 
       component.update();
@@ -269,7 +269,7 @@ describe('SimpleCatalogComponent', () => {
     }));
 
     it('should handle loading state during data fetch', fakeAsync(() => {
-      component.type = Catalog.SCIENCE_AREA;
+      fixture.componentRef.setInput('type', Catalog.SCIENCE_AREA);
       component.ngOnInit();
 
       component.update();

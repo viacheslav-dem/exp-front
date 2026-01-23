@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, computed, signal} from '@angular/core';
 import {ExpertReviewForm} from "@app/components/document-form/expert-review-form-container/expert-review-form";
 import {IndustryDto} from "@app/dto/IndustryDto";
 import {Catalog, DataService} from "@app/services/data.service";
@@ -13,12 +13,40 @@ export class ExpertReview_8_12IP_FormComponent extends ExpertReviewForm<any> {
   industries: IndustryDto[];
   Catalog = Catalog;
 
+  // Signal для отслеживания изменений формы
+  private readonly _formSignal = signal<any>(null);
+  
+  // Computed signals для вычисляемых значений
+  readonly organizationLabel = computed(() => {
+    const form = this._formSignal();
+    if (!form) return "не соответствует";
+    if (form.addedValue != null && !form.addedValueNotPresented && form.section != null &&
+      !form.sectionNotPresented && form.addedValue >= form.section.addedValueBound) {
+      return "соответствует";
+    }
+    return "не соответствует";
+  });
+
+  readonly exportLabel = computed(() => {
+    const form = this._formSignal();
+    if (!form) return "не соответствует";
+    if (form.balance != null && !form.balanceNotPresented && form.balance > 0) {
+      return "соответствует";
+    }
+    return "не соответствует";
+  });
+
   constructor(private _dataService: DataService) {
     super();
+  }
+  
+  private updateFormSignal() {
+    this._formSignal.set({ ...this._form });
   }
 
   ngOnInit() {
     super.ngOnInit();
+    this.updateFormSignal();
     this._dataService.getCatalog<IndustryDto>(Catalog.INDUSTRY).subscribe(res => {
       this.industries = res;
       this.initDefaultForm();
@@ -31,6 +59,7 @@ export class ExpertReview_8_12IP_FormComponent extends ExpertReviewForm<any> {
       this._form.sectionNotPresented = this.industries.length == 0;
       this._form.section = this.industries.length == 0 ? null : this.industries[0];
     }
+    this.updateFormSignal();
   }
 
   initDefaultForm() {
@@ -42,21 +71,7 @@ export class ExpertReview_8_12IP_FormComponent extends ExpertReviewForm<any> {
     if (!this._form.section && !this._form.sectionNotPresented) {
       this._form.sectionNotPresented = true;
     }
-  }
-
-  get organizationLabel() {
-    if (this._form.addedValue != null && !this._form.addedValueNotPresented && this._form.section != null &&
-      !this._form.sectionNotPresented && this._form.addedValue >= this._form.section.addedValueBound) {
-      return "соответствует";
-    }
-    return "не соответствует"
-  }
-
-  get exportLabel() {
-    if (this._form.balance != null && !this._form.balanceNotPresented && this._form.balance > 0) {
-      return "соответствует";
-    }
-    return "не соответствует"
+    this.updateFormSignal();
   }
 
   getForm() {
@@ -76,6 +91,7 @@ export class ExpertReview_8_12IP_FormComponent extends ExpertReviewForm<any> {
   setForm(form: any) {
     super.setForm(form);
     this.initDefaultForm();
+    this.updateFormSignal();
   }
 
   validate() {

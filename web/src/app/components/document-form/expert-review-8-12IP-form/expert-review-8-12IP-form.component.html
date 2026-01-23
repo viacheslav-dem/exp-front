@@ -56,7 +56,7 @@
         планируемый к реализации инновационный проект:
       </label>
       <div class="form-check mb-2" (click)="onChooseSection()">
-        <input type="checkbox" class="form-check-input" title="Выбор" [(ngModel)]="_form.sectionNotPresented">
+        <input type="checkbox" class="form-check-input" title="Выбор" [(ngModel)]="_form.sectionNotPresented" (ngModelChange)="updateFormSignal()">
         <label class="form-check-label"> - не представлено в материалах по объекту экспертизы</label>
       </div>
       @if (!_form.sectionNotPresented) {
@@ -67,7 +67,7 @@
           <ul class="dropdown-menu scrollable-menu">
             @for (item of industries; track item) {
               <li class="dropdown-item"
-                (click)="_form.section = item">
+                (click)="_form.section = item; updateFormSignal()">
                 <span class="bold">{{item.code}}</span> - {{item.name}}
               </li>
             }
@@ -102,14 +102,14 @@
         6. Уровень добавленной стоимости на одного работающего по инновационному проекту, соответствующий году,
         следующему за годом выхода на проектную мощность, евро:
       </label>
-      <div class="form-check mb-2" (click)="_form.addedValueNotPresented = !_form.addedValueNotPresented">
-        <input type="checkbox" class="form-check-input" title="Выбор" [(ngModel)]="_form.addedValueNotPresented">
+      <div class="form-check mb-2" (click)="_form.addedValueNotPresented = !_form.addedValueNotPresented; updateFormSignal()">
+        <input type="checkbox" class="form-check-input" title="Выбор" [(ngModel)]="_form.addedValueNotPresented" (ngModelChange)="updateFormSignal()">
         <label class="form-check-label"> - не представлено в материалах по объекту экспертизы</label>
       </div>
       @if (!_form.addedValueNotPresented) {
         <div class="form-sub-group">
           <input class="form-control" numberInput type="text" name="addedValue" [required]="!_form.addedValueNotPresented" min="0" title="Уровень добавленной стоимости, евро"
-            [(ngModel)]="_form.addedValue">
+            [(ngModel)]="_form.addedValue" (ngModelChange)="updateFormSignal()">
           </div>
         }
         @if (!_form.addedValueNotPresented) {
@@ -125,14 +125,14 @@
         <label>
           7. Сальдо потока денежных средств от текущей (операционной) деятельности, евро:
         </label>
-        <div class="form-check mb-2" (click)="_form.balanceNotPresented = !_form.balanceNotPresented">
-          <input type="checkbox" class="form-check-input" title="Выбор" [(ngModel)]="_form.balanceNotPresented">
+        <div class="form-check mb-2" (click)="_form.balanceNotPresented = !_form.balanceNotPresented; updateFormSignal()">
+          <input type="checkbox" class="form-check-input" title="Выбор" [(ngModel)]="_form.balanceNotPresented" (ngModelChange)="updateFormSignal()">
           <label class="form-check-label"> - не представлено в материалах по объекту экспертизы</label>
         </div>
         @if (!_form.balanceNotPresented) {
           <div class="form-sub-group">
             <input class="form-control" numberInput type="text" name="balance" [required]="!_form.balanceNotPresented" min="0" title="Сальдо потока денежных средств, евро"
-              [(ngModel)]="_form.balance">
+              [(ngModel)]="_form.balance" (ngModelChange)="updateFormSignal()">
             </div>
           }
           @if (!_form.balanceNotPresented) {
@@ -212,14 +212,14 @@
           на одного работающего, аналогичный среднему уровню добавленной стоимости на одного работающего
           по соответствующему виду экономической деятельности в Европейском союзе либо превышающий этот уровень:
         </label>
-        <input class="form-control" disabled title="Организация технологического процесса" [value]="organizationLabel">
+        <input class="form-control" disabled title="Организация технологического процесса" [value]="organizationLabel()">
       </div>
 
       <div class="form-sub-group">
         <label>
           2. Экспортная ориентированность инновационного проекта (превышение экспорта над импортом):
         </label>
-        <input class="form-control" disabled title="Организация технологического процесса" [value]="exportLabel">
+        <input class="form-control" disabled title="Организация технологического процесса" [value]="exportLabel()">
       </div>
 
       <div class="form-sub-group">

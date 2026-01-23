@@ -94,7 +94,7 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   private readonly _uiStateTick = signal(0);
   private bumpUiStateTick() {
     this._uiStateTick.update(v => v + 1);
-    this.cdr?.markForCheck?.();
+    // markForCheck не нужен: _uiStateTick используется в computed hasUnsavedChanges, который автоматически триггерит change detection
   }
   
   // Computed: есть ли несохранённые изменения
@@ -180,7 +180,7 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
       if (councils.length > 0) {
         this.selectCouncil(councils[0]);
       }
-      this.cdr?.markForCheck?.();
+      // markForCheck не нужен: councils.set() и selectCouncil() обновляют signals, которые автоматически триггерят change detection
     });
   }
 
@@ -358,7 +358,8 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
           CouncilsComponent.sortCouncilData(selected);
         }
       }
-      this.cdr?.markForCheck?.();
+      // markForCheck не нужен: selectedBureau.set() обновляет signal, который автоматически триггерит change detection
+      // Мутация selected.isExpanded не требует markForCheck, так как это UI-состояние, которое не влияет на computed signals
     });
   }
 
@@ -470,7 +471,7 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
         this.selectedBureau.set(res);
         sortPersonsByName(res.assessors);
       }
-      this.cdr?.markForCheck?.();
+      // markForCheck не нужен: selectedBureau.set() обновляет signal, который автоматически триггерит change detection
     });
   }
 
@@ -565,7 +566,8 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
         council.sections[sectionInd] = section;
         sortPersonsByName(section.assessors);
       }
-      this.cdr?.markForCheck?.();
+      // markForCheck не нужен: selectedSection.set() обновляет signal, который автоматически триггерит change detection
+      // Мутация council.sections не требует markForCheck, так как computed hasUnsavedChanges зависит от _uiStateTick, который обновляется через bumpUiStateTick() в других местах
     });
   }
 
@@ -573,7 +575,7 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
     const council = this.selectedCouncil();
     if (council && sectionInd >= 0 && sectionInd < council.sections.length) {
       council.sections.splice(sectionInd, 1);
-      this.cdr?.markForCheck?.();
+      this.bumpUiStateTick(); // Используем bumpUiStateTick для консистентности с другими мутациями DTO
       // if (this.editedSection?.id !== 0) {
       //   this._dataService.deleteSection(this.editedSection.id).pipe(
       //     takeUntilDestroyed(this.destroyRef)

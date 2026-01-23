@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, effect, input, Type} from '@angular/core';
+import {Component, ElementRef, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, computed, effect, input, Type} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {SearchPersonByRolesComponent} from "@app/components/search/search-person/search-person-by-role.component";
 import {Role} from "@app/pipes/role.pipe";
@@ -53,8 +53,6 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   documents: Text[] = [];
   formComponent: CouncilConclusionForm;
 
-  _project: ProjectDto;
-  _group: LifecycleGroupDto;
 
   @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
   @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
@@ -82,39 +80,29 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     return new CouncilConclusionFormContent();
   }
 
-  get project() {
-    return this._project;
-  }
-
   readonly projectInput = input<ProjectDto>(undefined, { alias: 'project' });
+  readonly project = computed(() => this.projectInput());
 
   private readonly projectEffect = effect(() => {
-    const project = this.projectInput();
+    const project = this.project();
     if (!project) {
       return;
     }
-    this._project = project;
-    this.updateFormComponent(this._formTypeResolver.getFormRenderer(this._project.code.code));
-    this.cdr?.markForCheck?.();
+    this.updateFormComponent(this._formTypeResolver.getFormRenderer(project.code.code));
   });
 
-  get group() {
-    return this._group;
-  }
-
   readonly groupInput = input<LifecycleGroupDto>(undefined, { alias: 'group' });
+  readonly group = computed(() => this.groupInput());
 
   private readonly groupEffect = effect(() => {
-    const group = this.groupInput();
+    const group = this.group();
     if (!group) {
       return;
     }
-    this._group = group;
-    this._form.chairman = this._form.chairman || this._group.bureauChairman;
+    this._form.chairman = this._form.chairman || group.bureauChairman;
     if (this.formComponent) {
-      this.formComponent.group = this._group;
+      this.formComponent.group = group;
     }
-    this.cdr?.markForCheck?.();
   });
 
   updateFormComponent(_formRenderer: Type<CouncilConclusionForm>) {
@@ -125,10 +113,9 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     const componentRef = this.formContainer.createComponent(_formRenderer);
     this.formComponent = componentRef.instance;
     this.formComponent.parent = this;
-    this.formComponent.project = this.project;
-    this.formComponent.group = this.group;
+    this.formComponent.project = this.project();
+    this.formComponent.group = this.group();
     this.formComponent.setForm(this._form.projectProtocol);
-    this.cdr?.markForCheck?.();
   }
 
   validate() {
@@ -186,16 +173,14 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   setForm(form: CouncilConclusionFormContent) {
     super.setForm(form);
     this._form.projectProtocol = this._form.projectProtocol || new AgendaNewFormContent();
-    this._form.chairman = this._form.chairman || this._group.bureauChairman;
+    const group = this.group();
+    this._form.chairman = this._form.chairman || group?.bureauChairman;
     this._form.documents = this._form.documents || [];
     this.documents = this._form.documents.map(d => new Text(d));
     this._form.innerExpertiseDate = this._form.innerExpertiseDate || dayjs().valueOf();
     if (this.formComponent) {
       this.formComponent.setForm(this._form.projectProtocol);
     }
-    // Обновление представления после загрузки данных из черновика
-    // Необходимо для OnPush change detection, чтобы данные отображались сразу после загрузки
-    this.cdr?.markForCheck?.();
   }
 
   showSearchChairmanModal() {
@@ -208,11 +193,11 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   }
 
   needSelectDirections() {
-    return !ProjectCodePlainDto.isCodeIn(this.project.code.code, 9, 10, 13);
+    return !ProjectCodePlainDto.isCodeIn(this.project()?.code?.code, 9, 10, 13);
   }
 
   is_8_9() {
-    return ProjectCodePlainDto.isCode(this.project.code.code, 9);
+    return ProjectCodePlainDto.isCode(this.project()?.code?.code, 9);
   }
 
   addDocument() {

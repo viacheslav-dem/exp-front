@@ -1,4 +1,4 @@
-import {Component, forwardRef, input, ChangeDetectionStrategy, effect} from '@angular/core';
+import {Component, forwardRef, input, ChangeDetectionStrategy, computed, signal} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {VoteResults} from "@app/components/document-form/meeting-protocol-form/VoteResults";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
@@ -14,7 +14,7 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'app-vote-results',
     template: `
       @if (_value) {
-        <div [class.d-none]="!display">
+        <div [class.d-none]="!displayComputed()">
           <label><i>Результаты голосования</i></label>
           <div class="row">
             <div class="col-md-4 pe-2">
@@ -82,17 +82,26 @@ export class VoteResultsComponent extends ControlComponent<VoteResults> {
   readonly all = input<number>(undefined);
   readonly displayInput = input<boolean>(false);
   readonly displaySignal = input<boolean | null>(null, { alias: 'display' });
-  _display: boolean | null = null;
-
-  private readonly displayEffect = effect(() => {
-    this._display = this.displaySignal();
+  
+  // Внутренний сигнал для управления display из кода (например, из agenda-form)
+  private readonly _displayInternal = signal<boolean | null>(null);
+  
+  // Computed signal для использования в шаблоне
+  readonly displayComputed = computed(() => {
+    const internal = this._displayInternal();
+    if (internal !== null) {
+      return internal;
+    }
+    const displaySignalValue = this.displaySignal();
+    return displaySignalValue !== null ? displaySignalValue : this.displayInput();
   });
-
+  
+  // Геттер/сеттер для совместимости с кодом, который присваивает display
   get display(): boolean {
-    return this._display !== null ? this._display : this.displayInput();
+    return this.displayComputed();
   }
-
+  
   set display(value: boolean) {
-    this._display = value;
+    this._displayInternal.set(value);
   }
 }

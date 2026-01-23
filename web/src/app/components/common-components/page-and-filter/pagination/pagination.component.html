@@ -1,4 +1,4 @@
-@if (page() && pagination() && pages.length > 0) {
+@if (page() && pagination() && pages().length > 0) {
   <nav aria-label="Навигация по страницам">
     <ul class="pagination pagination-modern justify-content-center mb-0">
       <!-- Первая -->
@@ -22,7 +22,7 @@
         </a>
       </li> -->
       <!-- Номера страниц -->
-      @for (p of pages; track p) {
+      @for (p of pages(); track p) {
         <li class="page-item"
           [class.active]="pagination().page === p">
           <a class="page-link" 

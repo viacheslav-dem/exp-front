@@ -12,10 +12,10 @@
         <ul class="dropdown-menu">
           <!-- attention! pre-line class is used here: don't break the text -->
           <li class="dropdown-item pre-line"
-            (click)="_form.highTech = highTechCriteria.highTech.items[0]">{{highTechCriteria.highTech.items[0].name}}<span
+            (click)="_form.highTech = highTechCriteria.highTech.items[0]; updateFormSignal()">{{highTechCriteria.highTech.items[0].name}}<span
           class="bold">({{highTechCriteria.highTech.items[0].score | number: 3}} баллов)</span></li>
           <li class="dropdown-divider"></li>
-          <li class="dropdown-item" (click)="_form.highTech = highTechCriteria.highTech.items[1]">
+          <li class="dropdown-item" (click)="_form.highTech = highTechCriteria.highTech.items[1]; updateFormSignal()">
             {{highTechCriteria.highTech.items[1].name}}
             <span class="bold">({{highTechCriteria.highTech.items[1].score | number: 3}} баллов)</span>
           </li>
@@ -32,7 +32,7 @@
         <ul class="dropdown-menu scrollable-menu">
           @for (item of highTechCriteria.exportOrientation.items; track item) {
             <li class="dropdown-item"
-              (click)="_form.exportOrientation = item">
+              (click)="_form.exportOrientation = item; updateFormSignal()">
               {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
             </li>
           }
@@ -49,7 +49,7 @@
         <ul class="dropdown-menu scrollable-menu">
           @for (item of highTechCriteria.science.items; track item) {
             <li class="dropdown-item"
-              (click)="_form.science = item">
+              (click)="_form.science = item; updateFormSignal()">
               {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
             </li>
           }
@@ -66,7 +66,7 @@
         <ul class="dropdown-menu scrollable-menu">
           @for (item of highTechCriteria.addedValue.items; track item) {
             <li class="dropdown-item"
-              (click)="_form.addedValue = item">
+              (click)="_form.addedValue = item; updateFormSignal()">
               {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
             </li>
           }
@@ -84,7 +84,7 @@
         <ul class="dropdown-menu scrollable-menu">
           @for (item of highTechCriteria.isTitleProtection.items; track item) {
             <li class="dropdown-item"
-              (click)="_form.intellectualProperty = item">
+              (click)="_form.intellectualProperty = item; updateFormSignal()">
               {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
             </li>
           }
@@ -118,7 +118,7 @@
     <label>
       1. Отнесение товара (работы, услуги) к категории высокотехнологичных товаров
     </label>
-    <input class="form-control" disabled title="Итоговая оценка" [value]="conclusion">
+    <input class="form-control" disabled title="Итоговая оценка" [value]="conclusion()">
   </div>
 
   <div class="form-sub-group">

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, input} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, input, signal} from "@angular/core";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ProjectService} from "@app/services/project.service";
 import {environment} from "../../../environments/environment";
@@ -16,26 +16,27 @@ export class SameProjectListComponent {
     }
 
     readonly sameProjects = input<ProjectDto[]>([]);
-    _sameProjects: ProjectDto[] = [];
+    private readonly _sameProjects = signal<ProjectDto[]>([]);
     readonly title = input<string>('');
-    _title: string = '';
+    private readonly _title = signal<string>('');
 
-    get sameProjectsValue(): ProjectDto[] {
-        return this._sameProjects.length > 0 ? this._sameProjects : this.sameProjects();
-    }
+    readonly sameProjectsValue = computed(() => {
+        const loaded = this._sameProjects();
+        return loaded.length > 0 ? loaded : this.sameProjects();
+    });
 
-    get titleValue(): string {
-        return this._title || this.title();
-    }
+    readonly titleValue = computed(() => {
+        const loaded = this._title();
+        return loaded || this.title();
+    });
 
-    set titleValue(value: string) {
-        this._title = value;
+    setTitle(value: string) {
+        this._title.set(value ?? '');
     }
 
     getSameProjects() {
-        this._projectService.getTheSameProjectsByTitle(this.titleValue).subscribe(value => {
-            this._sameProjects = value;
-            this.cdr?.markForCheck?.();
+        this._projectService.getTheSameProjectsByTitle(this.titleValue()).subscribe(value => {
+            this._sameProjects.set(value);
         })
     }
 

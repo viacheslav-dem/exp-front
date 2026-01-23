@@ -24,42 +24,18 @@ export class BestExpertComponent {
     private readonly http = inject(HttpClient);
     private readonly destroyRef = inject(DestroyRef);
 
-    private readonly _startDate = signal<string>('');
-    private readonly _endDate = signal<string>('');
+    readonly startDate = signal<string>('');
+    readonly endDate = signal<string>('');
     readonly expertsList = signal<PersonRatingRowDto[]>([]);
     readonly loading = signal<boolean>(false);
-    readonly _expertsCount = signal<number>(0);
+    readonly expertsCount = signal<number>(0);
 
     test: boolean = false;
 
-    get startDate(): string {
-        return this._startDate();
-    }
-
-    set startDate(value: string) {
-        this._startDate.set(value);
-    }
-
-    get endDate(): string {
-        return this._endDate();
-    }
-
-    set endDate(value: string) {
-        this._endDate.set(value);
-    }
-
-    get expertsCount(): number {
-        return this._expertsCount();
-    }
-
-    set expertsCount(value: number) {
-        this._expertsCount.set(value);
-    }
-
     onSubmit() {
-        const startDateValue = this._startDate();
-        const endDateValue = this._endDate();
-        const expertsCountValue = this._expertsCount();
+        const startDateValue = this.startDate();
+        const endDateValue = this.endDate();
+        const expertsCountValue = this.expertsCount();
         
         if (!startDateValue || !endDateValue) {
             throw 'Не установлены даты.';

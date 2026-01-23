@@ -2,15 +2,15 @@
     <form (ngSubmit)="onSubmit()">
         <div class="form-group">
             <label for="startDate">Дата начала:</label>
-            <input type="date" id="startDate" [(ngModel)]="startDate" name="startDate" required>
+            <input type="date" id="startDate" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)" name="startDate" required>
         </div>
         <div class="form-group">
             <label for="endDate">Дата конца:</label>
-            <input type="date" id="endDate" [(ngModel)]="endDate" name="endDate" required>
+            <input type="date" id="endDate" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)" name="endDate" required>
         </div>
         <div class="form-group">
             <label for="expertsCount">Количество экспертов:</label>
-            <input type="number" min="1" max="10" id="expertsCount" [(ngModel)]="expertsCount" name="expertsCount"
+            <input type="number" min="1" max="10" id="expertsCount" [ngModel]="expertsCount()" (ngModelChange)="expertsCount.set($event)" name="expertsCount"
                    required>
         </div>
         <div class="button-container">

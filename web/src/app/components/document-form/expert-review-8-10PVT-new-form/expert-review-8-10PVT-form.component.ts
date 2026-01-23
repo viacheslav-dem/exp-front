@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, computed, signal} from '@angular/core';
 import {ExpertReviewForm} from "@app/components/document-form/expert-review-form-container/expert-review-form";
 import {
   CriterionItem,
@@ -21,16 +21,40 @@ import {ExpertReview_8_10PVT_NewFormContent} from "@app/components/document-form
 export class ExpertReview_8_10PVT_NewFormComponent extends ExpertReviewForm<ExpertReview_8_10PVT_NewFormContent> {
 
   highTechCriteria: HighTechCriteria;
+  
+  // Signal для отслеживания изменений формы и критериев
+  private readonly _formSignal = signal<any>(null);
+  private readonly _highTechCriteriaSignal = signal<HighTechCriteria | null>(null);
+
+  // Computed signal для вычисляемого значения
+  readonly conclusion = computed(() => {
+    const form = this._formSignal();
+    const highTechCriteria = this._highTechCriteriaSignal();
+    if (!form?.highTech || !highTechCriteria) {
+      return "";
+    }
+    let totalScore = form.highTech.score +
+      form.exportOrientation.score + form.science.score + form.addedValue.score +
+      form.isTitleProtection.score;
+    return `${this._numberPipe.transform(totalScore, 3)} из ${highTechCriteria.maxScore} баллов (${
+      totalScore > highTechCriteria.maxScore / 2 ? 'возможно отнесение' : 'невозможно отнесение'})`;
+  });
 
   constructor(private _dataService: DataService,
               private _numberPipe: NumberPipe) {
     super();
   }
+  
+  private updateFormSignal() {
+    this._formSignal.set({ ...this._form });
+  }
 
   ngOnInit() {
     super.ngOnInit();
+    this.updateFormSignal();
     this._dataService.getHighTechCriteria().subscribe(res => {
       this.highTechCriteria = res;
+      this._highTechCriteriaSignal.set(res);
       this.prepareForm();
     });
   }
@@ -39,18 +63,6 @@ export class ExpertReview_8_10PVT_NewFormComponent extends ExpertReviewForm<Expe
     // Инкрементальная миграция: обязательность/мин.длина выражаются через template-driven validators (required/minlength),
     // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
-  }
-
-  get conclusion(): string {
-    if (!this._form.highTech || !this.highTechCriteria) {
-      // highTechCriteria or draft form not loaded yet
-      return "";
-    }
-    let totalScore = this._form.highTech.score +
-      this._form.exportOrientation.score + this._form.science.score + this._form.addedValue.score +
-      this._form.isTitleProtection.score;
-    return `${this._numberPipe.transform(totalScore, 3)} из ${this.highTechCriteria.maxScore} баллов (${
-      totalScore > this.highTechCriteria.maxScore / 2 ? 'возможно отнесение' : 'невозможно отнесение'})`;
   }
 
   /**
@@ -84,6 +96,7 @@ export class ExpertReview_8_10PVT_NewFormComponent extends ExpertReviewForm<Expe
       this._form.addedValue = this.highTechCriteria.addedValue.items[0];
       this._form.isTitleProtection = this.highTechCriteria.isTitleProtection.items[0];
     }
+    this.updateFormSignal();
   }
 
   createNewForm(): ExpertReview_8_10PVT_NewFormContent {
@@ -101,6 +114,7 @@ export class ExpertReview_8_10PVT_NewFormComponent extends ExpertReviewForm<Expe
   setForm(form: any) {
     super.setForm(form);
     this.initDefaultForm();
+    this.updateFormSignal();
   }
 
   onConditionsChanged() {

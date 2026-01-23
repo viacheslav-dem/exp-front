@@ -8,7 +8,7 @@ import {environment} from "../../../../../environments/environment";
 @Component({
     selector: 'app-science-area',
     template: `
-    <h5 class="mb-3">{{headerValue}}</h5>
+    <h5 class="mb-3">{{headerValue()}}</h5>
     <div class="list-group">
     
       <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
@@ -18,7 +18,7 @@ import {environment} from "../../../../../environments/environment";
         <!--ADD ITEM-->
         <div (click)="addItem()">
           <div class="list-group-item selectable link background-dark-sea-green">
-            {{addLabelValue}}
+            {{addLabelValue()}}
           </div>
         </div>
     
@@ -28,7 +28,7 @@ import {environment} from "../../../../../environments/environment";
             <!--ITEM HEADER-->
             <div class="list-group-item" [class.disabled]="item.disabled">
               <div class="text-mini font-weight-bold">
-                {{itemLabelValue}}
+                {{itemLabelValue()}}
                 @if (item.id == 0) {
                   <span>(не сохранено)</span>
                 }
@@ -84,7 +84,7 @@ import {environment} from "../../../../../environments/environment";
             @if (!items || items.length == 0) {
               <div>
                 <div class="italic list-group-item background-light-blue">
-                  {{noItemsLabelValue}}
+                  {{noItemsLabelValue()}}
                 </div>
               </div>
             }
@@ -106,10 +106,10 @@ export class ScienceAreaComponent extends SimpleCatalogComponent<ScienceAreaDto>
 
   constructor(toasty: GlobalToastyService, dataService: DataService) {
     super(toasty, dataService);
-    this._header = "Справочник отраслей наук";
-    this._addLabel = "Добавить отрасль наук";
-    this._itemLabel = "отрасль наук";
-    this._noItemsLabel = "Отрасли наук отсутствуют";
+    this._header.set("Справочник отраслей наук");
+    this._addLabel.set("Добавить отрасль наук");
+    this._itemLabel.set("отрасль наук");
+    this._noItemsLabel.set("Отрасли наук отсутствуют");
     this._type = Catalog.SCIENCE_AREA;
   }
 }

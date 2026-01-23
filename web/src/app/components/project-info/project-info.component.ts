@@ -478,7 +478,7 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
           this.updateLifecycleSignal(res);
           this.loadProject(new IdDto(this.project.id), null);
           this._toasty.success("Эксперты утверждены.");
-          this.cdr?.markForCheck?.();
+          // markForCheck не нужен: updateLifecycleSignal и loadProject обновляют signals, которые автоматически триггерят change detection
         },
         error: () => {
           // Ошибка уже обработана в HttpClientSecure.handleError, который показывает toast
@@ -500,7 +500,7 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
             this._toasty.success("Вы вернули объект экспертизы.");
             this.updateLifecycleSignal(res);
             // this.loadProject(this.project, null);
-            this.cdr?.markForCheck?.();
+            // markForCheck не нужен: updateLifecycleSignal обновляет signal, который автоматически триггерит change detection
             this.router.navigateByUrl('/projects');
           });
       });
@@ -515,7 +515,7 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
           this._toasty.success('Вы вернули объект экспертизы');
           this.updateLifecycleSignal(res);
           this.loadProject(new IdDto(this.project.id), null);
-          this.cdr?.markForCheck?.();
+          // markForCheck не нужен: updateLifecycleSignal и loadProject обновляют signals, которые автоматически триггерят change detection
         })
       })
   }
@@ -529,7 +529,7 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
           this._toasty.success('Вы вернули объект экспертизы');
           this.updateLifecycleGroupSignal(res);
           this.loadProject(new IdDto(this.project.id), null);
-          this.cdr?.markForCheck?.();
+          // markForCheck не нужен: updateLifecycleGroupSignal и loadProject обновляют signals, которые автоматически триггерят change detection
         })
       })
   }
@@ -871,17 +871,18 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
       return;
     }
     this.sameProjectsLoading.set(true);
-    this.sameProjectList.titleValue = title;
+    this.sameProjectList.setTitle(title);
     this._projectService.getTheSameProjectsByTitle(title)
       .pipe(finalize(() => this.sameProjectsLoading.set(false)))
       .subscribe({
         next: (value) => {
           this.listSameProjects = value;
           this.listProjects.show();
-          this.cdr?.markForCheck?.();
+          // markForCheck не нужен: sameProjectsLoading.set() обновляет signal, который автоматически триггерит change detection
+          // listSameProjects - обычное свойство, но используется только в модальном окне, которое само управляет своим отображением
         },
         error: () => {
-          this.cdr?.markForCheck?.();
+          // markForCheck не нужен: sameProjectsLoading.set(false) обновляет signal, который автоматически триггерит change detection
         }
       });
   }
@@ -1052,7 +1053,7 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
       if (this.role == Role.CUSTOMER) {
         this.loadLifecycleGroups();
       }
-      this.cdr?.markForCheck?.();
+      // markForCheck не нужен: updateProjectSignal и loadLifecycleGroups обновляют signals, которые автоматически триггерят change detection
     });
   }
 
