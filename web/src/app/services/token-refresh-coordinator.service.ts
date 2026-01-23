@@ -89,32 +89,8 @@ export class TokenRefreshCoordinatorService {
 
       // Если блокировки нет - пытаемся стать "лидером" и обновить токены сами
       if (!lockIsActive && this.tryAcquireLock()) {
-        // Стали лидером: делаем запрос на сервер и уведомляем другие вкладки
         console.log('[TokenRefreshCoordinator] Стали лидером, отправляем refresh запрос');
-        this.broadcast({ type: 'refresh-started', ownerId: this.tabId, at: Date.now() });
-
-        // Запоминаем "полёт" refresh внутри вкладки (single-flight).
-        // ВАЖНО: notifyRefreshSucceeded() должен вызываться после сохранения токенов в localStorage (делает caller).
-        this.inFlight$ = refreshFn().pipe(
-          shareReplay(1),
-          catchError((err: any) => {
-            // Если обновление не удалось - уведомляем другие вкладки и освобождаем блокировку
-            this.broadcast({
-              type: 'refresh-failed',
-              ownerId: this.tabId,
-              at: Date.now(),
-              status: err?.status,
-              message: err?.message,
-            });
-            this.releaseLock();
-            return throwError(() => err);
-          }),
-          finalize(() => {
-            this.inFlight$ = undefined;
-          })
-        );
-
-        return this.inFlight$;
+        return this.startLeaderRefresh(refreshFn);
       }
 
       // Блокировка занята - ждём, пока лидер обновит токены
@@ -130,28 +106,82 @@ export class TokenRefreshCoordinatorService {
               refreshToken: this.storage.getRefreshToken(),
             } as any as UserCredentials);
           }
-          // Токены не обновились (таймаут или ошибка лидера) - пробуем сами
-          console.log('[TokenRefreshCoordinator] Лидер не обновил токены (таймаут/ошибка), пробуем сами');
-          if (this.tryAcquireLock()) {
-            this.broadcast({ type: 'refresh-started', ownerId: this.tabId, at: Date.now() });
-            return refreshFn().pipe(
-              catchError((err: any) => {
-                this.broadcast({
-                  type: 'refresh-failed',
-                  ownerId: this.tabId,
-                  at: Date.now(),
-                  status: err?.status,
-                  message: err?.message,
-                });
-                this.releaseLock();
-                return throwError(() => err);
+
+          // Токены не обновились (лидер завис/упал/не успел записать токены).
+          // В этом случае возможен активный lock от другой вкладки. НЕЛЬЗЯ сразу падать ошибкой:
+          // нужно дождаться истечения lock TTL и затем попробовать стать лидером.
+          const lockAfterWait = this.readLock();
+          const now2 = Date.now();
+          const lockStillActive = !!lockAfterWait && lockAfterWait.expiresAt > now2 && lockAfterWait.ownerId !== this.tabId;
+          if (lockStillActive) {
+            const remainingMs = Math.max(0, lockAfterWait.expiresAt - now2);
+            console.log(
+              `[TokenRefreshCoordinator] Лидер не обновил токены, lock ещё активен (${remainingMs}ms). Ждём истечения TTL...`
+            );
+            return timer(remainingMs + 25).pipe(
+              switchMap(() => {
+                // После TTL могли появиться токены (например, лидер завершил очень поздно)
+                if (this.storage.isAccessTokenValidNow()) {
+                  console.log('[TokenRefreshCoordinator] Токены появились после ожидания TTL, используем их');
+                  return of({
+                    accessToken: this.storage.getAccessToken(),
+                    refreshToken: this.storage.getRefreshToken(),
+                  } as any as UserCredentials);
+                }
+
+                console.log('[TokenRefreshCoordinator] Пробуем стать лидером после истечения TTL');
+                if (this.tryAcquireLock()) {
+                  return this.startLeaderRefresh(refreshFn);
+                }
+
+                return throwError(() => new Error('Token refresh coordination failed: lock still owned by another tab'));
               })
             );
           }
+
+          // Lock уже не активен — пробуем стать лидером сразу.
+          console.log('[TokenRefreshCoordinator] Лидер не обновил токены, пробуем сами');
+          if (this.tryAcquireLock()) {
+            return this.startLeaderRefresh(refreshFn);
+          }
+
           return throwError(() => new Error('Token refresh coordination failed'));
         })
       );
     });
+  }
+
+  /**
+   * Общая ветка "мы лидер": стартуем refresh, шарим один запрос внутри вкладки и
+   * корректно освобождаем lock/рассылаем ошибки РОВНО ОДИН РАЗ (не на каждого подписчика).
+   *
+   * ВАЖНО: notifyRefreshSucceeded() вызывается снаружи (caller), только после записи токенов в localStorage.
+   */
+  private startLeaderRefresh(refreshFn: () => Observable<UserCredentials>): Observable<UserCredentials> {
+    this.broadcast({ type: 'refresh-started', ownerId: this.tabId, at: Date.now() });
+
+    // Single-flight: все параллельные запросы в этой вкладке подписываются на один и тот же Observable.
+    this.inFlight$ = refreshFn().pipe(
+      catchError((err: any) => {
+        // Если обновление не удалось - уведомляем другие вкладки и освобождаем блокировку.
+        this.broadcast({
+          type: 'refresh-failed',
+          ownerId: this.tabId,
+          at: Date.now(),
+          status: err?.status,
+          message: err?.message,
+        });
+        this.releaseLock();
+        return throwError(() => err);
+      }),
+      finalize(() => {
+        this.inFlight$ = undefined;
+      }),
+      // ВАЖНО: shareReplay должен быть ПОСЛЕ catchError/finalize, чтобы побочные эффекты выполнялись один раз.
+      shareReplay({ bufferSize: 1, refCount: false })
+    );
+
+    return this.inFlight$;
   }
 
   /**
@@ -176,11 +206,28 @@ export class TokenRefreshCoordinatorService {
    * Если за 15 секунд токены не обновились - возвращает управление (таймаут).
    */
   private waitForTokensOrEvent(): Observable<void> {
-    // Storage event срабатывает только в других вкладках (не в той, что изменила localStorage)
+    // Storage event срабатывает только в других вкладках (не в той, что изменила localStorage).
+    // ВАЖНО: не всегда можно проверять isAccessTokenValidNow() на событии EVENT_KEY,
+    // потому что (при ошибочной последовательности записи) уведомление может прийти чуть раньше записи токена.
     const storage$ = fromEvent<StorageEvent>(window, 'storage').pipe(
       filter((e) => e.storageArea === localStorage),
       filter((e) => e.key === 'access_token' || e.key === TokenRefreshCoordinatorService.EVENT_KEY),
-      filter(() => this.storage.isAccessTokenValidNow()),
+      filter((e) => {
+        // 1) access_token обновлён и уже валиден
+        if (e.key === 'access_token') {
+          return this.storage.isAccessTokenValidNow();
+        }
+
+        // 2) Получили межвкладочное событие refresh-succeeded (по EVENT_KEY)
+        // На removeItem придёт newValue=null — игнорируем.
+        if (!e.newValue) return false;
+        try {
+          const evt = JSON.parse(e.newValue) as RefreshEvent;
+          return evt?.type === 'refresh-succeeded';
+        } catch {
+          return false;
+        }
+      }),
       take(1),
       map(() => void 0)
     );

@@ -40,6 +40,19 @@ export class ProjectService extends HasStateService {
               private _http: HttpClientSecure,
               private _documentService: DocumentService) {
     super(_authService);
+    // Подписываемся на событие logout для очистки состояния
+    this._authService.onLogout$.subscribe(() => {
+      this.clearFilterState();
+    });
+  }
+  
+  /**
+   * Очищает состояние фильтра проектов.
+   * Вызывается при logout для предотвращения использования устаревших данных.
+   */
+  clearFilterState(): void {
+    this.filter = null;
+    this.filterName = null;
   }
 
   prepareProject(project: ProjectDto | ProjectLiDto) {

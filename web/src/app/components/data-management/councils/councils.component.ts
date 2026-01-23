@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, signal, computed, inject, DestroyRef} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {compareByField, createTrackKeyStore, sortPersonsByName} from "app/support/utils";
 import {Catalog, DataService} from "@app/services/data.service";
@@ -18,6 +20,7 @@ import {Filter} from "@app/components/common-components/page-and-filter/model/Fi
 import {FilterBuilder} from "@app/components/common-components/page-and-filter/model/FilterBuilder";
 import {SearchPersonComponent} from "@app/components/search/search-person/search-person.component";
 import {environment} from "../../../../environments/environment";
+import {catchError, of} from "rxjs";
 
 @Component({
     selector: 'app-councils',
@@ -32,6 +35,83 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   allSectionTypes: string[] = getAllSectionTypes();
 
   private readonly _trackKey = createTrackKeyStore<object>('councils:');
+
+  // Современные Angular 21 практики: используем inject() вместо constructor injection
+  private readonly _toasty = inject(GlobalToastyService);
+  private readonly _dataService = inject(DataService);
+  private readonly _sectionTypePipe = inject(SectionTypePipe);
+  private readonly _councilPipe = inject(CouncilPipe);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
+
+  // Signals для реактивного состояния
+  readonly councils = signal<CouncilDto[]>([]);
+  readonly selectedCouncil = signal<CouncilDto | null>(null);
+  readonly selectedBureau = signal<BureauDto | null>(null);
+  readonly selectedSection = signal<SectionDto | null>(null);
+  
+  // Состояние для редактирования
+  editedCouncil: CouncilDto | null = null;
+  editedBureau: BureauDto | null = null;
+  editedSection: SectionDto | null = null;
+  
+  // Состояние для модальных окон
+  onPersonSelected: ((person: PersonPlainDto) => void) | null = null;
+  readonly searchPersonFilter = signal<Filter<PersonPlainDto> | null>(null);
+  
+  // Другие свойства
+  readonly sectionTypeToString = (value: string) => this._sectionTypePipe.transform(value);
+  newDirection: CatalogDto | null = null;
+  
+  // Signal для belisa (загружается асинхронно)
+  readonly belisa = toSignal(
+    this._dataService.getBelisa().pipe(
+      catchError(() => {
+        console.error('Ошибка загрузки данных БелИСА');
+        return of(null);
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ),
+    { initialValue: null as IdNameDto | null }
+  );
+
+  // Computed для проверки возможности добавления секции
+  readonly canAddSection = computed(() => {
+    const council = this.selectedCouncil();
+    return council !== null && council.id !== 0;
+  });
+
+  // Сигналы для управления вкладками
+  readonly activeTab = signal<'main' | 'bureau' | 'sections'>('main');
+  readonly activeSectionIndex = signal<number | null>(null);
+
+  /**
+   * Важно для zoneless + signals:
+   * мы часто мутируем DTO (council.isEdit = true и т.п.), а computed зависит от signal-ссылок.
+   * Чтобы computed/шаблон гарантированно обновлялись, используем "тик" сигнал,
+   * который дергаем при смене UI-режимов (edit/cancel и т.п.).
+   */
+  private readonly _uiStateTick = signal(0);
+  private bumpUiStateTick() {
+    this._uiStateTick.update(v => v + 1);
+    this.cdr?.markForCheck?.();
+  }
+  
+  // Computed: есть ли несохранённые изменения
+  readonly hasUnsavedChanges = computed(() => {
+    // зависимость для реактивности при мутациях DTO
+    this._uiStateTick();
+    const council = this.selectedCouncil();
+    const bureau = this.selectedBureau();
+    return council?.isEdit || bureau?.isEdit || 
+           council?.sections?.some(s => s.isEdit) || false;
+  });
+
+  @ViewChild(SearchPersonComponent) public searchPersonModal: SearchPersonComponent;
+
+  constructor() {
+    super();
+  }
 
   /**
    * Стабильный track-ключ для councils:
@@ -53,34 +133,7 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
     return section.id || this._trackKey(section);
   }
 
-  councils: CouncilDto[];
-  selectedCouncil: CouncilDto;
-  editedCouncil: CouncilDto;
-  selectedBureau: BureauDto;
-  editedBureau: BureauDto;
-  selectedSection: SectionDto;
-  editedSection: SectionDto;
-  onPersonSelected: Function;
-  searchPersonFilter: Filter<PersonPlainDto>;
-  sectionTypeToString = value => this._sectionTypePipe.transform(value);
-  newDirection: CatalogDto;
-  belisa: IdNameDto;
-
-  @ViewChild(SearchPersonComponent) public searchPersonModal: SearchPersonComponent;
-
-  constructor(private _toasty: GlobalToastyService,
-              private _dataService: DataService,
-              private _sectionTypePipe: SectionTypePipe,
-              private _councilPipe: CouncilPipe,
-              private cdr: ChangeDetectorRef) {
-    super();
-  }
-
   ngOnInit() {
-    this._dataService.getBelisa().subscribe(res => {
-      this.belisa = res;
-      this.cdr?.markForCheck?.();
-    });
     this._searchFields = [
       SearchField.contains('name').setPlaceholder('Поиск по наименованию...').setSortable(true),
       SearchField.equals('code').setPlaceholder('Поиск по коду...')
@@ -92,30 +145,41 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
     ];
     this.enableFilterCache("councils");
     // Если нет сохранённого состояния фильтров, загружаем данные явно
-    setTimeout(() => {
+    // Используем requestAnimationFrame вместо setTimeout для лучшей производительности
+    requestAnimationFrame(() => {
       const hasCachedFilters = localStorage.getItem('filter_cache_councils');
       if (!hasCachedFilters) {
         this.update();
       }
-    }, 100);
+    });
   }
 
   loadPage() {
-    this._dataService.getCouncilsAdminPage(this._searchRequest).subscribe(res => {
+    this._dataService.getCouncilsAdminPage(this._searchRequest).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      catchError(error => {
+        console.error('Ошибка загрузки данных советов:', error);
+        this._toasty.error("Ошибка загрузки данных.");
+        this.setLoading(false);
+        this.cdr?.markForCheck?.();
+        return of(null);
+      })
+    ).subscribe(res => {
+      if (!res) {
+        return;
+      }
       this.setLoading(false);
       this._page = res;
-      this.councils = this._page.content;
+      const councils = res.content;
       // Инициализируем UI-поля для всех элементов
-      this.councils.forEach(council => {
+      councils.forEach(council => {
         this.initializeCouncilUI(council);
         CouncilsComponent.sortCouncilData(council);
       });
-      if (this.councils.length > 0) {
-        this.selectCouncil(this.councils[0]);
+      this.councils.set(councils);
+      if (councils.length > 0) {
+        this.selectCouncil(councils[0]);
       }
-      this.cdr?.markForCheck?.();
-    }, () => {
-      this.setLoading(false);
       this.cdr?.markForCheck?.();
     });
   }
@@ -127,197 +191,456 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
     return this._councilPipe.transform(council);
   }
 
-  selectCouncil(council: CouncilDto) {
-    if (this.selectedCouncil) {
-      this.selectedCouncil.isEdit = false;
+  selectCouncil(council: CouncilDto | null) {
+    const currentCouncil = this.selectedCouncil();
+    if (currentCouncil) {
+      currentCouncil.isEdit = false;
     }
-    if (this.selectedBureau) {
-      this.selectedBureau.isEdit = false;
+    const currentBureau = this.selectedBureau();
+    if (currentBureau) {
+      currentBureau.isEdit = false;
     }
-    this.selectedCouncil = council;
+    
     if (council) {
       this.initializeCouncilUI(council);
-      CouncilsComponent.sortSections(this.selectedCouncil);
-      this.selectedBureau = council.bureau;
-      if (this.selectedBureau) {
-        this.initializeBureauUI(this.selectedBureau);
+      CouncilsComponent.sortSections(council);
+      const bureau = council.bureau;
+      if (bureau) {
+        this.initializeBureauUI(bureau);
+        this.selectedBureau.set(bureau);
+      } else {
+        this.selectedBureau.set(null);
       }
       // Автоматически раскрываем выбранный совет для лучшего UX
       council.isExpanded = true;
+      this.selectedCouncil.set(council);
+      // Сбрасываем на первую вкладку и очищаем выбранную секцию
+      this.activeTab.set('main');
+      this.activeSectionIndex.set(council.sections.length > 0 ? 0 : null);
     } else {
-      this.selectedBureau = null;
+      this.selectedCouncil.set(null);
+      this.selectedBureau.set(null);
+      this.activeSectionIndex.set(null);
+    }
+    this.bumpUiStateTick();
+  }
+
+  /**
+   * Переключение вкладки с проверкой несохранённых изменений
+   */
+  switchTab(tab: 'main' | 'bureau' | 'sections') {
+    if (this.hasUnsavedChanges()) {
+      if (!confirm('У вас есть несохранённые изменения. Вы уверены, что хотите переключить вкладку?')) {
+        return;
+      }
+      // Отменяем все режимы редактирования
+      this.cancelAllEdits();
+    }
+    this.activeTab.set(tab);
+    // При переключении на секции выбираем первую, если есть
+    if (tab === 'sections') {
+      const council = this.selectedCouncil();
+      if (council && council.sections.length > 0 && this.activeSectionIndex() === null) {
+        this.activeSectionIndex.set(0);
+      }
     }
   }
 
+  /**
+   * Выбор секции по индексу (для мини-навигации)
+   */
+  selectSectionByIndex(index: number) {
+    const council = this.selectedCouncil();
+    if (!council || index < 0 || index >= council.sections.length) {
+      return;
+    }
+    // Проверяем несохранённые изменения в текущей секции
+    const currentSection = this.selectedSection();
+    if (currentSection?.isEdit) {
+      if (!confirm('У вас есть несохранённые изменения в текущей секции. Вы уверены, что хотите переключиться?')) {
+        return;
+      }
+      currentSection.isEdit = false;
+    }
+    this.activeSectionIndex.set(index);
+    this.selectedSection.set(council.sections[index]);
+    this.bumpUiStateTick();
+  }
+
+  /**
+   * Отмена всех режимов редактирования
+   */
+  private cancelAllEdits() {
+    const council = this.selectedCouncil();
+    if (council) {
+      council.isEdit = false;
+    }
+    const bureau = this.selectedBureau();
+    if (bureau) {
+      bureau.isEdit = false;
+    }
+    const section = this.selectedSection();
+    if (section) {
+      section.isEdit = false;
+    }
+    // Отменяем режим редактирования для всех секций
+    council?.sections?.forEach(s => s.isEdit = false);
+    this.bumpUiStateTick();
+  }
+
   editCouncil() {
-    this.selectedCouncil.isEdit = this.selectedCouncil.isExpanded = true;
-    this.editedCouncil = (this.selectedCouncil.id === 0 ?
-      this.selectedCouncil : CouncilsComponent.copyCouncil(this.selectedCouncil));
+    const council = this.selectedCouncil();
+    if (!council) {
+      return;
+    }
+    council.isEdit = council.isExpanded = true;
+    this.editedCouncil = (council.id === 0 ?
+      council : CouncilsComponent.copyCouncil(council));
+    this.bumpUiStateTick();
   }
 
   showSearchBelisaWorkerModal() {
+    if (!this.editedCouncil) {
+      return;
+    }
+    const belisaValue = this.belisa();
+    const filter = belisaValue ? FilterBuilder.equals('org', belisaValue) : null;
     this.setupPersonSelector(person => {
-      this.addPersonIfNotExists(this.editedCouncil.belisaWorkers, person);
-    });
-    this.searchPersonFilter = FilterBuilder.equals('org', this.belisa);
+      this.addPersonIfNotExists(this.editedCouncil!.belisaWorkers, person);
+    }, filter);
     this.showPersonModal();
   }
 
   cancelEditCouncil() {
-    this.selectedCouncil.isEdit = false;
+    const council = this.selectedCouncil();
+    if (council) {
+      council.isEdit = false;
+    }
+    this.bumpUiStateTick();
   }
 
-  getSelectedCouncilInd() {
-    return this.councils.findIndex(council => council === this.selectedCouncil);
+  getSelectedCouncilInd(): number {
+    const selected = this.selectedCouncil();
+    if (!selected) {
+      return -1;
+    }
+    return this.councils().findIndex(council => council === selected);
   }
 
   saveEditedCouncil() {
-    this._dataService.saveCouncil(this.editedCouncil).subscribe(res => {
-      this._toasty.success("Сохранено.");
+    if (!this.editedCouncil) {
+      return;
+    }
+    this._dataService.saveCouncil(this.editedCouncil).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      catchError(error => {
+        console.error('Ошибка сохранения совета:', error);
+        this._toasty.error("Ошибка сохранения.");
+        return of(null);
+      })
+    ).subscribe(res => {
+      if (!res) {
+        return;
+      }
+      this._toasty.success("ГЭС сохранена.");
       this.initializeCouncilUI(res);
       res.isExpanded = true;
-      this.councils[this.getSelectedCouncilInd()] = res;
-      this.selectCouncil(res);
-      this.selectedCouncil.isExpanded = true;
-      CouncilsComponent.sortCouncils(this.councils);
-      CouncilsComponent.sortCouncilData(this.selectedCouncil);
+      const councils = [...this.councils()];
+      const index = this.getSelectedCouncilInd();
+      if (index >= 0) {
+        councils[index] = res;
+        CouncilsComponent.sortCouncils(councils);
+        this.councils.set(councils);
+        this.selectCouncil(res);
+        const selected = this.selectedCouncil();
+        if (selected) {
+          selected.isExpanded = true;
+          CouncilsComponent.sortCouncilData(selected);
+        }
+      }
       this.cdr?.markForCheck?.();
     });
   }
 
   addCouncil() {
-    let newCouncil = new CouncilDto();
-    this.councils.push(newCouncil);
+    const newCouncil = new CouncilDto();
+    const councils = [...this.councils(), newCouncil];
+    this.councils.set(councils);
     this.selectCouncil(newCouncil);
     this.editCouncil();
   }
 
   deleteCouncil() {
-    this.councils.splice(this.getSelectedCouncilInd(), 1);
-    this.selectCouncil(this.councils[0]);
+    const councils = [...this.councils()];
+    const index = this.getSelectedCouncilInd();
+    if (index >= 0) {
+      councils.splice(index, 1);
+      this.councils.set(councils);
+      this.selectCouncil(councils.length > 0 ? councils[0] : null);
+    }
   }
 
   editBureau() {
-    this.selectedBureau.isEdit = this.selectedBureau.isExpanded = true;
-    this.editedBureau = CouncilsComponent.copyBureau(this.selectedBureau);
+    const bureau = this.selectedBureau();
+    if (!bureau) {
+      return;
+    }
+    bureau.isEdit = bureau.isExpanded = true;
+    this.editedBureau = CouncilsComponent.copyBureau(bureau);
+    this.bumpUiStateTick();
   }
 
   showSearchBureauChairmanModal() {
-    this.setupPersonSelector(person => this.editedBureau.chairman = person);
+    if (!this.editedBureau) {
+      return;
+    }
+    this.setupPersonSelector(person => {
+      if (this.editedBureau) {
+        this.editedBureau.chairman = person;
+      }
+    }, null);
     this.showPersonModal();
   }
 
   showSearchBureauDeputyChairmanModal() {
-    this.setupPersonSelector(person => this.editedBureau.deputyChairman = person);
+    if (!this.editedBureau) {
+      return;
+    }
+    this.setupPersonSelector(person => {
+      if (this.editedBureau) {
+        this.editedBureau.deputyChairman = person;
+      }
+    }, null);
     this.showPersonModal();
   }
 
   showSearchBureauSecretaryModal() {
-    this.setupPersonSelector(person => this.editedBureau.secretary = person);
+    if (!this.editedBureau) {
+      return;
+    }
+    this.setupPersonSelector(person => {
+      if (this.editedBureau) {
+        this.editedBureau.secretary = person;
+      }
+    }, null);
     this.showPersonModal();
   }
 
   showSearchBureauAssessorModal() {
+    if (!this.editedBureau) {
+      return;
+    }
     this.setupPersonSelector(person => {
-      this.addPersonIfNotExists(this.editedBureau.assessors, person);
-    });
+      if (this.editedBureau) {
+        this.addPersonIfNotExists(this.editedBureau.assessors, person);
+      }
+    }, null);
     this.showPersonModal();
   }
 
   cancelEditBureau() {
-    this.selectedBureau.isEdit = false;
+    const bureau = this.selectedBureau();
+    if (bureau) {
+      bureau.isEdit = false;
+    }
+    this.bumpUiStateTick();
   }
 
   saveEditedBureau() {
-    this._dataService.saveBureau(this.editedBureau).subscribe(res => {
-      this._toasty.success("Сохранено.");
+    if (!this.editedBureau) {
+      return;
+    }
+    this._dataService.saveBureau(this.editedBureau).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      catchError(error => {
+        console.error('Ошибка сохранения бюро:', error);
+        this._toasty.error("Ошибка сохранения.");
+        return of(null);
+      })
+    ).subscribe(res => {
+      if (!res) {
+        return;
+      }
+      this._toasty.success("Бюро сохранено.");
       this.initializeBureauUI(res);
       res.isExpanded = true;
-      this.selectedCouncil.bureau = this.selectedBureau = res;
-      sortPersonsByName(this.selectedBureau.assessors);
+      const council = this.selectedCouncil();
+      if (council) {
+        council.bureau = res;
+        this.selectedBureau.set(res);
+        sortPersonsByName(res.assessors);
+      }
       this.cdr?.markForCheck?.();
     });
   }
 
   editSection(section: SectionDto) {
-    if (this.selectedSection) {
-      this.selectedSection.isEdit = false;
+    const currentSection = this.selectedSection();
+    if (currentSection) {
+      currentSection.isEdit = false;
     }
-    this.selectedSection = section;
+    this.selectedSection.set(section);
     this.editedSection = (section.id === 0 ?
-      this.selectedSection : CouncilsComponent.copySection(this.selectedSection));
-    this.selectedSection.isEdit = this.selectedSection.isExpanded = true;
+      section : CouncilsComponent.copySection(section));
+    section.isEdit = section.isExpanded = true;
+    this.bumpUiStateTick();
   }
 
   showSearchSectionHeadModal() {
-    this.setupPersonSelector(person => this.editedSection.head = person);
+    if (!this.editedSection) {
+      return;
+    }
+    this.setupPersonSelector(person => {
+      if (this.editedSection) {
+        this.editedSection.head = person;
+      }
+    }, null);
     this.showPersonModal();
   }
 
   showSearchSectionDeputyHeadModal() {
-    this.setupPersonSelector(person => this.editedSection.deputyHead = person);
+    if (!this.editedSection) {
+      return;
+    }
+    this.setupPersonSelector(person => {
+      if (this.editedSection) {
+        this.editedSection.deputyHead = person;
+      }
+    }, null);
     this.showPersonModal();
   }
 
   showSearchSectionSecretaryModal() {
-    this.setupPersonSelector(person => this.editedSection.secretary = person);
+    if (!this.editedSection) {
+      return;
+    }
+    this.setupPersonSelector(person => {
+      if (this.editedSection) {
+        this.editedSection.secretary = person;
+      }
+    }, null);
     this.showPersonModal();
   }
 
   showSearchSectionAssessorModal() {
+    if (!this.editedSection) {
+      return;
+    }
     this.setupPersonSelector(person => {
-      this.addPersonIfNotExists(this.editedSection.assessors, person);
-    });
+      if (this.editedSection) {
+        this.addPersonIfNotExists(this.editedSection.assessors, person);
+      }
+    }, null);
     this.showPersonModal();
   }
 
   cancelEditSection() {
-    this.selectedSection.isEdit = false;
+    const section = this.selectedSection();
+    if (section) {
+      section.isEdit = false;
+    }
+    this.bumpUiStateTick();
   }
 
-  saveEditedSection(sectionInd) {
-    this._dataService.saveSection(this.editedSection).subscribe(section => {
-      this._toasty.success("Сохранено.");
+  saveEditedSection(sectionInd: number) {
+    if (!this.editedSection) {
+      return;
+    }
+    this._dataService.saveSection(this.editedSection).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      catchError(error => {
+        console.error('Ошибка сохранения секции:', error);
+        this._toasty.error("Ошибка сохранения.");
+        return of(null);
+      })
+    ).subscribe(section => {
+      if (!section) {
+        return;
+      }
+      this._toasty.success("Секция сохранена.");
       this.initializeSectionUI(section);
       section.isExpanded = true;
-      this.selectedCouncil.sections[sectionInd] = section;
-      sortPersonsByName(section.assessors);
+      const council = this.selectedCouncil();
+      if (council && sectionInd >= 0 && sectionInd < council.sections.length) {
+        council.sections[sectionInd] = section;
+        sortPersonsByName(section.assessors);
+      }
       this.cdr?.markForCheck?.();
     });
   }
 
-  deleteSection(sectionInd) {
-    this.selectedCouncil.sections.splice(sectionInd, 1);
-    this.cdr?.markForCheck?.();
-    // if (this.editedSection.id != 0) {
-    //   this._dataService.deleteSection(this.editedSection.id).subscribe();
-    // }
-  }
-
-  canAddSection() {
-    return this.selectedCouncil && this.selectedCouncil.id !== 0;
+  deleteSection(sectionInd: number) {
+    const council = this.selectedCouncil();
+    if (council && sectionInd >= 0 && sectionInd < council.sections.length) {
+      council.sections.splice(sectionInd, 1);
+      this.cdr?.markForCheck?.();
+      // if (this.editedSection?.id !== 0) {
+      //   this._dataService.deleteSection(this.editedSection.id).pipe(
+      //     takeUntilDestroyed(this.destroyRef)
+      //   ).subscribe();
+      // }
+    }
   }
 
   addSection() {
-    let newSection = new SectionDto(this.selectedCouncil.id);
-    this.selectedCouncil.sections.push(newSection);
+    const council = this.selectedCouncil();
+    if (!council) {
+      return;
+    }
+    const newSection = new SectionDto(council.id);
+    council.sections.push(newSection);
+    // Выбираем новую секцию в мини-навигации
+    this.activeSectionIndex.set(council.sections.length - 1);
     this.editSection(newSection);
   }
 
   showPersonModal() {
+    // Просто показываем модальное окно - фильтр уже установлен в setupPersonSelector
+    // Эффект в SearchPersonComponent должен обработать изменение автоматически
     this.searchPersonModal.show();
   }
 
   selectPerson(person: PersonDto) {
-    this.onPersonSelected(person);
-    this.searchPersonModal.hide();
+    if (this.onPersonSelected) {
+      this.onPersonSelected(person);
+    }
+    this.searchPersonModal?.hide();
   }
 
   addDirection() {
-    if (this.newDirection) {
-      this.editedCouncil.directions.push(this.newDirection);
-      this.newDirection = null;
+    if (!this.newDirection || !this.editedCouncil) {
+      return;
     }
+    this.editedCouncil.directions.push(this.newDirection);
+    this.newDirection = null;
+  }
+
+  removeDirection(index: number) {
+    if (!this.editedCouncil || index < 0 || index >= this.editedCouncil.directions.length) {
+      return;
+    }
+    this.editedCouncil.directions.splice(index, 1);
+  }
+
+  removeBelisaWorker(index: number) {
+    if (!this.editedCouncil || index < 0 || index >= this.editedCouncil.belisaWorkers.length) {
+      return;
+    }
+    this.editedCouncil.belisaWorkers.splice(index, 1);
+  }
+
+  removeBureauAssessor(index: number) {
+    if (!this.editedBureau || index < 0 || index >= this.editedBureau.assessors.length) {
+      return;
+    }
+    this.editedBureau.assessors.splice(index, 1);
+  }
+
+  removeSectionAssessor(index: number) {
+    if (!this.editedSection || index < 0 || index >= this.editedSection.assessors.length) {
+      return;
+    }
+    this.editedSection.assessors.splice(index, 1);
   }
 
   static sortCouncils(councils: CouncilDto[]) {
@@ -383,9 +706,15 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   }
 
   // Вспомогательные методы для работы с модальными окнами поиска людей
-  private setupPersonSelector(handler: (person: PersonPlainDto) => void) {
+  private setupPersonSelector(handler: (person: PersonPlainDto) => void, filter?: Filter<PersonPlainDto> | null) {
     this.onPersonSelected = handler;
-    this.searchPersonFilter = null;
+    // Устанавливаем фильтр - если не передан, используем null
+    const filterToSet = filter ?? null;
+    // Принудительно обновляем фильтр, чтобы гарантировать, что эффект увидит изменение
+    // Сначала устанавливаем undefined, затем нужное значение синхронно
+    this.searchPersonFilter.set(undefined as any);
+    // Устанавливаем нужное значение синхронно, чтобы оно было установлено до вызова showPersonModal
+    this.searchPersonFilter.set(filterToSet);
   }
 
   private addPersonIfNotExists(people: PersonPlainDto[], person: PersonPlainDto) {

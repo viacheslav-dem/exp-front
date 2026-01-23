@@ -60,6 +60,7 @@ export const DataManagementRoutes: Route = {
     RouterModule,
     CommonComponentsModule,
     SearchModule,
+    DirectionsComponent,
   ],
   declarations: [
     FundingComponent,
@@ -70,7 +71,6 @@ export const DataManagementRoutes: Route = {
     IndustriesComponent,
     AreasOfCompetenceComponent,
     TemplatesComponent,
-    DirectionsComponent,
     GkntDepartmentComponent,
     MailTemplateComponent,
     UserManualComponent,

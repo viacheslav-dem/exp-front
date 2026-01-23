@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, computed, effect, input, signal, output} from "@angular/core";
+import {ChangeDetectionStrategy, Component, computed, effect, input, signal, output} from "@angular/core";
 import {
   CheckboxField,
   MultiCheck,
@@ -79,7 +79,7 @@ import {environment} from "../../../../../environments/environment";
       ? ChangeDetectionStrategy.OnPush
       : ChangeDetectionStrategy.Default
 })
-export class FilterComponent implements OnInit {
+export class FilterComponent {
 
   SearchFieldType = SearchFieldType;
   searcherTimer: any;
@@ -99,9 +99,6 @@ export class FilterComponent implements OnInit {
   constructor(
     private dataService: DataService
   ) {
-  }
-
-  ngOnInit() {
   }
 
   /**

@@ -45,6 +45,8 @@ export class SelectCatalogComponent extends ControlComponent<CatalogDto> impleme
   }
 
   ngOnInit(): void {
+    // Справочники кешируются в DataService и автоматически инвалидируются при logout.
+    // При следующем запросе после login будет загружена свежая версия.
     this.subscription = this.dataService.getCatalog<CatalogDto>(this.catalog()).subscribe(res => {
       this.options = res;
       // Важно для OnPush/zoneless: данные пришли асинхронно

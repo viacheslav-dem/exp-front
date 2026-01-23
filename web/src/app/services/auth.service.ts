@@ -4,7 +4,7 @@ import {HttpClientSecure} from "./http.client";
 import {SERVER_URL} from "../config";
 import {Router} from "@angular/router";
 import {StorageService} from "./storage.service";
-import {Observable, Observer, of, defer} from "rxjs";
+import {Observable, Observer, of, defer, Subject} from "rxjs";
 import {UserCredentials} from "@app/dto/UserCredentials";
 import {PasswordDto} from "@app/dto/PasswordDto";
 import {UserDto} from "@app/dto/UserDto";
@@ -20,6 +20,11 @@ import {TokenRefreshCoordinatorService} from "@app/services/token-refresh-coordi
 export class AuthService implements OnInit {
 
   private restoreSessionInFlight$?: Observable<boolean>;
+  
+  // Событие для уведомления о login (для перезагрузки справочников)
+  readonly onLogin$ = new Subject<void>();
+  // Событие для уведомления о logout (для очистки состояния)
+  readonly onLogout$ = new Subject<void>();
 
   constructor(private http: HttpClientSecure,
               private storage: StorageService,
@@ -136,6 +141,9 @@ export class AuthService implements OnInit {
   loginWithCredentials(credentials: UserCredentials) {
     let roles = credentials.roles;
     this.updateCredentials(credentials);
+    
+    // Уведомляем о login для перезагрузки справочников
+    this.onLogin$.next();
 
     if (credentials.passwordExpired) {
       this.toasty.warn('Истёк срок действия пароля.');
@@ -162,12 +170,19 @@ export class AuthService implements OnInit {
   }
 
   logout() {
-    // Получаем refreshToken ДО очистки, чтобы сервер мог удалить только текущую сессию
+    // Получаем refreshToken ДО очистки, чтобы сервер мог удалить только текущей сессии
     const refreshToken = this.storage.getRefreshToken();
     // Очищаем токены сразу, чтобы предотвратить дальнейшие запросы с устаревшими токенами
     this.storage.resetCredentials();
     // Очищаем все кэши фильтров при выходе из системы
     this.storage.clearFilterCaches();
+    
+    // Очищаем состояние ProjectService (filter и filterName) через событие
+    // ProjectService подпишется на onLogout$ и очистит свое состояние
+    
+    // Уведомляем о logout для компонентов, которые могут подписаться
+    this.onLogout$.next();
+    
     // Отправляем refreshToken на сервер для удаления только этой сессии (мультисессии)
     this.http.post(`${SERVER_URL}/public/logout`, { refreshToken }).subscribe({
       next: () => {

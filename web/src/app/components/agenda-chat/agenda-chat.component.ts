@@ -40,8 +40,12 @@ export class AgendaChatComponent implements OnInit {
   }
 
   createComment() {
+    if (!this.text || !this.text.trim()) {
+      return;
+    }
     this._agendaService.createComment(this._agenda, new CommentDto(this._agenda, this.text))
       .subscribe(() => {
+        this.text = '';
         this.loadComments();
         this.cdr?.markForCheck?.();
       });

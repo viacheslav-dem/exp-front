@@ -626,11 +626,47 @@ span.badge.bg-primary,
 .subdirections app-dropdown .dropdown-menu {
   min-width: 500px;   // ширина выпадающего списка
 }
+
+/* =====================================================================
+ Councils: app-select-catalog (app-dropdown) — фикс ширины и переноса текста
+ Контекст: длинные значения в dropdown-toggle растягивают контрол и "выпирают"
+ из Bootstrap grid (col-10/col-2). Делаем контрол шириной 100% и разрешаем перенос.
+ ===================================================================== */
+app-councils app-select-catalog app-dropdown {
+  // btn-group по умолчанию inline-flex и может расширяться по содержимому
+  .dropdown.btn-group {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+  }
+
+  // Основная кнопка выбора (та самая btn-outline-primary:nth-child(1))
+  .dropdown.btn-group > .dropdown-toggle.btn.btn-outline-primary {
+    flex: 1 1 auto;
+    min-width: 0; // критично для сжатия внутри flex/grid
+    width: 100%;
+    max-width: 100%;
+    white-space: normal; // разрешаем перенос
+    word-break: break-word;
+    text-align: left;
+  }
+
+  // Кнопка сброса (крестик) — фиксированной ширины
+  .dropdown.btn-group > .reset.btn.btn-outline-primary {
+    flex: 0 0 auto;
+  }
+
+  // Само меню — не должно раздувать layout, но должно быть не уже кнопки
+  .dropdown-menu {
+    min-width: 100%;
+  }
+}
 // Отступ под drag&drop-зоной в списке шаблонов документов,
 // чтобы подсказка и область загрузки не прилипали к следующему блоку
 .list-group .form-sub-group .file-drop-zone {
   margin-bottom: 1rem;
 }
+// ng-select: ограничиваем высоту выбранного значения (2 строки)
 .ng-select .ng-value-label {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -1168,5 +1204,62 @@ app-basic-project-info {
         margin-bottom: 0.05rem;
       }
     }
+  }
+}
+
+// Стили для кнопок выпадающих списков в councils компоненте - сероватый фон
+app-councils app-dropdown .dropdown .btn-group button,
+app-councils app-dropdown .dropdown .btn-group .btn,
+app-councils app-select-catalog .dropdown .btn-group button,
+app-councils app-select-catalog .dropdown .btn-group .btn,
+app-councils app-dropdown .btn-group button.dropdown-toggle,
+app-councils app-dropdown .btn-group .btn.dropdown-toggle,
+app-councils app-select-catalog .btn-group button.dropdown-toggle,
+app-councils app-select-catalog .btn-group .btn.dropdown-toggle,
+app-councils app-dropdown button.btn-outline-primary,
+app-councils app-dropdown .btn.btn-outline-primary,
+app-councils app-select-catalog button.btn-outline-primary,
+app-councils app-select-catalog .btn.btn-outline-primary {
+  background-color: #f8f9fa !important;
+  background: #f8f9fa !important;
+  border-color: #dee2e6 !important;
+  color: #495057 !important;
+
+  &:hover:not(:disabled),
+  &:focus:not(:disabled) {
+    background-color: #e9ecef !important;
+    background: #e9ecef !important;
+    border-color: #ced4da !important;
+    color: #212529 !important;
+  }
+
+  &:focus {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1) !important;
+  }
+
+  &:disabled {
+    background-color: #e9ecef !important;
+    background: #e9ecef !important;
+    opacity: 0.6;
+  }
+}
+
+
+// Кнопка сброса (reset) в councils компоненте
+app-councils app-dropdown .btn-group button.reset,
+app-councils app-dropdown .btn-group .btn.reset,
+app-councils app-select-catalog .btn-group button.reset,
+app-councils app-select-catalog .btn-group .btn.reset {
+  background-color: #f8f9fa !important;
+  background: #f8f9fa !important;
+  border-color: #dee2e6 !important;
+  color: #495057 !important;
+
+  &:hover:not(:disabled) {
+    background-color: #e9ecef !important;
+    background: #e9ecef !important;
+    border-color: #ced4da !important;
+    color: #212529 !important;
   }
 }

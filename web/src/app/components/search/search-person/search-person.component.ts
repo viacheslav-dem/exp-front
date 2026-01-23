@@ -26,6 +26,8 @@ export class SearchPersonComponent extends FilterAndPages<PersonPlainDto> {
   }
 
   ngOnInit() {
+    // Инициализируем _initialLoadDone, чтобы защита в update() не блокировала загрузку данных
+    this._initialLoadDone = true;
   }
 
   readonly searchFields = input<SearchField[]>(undefined);

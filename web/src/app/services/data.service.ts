@@ -1,7 +1,9 @@
-import {Injectable} from "@angular/core";
+import {Injectable, inject, DestroyRef} from "@angular/core";
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SERVER_URL} from "@app/config";
 import {HttpClientSecure} from "@app/services/http.client";
 import {Observable} from "rxjs";
+import {shareReplay, map as rxMap} from "rxjs/operators";
 import {OrgDto} from "@app/dto/OrgDto";
 import {CouncilDto} from "@app/dto/CouncilDto";
 import {HighTechCriteria} from "@app/components/document-form/form-model/high-tech-criteria";
@@ -17,13 +19,43 @@ import {AuthPolicy, PropertyDto} from "@app/dto/PropertyDto";
 import {PropertyPlainDto} from "@app/dto/PropertyPlainDto";
 import {DirectionDto} from "@app/dto/DirectionDto";
 import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
+import {AuthService} from "@app/services/auth.service";
 
 @Injectable()
 export class DataService {
 
   public url: string = `${SERVER_URL}/data`;
+  
+  // Кеш справочников: Map<тип_справочника, Observable<данные>>
+  private catalogCache = new Map<string | Catalog, Observable<CatalogDto[]>>();
+  
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly authService = inject(AuthService);
 
   constructor(private _http: HttpClientSecure) {
+    // Подписываемся на logout и login для инвалидации кеша справочников
+    // Это гарантирует, что после logout/login будут загружены свежие данные
+    this.authService.onLogout$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.invalidateCatalogCache();
+      });
+    
+    this.authService.onLogin$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        // Инвалидируем кеш при login, чтобы гарантировать свежие данные
+        // (на случай, если пользователь быстро вышел и зашёл обратно)
+        this.invalidateCatalogCache();
+      });
+  }
+  
+  /**
+   * Инвалидирует кеш всех справочников.
+   * Вызывается при logout, чтобы после следующего login загружались свежие данные.
+   */
+  private invalidateCatalogCache(): void {
+    this.catalogCache.clear();
   }
 
   getCouncils(): Observable<CouncilPlainDto[]> {
@@ -54,8 +86,31 @@ export class DataService {
     return this._http.getBlock(`${this.url}/sections`);
   }
 
+  /**
+   * Получает справочник с кешированием.
+   * Кеш автоматически инвалидируется при logout.
+   * 
+   * Использует shareReplay(1) для:
+   * - Кеширования результата между подписчиками
+   * - Избежания множественных HTTP-запросов для одного справочника
+   * - Автоматической очистки при отсутствии подписчиков (refCount: true)
+   */
   getCatalog<T extends CatalogDto>(type: string | Catalog): Observable<T[]> {
-    return this._http.getBlock<T[]>(`${this.url}/${type}`);
+    // Используем строковое представление типа как ключ кеша
+    const cacheKey = typeof type === 'string' ? type : String(type);
+    
+    // Проверяем кеш
+    if (!this.catalogCache.has(cacheKey)) {
+      // Создаём новый Observable с кешированием
+      // shareReplay с refCount: true автоматически завершит Observable,
+      // когда не останется подписчиков, освобождая память
+      const cached$ = this._http.getBlock<T[]>(`${this.url}/${type}`).pipe(
+        shareReplay({ bufferSize: 1, refCount: true })
+      );
+      this.catalogCache.set(cacheKey, cached$ as Observable<CatalogDto[]>);
+    }
+    
+    return this.catalogCache.get(cacheKey) as Observable<T[]>;
   }
 
   /**
@@ -71,7 +126,13 @@ export class DataService {
   }
 
   saveCatalog<T extends CatalogDto>(type: string | Catalog, value: T): Observable<T> {
-    return this._http.putBlock<T>(`${this.url}/${type}`, value);
+    return this._http.putBlock<T>(`${this.url}/${type}`, value).pipe(
+      // Инвалидируем кеш после сохранения, чтобы изменения сразу отображались
+      rxMap(saved => {
+        this.invalidateCatalogCache();
+        return saved;
+      })
+    );
   }
 
   saveDirection(directionDto: DirectionDto): Observable<DirectionDto>{

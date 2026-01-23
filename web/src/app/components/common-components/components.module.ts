@@ -6,6 +6,7 @@ import {FileEditorComponent} from "./file-editor/file-editor.component";
 import {BsDatepickerModule} from "ngx-bootstrap/datepicker";
 import {CollapseModule} from "ngx-bootstrap/collapse";
 import {ModalModule} from "ngx-bootstrap/modal";
+import {TabsModule} from "ngx-bootstrap/tabs";
 import {PaginationModule} from "ngx-bootstrap/pagination";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {CryptoModule} from "app/crypto/crypto.module";
@@ -60,6 +61,7 @@ import {PdfViewerModule} from "ng2-pdf-viewer";
     ModalModule,
     CustomFormsModule,
     CollapseModule,
+    TabsModule,
     CryptoModule,
     FontAwesomeModule,
     NgSelectModule,
@@ -78,6 +80,7 @@ import {PdfViewerModule} from "ng2-pdf-viewer";
     ModalModule,
     CustomFormsModule,
     CollapseModule,
+    TabsModule,
     FontAwesomeModule,
     NgSelectModule,
     NgxSliderModule,

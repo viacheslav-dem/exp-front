@@ -14,7 +14,9 @@
       <div class="col-md-6">
         <!--ASSESSORS-->
         <div *ifRole="[Role.BUREAU_ASSESSOR,Role.SECTION_ASSESSOR]">
-          <app-agenda-chat [agenda]="agenda"></app-agenda-chat>
+          @if (agenda) {
+            <app-agenda-chat [agenda]="agenda"></app-agenda-chat>
+          }
           <div *ifRole="Role.BUREAU_ASSESSOR">
             <div class="mt-2 mb-1 text-muted text-sm">Протоколы заседаний</div>
             <app-document-list [documents]="sectionReports"></app-document-list>
