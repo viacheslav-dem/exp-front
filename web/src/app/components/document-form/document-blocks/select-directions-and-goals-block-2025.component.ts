@@ -99,11 +99,12 @@ export class SelectDirectionsAndGoalsBlock2025Component {
   });
 
   showTarget8_4() {
-    return this._project.code.code.startsWith('8.4');
+    // Проект может приходить частично (например, без code) — не падаем в рантайме.
+    return this._project?.code?.code?.startsWith('8.4') ?? false;
   }
 
   canHasSocialEconomicGoals() {
-    return this._project.code.code == '8.13';
+    return this._project?.code?.code === '8.13';
   }
 
   private update() {
@@ -112,13 +113,16 @@ export class SelectDirectionsAndGoalsBlock2025Component {
       this._form.selectedSocialEconomicGoals = this._form.selectedSocialEconomicGoals || [];
     }
     if (this._project && this._form) {
-      this._allDirections = this._project.directions.map(item => new IdNameDto(item.id, item.name));
+      const directions = this._project.directions ?? [];
+      const goals = this._project.socialEconomicGoals ?? [];
+
+      this._allDirections = directions.map(item => new IdNameDto(item.id, item.name));
       this._form.selectedDirections = this._form.selectedDirections.filter(selectedItem =>
         this._allDirections.some(item => item.id == selectedItem.id))
       this._allDirections.forEach(item => item.isChecked =
         this._form.selectedDirections.some(selectedItem => selectedItem.id == item.id));
 
-      this._allGoals = this._project.socialEconomicGoals.map(item => new IdNameDto(item.id, item.name));
+      this._allGoals = goals.map(item => new IdNameDto(item.id, item.name));
       this._form.selectedSocialEconomicGoals = this._form.selectedSocialEconomicGoals.filter(selectedItem =>
         this._allGoals.some(item => item.id == selectedItem.id))
       this._allGoals.forEach(item => item.isChecked =

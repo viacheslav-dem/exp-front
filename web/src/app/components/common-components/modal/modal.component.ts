@@ -137,6 +137,9 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
   public show(): void {
     this.modal.show();
     this.lockBodyScroll();
+    // Zoneless/OnPush: открытие модалки не меняет @input/сигналы напрямую,
+    // поэтому явно помечаем компонент (и его ng-content) на отрисовку.
+    this.cdr.markForCheck();
     // Удобство: открываем модалку всегда сверху.
     setTimeout(() => {
       this.scrollModalToTop(false);
@@ -159,6 +162,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
     this.modal.hide();
     this.unlockBodyScroll();
     this.showBackToTop.set(false);
+    this.cdr.markForCheck();
   }
 
   internalHide(): void {
@@ -167,6 +171,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.unlockBodyScroll();
     this.showBackToTop.set(false);
+    this.cdr.markForCheck();
     this.onClose.emit();
   }
 

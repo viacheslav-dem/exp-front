@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, output} from "@angular/core";
+import {ChangeDetectionStrategy, Component, output, signal, viewChild} from "@angular/core";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {
     Direction,
@@ -23,24 +23,24 @@ import {environment} from "../../../../environments/environment";
 })
 export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
 
-    projects: ProjectDto[] = [];
-    countProjects: number;
+    // Используем signals вместо обычных свойств для автоматического обновления UI
+    projects = signal<ProjectDto[]>([]);
+    countProjects = signal<number>(0);
     isDisplayPage = false;
 
     type: string;
     councilId: number;
     startOfMonth: number;
     endOfMonth: number;
-    period: string;
+    period = signal<string>('');
 
     SortClass = SortClass;
-    sortDirection = Direction.ASC;
+    sortDirection = signal<Direction>(Direction.ASC);
     readonly selected = output<ProjectDto>();
-    @ViewChild('searchModal', { static: false }) searchProjectModal: ModalComponent;
+    searchProjectModal = viewChild<ModalComponent>('searchModal');
 
     constructor(protected service: ProjectService,
-                private router: Router,
-                private cdr: ChangeDetectorRef) {
+                private router: Router) {
         super();
         this._searchFields = [SearchField.startsWith('title').setPlaceholder('Поиск по наименованию объекта экспертизы...')];
     }
@@ -56,66 +56,85 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
     }
 
     loadPage() {
-        if (this.isDisplayPage) {
-            this.service.getExpiredProjectList(
-                this.councilId, this.startOfMonth, this.endOfMonth, this._searchRequest
-            ).subscribe(res => {
-                this._page = res;
-                this.projects = res.content;
-                this.countProjects = res.totalElements;
-
-                this.setLoading(false);
-                this.cdr?.markForCheck?.();
-            }, () => {
-                this.setLoading(false);
-                this.cdr?.markForCheck?.();
-            });
-            this.period = dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY');
-            this.searchProjectModal.show();
-            this.cdr?.markForCheck?.();
+        // Базовый класс FilterAndPages вызывает loadPage() при update()
+        // Выбираем правильный метод загрузки в зависимости от типа
+        if (this.type === "expired") {
+            this.loadExpiredPage();
+        } else if (this.type === "on_examination") {
+            this.loadOnExaminationPage();
         }
     }
 
-    loadPageOnExamination() {
+    private loadExpiredPage() {
         if (this.isDisplayPage) {
+            this.period.set(dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY'));
+            this.setLoading(true);
+            
+            this.service.getExpiredProjectList(
+                this.councilId, this.startOfMonth, this.endOfMonth, this._searchRequest
+            ).subscribe({
+                next: (res) => {
+                    this._page = res;
+                    this.projects.set(res.content);
+                    this.countProjects.set(res.totalElements);
+                    this.setLoading(false);
+                    this.searchProjectModal()?.show();
+                },
+                error: () => {
+                    this.setLoading(false);
+                }
+            });
+        }
+    }
+
+    private loadOnExaminationPage() {
+        if (this.isDisplayPage) {
+            this.period.set(dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY'));
+            this.setLoading(true);
+            
             this.service.getOnExaminationProjectList(
                 this.councilId, this.startOfMonth, this.endOfMonth, this._searchRequest
-            ).subscribe(res => {
-                this._page = res;
-                this.projects = res.content;
-                this.countProjects = res.totalElements;
-
-                this.setLoading(false);
-            }, () => this.setLoading(false));
-            this.period = dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY');
-            this.searchProjectModal.show();
+            ).subscribe({
+                next: (res) => {
+                    this._page = res;
+                    this.projects.set(res.content);
+                    this.countProjects.set(res.totalElements);
+                    this.setLoading(false);
+                    this.searchProjectModal()?.show();
+                },
+                error: () => {
+                    this.setLoading(false);
+                }
+            });
         }
     }
 
     getSortOrders() {
-        return [new SortOrder("title", this.sortDirection)];
+        return [new SortOrder("title", this.sortDirection())];
     }
 
     changeSort() {
-        this.sortDirection = switchDirection(this.sortDirection, false);
+        this.sortDirection.update(current => switchDirection(current, false));
         this.update();
     }
 
     show(type, councilId, startOfMonth, endOfMonth) {
-
         this.type = type;
         this.councilId = councilId;
         this.startOfMonth = startOfMonth;
         this.endOfMonth = endOfMonth;
         this.isDisplayPage = true;
-        if(type == "expired")
-            this.loadPage();
-        else if (type == "on_examination")
-            this.loadPageOnExamination();
+        
+        // Вызываем соответствующий метод загрузки
+        if (type === "expired") {
+            this.loadExpiredPage();
+        } else if (type === "on_examination") {
+            this.loadOnExaminationPage();
+        }
     }
 
     hide() {
-        this.searchProjectModal.hide();
+        this.searchProjectModal()?.hide();
     }
 
     openNewTab(event: MouseEvent, id: number) {

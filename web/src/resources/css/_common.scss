@@ -1135,6 +1135,20 @@ app-project-form {
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
 }
 
+.modal-body {
+  background-color: #ffffff !important;
+}
+
+.modal-body .table {
+  --bs-table-bg: #ffffff !important;
+  --bs-table-hover-bg: #f8f9fa !important;
+  background-color: #ffffff !important;
+  
+  tbody tr:hover {
+    background-color: #f8f9fa !important;
+  }
+}
+
 // Оставляем одно определение .modal-backdrop здесь (дубликат закомментирован выше)
 .modal-backdrop {
  // backdrop-filter: blur(5px);

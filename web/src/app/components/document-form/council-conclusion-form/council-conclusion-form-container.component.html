@@ -1,80 +1,78 @@
 <div>
-  @if (project && group) {
-    <div class="form-group">
-      <div class="form-group-label">Объект экспертизы: <i>{{project | titleAndCode}}</i></div>
-      <div class="form-group-label">ГЭС: <i>{{group.council | councilCodeAndName}}</i></div>
-    </div>
-    <div class="form-group">
-      <label>Дата заключения:</label>
-      <app-date-input class="width-100 input-group-sm input-group" 
-                      name="date" required
-                      [(ngModel)]="_form.date"></app-date-input>
-    </div>
-    <div class="form-group">
-      <div>Исполняющий обязанности Председателя ГЭС:</div>
-      <div>
-        <span class="italic">{{_form.chairman | fullName}}</span>
-        <a class="btn btn-icon btn-icon-sm" (click)="showSearchChairmanModal()">
-          <fa-icon icon="pencil-alt"></fa-icon>
-        </a>
-      </div>
-    </div>
-    @if (is_8_9()) {
-      <div class="form-group">
-        <label>
-          Дата заключения ведомственной научно-технической экспертизы:
-        </label>
-        <app-date-input class="width-100 input-group-sm input-group"
-                        name="innerExpertiseDate" required
-                        [(ngModel)]="_form.innerExpertiseDate"></app-date-input>
-      </div>
-      <div class="form-group">
-        <label>Другие прилагаемые документы, установленные актами законодательства:</label>
-        @if (documents.length == 0) {
-          <div class="italic mb-1">Отсутствуют</div>
-        }
-        @for (document of documents; track trackText(document); let i = $index) {
-          <div class="input-group btn-group input-group-sm mb-2">
-            <input [(ngModel)]="document.text" type="text" class="form-control"
-              placeholder="документ {{i + 1}}"
-              title="Документ">
-              <button type="button" class="btn btn-sm btn-outline-danger" (click)="documents.splice(i, 1)">&times;</button>
-            </div>
-          }
-          <div>
-            <button type="button" class="btn btn-primary btn-sm" (click)="addDocument()">
-              Добавить документ
-            </button>
-          </div>
-        </div>
-      }
-      @if (needSelectDirections()) {
-        <app-select-directions-and-goals-block
-          [form]="_form.projectProtocol"
-        [project]="project"></app-select-directions-and-goals-block>
-      }
-    }
-
-    <ng-template #form></ng-template>
-
-    <hr/>
-
-    <div class="mt-2">
-      <button type="button" class="btn btn-secondary" (click)="close()" [disabled]="loading()">Отмена</button>
-      <button type="button" class="btn btn-primary ml-05" (click)="save()" [disabled]="loading()">
-        @if (loading()) {
-          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-          Создание...
-        } @else {
-          Создать
-        }
-      </button>
-      <div class="mt-1 text-sm italic">Черновик формы автоматически сохраняется каждые 30 секунд и при закрытии формы.</div>
-      <div class="mt-1 text-sm italic">Будьте внимательны! Если Вы ранее уже создавали этот документ, то он будет перезаписан.</div>
+  <div class="form-group">
+    <div class="form-group-label">Объект экспертизы: <i>{{project() | titleAndCode}}</i></div>
+    <div class="form-group-label">ГЭС: <i>{{group()?.council | councilCodeAndName}}</i></div>
+  </div>
+  <div class="form-group">
+    <label>Дата заключения:</label>
+    <app-date-input class="width-100 input-group-sm input-group" 
+                    name="date" required
+                    [(ngModel)]="_form.date"></app-date-input>
+  </div>
+  <div class="form-group">
+    <div>Исполняющий обязанности Председателя ГЭС:</div>
+    <div>
+      <span class="italic">{{_form.chairman | fullName}}</span>
+      <a class="btn btn-icon btn-icon-sm" (click)="showSearchChairmanModal()">
+        <fa-icon icon="pencil-alt"></fa-icon>
+      </a>
     </div>
   </div>
+  @if (is_8_9()) {
+    <div class="form-group">
+      <label>
+        Дата заключения ведомственной научно-технической экспертизы:
+      </label>
+      <app-date-input class="width-100 input-group-sm input-group"
+                      name="innerExpertiseDate" required
+                      [(ngModel)]="_form.innerExpertiseDate"></app-date-input>
+    </div>
+    <div class="form-group">
+      <label>Другие прилагаемые документы, установленные актами законодательства:</label>
+      @if (documents.length == 0) {
+        <div class="italic mb-1">Отсутствуют</div>
+      }
+      @for (document of documents; track trackText(document); let i = $index) {
+        <div class="input-group btn-group input-group-sm mb-2">
+          <input [(ngModel)]="document.text" type="text" class="form-control"
+            placeholder="документ {{i + 1}}"
+            title="Документ">
+          <button type="button" class="btn btn-sm btn-outline-danger" (click)="documents.splice(i, 1)">&times;</button>
+        </div>
+      }
+      <div>
+        <button type="button" class="btn btn-primary btn-sm" (click)="addDocument()">
+          Добавить документ
+        </button>
+      </div>
+    </div>
+  }
+  @if (needSelectDirections()) {
+    <app-select-directions-and-goals-block
+      [form]="_form.projectProtocol"
+      [project]="project()"></app-select-directions-and-goals-block>
+  }
 
-  <app-search-person-by-roles
-    [roles]="Role.BUREAU_CHAIRMAN"
-    (selected)="selectPerson($event)">
-  </app-search-person-by-roles>
+  <ng-template #form></ng-template>
+
+  <hr/>
+
+  <div class="mt-2">
+    <button type="button" class="btn btn-secondary" (click)="close()" [disabled]="loading()">Отмена</button>
+    <button type="button" class="btn btn-primary ml-05" (click)="save()" [disabled]="loading()">
+      @if (loading()) {
+        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+        Создание...
+      } @else {
+        Создать
+      }
+    </button>
+    <div class="mt-1 text-sm italic">Черновик формы автоматически сохраняется каждые 30 секунд и при закрытии формы.</div>
+    <div class="mt-1 text-sm italic">Будьте внимательны! Если Вы ранее уже создавали этот документ, то он будет перезаписан.</div>
+  </div>
+</div>
+
+<app-search-person-by-roles
+  [roles]="Role.BUREAU_CHAIRMAN"
+  (selected)="selectPerson($event)">
+</app-search-person-by-roles>

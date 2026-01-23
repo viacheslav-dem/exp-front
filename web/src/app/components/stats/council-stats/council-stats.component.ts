@@ -246,15 +246,47 @@ export class CouncilStatsComponent implements OnInit, AfterViewInit {
       console.warn('ГЭС не выбран');
       return;
     }
-    const monthValue = dayjs(month).valueOf();
-    const startOfMonthDate = dayjs(monthValue).startOf('month');
-    const endOfMonthDate = dayjs(monthValue).endOf('month');
-    const startOfMonthStr = startOfMonthDate.locale('ru').format('DD-MMMM-YYYY HH:mm');
-    const endOfMonthStr = endOfMonthDate.locale('ru').format('DD-MMMM-YYYY HH:mm');
-
-    const startOfMonthValue = dayjs(startOfMonthStr, 'DD-MMMM-YYYY HH:mm', 'ru').valueOf();
-    const endOfMonthValue = dayjs(endOfMonthStr, 'DD-MMMM-YYYY HH:mm', 'ru').valueOf();
-
+    
+    let startOfMonthValue: number;
+    let endOfMonthValue: number;
+    
+    // Пытаемся найти исходный timestamp из статистики по отформатированной строке
+    // MonthYearPipe форматирует как "MMMM YYYY" с первой заглавной буквой
+    const stats = this.statsV2();
+    const foundStat = stats.find(stat => {
+      const formatted = dayjs(stat.startDate).locale('ru').format('MMMM YYYY');
+      // Сравниваем без учета регистра первой буквы
+      const formattedLower = formatted.charAt(0).toLowerCase() + formatted.slice(1);
+      const monthLower = month.charAt(0).toLowerCase() + month.slice(1);
+      return formatted === month || formattedLower === monthLower;
+    });
+    
+    if (foundStat) {
+      // Используем исходный timestamp из статистики - это самый надежный способ
+      const monthDate = dayjs(foundStat.startDate);
+      startOfMonthValue = monthDate.startOf('month').valueOf();
+      endOfMonthValue = monthDate.endOf('month').valueOf();
+    } else {
+      // Fallback: парсим строку категории графика (формат "MMMM YYYY" на русском, например "Январь 2025")
+      const parsedMonth = dayjs(month, 'MMMM YYYY', 'ru', true); // strict mode
+      
+      // Проверяем, что парсинг успешен
+      if (!parsedMonth.isValid()) {
+        console.error('Не удалось распарсить дату из категории графика:', month);
+        this.toasty.err(400, `Не удалось обработать дату: ${month}`);
+        return;
+      }
+      
+      startOfMonthValue = parsedMonth.startOf('month').valueOf();
+      endOfMonthValue = parsedMonth.endOf('month').valueOf();
+    }
+    
+    // Дополнительная проверка на валидность timestamp
+    if (isNaN(startOfMonthValue) || isNaN(endOfMonthValue)) {
+      console.error('Получены невалидные значения дат:', { startOfMonthValue, endOfMonthValue, month });
+      this.toasty.err(400, `Не удалось обработать дату: ${month}`);
+      return;
+    }
     listComponent.show(type, this._council.id, startOfMonthValue, endOfMonthValue);
   }
 

@@ -9,7 +9,7 @@
     <span class="text-muted text-sm bold italic"> {{expertReview().termsMessage}}</span>
     @if (expertReview().state == ExpertReviewState.ON_EXPERT_CONFIRMATION && role() == Role.BELISA_EDIT) {
       <span class="float-end">
-        <button class="btn-sm btn btn-primary mr-1" (click)="acceptExpertByBelisa()">Подтвердить</button>
+        <button class="btn-sm btn btn-primary me-1" (click)="acceptExpertByBelisa()">Подтвердить</button>
         <button class="btn-sm btn btn-secondary" (click)="rejectExpertByBelisa()">Отклонить</button>
       </span>
     }

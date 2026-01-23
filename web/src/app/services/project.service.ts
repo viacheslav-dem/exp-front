@@ -33,13 +33,38 @@ export class ProjectService extends HasStateService {
   url = SERVER_URL + '/project';
 
   // for project-list-filtered.component
-  filter: Filter<any>;
-  filterName: string;
+  private static readonly PROJECTS_FILTERED_CACHE_KEY = 'filter_cache_projects-filtered';
+  private static readonly PROJECTS_FILTERED_CACHE_VERSION = 1;
+
+  private _filter: Filter<any> | null = null;
+  private _filterName: string | null = null;
+
+  get filter(): Filter<any> | null {
+    return this._filter;
+  }
+
+  set filter(value: Filter<any> | null) {
+    this._filter = value;
+    this.persistFilteredProjectsState();
+  }
+
+  get filterName(): string | null {
+    return this._filterName;
+  }
+
+  set filterName(value: string | null) {
+    this._filterName = value;
+    this.persistFilteredProjectsState();
+  }
 
   constructor(protected _authService: AuthService,
               private _http: HttpClientSecure,
               private _documentService: DocumentService) {
     super(_authService);
+    // Восстанавливаем состояние projects-filtered при перезагрузке страницы.
+    // Риск: localStorage может содержать устаревшие данные. Снижаем риск версионированием и безопасным парсингом.
+    // Решение обратимо: достаточно удалить ключ `filter_cache_projects-filtered` и использовать только in-memory поля.
+    this.restoreFilteredProjectsState();
     // Подписываемся на событие logout для очистки состояния
     this._authService.onLogout$.subscribe(() => {
       this.clearFilterState();
@@ -51,8 +76,58 @@ export class ProjectService extends HasStateService {
    * Вызывается при logout для предотвращения использования устаревших данных.
    */
   clearFilterState(): void {
-    this.filter = null;
-    this.filterName = null;
+    // Важно: чистим напрямую backing-поля, чтобы не выполнять лишние записи в localStorage через setters.
+    this._filter = null;
+    this._filterName = null;
+    try {
+      localStorage.removeItem(ProjectService.PROJECTS_FILTERED_CACHE_KEY);
+    } catch {
+      // ignore
+    }
+  }
+
+  private persistFilteredProjectsState(): void {
+    try {
+      if (!this._filter) {
+        localStorage.removeItem(ProjectService.PROJECTS_FILTERED_CACHE_KEY);
+        return;
+      }
+
+      const payload = {
+        v: ProjectService.PROJECTS_FILTERED_CACHE_VERSION,
+        filter: this._filter,
+        filterName: this._filterName
+      };
+
+      localStorage.setItem(ProjectService.PROJECTS_FILTERED_CACHE_KEY, JSON.stringify(payload));
+    } catch {
+      // Не считаем ошибку критичной: это лишь кэш UI состояния.
+    }
+  }
+
+  private restoreFilteredProjectsState(): void {
+    try {
+      const raw = localStorage.getItem(ProjectService.PROJECTS_FILTERED_CACHE_KEY);
+      if (!raw) return;
+
+      const parsed = JSON.parse(raw);
+      if (!parsed || parsed.v !== ProjectService.PROJECTS_FILTERED_CACHE_VERSION) {
+        localStorage.removeItem(ProjectService.PROJECTS_FILTERED_CACHE_KEY);
+        return;
+      }
+
+      // Важно: сохраняем как plain object — бэкенд ожидает JSON со свойствами key/value/operation/filters.
+      this._filter = (parsed.filter ?? null) as Filter<any> | null;
+      this._filterName = (parsed.filterName ?? null) as string | null;
+
+      // Если фильтр невалиден — не держим мусор в localStorage.
+      if (!this._filter?.operation) {
+        this.clearFilterState();
+      }
+    } catch {
+      // Если кэш поврежден — очищаем, чтобы не ломать навигацию.
+      this.clearFilterState();
+    }
   }
 
   prepareProject(project: ProjectDto | ProjectLiDto) {

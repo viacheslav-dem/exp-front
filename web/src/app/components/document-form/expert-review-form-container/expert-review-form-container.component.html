@@ -2,7 +2,7 @@
   @if (_project && _form) {
     <div class="form-group">
       <label class="form-group-label">Объект экспертизы: <i>{{_project | titleAndCode}}</i></label>
-      @if (!needSelectDirections() && _project.directions.length > 0) {
+      @if (!needSelectDirections() && (_project.directions?.length ?? 0) > 0) {
         <div>
           <label>Приоритетное направление научных исследований Республики Беларусь
           и (или) приоритетное направление научно-технической деятельности</label>
@@ -15,7 +15,7 @@
           </ul>
         </div>
       }
-      @if (!needSelectDirections() && canHasSocialEconomicGoals() && _project.socialEconomicGoals.length > 0) {
+      @if (!needSelectDirections() && canHasSocialEconomicGoals() && (_project.socialEconomicGoals?.length ?? 0) > 0) {
         <div>
           <label>Цель (приоритет) социально-экономического развития</label>
           <ul>
@@ -63,8 +63,8 @@
     <hr/>
 
     <div class="mt-2">
-      <button type="button" class="btn btn-secondary mr-1" (click)="close()" [disabled]="loading()">Закрыть</button>
-      <button type="button" class="btn btn-primary mr-1" (click)="save()" [disabled]="loading()">
+      <button type="button" class="btn btn-secondary me-1" (click)="close()" [disabled]="loading()">Закрыть</button>
+      <button type="button" class="btn btn-primary me-1" (click)="save()" [disabled]="loading()">
         @if (loading()) {
           <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
           Создание...

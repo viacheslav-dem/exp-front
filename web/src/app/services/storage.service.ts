@@ -83,6 +83,9 @@ export class StorageService {
     localStorage.setItem(this.currRolePlace, newRole);
     // Очищаем фильтры проектов при смене роли
     localStorage.removeItem('filter_cache_project-list');
+    // Очищаем состояние предустановленного списка (projects-filtered) при смене роли,
+    // чтобы не переносить фильтры между ролями/правами доступа.
+    localStorage.removeItem('filter_cache_projects-filtered');
   }
 
   clear() {

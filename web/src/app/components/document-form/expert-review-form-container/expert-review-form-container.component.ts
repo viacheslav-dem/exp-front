@@ -61,6 +61,8 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
     if (!project) return;
     this._project = project;
     this.update();
+    // OnPush: _project изменился - обновляем шаблон
+    this.cdr.markForCheck();
   });
 
   updateFormComponent(formRenderer) {

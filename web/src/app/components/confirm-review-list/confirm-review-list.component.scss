@@ -2,6 +2,17 @@
   margin: 0;
 }
 
+// Белый фон для таблицы экспертов
+.table.table-responsive {
+  --bs-table-bg: #ffffff !important;
+  --bs-table-hover-bg: #f8f9fa !important;
+  background-color: #ffffff !important;
+  
+  tbody tr:hover {
+    background-color: #f8f9fa !important;
+  }
+}
+
 // Стили для очень маленьких экранов (360px и меньше, до 575.98px)
 @media (max-width: 575.98px) {
   // Стили для карточек объектов экспертизы на маленьких экранах

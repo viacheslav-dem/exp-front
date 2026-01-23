@@ -85,7 +85,7 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
 
   private readonly projectEffect = effect(() => {
     const project = this.project();
-    if (!project) {
+    if (!project?.code?.code) {
       return;
     }
     this.updateFormComponent(this._formTypeResolver.getFormRenderer(project.code.code));
@@ -103,6 +103,7 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     if (this.formComponent) {
       this.formComponent.group = group;
     }
+    this.cdr.markForCheck();
   });
 
   updateFormComponent(_formRenderer: Type<CouncilConclusionForm>) {
@@ -116,6 +117,9 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     this.formComponent.project = this.project();
     this.formComponent.group = this.group();
     this.formComponent.setForm(this._form.projectProtocol);
+    // Синхронная отрисовка динамического компонента
+    componentRef.changeDetectorRef.detectChanges();
+    this.cdr.markForCheck();
   }
 
   validate() {
@@ -181,6 +185,8 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     if (this.formComponent) {
       this.formComponent.setForm(this._form.projectProtocol);
     }
+    // OnPush: данные формы изменились - запрашиваем перерисовку
+    this.cdr.markForCheck();
   }
 
   showSearchChairmanModal() {
@@ -202,5 +208,13 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
 
   addDocument() {
     this.documents.push(new Text());
+  }
+
+  /**
+   * Публичный метод для явного запуска change detection.
+   * Используется родительским компонентом при открытии модалки в zoneless/OnPush режиме.
+   */
+  markForCheck() {
+    this.cdr.markForCheck();
   }
 }

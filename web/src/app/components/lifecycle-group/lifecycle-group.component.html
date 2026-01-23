@@ -39,7 +39,7 @@
           <div class="d-inline-block text-muted text-sm">Направление в ГЭС</div>
           @if (canEditReferral()) {
             <div class="btn-right-sm">
-              <button class="btn btn-sm btn-primary" (click)="referralFormModal.show()">Создать</button>
+              <button class="btn btn-sm btn-primary" (click)="showReferralForm()">Создать</button>
             </div>
           }
         </div>
@@ -89,7 +89,7 @@
           <div class="d-inline-block text-muted text-sm">Направление результатов заказчику</div>
           @if (canEditLifecycleGroupDecision()) {
             <div class="btn-right-sm">
-              <button class="btn btn-sm btn-primary" (click)="groupDecisionFormModal.show()">
+              <button class="btn btn-sm btn-primary" (click)="showGroupDecisionForm()">
                 Создать
               </button>
             </div>

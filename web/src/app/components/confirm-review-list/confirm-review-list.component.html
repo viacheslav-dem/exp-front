@@ -1,6 +1,6 @@
 <div class="list-group">
   <div [loadingData]="_loading">
-    @for (project of projects; track trackByProject($index, project)) {
+    @for (project of projects(); track trackByProject($index, project)) {
       <div class="card card-block mb-3">
         <a class="h5 bold" target="_blank" [routerLink]="['/projects/',project.id]">{{project |
         titleAndCode}}</a>
@@ -28,7 +28,7 @@
               <span class="italic">{{project.executor | orElse: 'не указан'}}</span>
             </div>
           }
-          @if (projects.length > 0) {
+          @if (hasProjects()) {
             <table class="table table-responsive mb-0 mt-3">
               <thead>
                 <tr>
@@ -122,7 +122,7 @@
     </div>
   </div>
 }
-@if (review.state!='ON_GKNT_CONFIRMATION') {
+@if (review.state !== ExpertReviewState.ON_GKNT_CONFIRMATION) {
   <div>
     @switch (review.state) {
       @case (ExpertReviewState.REJECTED) {
@@ -163,7 +163,7 @@
 }
 </div>
 }
-@if (projects.length == 0) {
+@if (!hasProjects()) {
   <div class="alert alert-info italic mb-0 card card-block">
     Не требуется
   </div>
@@ -173,26 +173,27 @@
 </div>
 </div>
 <app-modal #expertInfo [title]="'Информация об эксперте'" [modalClasses]="'modal-xl'">
-  @if (expert!=null) {
+  @if (expert() != null) {
     <div class="container" style="min-height:auto;">
       <div class="row">
+        @let currentExpert = expert();
         <div class="col-lg-3">
-          <div class="bold">{{expert|fullName}}</div>
-          <div class="text-sm italic text-muted">{{expert.personInfo | academicInfo}}</div>
-          <div class="text-sm italic">{{expert.email}}</div>
-          <div class="text-sm italic">{{expert.phones | phones}}</div>
+          <div class="bold">{{currentExpert|fullName}}</div>
+          <div class="text-sm italic text-muted">{{currentExpert.personInfo | academicInfo}}</div>
+          <div class="text-sm italic">{{currentExpert.email}}</div>
+          <div class="text-sm italic">{{currentExpert.phones | phones}}</div>
         </div>
         <div class="col-lg-3 text-sm px-0">
-          @if (expert?.areas?.length > 0) {
+          @if (currentExpert?.areas?.length > 0) {
             <div>
               Области компетенции:&nbsp;
-              <span class="italic">{{ expert | areas }}</span>
+              <span class="italic">{{ currentExpert | areas }}</span>
             </div>
           }
-          @if (expert?.personInfo?.specializations?.length) {
+          @if (currentExpert?.personInfo?.specializations?.length) {
             <div>
               Специализация:&nbsp;
-              @for (spec of expert.personInfo.specializations; track spec) {
+              @for (spec of currentExpert.personInfo.specializations; track spec) {
                 <div
                   class="italic">
                   {{ spec.name }}
@@ -200,10 +201,10 @@
               }
             </div>
           }
-          @if (expert?.personInfo?.specialities?.length) {
+          @if (currentExpert?.personInfo?.specialities?.length) {
             <div>
               Специальность:&nbsp;
-              @for (special of expert.personInfo.specialities; track special) {
+              @for (special of currentExpert.personInfo.specialities; track special) {
                 <div
                   class="italic">
                   {{ special.name }}
@@ -213,14 +214,14 @@
           }
         </div>
         <div class="col-lg-3 text-sm pe-0">
-          @if (expert.org?.name) {
+          @if (currentExpert.org?.name) {
             <div>
-              Организация:&nbsp;<span class="italic">{{ expert.org?.name }}</span>
+              Организация:&nbsp;<span class="italic">{{ currentExpert.org?.name }}</span>
             </div>
           }
-          @if (expert.post) {
+          @if (currentExpert.post) {
             <div>
-              Должность:&nbsp;<span class="italic">{{ expert.post }}</span>
+              Должность:&nbsp;<span class="italic">{{ currentExpert.post }}</span>
             </div>
           }
         </div>
@@ -228,38 +229,38 @@
           <div>
             Объектов на&nbsp;экспертизе:&nbsp;
             <span class="bold">
-              {{ expert?.realTimeStats?.projectsOnExamination }}
+              {{ currentExpert?.realTimeStats?.projectsOnExamination }}
             </span>
           </div>
           <div>
             Ожидают подтверждения:&nbsp;
             <span class="bold">
-              {{ expert?.realTimeStats?.reviewsOnConfirmation }}
+              {{ currentExpert?.realTimeStats?.reviewsOnConfirmation }}
             </span>
           </div>
           <div>
             Нарушены сроки:&nbsp;
             <span class="bold">
-              {{ expert?.realTimeStats?.reviewsTermsViolation?.red }}
+              {{ currentExpert?.realTimeStats?.reviewsTermsViolation?.red }}
             </span>
           </div>
           <div>
             Завершено заключений:&nbsp;
             <span class="bold">
-              {{ (expert?.realTimeStats?.acceptedProjects || 0) + (expert?.realTimeStats?.rejectedProjects || 0) }}
+              {{ (currentExpert?.realTimeStats?.acceptedProjects || 0) + (currentExpert?.realTimeStats?.rejectedProjects || 0) }}
             </span>
           </div>
           <div class="">
             <div class="d-inline-block text-nowrap me-2">
               Отказы эксперта:&nbsp;
               <span class="bold">
-                {{ expert?.realTimeStats?.rejectedReviewsByExpert }}
+                {{ currentExpert?.realTimeStats?.rejectedReviewsByExpert }}
               </span>
             </div>
             <div class="d-inline-block text-nowrap">
               Отказы ГКНТ:&nbsp;
               <span class="bold">
-                {{ expert?.realTimeStats?.rejectedReviewsByGknt }}
+                {{ currentExpert?.realTimeStats?.rejectedReviewsByGknt }}
               </span>
             </div>
           </div>

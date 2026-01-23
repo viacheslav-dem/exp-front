@@ -1,26 +1,26 @@
-<app-modal #modalComponent [title]="title" (onClose)="close()" [closePermission]="false">
-  @if (dlg!= null && data != null) {
-    @switch (dlg.type) {
+<app-modal #modalComponent [title]="title()" (onClose)="close()" [closePermission]="false">
+  @if (dlg() != null && data() != null) {
+    @switch (dlg()!.type) {
       @case (DialogType.USER) {
-        <app-user-form [user]="data" (onSave)="save($event)" (canceled)="cancel()">
+        <app-user-form [user]="data()!" (onSave)="save($event)" (canceled)="cancel()">
         </app-user-form>
       }
       @case (DialogType.PASSWORD) {
-        <app-change-password [userId]="data" (onSave)="save($event)" (canceled)="cancel()"></app-change-password>
+        <app-change-password [userId]="data()!" (onSave)="save($event)" (canceled)="cancel()"></app-change-password>
       }
       @case (DialogType.CONFIRM) {
         <app-confirm-dialog
-          [message]="data.message" [description]="data.description" [okBtnMessage]="data.okBtnMessage"
-          [cancelBtnMessage]="data.cancelBtnMessage" (onSave)="save($event)" [fields]="data.fields"
+          [message]="data()!.message" [description]="data()!.description" [okBtnMessage]="data()!.okBtnMessage"
+          [cancelBtnMessage]="data()!.cancelBtnMessage" (onSave)="save($event)" [fields]="data()!.fields"
           (canceled)="cancel()">
         </app-confirm-dialog>
       }
       @case (DialogType.VIEWER) {
-        <app-pdf-viewer [url]="data.url" [doc]="data.doc"></app-pdf-viewer>
+        <app-pdf-viewer [url]="data()!.url" [doc]="data()!.doc"></app-pdf-viewer>
       }
       @case (DialogType.METH_REC) {
-        <app-meth-rec-pdf [message]="data.message" [description]="data.description" [okBtnMessage]="data.okBtnMessage"
-          [cancelBtnMessage]="data.cancelBtnMessage" (onSave)="save($event)" [fields]="data.fields"
+        <app-meth-rec-pdf [message]="data()!.message" [description]="data()!.description" [okBtnMessage]="data()!.okBtnMessage"
+          [cancelBtnMessage]="data()!.cancelBtnMessage" (onSave)="save($event)" [fields]="data()!.fields"
         (canceled)="cancel()"></app-meth-rec-pdf>
       }
     }

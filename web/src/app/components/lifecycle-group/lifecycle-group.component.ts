@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, effect, input, output} from '@angular/core';
+import {Component, OnDestroy, OnInit, viewChild, ChangeDetectionStrategy, ChangeDetectorRef, effect, input, output} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {ProjectLifecycleState, ProjectLifecycleStateBadge} from "@app/pipes/lifecycle-state.pipe";
 import {Router} from "@angular/router";
@@ -62,16 +62,16 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   readonly onDeleted = output<any>();
   readonly onReplyChanged = output<any>();
 
-  @ViewChild(CouncilConclusionFormContainerComponent, { static: false }) conclusionForm: CouncilConclusionFormContainerComponent;
-  @ViewChild('searchSection', { static: false }) searchSectionListComponent: SearchSectionComponent;
-  @ViewChild('changeSection', { static: false }) changeSectionListComponent: SearchSectionComponent;
-  @ViewChild('referralFormModal', { static: false }) referralFormModal: ModalComponent;
-  @ViewChild('councilFormModal', { static: false }) councilFormModal: ModalComponent;
-  @ViewChild('groupDecisionFormModal', { static: false }) groupDecisionFormModal: ModalComponent;
-  @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
-  @ViewChild('lifecycleTransitionHistoryModal', { static: false }) lifecycleTransitionHistoryModal: ModalComponent;
-  @ViewChild('remarkResponseForSection', { static: false }) remarkResponseForSection: ModalComponent;
-  @ViewChild('remarkResponseForBureau', { static: false }) remarkResponseForBureau: ModalComponent;
+  readonly conclusionForm = viewChild(CouncilConclusionFormContainerComponent);
+  readonly searchSectionListComponent = viewChild<SearchSectionComponent>('searchSection');
+  readonly changeSectionListComponent = viewChild<SearchSectionComponent>('changeSection');
+  readonly referralFormModal = viewChild<ModalComponent>('referralFormModal');
+  readonly councilFormModal = viewChild<ModalComponent>('councilFormModal');
+  readonly groupDecisionFormModal = viewChild<ModalComponent>('groupDecisionFormModal');
+  readonly transitionHistoryModal = viewChild<ModalComponent>('transitionHistoryModal');
+  readonly lifecycleTransitionHistoryModal = viewChild<ModalComponent>('lifecycleTransitionHistoryModal');
+  readonly remarkResponseForSection = viewChild<ModalComponent>('remarkResponseForSection');
+  readonly remarkResponseForBureau = viewChild<ModalComponent>('remarkResponseForBureau');
 
   constructor(private _router: Router,
               public _lifecycleGroupService: LifecycleGroupService,
@@ -98,7 +98,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   });
 
   showTransitionHistoryModal() {
-    this.transitionHistoryModal.show();
+    this.transitionHistoryModal()?.show();
     this.subscriptions.push(
       this._transitionHistoryService.getGroupHistory(this._group)
         .subscribe(res => {
@@ -109,7 +109,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   }
 
   showLifecycleTransitionHistoryModal(lifecycle) {
-    this.lifecycleTransitionHistoryModal.show();
+    this.lifecycleTransitionHistoryModal()?.show();
     this.subscriptions.push(
       this._transitionHistoryService.getLifecycleHistory(lifecycle)
         .subscribe(res => {
@@ -125,7 +125,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   }
 
   showSearchSectionModal() {
-    this.searchSectionListComponent.show(this._group.council.id)
+    this.searchSectionListComponent()?.show(this._group.council.id);
   }
 
   canEditSections() {
@@ -148,7 +148,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
 
   answerForSectionRemark(lifecycle: ProjectLifecycleDto) {
     this.lifecycleRemark = lifecycle;
-    this.remarkResponseForSection.show();
+    this.remarkResponseForSection()?.show();
   }
 
   canAnswerForBureauQuestion(group?: LifecycleGroupDto) {
@@ -161,7 +161,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
 
   answerForBureauRemark(group: LifecycleGroupDto) {
     this.groupRemark = group;
-    this.remarkResponseForBureau.show();
+    this.remarkResponseForBureau()?.show();
   }
 
   saveRemarkResponseForSection(remarks: RemarkDto[]) {
@@ -197,7 +197,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
         return;
       }
     }
-    this.remarkResponseForSection.hide();
+    this.remarkResponseForSection()?.hide();
     this.subscriptions.push(
       this._dialogService.showConfirmDialog('Ответить на замечания по объекту экспертизы',
         'Вы уверены, что хотите отправить ответы на замечания по объекту экспертизы ' + this.projectValue.title + '?',
@@ -225,7 +225,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
         return;
       }
     }
-    this.remarkResponseForBureau.hide();
+    this.remarkResponseForBureau()?.hide();
     this.subscriptions.push(
       this._dialogService.showConfirmDialog('Ответить на замечания по объекту экспертизы',
         'Вы уверены, что хотите отправить ответы на замечания по объекту экспертизы ' + this.projectValue.title + '?',
@@ -261,7 +261,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
       this._dialogService.showConfirmDialog("Переназначение секции", `Вы уверены что хотите переназначить секцию?`,
         "Отменить действие будет невозможно").subscribe(() => {
         this._lifecycle = lifecycle;
-        this.changeSectionListComponent.show(this._group.council.id);
+        this.changeSectionListComponent()?.show(this._group.council.id);
       })
     );
   }
@@ -270,7 +270,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this._lifecycleGroupService.changeSection(this._lifecycle, this._group, $event.id).subscribe(value => {
         this._toasty.success("Секция переназначена.");
-        this.changeSectionListComponent.hide();
+        this.changeSectionListComponent()?.hide();
         this.applyGroup(value);
       })
     );
@@ -297,7 +297,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
       this._lifecycleGroupService.attachSection(this._group, $event.id).subscribe(res => {
         this._group.lifecycles.push(res);
         this._toasty.success("Секция прикреплена.");
-        this.searchSectionListComponent.hide();
+        this.searchSectionListComponent()?.hide();
         this.changed();
         this.cdr?.markForCheck?.();
       })
@@ -343,13 +343,17 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
       (project.state === 'ON_DEPARTMENT_SIGNING' && role === Role.GKNT_DEPARTMENT_CHAIRMAN);
   }
 
+  showReferralForm() {
+    this.referralFormModal()?.show();
+  }
+
   generateReferral(form: any) {
     this.isCreatingReferral = true;
     this.subscriptions.push(
       this._lifecycleGroupService.generateReferral(this._group, form).subscribe({
         next: (res) => {
           this.isCreatingReferral = false;
-          this.referralFormModal.hide();
+          this.referralFormModal()?.hide();
           this._group.referral = res;
           this.changed();
           this.cdr?.markForCheck?.();
@@ -376,6 +380,10 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
       anyMatch(this.role(), Role.GKNT_WORKER, Role.GKNT_DEPARTMENT_CHAIRMAN);
   }
 
+  showGroupDecisionForm() {
+    this.groupDecisionFormModal()?.show();
+  }
+
   canReadLifecycleGroupDecision() {
     return anyMatch(this._group.state, LifecycleGroupState.ACCEPTED, LifecycleGroupState.RETURNED, LifecycleGroupState.REJECTED);
   }
@@ -389,7 +397,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   }
 
   generateLifecycleGroupDecisionDocument(form: any) {
-    this.groupDecisionFormModal.hide();
+    this.groupDecisionFormModal()?.hide();
     this.subscriptions.push(
       this._lifecycleGroupService.generateLifecycleGroupDecisionDocument(this._group, form).subscribe(res => {
         this._group.decisionDocument = res;
@@ -404,12 +412,12 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   }
 
   closeConclusionForm() {
-    this.conclusionForm.close();
+    this.conclusionForm()?.close();
   }
 
   showConclusionForm() {
-    this.councilFormModal.show();
-    this.conclusionForm.startAutoSave();
+    this.councilFormModal()?.show();
+    this.conclusionForm()?.startAutoSave();
   }
 
   trackByLifecycle(index: number, lifecycle: ProjectLifecycleDto): any {

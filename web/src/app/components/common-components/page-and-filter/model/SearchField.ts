@@ -369,17 +369,41 @@ export class MultiSelectField extends SearchField {
   }
 
   setSelectedValues(values: any[] = []) {
-    // Фильтруем undefined значения после map, чтобы избежать ошибок в selectChanged
-    this.selectedItems = values
-      .map(value => {
-        // Используем более точное сравнение, как в filter-and-pages.ts
-        return this.allItems.find(item => {
-          const itemValue = item.value?.id ?? item.value;
-          const searchValue = value?.id ?? value;
-          return itemValue === searchValue || itemValue == searchValue;
-        });
-      })
-      .filter(item => item != null); // Удаляем undefined и null значения
+    /**
+     * Важно (кэш/восстановление):
+     * MultiSelectField.selectChanged() "сплющивает" значения, если option.value — массив:
+     * Соответственно, при восстановлении из кэша (localStorage) к нам часто приходят "плоские" значения [A, B],
+     * а не исходные option.value (который был массивом).
+     * Раньше мы пытались матчить каждое сохранённое значение с option.value через ===,
+     * что НЕ работает для case'ов, когда option.value — массив.
+     * Это приводило к тому, что UI и фильтр могли "обнулиться" после возврата на страницу.
+     * Решение: подбираем selectedItems по allItems:
+     * - если option.value скаляр — ищем прямое совпадение
+     * - если option.value массив — считаем опцию выбранной, если ВСЕ элементы массива присутствуют в сохранённых значениях
+     */
+    const normalized = (values ?? []).map(v => (v as any)?.id ?? v);
+
+    const selected: SelectItem[] = [];
+    for (const item of (this.allItems ?? [])) {
+      const itemValue = (item as any)?.value?.id ?? (item as any)?.value;
+      if (Array.isArray(itemValue)) {
+        const allPresent = itemValue.every(v =>
+          normalized.some(x => x === v || x == v)
+        );
+        if (allPresent) {
+          selected.push(item);
+        }
+      } else {
+        const present = normalized.some(v =>
+          v === itemValue || v == itemValue
+        );
+        if (present) {
+          selected.push(item);
+        }
+      }
+    }
+
+    this.selectedItems = selected;
     this.selectChanged();
   }
 

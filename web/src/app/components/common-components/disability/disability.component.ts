@@ -15,7 +15,7 @@ export const DISABILITY_CONTROL_VALUE_ACCESSOR: any = {
     template: `
     @if (_value != null) {
       <div class="btn-group" style="margin-top: 0.5rem">
-        <label class="btn btn-sm btn-primary mr-2" [class.active]="_value.isPensioner"
+        <label class="btn btn-sm btn-primary me-2" [class.active]="_value.isPensioner"
           (click)="_value.isPensioner = !_value.isPensioner">
           @if (_value.isPensioner) {
             <fa-icon icon="check"></fa-icon>

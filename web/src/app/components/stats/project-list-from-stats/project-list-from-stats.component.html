@@ -1,19 +1,19 @@
 <app-modal #searchModal [title]="'Объекты экспертизы'" [modalClasses]="'modal-xl'">
-  <p><i>Период:</i> {{period}}</p>
-  <p style="padding-bottom: 10px"><i>Количество объектов экспертизы:</i> {{countProjects}}</p>
+  <p><i>Период:</i> {{period()}}</p>
+  <p style="padding-bottom: 10px"><i>Количество объектов экспертизы:</i> {{countProjects()}}</p>
 
   <!--FILTER
   <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
   -->
 
   <div [loadingData]="_loading" class="mt-3">
-    @if (projects.length > 0) {
+    @if (projects().length > 0) {
       <table class="table table-responsive mb-0">
         <thead>
           <tr>
             <th class="text-nowrap selectable" style="min-width: 300px" (click)="changeSort()">
               <span>Объект экспертизы </span>
-              <fa-icon class="fa-active" [icon]="SortClass[sortDirection]"></fa-icon>
+              <fa-icon class="fa-active" [icon]="SortClass[sortDirection()]"></fa-icon>
             </th>
             <th class="text-nowrap" style="width: 50%">Код объекта</th>
             <th class="text-nowrap" style="width: 50%">Заказчик экспертизы</th>
@@ -22,7 +22,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (project of projects; track project) {
+          @for (project of projects(); track project.id) {
             <tr class="list-group-item-action selectable" (click)="onSelected(project)"  (contextmenu)="openNewTab($event, project.id)">
               <td class="text-sm">
                 <div> {{project.title}} </div>
@@ -52,7 +52,7 @@
       </table>
     }
 
-    @if (projects.length == 0) {
+    @if (projects().length == 0) {
       <div class="alert alert-info italic mb-0">Объекты экспертизы не найдены</div>
     }
 

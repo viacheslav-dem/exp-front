@@ -1,11 +1,11 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, viewChild, signal, computed, effect, DestroyRef, inject, untracked} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {DialogService} from "@app/components/dialogs/dialog.service";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {DialogResult} from "@app/components/dialogs/dialog-result";
 import {DialogContainer, DialogType} from "@app/components/dialogs/dialog-container";
 import {UserFormComponent} from "@app/components/dialogs/user-form/user-form.component";
-import {GlobalToastyService} from "@app/services/global-toasty.service";
-import {Subscription} from "rxjs";
 import {environment} from "../../../environments/environment";
 
 @Component({
@@ -18,60 +18,75 @@ import {environment} from "../../../environments/environment";
       ? ChangeDetectionStrategy.OnPush
       : ChangeDetectionStrategy.Default
 })
-export class DialogComponent implements OnInit, OnDestroy {
+export class DialogComponent {
 
   DialogType = DialogType;
-  dlg: DialogContainer<any>;
-  data: any;
-  title: string;
-  titleMap = {};
-  private subscription: Subscription;
+  
+  readonly dlg = signal<DialogContainer<any> | null>(null);
+  readonly data = computed(() => this.dlg()?.data ?? null);
+  readonly title = computed(() => {
+    const currentDlg = this.dlg();
+    if (!currentDlg) return '';
+    const data = currentDlg.data;
+    return data?.title ? data.title : this.titleMap[currentDlg.type];
+  });
+  
+  private readonly titleMap: Record<DialogType, string> = {
+    [DialogType.USER]: 'Редактирование пользователя',
+    [DialogType.PASSWORD]: 'Смена пароля',
+    [DialogType.CONFIRM]: 'Подтверждение действия',
+    [DialogType.VIEWER]: '',
+    [DialogType.METH_REC]: ''
+  };
 
-  @ViewChild('modalComponent', { static: false }) public modalComponent: ModalComponent;
-  @ViewChild(UserFormComponent, { static: false }) userForm: UserFormComponent;
+  readonly modalComponent = viewChild<ModalComponent>('modalComponent');
+  readonly userForm = viewChild(UserFormComponent);
 
-  constructor(
-    private dialogService: DialogService,
-    private toastService: GlobalToastyService,
-    private cdr: ChangeDetectorRef
-  ) {
-    this.titleMap[DialogType.USER] = 'Редактирование пользователя';
-    this.titleMap[DialogType.PASSWORD] = 'Смена пароля';
-    this.titleMap[DialogType.CONFIRM] = 'Подтверждение действия';
-  }
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly dialogService = inject(DialogService);
+  private _openSeq = 0; // Токен для отмены устаревших операций открытия
 
-  ngOnInit() {
-    this.subscription = this.dialogService.onOpenDialog.subscribe(dlg => {
-      if (this.dlg != null) {
-        this.cancel(); // close current dialog
+  private readonly dialogStream = toSignal(
+    this.dialogService.onOpenDialog.pipe(takeUntilDestroyed(this.destroyRef)),
+    { initialValue: undefined }
+  );
+
+  constructor() {
+    effect(() => {
+      const newDlg = this.dialogStream();
+      if (newDlg === undefined) return;
+
+      // КРИТИЧНО: effect должен зависеть ТОЛЬКО от dialogStream().
+      // Чтения dlg()/modalComponent() только через untracked(), иначе возможен цикл.
+      const currentDlg = untracked(() => this.dlg());
+      const seq = ++this._openSeq;
+
+      if (currentDlg != null) {
+        currentDlg.callback.complete();
       }
-      
-      // Сначала сбрасываем данные, чтобы Angular уничтожил старый компонент
-      this.dlg = null;
-      this.data = null;
-      this.cdr.markForCheck();
-      
-      setTimeout(() => {
-        // open new dialog - теперь Angular создаст новый экземпляр компонента
-        this.dlg = dlg;
-        this.data = dlg.data;
-        this.title = dlg.data.title ? dlg.data.title : this.titleMap[this.dlg.type];
-        this.modalComponent.show();
-        // Важно для OnPush/zoneless: обновление пришло из подписки + открытие модалки
-        this.cdr.markForCheck();
+
+      untracked(() => this.dlg.set(null));
+
+      queueMicrotask(() => {
+        if (seq !== this._openSeq) return;
+        untracked(() => this.dlg.set(newDlg));
+
+        setTimeout(() => {
+          if (seq !== this._openSeq) return;
+          if (untracked(() => this.dlg()) === newDlg) {
+            untracked(() => this.modalComponent()?.show());
+          }
+        }, 0);
       });
     });
   }
 
-  ngOnDestroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-  }
-
   save(entity?: any) {
-    this.dlg.callback.next(new DialogResult(entity, this));
-    if (this.dlg.autoClose) {
+    const currentDlg = this.dlg();
+    if (!currentDlg) return;
+    
+    currentDlg.callback.next(new DialogResult(entity, this));
+    if (currentDlg.autoClose) {
       this.forceClose();
     }
   }
@@ -81,27 +96,24 @@ export class DialogComponent implements OnInit, OnDestroy {
   }
 
   check(): boolean {
-    if (this.userForm == null)
+    const form = this.userForm();
+    if (form == null)
       return true;
     else
-      return this.userForm.checkModification();
+      return form.checkModification();
   }
 
   close() {
-    // if (!this.check()) {
-    //   this.toastService.warn('Данные были изменены, нажмите кнопку "Отмена" для выхода без сохранения данных или "Сохранить"')
-    // } else {
-      this.forceClose();
-    // }
+    this.forceClose();
   }
 
   forceClose() {
-    this.modalComponent.hide();
-    if (this.dlg) {
-      this.dlg.callback.complete();
+    this._openSeq++;
+    this.modalComponent()?.hide();
+    const currentDlg = this.dlg();
+    if (currentDlg) {
+      currentDlg.callback.complete();
     }
-    this.dlg = null;
-    this.data = null;  // Сбрасываем data для уничтожения дочернего компонента
-    this.cdr.markForCheck();
+    this.dlg.set(null);
   }
 }
