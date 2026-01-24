@@ -12,7 +12,7 @@ import {
   Signal,
   signal,
   untracked,
-  ViewChild
+  viewChild
 } from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -56,7 +56,7 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
   readonly hasProjects = computed(() => this.projects().length > 0);
   readonly projectsCount = computed(() => this.projects().length);
   
-  @ViewChild('expertInfo') expertInfoModal!: ModalComponent;
+  readonly expertInfoModal = viewChild.required<ModalComponent>('expertInfo');
   
   // Флаг для предотвращения двойной загрузки при изменении страницы
   private _isPageChangeInProgress = false;
@@ -432,7 +432,7 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
   }
 
   showExpertInfoDialog(expert: PersonExpertDto) {
-    this.expertInfoModal.show();
+    this.expertInfoModal()?.show();
     // Обновляем signal вместо прямого присваивания
     this.expert.set(expert);
     // Используем afterNextRender вместо setTimeout для обновления графиков

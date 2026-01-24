@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, effect, input, output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, effect, input, output, viewChild} from '@angular/core';
 import {ModalDirective} from "ngx-bootstrap/modal";
 import {DocumentDto} from "@app/dto/DocumentDto";
 import * as _ from "lodash";
@@ -18,7 +18,7 @@ export class FileEditorComponent implements OnInit {
   doc: DocumentDto;
   readonly onUpdate = output<DocumentDto>();
 
-  @ViewChild('fileEditorModal') public fileEditorModal: ModalDirective;
+  public readonly fileEditorModal = viewChild<ModalDirective>('fileEditorModal');
 
   constructor(private cdr: ChangeDetectorRef) {
   }
@@ -42,10 +42,10 @@ export class FileEditorComponent implements OnInit {
   }
 
   hide() {
-    this.fileEditorModal.hide();
+    this.fileEditorModal()?.hide();
   }
 
   show() {
-    this.fileEditorModal.show();
+    this.fileEditorModal()?.show();
   }
 }

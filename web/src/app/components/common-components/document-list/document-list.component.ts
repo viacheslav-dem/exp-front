@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, computed, input, output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, computed, input, output, viewChild} from '@angular/core';
 import {FileEditorComponent} from "../file-editor/file-editor.component";
 import {DocumentService} from "@app/services/document.service";
 import {DocumentDto} from "@app/dto/DocumentDto";
@@ -25,8 +25,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   readonly url = input<string>('document');
   readonly onUpdate = output<DocumentDto>();
   readonly onDelete = output<any>();
-  @ViewChild(FileEditorComponent) fileEditor: FileEditorComponent;
-  @ViewChild("fileViewerModal") fileViewerModal: ModalComponent;
+  readonly fileEditor = viewChild(FileEditorComponent);
+  readonly fileViewerModal = viewChild<ModalComponent>("fileViewerModal");
   private subscriptions: Subscription[] = [];
 
   constructor(private _documentService: DocumentService,
@@ -71,7 +71,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
 
   editDocument(doc) {
     this.selectedDocument = doc;
-    this.fileEditor.show();
+    this.fileEditor()?.show();
   }
 
   updateDocument(doc: DocumentDto) {
@@ -79,7 +79,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   hideEditor() {
-    this.fileEditor.hide();
+    this.fileEditor()?.hide();
   }
 
   downloadDocument(doc: DocumentDto) {

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, effect, input, output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, effect, input, output, viewChild} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute} from "@angular/router";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
@@ -33,7 +33,7 @@ export class LifecycleInfoComponent implements OnInit, OnDestroy {
   readonly project = input<ProjectDto>(undefined);
   readonly onChanged = output<any>();
 
-  @ViewChild('transitionHistoryModal', { static: false }) transitionHistoryModal: ModalComponent;
+  readonly transitionHistoryModal = viewChild<ModalComponent>('transitionHistoryModal');
 
   constructor(private route: ActivatedRoute,
               private _toasty: GlobalToastyService,
@@ -53,7 +53,7 @@ export class LifecycleInfoComponent implements OnInit, OnDestroy {
   });
 
   showTransitionHistoryModal() {
-    this.transitionHistoryModal.show();
+    this.transitionHistoryModal()?.show();
     this.subscriptions.push(
       this._transitionHistoryService.getLifecycleHistory(this._lifecycle)
         .subscribe(res => {

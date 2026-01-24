@@ -1,4 +1,4 @@
-import { OnInit, Directive } from "@angular/core";
+import { Directive, OnInit, signal } from "@angular/core";
 import {SearchField, SearchFieldType, MultiSelectField} from "app/components/common-components/page-and-filter/model/SearchField";
 import {Page} from "app/components/common-components/page-and-filter/model/Page";
 import {Filter} from "app/components/common-components/page-and-filter/model/Filter";
@@ -11,21 +11,75 @@ import {PageRequest} from "@app/components/common-components/page-and-filter/mod
 @Directive()
 export abstract class FilterAndPages<T> implements OnInit {
 
-  _page: Page<T> = new Page();
-  _pagination: Pagination;
+  /**
+   * Важно для zoneless/OnPush:
+   * - поля `_page/_pagination/_loading/_searchFields/...` используются во множестве шаблонов как обычные свойства.
+   * - чтобы НЕ переписывать все шаблоны разом и при этом получить реактивность сигналов,
+   *   оставляем публичные имена как getter/setter, а состояние переносим в signals.
+   *
+   * Ограничение (постепенная миграция):
+   * - прямые мутации вложенных свойств (например, `this._page.totalElements = ...`) НЕ триггерят сигнал.
+   *   В таких местах нужно переходить на иммутабельные присваивания: `this._page = {...}`.
+   */
+  private readonly _pageSignal = signal<Page<T>>(new Page<T>());
+  private readonly _paginationSignal = signal<Pagination>(new Pagination());
+  private readonly _loadingSignal = signal<boolean>(false);
+  private readonly _searchFieldsSignal = signal<SearchField[]>([]);
+  private readonly _filtersSignal = signal<Filter<any>[]>([]);
+  private readonly _sortOrdersSignal = signal<SortOrder[]>([]);
+
   _searchRequest: SearchPageRequest;
-  _loading: boolean = false;
 
   protected _filterCachePageName: string | null = null;
   protected _initialLoadDone: boolean = false;
 
-  _searchFields: SearchField[] = [];
-  _filters: Filter<any>[] = [];
-  _sortOrders: SortOrder[] = [];
+  // Back-compat API (шаблоны/наследники): поля остаются с теми же именами.
+  get _page(): Page<T> {
+    return this._pageSignal();
+  }
+  set _page(value: Page<T>) {
+    this._pageSignal.set(value ?? new Page<T>());
+  }
+
+  get _pagination(): Pagination {
+    return this._paginationSignal();
+  }
+  set _pagination(value: Pagination) {
+    this._paginationSignal.set(value ?? new Pagination());
+  }
+
+  get _loading(): boolean {
+    return this._loadingSignal();
+  }
+  set _loading(value: boolean) {
+    this._loadingSignal.set(!!value);
+  }
+
+  get _searchFields(): SearchField[] {
+    return this._searchFieldsSignal();
+  }
+  set _searchFields(value: SearchField[]) {
+    this._searchFieldsSignal.set(value ?? []);
+  }
+
+  get _filters(): Filter<any>[] {
+    return this._filtersSignal();
+  }
+  set _filters(value: Filter<any>[]) {
+    this._filtersSignal.set(value ?? []);
+  }
+
+  get _sortOrders(): SortOrder[] {
+    return this._sortOrdersSignal();
+  }
+  set _sortOrders(value: SortOrder[]) {
+    this._sortOrdersSignal.set(value ?? []);
+  }
 
   constructor(itemsPerPage?: number) {
-    this._pagination = new Pagination(itemsPerPage ? itemsPerPage : 10);
-    this._searchRequest = new SearchPageRequest(this._pagination);
+    const pagination = new Pagination(itemsPerPage ? itemsPerPage : 10);
+    this._paginationSignal.set(pagination);
+    this._searchRequest = new SearchPageRequest(pagination);
   }
 
   ngOnInit() {
@@ -33,8 +87,6 @@ export abstract class FilterAndPages<T> implements OnInit {
 
   enableFilterCache(pageName: string) {
     this._filterCachePageName = pageName;
-    // Проверяем наличие сохранённого состояния синхронно
-    const hasSavedState = !!localStorage.getItem(`filter_cache_${pageName}`);
     
     // Загружаем состояние только один раз при инициализации
     setTimeout(() => {
@@ -198,7 +250,7 @@ export abstract class FilterAndPages<T> implements OnInit {
   onFilterChanged() {
     this.setPage(0);
     // Сбрасываем страницу, чтобы не показывать "не найдено" до загрузки
-    this._page.totalElements = null;
+    this._page = Object.assign(new Page<T>(), this._page, { totalElements: null });
     // Сохраняем состояние перед обновлением, чтобы актуальные значения были сохранены
     if (this._filterCachePageName) {
       this.saveFilterState(this._filterCachePageName);
@@ -218,7 +270,10 @@ export abstract class FilterAndPages<T> implements OnInit {
     // for request
     this._searchRequest.paging.page = page;
     // for pagination component
-    this._pagination.page = page + 1;
+    const prev = this._pagination;
+    const next = new Pagination(prev?.itemsPerPage);
+    next.page = page + 1;
+    this._pagination = next;
   }
 
   // for pagination component
@@ -259,11 +314,9 @@ export abstract class FilterAndPages<T> implements OnInit {
     }
     
     this.prepareRequest();
-    // Откладываем изменение состояния загрузки на следующий тик,
-    // чтобы избежать ExpressionChangedAfterItHasBeenCheckedError
-    setTimeout(() => {
-      this.setLoading(true);
-    }, 0);
+    // В zoneless/OnPush мы полагаемся на signals.
+    // Ставим loading в микротаске, чтобы избежать ExpressionChangedAfterItHasBeenCheckedError в dev режиме.
+    Promise.resolve().then(() => this.setLoading(true));
     this.loadPage();
   }
 

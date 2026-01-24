@@ -5,7 +5,7 @@ import {
   ElementRef,
   inject,
   signal,
-  ViewChild,
+  viewChild
 } from '@angular/core';
 import { Catalog, DataService } from 'app/services/data.service';
 import { CatalogTemplate } from '@app/components/data-management/catalog/CatalogTemplate';
@@ -38,7 +38,7 @@ export class DirectionsComponent<T extends DirectionDto> extends CatalogTemplate
   readonly subDirInput = signal('');
   readonly subDirError = signal<string | null>(null);
 
-  @ViewChild('subDirInputEl') private subDirInputEl?: ElementRef<HTMLInputElement>;
+  private readonly subDirInputEl = viewChild<ElementRef<HTMLInputElement>>('subDirInputEl');
 
   // Стабильные trackKey без мутации DTO (WeakMap).
   private readonly _directionTrackKey = createTrackKeyStore<DirectionDto>('direction:');
@@ -85,7 +85,7 @@ export class DirectionsComponent<T extends DirectionDto> extends CatalogTemplate
 
   private focusSubDirInput(): void {
     // После добавления удобно сразу вводить следующее значение.
-    queueMicrotask(() => this.subDirInputEl?.nativeElement?.focus());
+    queueMicrotask(() => this.subDirInputEl()?.nativeElement?.focus());
   }
 
   addSubDir(): void {

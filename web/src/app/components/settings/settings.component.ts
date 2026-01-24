@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactoryResolver, ViewChild, ViewContainerRef, AfterViewInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactoryResolver, ViewContainerRef, AfterViewInit, viewChild} from '@angular/core';
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {DataService} from "@app/services/data.service";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
@@ -27,7 +27,7 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> implements Af
   editedProperty: PropertyPlainDto;
   private _pendingPropertySelection: PropertyDto;
 
-  @ViewChild('propertyContainer', { read: ViewContainerRef, static: false }) propertyContainer: ViewContainerRef;
+  readonly propertyContainer = viewChild('propertyContainer', { read: ViewContainerRef });
   propertyComponent: PropertyComponent<any>;
 
   constructor(private _toasty: GlobalToastyService,
@@ -69,7 +69,7 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> implements Af
       this.properties = this._page.content;
       if (this.properties && this.properties.length > 0) {
         // Если propertyContainer еще не инициализирован, откладываем выборку
-        if (this.propertyContainer) {
+        if (this.propertyContainer()) {
           this.selectProperty(this.properties[0]);
         } else {
           this._pendingPropertySelection = this.properties[0];
@@ -116,18 +116,19 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> implements Af
   }
 
   updatePropertyComponent() {
-    if (!this.propertyContainer || !this.selectedProperty) {
+    const propertyContainer = this.propertyContainer();
+    if (!propertyContainer || !this.selectedProperty) {
       return;
     }
-    while (this.propertyContainer.length > 0) {
-      this.propertyContainer.get(0).destroy();
+    while (propertyContainer.length > 0) {
+      propertyContainer.get(0).destroy();
     }
     let renderer = this._propertyComponentResolver.getRenderer(this.selectedProperty.type);
     if (!renderer) {
       this.propertyComponent = null;
     } else {
       const componentFactory = this._resolver.resolveComponentFactory(renderer);
-      const componentRef = this.propertyContainer.createComponent(componentFactory);
+      const componentRef = propertyContainer.createComponent(componentFactory);
       this.propertyComponent = componentRef.instance as PropertyComponent<any>;
       this.propertyComponent.setProperty(this.selectedProperty);
     }

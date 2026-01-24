@@ -1,4 +1,4 @@
-import {Component, ElementRef, Type, ViewChild, ViewContainerRef, input, ChangeDetectionStrategy, ChangeDetectorRef, signal, effect} from "@angular/core";
+import {Component, ElementRef, Type, ViewContainerRef, input, ChangeDetectionStrategy, ChangeDetectorRef, signal, effect, viewChild} from "@angular/core";
 import {MeetingDto} from "@app/dto/MeetingDto";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {Role} from "@app/pipes/role.pipe";
@@ -73,8 +73,8 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
 
   // Аккордеон: открыт максимум один проект за раз.
   readonly openedAgendaProjectId = signal<number | null>(null);
-  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
-  @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
+  public readonly searchPersonModal = viewChild(SearchPersonByRolesComponent);
+  readonly formContainer = viewChild('form', { read: ViewContainerRef });
 
   constructor(private _personService: PersonService,
               private _meetingService: MeetingService,
@@ -132,14 +132,15 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
   }
 
   prepareAgendaForms() {
-    while (this.formContainer.length > 0) {
-      this.formContainer.get(0).destroy();
+    const container = this.formContainer();
+    while (container?.length > 0) {
+      container.get(0).destroy();
     }
     this._meeting.agendas.sort(compareByField('id'));
     this._meeting.agendas.forEach((agenda, i) => {
       let formRenderer: Type<AgendaNewForm> = this._agendaFormResolver.getFormRenderer(agenda.project.code.code);
       if (formRenderer) {
-        const componentRef = this.formContainer.createComponent(formRenderer);
+        const componentRef = this.formContainer()!.createComponent(formRenderer);
         let component: AgendaNewForm = this.agendaComponents[agenda.project.id] = componentRef.instance;
         component.ind = i;
         component.project = agenda.project;
@@ -168,12 +169,12 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
 
   showSearchChairmanModal() {
     this.searchPersonRoles = this.role();
-    this.searchPersonModal.show();
+    this.searchPersonModal()?.show();
   }
 
   selectPerson(person: PersonPlainDto) {
     this._form.chairman = person;
-    this.searchPersonModal.hide();
+    this.searchPersonModal()?.hide();
   }
 
   validate() {

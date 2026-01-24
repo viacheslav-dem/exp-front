@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, output, viewChild} from '@angular/core';
 import {ModalDirective} from "ngx-bootstrap/modal";
 import {DataService} from "app/services/data.service";
 import {environment} from "../../../../environments/environment";
@@ -13,7 +13,7 @@ export class SearchCouncilComponent implements OnInit {
 
   public data: any[];
   readonly selected = output<any>();
-  @ViewChild('searchModal', { static: false }) public searchModal: ModalDirective;
+  public readonly searchModal = viewChild<ModalDirective>('searchModal');
 
   constructor(private _dataService: DataService, private cdr: ChangeDetectorRef) {
   }
@@ -34,12 +34,12 @@ export class SearchCouncilComponent implements OnInit {
 
   show() {
     this.loadData();
-    this.searchModal.show();
+    this.searchModal()?.show();
     this.cdr?.markForCheck?.();
   }
 
   hide() {
-    this.searchModal.hide();
+    this.searchModal()?.hide();
     this.cdr?.markForCheck?.();
   }
 

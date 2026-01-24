@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef, computed, effect, signal, output} from '@angular/core';
+import {Component, OnDestroy, OnInit, input, ChangeDetectionStrategy, ChangeDetectorRef, computed, effect, signal, output, viewChild} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {PersonService} from "@app/services/person.service";
 import {Router} from "@angular/router";
@@ -37,7 +37,7 @@ export class LifecycleGroupListComponent implements OnInit, OnDestroy {
   readonly onChanged = output<any>();
   readonly onReplyChanged = output<ProjectDto>();
 
-  @ViewChild(SearchCouncilComponent, { static: false }) searchCouncilComponent: SearchCouncilComponent;
+  readonly searchCouncilComponent = viewChild(SearchCouncilComponent);
 
   constructor(private _plainService: PersonService,
               private _router: Router,
@@ -77,7 +77,7 @@ export class LifecycleGroupListComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this._projectService.attachCouncil(this.project(), $event.id).subscribe(res => {
         this.groupsState.set([...this.groupsState(), res]);
-        this.searchCouncilComponent.hide();
+        this.searchCouncilComponent()?.hide();
         this.changed();
         this.cdr?.markForCheck?.();
       })

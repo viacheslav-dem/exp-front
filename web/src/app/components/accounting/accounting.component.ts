@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild, ChangeDetectionStrategy, signal, ChangeDetectorRef} from "@angular/core";
+import {Component, ElementRef, ChangeDetectionStrategy, signal, ChangeDetectorRef, viewChild} from "@angular/core";
 import {
   Direction,
   sortByName,
@@ -54,9 +54,9 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
   filterName = signal<string | undefined>(undefined);
   payDate = signal<Date | undefined>(undefined);
 
-  @ViewChild('fileViewerModal', { static: false }) fileViewer: ModalComponent;
-  @ViewChild('confirmFinishAccountingModal', { static: false }) confirmFinishAccountingModal: ModalComponent;
-  @ViewChild('paySumInput', { static: false }) paySumInput;
+  readonly fileViewer = viewChild<ModalComponent>('fileViewerModal');
+  readonly confirmFinishAccountingModal = viewChild<ModalComponent>('confirmFinishAccountingModal');
+  readonly paySumInput = viewChild<ElementRef<HTMLInputElement>>('paySumInput');
 
 
   constructor(private _accountingService: AccountingService,
@@ -169,7 +169,7 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
   showFinishAccountingModal(accounting: AccountingDto) {
     this.payDate.set(new Date());
     this.selectedRecord.set(accounting);
-    this.confirmFinishAccountingModal.show();
+    this.confirmFinishAccountingModal()?.show();
   }
 
   finishAccounting() {
@@ -180,13 +180,14 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
       this._toasty.error('Заполните дату оплаты');
       return;
     }
-    if (this.paySumInput.nativeElement.value == null){
+    const paySumInput = this.paySumInput()?.nativeElement;
+    if (paySumInput?.value == null){
       this._toasty.error('Введите сумму к оплате')
       return;
     }
-    this.confirmFinishAccountingModal.hide();
+    this.confirmFinishAccountingModal()?.hide();
     if (selectedRecordValue) {
-      this._accountingService.finishAccounting(selectedRecordValue, payDateValue, this.paySumInput.nativeElement.value).subscribe(() => {
+      this._accountingService.finishAccounting(selectedRecordValue, payDateValue, Number(paySumInput.value)).subscribe(() => {
         this._toasty.success('Произведена отметка об оплате.');
         this.update();
       });
@@ -194,7 +195,7 @@ export class AccountingComponent extends FilterAndPages<AccountingDto> {
   }
 
   closeFinishAccountingModal() {
-    this.confirmFinishAccountingModal.hide();
+    this.confirmFinishAccountingModal()?.hide();
   }
 
   getSortOrders() {

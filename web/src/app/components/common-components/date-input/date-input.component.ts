@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnChanges, ViewChild, forwardRef, input, output} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnChanges, forwardRef, input, output, viewChild} from '@angular/core';
 import {ControlComponent} from "@app/components/common-components/control-component";
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import dayjs from 'dayjs';
@@ -47,7 +47,7 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
   dateValue: Date;
   readonly onSelect = output<number>();
 
-  @ViewChild('dateInput', { static: false }) dateInput: ElementRef<HTMLInputElement>;
+  readonly dateInput = viewChild<ElementRef<HTMLInputElement>>('dateInput');
   bsConfig: any;
 
   constructor(private _cdr: ChangeDetectorRef) {
@@ -62,7 +62,7 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
 
   ngAfterViewInit() {
     // Обновляем отображение после инициализации если есть значение
-    if (this.dateValue && this.dateInput) {
+    if (this.dateValue && this.dateInput()) {
       requestAnimationFrame(() => {
         this.updateInputDisplay();
       });
@@ -99,10 +99,11 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
   }
 
   private updateInputDisplay() {
-    if (this.dateInput && this.dateInput.nativeElement && this.dateValue) {
+    const dateInput = this.dateInput();
+    if (dateInput && dateInput.nativeElement && this.dateValue) {
       const formatted = dayjs(this.dateValue).locale('ru').format(this.dateFormat());
-      if (this.dateInput.nativeElement.value !== formatted) {
-        this.dateInput.nativeElement.value = formatted;
+      if (dateInput.nativeElement.value !== formatted) {
+        dateInput.nativeElement.value = formatted;
       }
     }
   }
@@ -110,7 +111,7 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
   onModelChange(value: Date) {
     // Workaround: ngx-bootstrap имеет баг с форматированием года
     // Обновляем отображение после того, как ngx-bootstrap обновит значение
-    if (value && this.dateInput?.nativeElement) {
+    if (value && this.dateInput()?.nativeElement) {
       requestAnimationFrame(() => {
         this.updateDisplayValue(value);
       });
@@ -141,11 +142,12 @@ export class DateInputComponent extends ControlComponent<number> implements OnCh
    * Использует dayjs для форматирования с поддержкой формата Moment.js (DD.MM.YYYY)
    */
   private updateDisplayValue(date: Date): void {
-    if (this.dateInput?.nativeElement) {
+    const dateInput = this.dateInput();
+    if (dateInput?.nativeElement) {
       const formatted = dayjs(date).locale('ru').format(this.dateFormat());
       // Обновляем только если значение отличается (избегаем лишних обновлений)
-      if (this.dateInput.nativeElement.value !== formatted) {
-        this.dateInput.nativeElement.value = formatted;
+      if (dateInput.nativeElement.value !== formatted) {
+        dateInput.nativeElement.value = formatted;
       }
     }
   }

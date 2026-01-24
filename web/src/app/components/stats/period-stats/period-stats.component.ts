@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ElementRef, AfterViewInit, viewChild} from "@angular/core";
 import {StatsService} from "@app/services/stats.service";
 import {StatsDto} from "@app/dto/StatsDto";
 import dayjs from 'dayjs';
@@ -21,8 +21,8 @@ export class PeriodStatsComponent implements OnInit, AfterViewInit {
   dateFromValue: Date = new Date(this.dateFrom);
   dateToValue: Date = new Date(this.dateTo);
   
-  @ViewChild('dateFromInput', { static: false }) dateFromInput: ElementRef<HTMLInputElement>;
-  @ViewChild('dateToInput', { static: false }) dateToInput: ElementRef<HTMLInputElement>;
+  readonly dateFromInput = viewChild<ElementRef<HTMLInputElement>>('dateFromInput');
+  readonly dateToInput = viewChild<ElementRef<HTMLInputElement>>('dateToInput');
   
   datePickerConfig: Partial<BsDatepickerConfig> = {
     minMode: 'month',
@@ -47,16 +47,18 @@ export class PeriodStatsComponent implements OnInit, AfterViewInit {
   }
 
   private updateInputDisplay(): void {
-    if (this.dateFromInput?.nativeElement && this.dateFromValue) {
+    const dateFromInput = this.dateFromInput();
+    if (dateFromInput?.nativeElement && this.dateFromValue) {
       const formatted = dayjs(this.dateFromValue).locale('ru').format('MM.YYYY');
-      if (this.dateFromInput.nativeElement.value !== formatted) {
-        this.dateFromInput.nativeElement.value = formatted;
+      if (dateFromInput.nativeElement.value !== formatted) {
+        dateFromInput.nativeElement.value = formatted;
       }
     }
-    if (this.dateToInput?.nativeElement && this.dateToValue) {
+    const dateToInput = this.dateToInput();
+    if (dateToInput?.nativeElement && this.dateToValue) {
       const formatted = dayjs(this.dateToValue).locale('ru').format('MM.YYYY');
-      if (this.dateToInput.nativeElement.value !== formatted) {
-        this.dateToInput.nativeElement.value = formatted;
+      if (dateToInput.nativeElement.value !== formatted) {
+        dateToInput.nativeElement.value = formatted;
       }
     }
   }
@@ -76,9 +78,10 @@ export class PeriodStatsComponent implements OnInit, AfterViewInit {
       this.update();
       // Обновляем отображение после изменения даты
       requestAnimationFrame(() => {
-        if (this.dateToInput?.nativeElement) {
+        const dateToInput = this.dateToInput();
+        if (dateToInput?.nativeElement) {
           const formatted = dayjs(date).locale('ru').format('MM.YYYY');
-          this.dateToInput.nativeElement.value = formatted;
+          dateToInput.nativeElement.value = formatted;
         }
         this.cdr?.markForCheck?.();
       });
@@ -92,9 +95,10 @@ export class PeriodStatsComponent implements OnInit, AfterViewInit {
       this.update();
       // Обновляем отображение после изменения даты
       requestAnimationFrame(() => {
-        if (this.dateFromInput?.nativeElement) {
+        const dateFromInput = this.dateFromInput();
+        if (dateFromInput?.nativeElement) {
           const formatted = dayjs(date).locale('ru').format('MM.YYYY');
-          this.dateFromInput.nativeElement.value = formatted;
+          dateFromInput.nativeElement.value = formatted;
         }
         this.cdr?.markForCheck?.();
       });

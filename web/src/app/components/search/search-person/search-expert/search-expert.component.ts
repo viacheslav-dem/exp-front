@@ -1,4 +1,4 @@
-import {Component, ViewChild, ChangeDetectorRef, output} from '@angular/core';
+import {Component, ChangeDetectorRef, output, viewChild} from '@angular/core';
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {PersonService} from "@app/services/person.service";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
@@ -10,6 +10,7 @@ import {
 } from "@app/components/common-components/page-and-filter/model/SortOrder";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {Page} from "@app/components/common-components/page-and-filter/model/Page";
+import {Pagination} from "@app/components/common-components/page-and-filter/model/Pagination";
 import {PersonExpertDto} from "@app/dto/PersonExpertDto";
 
 @Component({
@@ -23,7 +24,7 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
   experts: PersonExpertDto[] = [];
   sortDirection = Direction.ASC;
   readonly selected = output<PersonExpertDto>();
-  @ViewChild('searchModal', { static: false }) searchPersonModal: ModalComponent;
+  readonly searchPersonModal = viewChild<ModalComponent>('searchModal');
 
   constructor(protected _service: PersonService, private _cdr: ChangeDetectorRef) {
     super();
@@ -72,17 +73,19 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
   show() {
     // Очищаем результаты предыдущего поиска при открытии модального окна
     this.experts = [];
-    this._page = new Page();
-    this._page.totalElements = null;
+    // Zoneless/Signals: иммутабельное обновление _page
+    this._page = Object.assign(new Page<PersonExpertDto>(), { totalElements: null });
     // Поля поиска НЕ очищаем - они сохраняются через кэш фильтров
     // Сбрасываем страницу на первую
-    this._pagination.page = 1;
+    const nextPagination = new Pagination(this._pagination?.itemsPerPage);
+    nextPagination.page = 1;
+    this._pagination = nextPagination;
     this._searchRequest.paging.page = 0;
     
     // Помечаем компонент для проверки изменений (важно для OnPush стратегии)
     this._cdr.markForCheck();
     
-    this.searchPersonModal.show();
+    this.searchPersonModal()?.show();
     // Загружаем первую страницу при открытии (убраны ненужные задержки для ускорения)
     this.setLoading(true);
     this.update();
@@ -93,6 +96,6 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
     // Помечаем компонент для проверки изменений
     this._cdr.markForCheck();
     
-    this.searchPersonModal.hide();
+    this.searchPersonModal()?.hide();
   }
 }

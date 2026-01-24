@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, input, output} from "@angular/core";
+import {ChangeDetectionStrategy, Component, ElementRef, OnInit, input, output, viewChild} from "@angular/core";
 import {DocType} from "@app/components/common-components/file-uploader/doc-type";
 import {environment} from "../../../../../environments/environment";
 
@@ -18,7 +18,7 @@ export class ChooseFilesComponent implements OnInit {
     DocType.DOCX.extension, DocType.DOC.extension,
     DocType.PDF.extension, DocType.TIFF.extension
 ].join(','));
-  @ViewChild('fileInput') fileInput: ElementRef;
+  readonly fileInput = viewChild<ElementRef>('fileInput');
 
   constructor() {
   }
@@ -31,7 +31,8 @@ export class ChooseFilesComponent implements OnInit {
       this.validateTypes(event.target.files);
       this.onFilesChosen.emit(event.target.files);
     }
-    this.fileInput.nativeElement.value = "";
+    const el = this.fileInput()?.nativeElement;
+    if (el) el.value = "";
   }
 
   private validateTypes(files: any) {

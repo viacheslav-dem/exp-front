@@ -1,4 +1,4 @@
-import {Component, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy, ChangeDetectorRef, viewChild} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {Role} from "@app/pipes/role.pipe";
@@ -32,7 +32,7 @@ export class ReturnFromCouncilWithoutExpertiseFormComponent extends DocumentForm
   readonly group = input<LifecycleGroupDto>(undefined);
   readonly council = input<CouncilPlainDto>(undefined);
 
-  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
+  public readonly searchPersonModal = viewChild(SearchPersonByRolesComponent);
 
   ngOnInit() {
     super.ngOnInit();
@@ -51,11 +51,11 @@ export class ReturnFromCouncilWithoutExpertiseFormComponent extends DocumentForm
   }
 
   showSearchChairmanModal() {
-    this.searchPersonModal.show();
+    this.searchPersonModal()?.show();
   }
 
   selectPerson(person: PersonPlainDto) {
     this._form.chairman = person;
-    this.searchPersonModal.hide();
+    this.searchPersonModal()?.hide();
   }
 }

@@ -1,4 +1,5 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, signal, computed} from "@angular/core";
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, viewChild, signal, computed} from "@angular/core";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {finalize} from "rxjs";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -45,56 +46,186 @@ import {environment} from "../../../environments/environment";
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
-export class ProjectInfoComponent implements OnInit, OnDestroy {
+export class ProjectInfoComponent implements OnInit {
 
   Role = Role; // enum for template
 
-  agreement: boolean = false;
-
-  currentUser: any;
-  role: string;
-  project: ProjectDto;
-  editedProject: ProjectDto;
-  copiedProject: ProjectCopyDto;
-  listSameProjects: ProjectDto[] = [];
-  lifecycleRemark: ProjectLifecycleDto = new ProjectLifecycleDto();
-
-  // for assessors
-  agenda: IdDto;
-  sectionReports: any[];
-  reviews: any[];
-
-  // for bureau chairman
-  lifecycleGroup: LifecycleGroupDto;
-
-  // for section chairman
-  lifecycle: any;
-
-  // Signals для computed values
+  // Signals для всех свойств
   private readonly _roleSignal = signal<string | undefined>(undefined);
+  private readonly _projectSignal = signal<ProjectDto | undefined>(undefined);
   private readonly _lifecycleGroupSignal = signal<LifecycleGroupDto | undefined>(undefined);
   private readonly _lifecycleSignal = signal<any | undefined>(undefined);
-  private readonly _projectSignal = signal<ProjectDto | undefined>(undefined);
   private readonly _lifecycleGroupsSignal = signal<any[]>([]);
   private readonly _expertReviewSignal = signal<ExpertReviewDto | undefined>(undefined);
+  private readonly _currentUserSignal = signal<any | undefined>(undefined);
+  private readonly _agreementSignal = signal<boolean>(false);
+  private readonly _editedProjectSignal = signal<ProjectDto | undefined>(undefined);
+  private readonly _copiedProjectSignal = signal<ProjectCopyDto | undefined>(undefined);
+  private readonly _listSameProjectsSignal = signal<ProjectDto[]>([]);
+  private readonly _lifecycleRemarkSignal = signal<ProjectLifecycleDto>(new ProjectLifecycleDto());
+  private readonly _agendaSignal = signal<IdDto | undefined>(undefined);
+  private readonly _sectionReportsSignal = signal<any[]>([]);
+  private readonly _reviewsSignal = signal<any[]>([]);
+  private readonly _visibleDocsForExpertSignal = signal<boolean>(false);
+
   readonly sameProjectsLoading = signal<boolean>(false);
+  readonly acceptProjectLoading = signal<boolean>(false);
 
-  // for gknt, customer and belisa
-  lifecycleGroups: any[] = [];
+  // Геттеры для обратной совместимости (используются в шаблоне и методах)
+  get role(): string | undefined {
+    return this._roleSignal();
+  }
+  set role(value: string | undefined) {
+    this._roleSignal.set(value);
+  }
 
-  // for expert
-  expertReview: ExpertReviewDto;
-  visibleDocsForExpert: boolean = false;
+  get project(): ProjectDto | undefined {
+    return this._projectSignal();
+  }
+  set project(value: ProjectDto | undefined) {
+    this._projectSignal.set(value);
+  }
 
-  @ViewChild(SearchExpertComponent, { static: false }) public searchExpertComponent: SearchExpertComponent;
-  @ViewChild(SearchGkntWorkerComponent, { static: false }) searchGkntWorkerComponent: SearchGkntWorkerComponent;
-  @ViewChild('editProjectModal', { static: false }) editProjectModal: ModalComponent;
-  @ViewChild('returnFromCouncilWithoutExpertiseModal', { static: false }) returnFromCouncilWithoutExpertiseModal: ModalComponent;
-  @ViewChild('copyProjectModal', { static: false }) copyProjectModal: ModalComponent;
-  @ViewChild('expertRejectProject', { static: false }) expertRejectProject: ModalComponent;
-  @ViewChild('expertAgreement', { static: false }) expertAgreement: ModalComponent;
-  @ViewChild('listProjects', { static: false }) listProjects: ModalComponent;
-  @ViewChild(SameProjectListComponent, { static: false }) sameProjectList: SameProjectListComponent;
+  get lifecycleGroup(): LifecycleGroupDto | undefined {
+    return this._lifecycleGroupSignal();
+  }
+  set lifecycleGroup(value: LifecycleGroupDto | undefined) {
+    this._lifecycleGroupSignal.set(value);
+  }
+
+  get lifecycle(): any | undefined {
+    return this._lifecycleSignal();
+  }
+  set lifecycle(value: any | undefined) {
+    this._lifecycleSignal.set(value);
+  }
+
+  get lifecycleGroups(): any[] {
+    return this._lifecycleGroupsSignal();
+  }
+  set lifecycleGroups(value: any[]) {
+    this._lifecycleGroupsSignal.set(value ?? []);
+  }
+
+  get expertReview(): ExpertReviewDto | undefined {
+    return this._expertReviewSignal();
+  }
+  set expertReview(value: ExpertReviewDto | undefined) {
+    this._expertReviewSignal.set(value);
+  }
+
+  get currentUser(): any | undefined {
+    return this._currentUserSignal();
+  }
+  set currentUser(value: any | undefined) {
+    this._currentUserSignal.set(value);
+  }
+
+  get agreement(): boolean {
+    return this._agreementSignal();
+  }
+  set agreement(value: boolean) {
+    this._agreementSignal.set(value);
+  }
+
+  get editedProject(): ProjectDto | undefined {
+    return this._editedProjectSignal();
+  }
+  set editedProject(value: ProjectDto | undefined) {
+    this._editedProjectSignal.set(value);
+  }
+
+  get copiedProject(): ProjectCopyDto | undefined {
+    return this._copiedProjectSignal();
+  }
+  set copiedProject(value: ProjectCopyDto | undefined) {
+    this._copiedProjectSignal.set(value);
+  }
+
+  get listSameProjects(): ProjectDto[] {
+    return this._listSameProjectsSignal();
+  }
+  set listSameProjects(value: ProjectDto[]) {
+    this._listSameProjectsSignal.set(value ?? []);
+  }
+
+  get lifecycleRemark(): ProjectLifecycleDto {
+    return this._lifecycleRemarkSignal();
+  }
+  set lifecycleRemark(value: ProjectLifecycleDto) {
+    this._lifecycleRemarkSignal.set(value ?? new ProjectLifecycleDto());
+  }
+
+  get agenda(): IdDto | undefined {
+    return this._agendaSignal();
+  }
+  set agenda(value: IdDto | undefined) {
+    this._agendaSignal.set(value);
+  }
+
+  get sectionReports(): any[] {
+    return this._sectionReportsSignal();
+  }
+  set sectionReports(value: any[]) {
+    this._sectionReportsSignal.set(value ?? []);
+  }
+
+  get reviews(): any[] {
+    return this._reviewsSignal();
+  }
+  set reviews(value: any[]) {
+    this._reviewsSignal.set(value ?? []);
+  }
+
+  get visibleDocsForExpert(): boolean {
+    return this._visibleDocsForExpertSignal();
+  }
+  set visibleDocsForExpert(value: boolean) {
+    this._visibleDocsForExpertSignal.set(value);
+  }
+
+  // ViewChild переведены на viewChild (сигналы)
+  private readonly _searchExpertComponentSignal = viewChild<SearchExpertComponent>(SearchExpertComponent);
+  private readonly _searchGkntWorkerComponentSignal = viewChild<SearchGkntWorkerComponent>(SearchGkntWorkerComponent);
+  private readonly _editProjectModalSignal = viewChild<ModalComponent>('editProjectModal');
+  private readonly _returnFromCouncilWithoutExpertiseModalSignal = viewChild<ModalComponent>('returnFromCouncilWithoutExpertiseModal');
+  private readonly _copyProjectModalSignal = viewChild<ModalComponent>('copyProjectModal');
+  private readonly _expertRejectProjectSignal = viewChild<ModalComponent>('expertRejectProject');
+  private readonly _expertAgreementSignal = viewChild<ModalComponent>('expertAgreement');
+  private readonly _listProjectsSignal = viewChild<ModalComponent>('listProjects');
+  private readonly _sameProjectListSignal = viewChild<SameProjectListComponent>(SameProjectListComponent);
+
+  // Геттеры для обратной совместимости с шаблоном (template reference variables)
+  get searchExpertComponent(): SearchExpertComponent | undefined {
+    return this._searchExpertComponentSignal();
+  }
+  get searchGkntWorkerComponent(): SearchGkntWorkerComponent | undefined {
+    return this._searchGkntWorkerComponentSignal();
+  }
+  get editProjectModal(): ModalComponent | undefined {
+    return this._editProjectModalSignal();
+  }
+  get returnFromCouncilWithoutExpertiseModal(): ModalComponent | undefined {
+    return this._returnFromCouncilWithoutExpertiseModalSignal();
+  }
+  get copyProjectModal(): ModalComponent | undefined {
+    return this._copyProjectModalSignal();
+  }
+  get expertRejectProject(): ModalComponent | undefined {
+    return this._expertRejectProjectSignal();
+  }
+  get expertAgreement(): ModalComponent | undefined {
+    return this._expertAgreementSignal();
+  }
+  get listProjects(): ModalComponent | undefined {
+    return this._listProjectsSignal();
+  }
+  get sameProjectList(): SameProjectListComponent | undefined {
+    return this._sameProjectListSignal();
+  }
+
+  private readonly destroyRef = inject(DestroyRef);
+  private _lastLoadedProjectId: number | undefined;
 
   constructor(private route: ActivatedRoute,
               private _toasty: GlobalToastyService,
@@ -112,125 +243,185 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
               private _reviewService: ExpertReviewService,
               private _dialogService: DialogService,
               private _personPipe: PersonFullNamePipe,
-              private _documentService: DocumentService,
-              private cdr: ChangeDetectorRef) {
+              private _documentService: DocumentService) {
   }
 
-  private paramsSubscription: any;
-  private _lastLoadedProjectId: number | undefined;
+  /**
+   * Zoneless/Signals: защитные геттеры для runtime-устойчивости.
+   * Не меняют поведение при корректном UI-потоке (когда проект уже загружен),
+   * но предотвращают падения, если метод вызван до загрузки данных.
+   */
+  private requireProject(): ProjectDto | undefined {
+    const project = this.project;
+    if (!project) {
+      this._toasty?.error?.('Проект не загружен. Повторите попытку.');
+      return undefined;
+    }
+    return project;
+  }
+
+  private requireLifecycle(): any | undefined {
+    const lifecycle = this.lifecycle;
+    if (!lifecycle) {
+      this._toasty?.error?.('Данные жизненного цикла не загружены. Повторите попытку.');
+      return undefined;
+    }
+    return lifecycle;
+  }
+
+  private requireLifecycleGroup(): LifecycleGroupDto | undefined {
+    const group = this.lifecycleGroup;
+    if (!group) {
+      this._toasty?.error?.('Данные группы не загружены. Повторите попытку.');
+      return undefined;
+    }
+    return group;
+  }
+
+  private requireExpertReview(): ExpertReviewDto | undefined {
+    const review = this.expertReview;
+    if (!review) {
+      this._toasty?.error?.('Экспертная оценка не загружена. Повторите попытку.');
+      return undefined;
+    }
+    return review;
+  }
 
   ngOnInit() {
     this.role = this._authService.getCurrRole();
-    this._roleSignal.set(this.role);
-    this._personService.getCurrentPerson().subscribe(res => {
-      this.currentUser = res;
-      this.cdr?.markForCheck?.();
-    });
-    this.paramsSubscription = this.route.params.subscribe(params => {
-      const projectId = parseInt(params['id'], 10);
-      // Защита от повторных вызовов loadProject с тем же id
-      if (this._lastLoadedProjectId === projectId && this.project && this.project.id === projectId) {
-        return;
-      }
-      this._lastLoadedProjectId = projectId;
-      this.agenda = params['agendaId'] ? new IdDto(params['agendaId']) : null;
-      this.loadProject(new IdDto(params['id']), params['group']);
-    });
-  }
-
-  ngOnDestroy() {
-    if (this.paramsSubscription) {
-      this.paramsSubscription.unsubscribe();
-    }
+    this._personService.getCurrentPerson()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.currentUser = res;
+      });
+    this.route.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        const projectId = parseInt(params['id'], 10);
+        // Защита от повторных вызовов loadProject с тем же id
+        if (this._lastLoadedProjectId === projectId && this.project && this.project.id === projectId) {
+          return;
+        }
+        this._lastLoadedProjectId = projectId;
+        this.agenda = params['agendaId'] ? new IdDto(params['agendaId']) : null;
+        this.loadProject(new IdDto(params['id']), params['group']);
+      });
   }
 
   loadLifecycle() {
-    this._projectService.getLifecycle(this.project).subscribe(res => {
-      this.updateLifecycleSignal(res);
-      // markForCheck не нужен: computed signal visibleForSection автоматически триггерит change detection
-    });
+    const project = this.requireProject();
+    if (!project) return;
+
+    this._projectService.getLifecycle(project)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.updateLifecycleSignal(res);
+      });
   }
 
   loadLifecycleGroups() {
-    this._projectService.getLifecycleGroups(this.project).subscribe(res => {
-      this.updateLifecycleGroupsSignal(res);
-      // computed signal buttons пересчитается автоматически
-    });
+    const project = this.requireProject();
+    if (!project) return;
+
+    this._projectService.getLifecycleGroups(project)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.updateLifecycleGroupsSignal(res);
+      });
   }
 
   loadLifecycleGroup() {
-    this._projectService.getLifecycleGroup(this.project).subscribe(res => {
-      this.updateLifecycleGroupSignal(res);
-      // markForCheck не нужен: computed signal visibleForBureau автоматически триггерит change detection
-    });
+    const project = this.requireProject();
+    if (!project) return;
+
+    this._projectService.getLifecycleGroup(project)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.updateLifecycleGroupSignal(res);
+      });
   }
 
   loadProject(idDto: IdDto, group: string) {
-    this._projectService.getProject(idDto).subscribe({
-      next: (res) => {
-        // Проверяем, действительно ли объект изменился, чтобы избежать ненужных обновлений
-        if (this.project && this.project.id === res.id && this.project === res) {
-          return;
-        }
-        this.updateProjectSignal(res);
-        if (group != null && group != 'null' && typeof group === 'string' && !group.includes('=>')) {
-          this._projectService.markViewed(this.project, group).subscribe();
-        }
-        this.showProjectDocuments();
-        if (this.role == Role.BUREAU_ASSESSOR) {
-          this.loadAnonymousExpertReviews();
-          this.loadLifecycleGroup();
-          // Протоколы заседаний будут загружены из lifecycleGroup в updateLifecycleGroupSignal
-          if (this.agenda) {
-            this.loadSectionReports();
+    this._projectService.getProject(idDto)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          // Проверяем, действительно ли объект изменился, чтобы избежать ненужных обновлений
+          if (this.project && this.project.id === res.id && this.project === res) {
+            return;
           }
-        } else if (this.role == Role.SECTION_ASSESSOR) {
-          this.loadAnonymousExpertReviews();
-        } else if (this.role == Role.BUREAU_CHAIRMAN) {
-          this.loadLifecycleGroup();
-        } else if (this.role == Role.SECTION_CHAIRMAN) {
-          this.loadLifecycle();
-        } else if (anyMatch(this.role,
-          Role.GKNT_WORKER, Role.GKNT_CHAIRMAN, Role.GKNT_DEPARTMENT_CHAIRMAN,
-          Role.BELISA_READ, Role.BELISA_EDIT, Role.CUSTOMER)
-        ) {
-          this.loadLifecycleGroups();
-          if (this.role == Role.CUSTOMER) {
+          this.updateProjectSignal(res);
+          if (group != null && group != 'null' && typeof group === 'string' && !group.includes('=>')) {
+            this._projectService.markViewed(this.project, group)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe();
+          }
+          this.showProjectDocuments();
+          if (this.role == Role.BUREAU_ASSESSOR) {
             this.loadAnonymousExpertReviews();
+            this.loadLifecycleGroup();
+            // Протоколы заседаний будут загружены из lifecycleGroup в updateLifecycleGroupSignal
+            if (this.agenda) {
+              this.loadSectionReports();
+            }
+          } else if (this.role == Role.SECTION_ASSESSOR) {
+            this.loadAnonymousExpertReviews();
+          } else if (this.role == Role.BUREAU_CHAIRMAN) {
+            this.loadLifecycleGroup();
+          } else if (this.role == Role.SECTION_CHAIRMAN) {
+            this.loadLifecycle();
+          } else if (anyMatch(this.role,
+            Role.GKNT_WORKER, Role.GKNT_CHAIRMAN, Role.GKNT_DEPARTMENT_CHAIRMAN,
+            Role.BELISA_READ, Role.BELISA_EDIT, Role.CUSTOMER)
+          ) {
+            this.loadLifecycleGroups();
+            if (this.role == Role.CUSTOMER) {
+              this.loadAnonymousExpertReviews();
+            }
+          } else if (this.role == Role.EXPERT) {
+            this.loadExpertReview();
           }
-        } else if (this.role == Role.EXPERT) {
-          this.loadExpertReview();
+        },
+        error: (err) => {
+          // Error is already handled by HttpClientSecure.handleError which shows toast
+          // Just prevent it from propagating to global error handler
+          console.error('Error loading project:', err);
         }
-        // computed signal buttons пересчитается автоматически после загрузки данных
-      },
-      error: (err) => {
-        // Error is already handled by HttpClientSecure.handleError which shows toast
-        // Just prevent it from propagating to global error handler
-        console.error('Error loading project:', err);
-        this.cdr?.markForCheck?.();
-      }
-    })
+      })
   }
 
   loadExpertReview() {
-    this._projectService.getReview(this.project).subscribe(res => {
-      this.updateExpertReviewSignal(res);
-      this.showProjectDocuments();
-    });
+    const project = this.requireProject();
+    if (!project) return;
+
+    this._projectService.getReview(project)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.updateExpertReviewSignal(res);
+        this.showProjectDocuments();
+      });
   }
 
   loadSectionReports() {
-    this._agendaService.getSectionReportsByBureauAssessor(this.agenda).subscribe(res => {
-      this.sectionReports = res;
-      this.cdr?.markForCheck?.();
-    });
+    const agenda = this.agenda;
+    if (!agenda) return;
+
+    this._agendaService.getSectionReportsByBureauAssessor(agenda)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.sectionReports = res;
+      });
   }
 
   loadAnonymousExpertReviews() {
-    this._projectService.getAnonymousReviews(this.project).subscribe(res => {
-      this.reviews = res;
-      this.cdr?.markForCheck?.();
-    });
+    const project = this.requireProject();
+    if (!project) return;
+
+    this._projectService.getAnonymousReviews(project)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.reviews = res;
+      });
   }
 
   // Computed signals для видимости блоков
@@ -343,8 +534,10 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
     // EXPERT
     if (expertReview && role == Role.EXPERT) {
       if (expertReview.state == 'ON_EXPERT_CONFIRMATION') {
-        buttons.push(new ActionButtonMetadata('Принять', () => this.acceptProject(), 'btn-primary'));
-        buttons.push(new ActionButtonMetadata('Отклонить', () => this.expertRejectProject.show(), 'btn-secondary'));
+        buttons.push(new ActionButtonMetadata('Принять', () => this.acceptProject(), 'btn-primary', {
+          isLoading: () => this.acceptProjectLoading()
+        }));
+        buttons.push(new ActionButtonMetadata('Отклонить', () => this.expertRejectProject?.show(), 'btn-secondary'));
       }
       if (expertReview.state == 'ON_EXAMINATION' && expertReview.documents.length > 0) {
         buttons.push(new ActionButtonMetadata('Завершить', () => this.finishExpertExamination(), 'btn-primary'));
@@ -375,7 +568,7 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
     // GKNT_DEPARTMENT_CHAIRMAN
     if (role == Role.GKNT_DEPARTMENT_CHAIRMAN) {
       if (!anyMatch(project.state, ProjectState.ACCEPTED, ProjectState.REJECTED, ProjectState.RETURNED)) {
-        buttons.push(new ActionButtonMetadata('Назначить сотрудника', () => this.searchGkntWorkerComponent.show(), 'btn-primary'));
+        buttons.push(new ActionButtonMetadata('Назначить сотрудника', () => this.searchGkntWorkerComponent?.show(), 'btn-primary'));
       }
       if (project.state == 'ON_DEPARTMENT_SIGNING') {
         buttons.push(new ActionButtonMetadata('Вернуть назначенному сотруднику', () => this.returnOnChecking(), 'btn-primary'));
@@ -415,7 +608,6 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
   private updateProjectSignal(project: ProjectDto) {
     // Объект приходит из API или дочерних компонентов, уже новый - копирование не требуется
     this.project = project;
-    this._projectSignal.set(project);
   }
 
   private updateLifecycleGroupSignal(lifecycleGroup: LifecycleGroupDto) {
@@ -423,21 +615,18 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
     // Поэтому создаем новый объект с новым массивом lifecycles для триггера обновления signal
     const updatedGroup = { ...lifecycleGroup, lifecycles: [...(lifecycleGroup.lifecycles ?? [])] };
     this.lifecycleGroup = updatedGroup;
-    this._lifecycleGroupSignal.set(updatedGroup);
     
     // Для BUREAU_ASSESSOR собираем протоколы заседаний секций из lifecycle'ов
     if (this.role == Role.BUREAU_ASSESSOR && !this.agenda) {
       this.sectionReports = (lifecycleGroup.lifecycles ?? [])
         .flatMap(lifecycle => lifecycle.meetingProtocol ?? [])
         .filter(protocol => protocol != null);
-      this.cdr?.markForCheck?.();
     }
   }
 
   private updateLifecycleSignal(lifecycle: any) {
     // Объект приходит из API или дочерних компонентов, уже новый - копирование не требуется
     this.lifecycle = lifecycle;
-    this._lifecycleSignal.set(lifecycle);
   }
 
   private updateLifecycleGroupsSignal(groups: any[]) {
@@ -445,13 +634,11 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
     // Поэтому создаем новый массив для триггера обновления signal
     const updatedGroups = [...(groups ?? [])];
     this.lifecycleGroups = updatedGroups;
-    this._lifecycleGroupsSignal.set(updatedGroups);
   }
 
   private updateExpertReviewSignal(review: ExpertReviewDto) {
     // Объект приходит из API или дочерних компонентов, уже новый - копирование не требуется
     this.expertReview = review;
-    this._expertReviewSignal.set(review);
   }
 
   showProjectDocuments() {
@@ -464,144 +651,218 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
     } else {
       this.visibleDocsForExpert = true;
     }
-    this.cdr?.markForCheck?.();
   }
 
 
   finishChoosingExperts() {
+    const project = this.requireProject();
+    const lifecycle = this.requireLifecycle();
+    if (!project || !lifecycle) return;
+    const projectId = project.id;
+
     this._dialogService.showConfirmDialog(
       'Утверждение экспертных заключений',
-      `Утвердить текущий список экспертных заключений для объекта "${this.project.title}" и перейти к рассмотрению в секции?`
-    ).subscribe(() => {
-      this._lifecycleService.finishExpertExamination(this.lifecycle).subscribe({
-        next: (res) => {
-          this.updateLifecycleSignal(res);
-          this.loadProject(new IdDto(this.project.id), null);
-          this._toasty.success("Эксперты утверждены.");
-          // markForCheck не нужен: updateLifecycleSignal и loadProject обновляют signals, которые автоматически триггерят change detection
-        },
-        error: () => {
-          // Ошибка уже обработана в HttpClientSecure.handleError, который показывает toast
-          this.cdr?.markForCheck?.();
-        }
+      `Утвердить текущий список экспертных заключений для объекта "${project.title}" и перейти к рассмотрению в секции?`
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._lifecycleService.finishExpertExamination(lifecycle)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: (res) => {
+              this.updateLifecycleSignal(res);
+              this.loadProject(new IdDto(projectId), null);
+              this._toasty.success("Эксперты утверждены.");
+            },
+            error: () => {
+              // Ошибка уже обработана в HttpClientSecure.handleError, который показывает toast
+            }
+          });
       });
-    });
   }
 
   returnFromSectionToCouncil() {
+    const lifecycle = this.requireLifecycle();
+    if (!lifecycle) return;
+
     this._dialogService.showConfirmDialog(
         'Возврат в бюро ГЭС',
         `Вернуть обьект в бюро ГЭС?`,
         'Это действие будет необратимо')
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         let reason = "";
-        this._lifecycleService.returnFromSectionToCouncil(this.lifecycle, reason)
+        this._lifecycleService.returnFromSectionToCouncil(lifecycle, reason)
+          .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe((res) => {
             this._toasty.success("Вы вернули объект экспертизы.");
             this.updateLifecycleSignal(res);
-            // this.loadProject(this.project, null);
-            // markForCheck не нужен: updateLifecycleSignal обновляет signal, который автоматически триггерит change detection
             this.router.navigateByUrl('/projects');
           });
       });
   }
 
   returnFromSectionToCouncilWithoutExamination() {
+    const project = this.requireProject();
+    const lifecycle = this.requireLifecycle();
+    if (!project || !lifecycle) return;
+    const projectId = project.id;
+
     this._dialogService.showConfirmDialog(
       'Возврат объекта экспертизы',
-      `Вернуть объект экспертизы "${this.project.title}" в бюро ГЭС?`)
+      `Вернуть объект экспертизы "${project.title}" в бюро ГЭС?`)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        this._lifecycleService.returnFromSectionToCouncilWithoutExamination(this.lifecycle).subscribe((res) => {
-          this._toasty.success('Вы вернули объект экспертизы');
-          this.updateLifecycleSignal(res);
-          this.loadProject(new IdDto(this.project.id), null);
-          // markForCheck не нужен: updateLifecycleSignal и loadProject обновляют signals, которые автоматически триггерят change detection
-        })
+        this._lifecycleService.returnFromSectionToCouncilWithoutExamination(lifecycle)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe((res) => {
+            this._toasty.success('Вы вернули объект экспертизы');
+            this.updateLifecycleSignal(res);
+            this.loadProject(new IdDto(projectId), null);
+          })
       })
   }
 
   returnFromBureauToGKNTWithoutExamination() {
+    const project = this.requireProject();
+    const group = this.requireLifecycleGroup();
+    if (!project || !group) return;
+    const projectId = project.id;
+
     this._dialogService.showConfirmDialog(
       'Возврат объекта экспертизы',
-      `Вернуть объект экспертизы "${this.project.title}" в ГКНТ ?`)
+      `Вернуть объект экспертизы "${project.title}" в ГКНТ ?`)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        this._groupService.returnFromBureauToGKNTlWithoutExamination(this.lifecycleGroup).subscribe((res) => {
-          this._toasty.success('Вы вернули объект экспертизы');
-          this.updateLifecycleGroupSignal(res);
-          this.loadProject(new IdDto(this.project.id), null);
-          // markForCheck не нужен: updateLifecycleGroupSignal и loadProject обновляют signals, которые автоматически триггерят change detection
-        })
+        this._groupService.returnFromBureauToGKNTlWithoutExamination(group)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe((res) => {
+            this._toasty.success('Вы вернули объект экспертизы');
+            this.updateLifecycleGroupSignal(res);
+            this.loadProject(new IdDto(projectId), null);
+          })
       })
   }
 
   sendBySections() {
+    const project = this.requireProject();
+    const group = this.requireLifecycleGroup();
+    if (!project || !group) return;
+
     this._dialogService.showConfirmDialog('Утверждение секций',
-      `Утвердить текущий список секций для объекта экспертизы "${this.project.title}"?`).subscribe(() => {
-      this._groupService.sendBySections(this.lifecycleGroup).subscribe(res => {
-        this.updateLifecycleGroupSignal(res);
-        this._toasty.success('Отправлен в секции.');
+      `Утвердить текущий список секций для объекта экспертизы "${project.title}"?`)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._groupService.sendBySections(group)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            this.updateLifecycleGroupSignal(res);
+            this._toasty.success('Отправлен в секции.');
+          });
       });
-    });
   }
 
   acceptProject() {
+    const project = this.requireProject();
+    const review = this.requireExpertReview();
+    if (!project || !review) return;
+
     this._dialogService.showMethRecPDF(
       'Принятие объекта экспертизы',
-      `Вы согласны провести экспертизу объекта "${this.project.title}"?`,
+      `Вы согласны провести экспертизу объекта "${project.title}"?`,
       'Вы соглашаетесь с методическими рекомендациями и будете обязаны завершить экспертизу в течение установленного нормативными актами срока.'
-    ).subscribe(() => {
-      this._reviewService.acceptProject(this.expertReview).subscribe(res => {
-        this.updateExpertReviewSignal(res);
-        this._toasty.success("Вы приняли объект на экспертизу.");
-        this.showProjectDocuments();
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.acceptProjectLoading.set(true);
+        this._reviewService.acceptProject(review)
+          .pipe(
+            finalize(() => this.acceptProjectLoading.set(false)),
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({
+            next: (res) => {
+              this.updateExpertReviewSignal(res);
+              this._toasty.success("Вы приняли объект на экспертизу.");
+              this.showProjectDocuments();
+            },
+            error: (error) => {
+              const errorMessage = error?.error || error?.message || 'Произошла ошибка при принятии объекта';
+              this._toasty.error(errorMessage);
+            }
+          });
       });
-    });
   }
 
   rejectProject(reason: string) {
-    this._reviewService.rejectProject(this.expertReview, reason).subscribe(res => {
-      this.updateExpertReviewSignal(res);
-      this._toasty.success("Вы отклонили экспертизу объекта.");
-      this.router.navigateByUrl('projects');
-    });
+    const review = this.requireExpertReview();
+    if (!review) return;
+
+    this._reviewService.rejectProject(review, reason)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.updateExpertReviewSignal(res);
+        this._toasty.success("Вы отклонили экспертизу объекта.");
+        this.router.navigateByUrl('projects');
+      });
   }
 
   finishExpertExamination() {
+    const project = this.requireProject();
+    const review = this.requireExpertReview();
+    if (!project || !review) return;
+
     this._dialogService.showConfirmDialog(
       'Завершение экспертизы',
-      `Завершить экспертизу объекта "${this.project.title}"?`
-    ).subscribe(() => {
-      this._reviewService.finishReview(this.expertReview).subscribe(res => {
-        this.updateExpertReviewSignal(res);
-        this._toasty.success("Вы завершили экспертизу объекта.");
-      })
-    });
+      `Завершить экспертизу объекта "${project.title}"?`
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._reviewService.finishReview(review)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            this.updateExpertReviewSignal(res);
+            this._toasty.success("Вы завершили экспертизу объекта.");
+          })
+      });
   }
 
   sendOnExamination() {
+    const project = this.requireProject();
+    if (!project) return;
+
     this._dialogService.showConfirmDialog(
       null,
-      `Отправить на экспертизу объект "${this.project.title}"?`,
+      `Отправить на экспертизу объект "${project.title}"?`,
       'После выполнения операции редактировать данные станет невозможно.'
-    ).subscribe(() => {
-      this._projectService.sendOnExaminationToGknt(this.project).subscribe((res) => {
-        this.updateProjectSignal(res);
-        this._toasty.success("Отправлен на экспертизу.");
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._projectService.sendOnExaminationToGknt(project)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe((res) => {
+            this.updateProjectSignal(res);
+            this._toasty.success("Отправлен на экспертизу.");
+          });
       });
-    });
   }
 
   sendToSubCustomer() {
+    const project = this.requireProject();
+    if (!project) return;
+
     this._dialogService.showConfirmDialogWithFields(
       [new ConfirmDialogField<string>('reason', 'Причина возврата')],
       'Возврат объекта экспертизы',
-      `Вернуть объект экспертизы "${this.project.title}" инциатору экспертизы?`)
+      `Вернуть объект экспертизы "${project.title}" инциатору экспертизы?`)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((dlgResult: DialogResult<any>) => {
         let reason = "";
         if (dlgResult != null && dlgResult.value != null) {
           reason = dlgResult.value.reason;
         }
-        this._projectService.returnToSubCustomer(this.project, reason)
+        this._projectService.returnToSubCustomer(project, reason)
+          .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe(() => {
             this._toasty.success("Вы вернули объект экспертизы.");
             this.router.navigateByUrl('/projects');
@@ -610,63 +871,98 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
   }
 
   sendToHeadOrg() {
+    const project = this.requireProject();
+    if (!project) return;
+
     this._dialogService.showConfirmDialog(null,
-      `Отправить на утверждение объект "${this.project.title}"?`,
+      `Отправить на утверждение объект "${project.title}"?`,
       'После выполнения операции редактировать данные станет невозможно.'
-    ).subscribe(() => {
-      this._projectService.sendForApproval(this.project).subscribe((res) => {
-        this.updateProjectSignal(res);
-        this._toasty.success("Отправлен на утверждение.");
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._projectService.sendForApproval(project)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe((res) => {
+            this.updateProjectSignal(res);
+            this._toasty.success("Отправлен на утверждение.");
+          })
       })
-    })
   }
 
   sendOnDepartmentSigning() {
-    if (this.project.decisionDocument && this.getActiveGroups().length > 0) {
+    const project = this.requireProject();
+    if (!project) return;
+
+    if (project.decisionDocument && this.getActiveGroups().length > 0) {
       throw 'Пожалуйста, приведите документы и данные о ГЭСах в соответствие с принятым решением по объекту экспертизы.';
     }
     this._dialogService.showConfirmDialog(
       null,
-      `Отправить документы по объекту экспертизы "${this.project.title}" на подпись начальнику подразделения?`,
+      `Отправить документы по объекту экспертизы "${project.title}" на подпись начальнику подразделения?`,
       ''
-    ).subscribe(() => {
-      this._projectService.sendOnDepartmentSigning(this.project).subscribe(res => {
-        this.updateProjectSignal(res);
-        this._toasty.success("Вы отправили документы начальнику подраделения.");
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._projectService.sendOnDepartmentSigning(project)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            this.updateProjectSignal(res);
+            this._toasty.success("Вы отправили документы начальнику подраделения.");
+          });
       });
-    });
   }
 
   returnOnChecking() {
+    const project = this.requireProject();
+    if (!project) return;
+
     this._dialogService.showConfirmDialog(
       null,
-      `Вернуть объект экспертизы "${this.project.title}" назначенному ответственному сотруднику подразделения 
+      `Вернуть объект экспертизы "${project.title}" назначенному ответственному сотруднику подразделения 
       ГКНТ для дополнительного рассмотрения?`,
       ''
-    ).subscribe(() => {
-      this._projectService.returnOnChecking(this.project).subscribe(res => {
-        this.updateProjectSignal(res);
-        this._toasty.success("Объект экспертизы возвращён на доработку.");
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._projectService.returnOnChecking(project)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            this.updateProjectSignal(res);
+            this._toasty.success("Объект экспертизы возвращён на доработку.");
+          });
       });
-    });
   }
 
   returnOnDepartmentSigning() {
-    this.returnOnDepartmentSigningConfirmDialog().subscribe(() => {
-      this._projectService.returnOnDepartmentSigning(this.project).subscribe(res => {
-        this.updateProjectSignal(res);
-        this._toasty.success("Объект экспертизы возвращён на доработку.");
+    const project = this.requireProject();
+    if (!project) return;
+
+    this.returnOnDepartmentSigningConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._projectService.returnOnDepartmentSigning(project)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            this.updateProjectSignal(res);
+            this._toasty.success("Объект экспертизы возвращён на доработку.");
+          });
       });
-    });
   }
 
   returnOnDepartmentFinalSigning() {
-    this.returnOnDepartmentSigningConfirmDialog().subscribe(() => {
-      this._projectService.returnOnDepartmentFinalSigning(this.project).subscribe(res => {
-        this.updateProjectSignal(res);
-        this._toasty.success("Объект экспертизы возвращён на доработку.");
+    const project = this.requireProject();
+    if (!project) return;
+
+    this.returnOnDepartmentSigningConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._projectService.returnOnDepartmentFinalSigning(project)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            this.updateProjectSignal(res);
+            this._toasty.success("Объект экспертизы возвращён на доработку.");
+          });
       });
-    });
   }
 
   private returnOnDepartmentSigningConfirmDialog() {
@@ -678,10 +974,12 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
   }
 
   private finishProject() {
-    this._projectService.finishProject(this.project).subscribe(res => {
-      this.updateProjectSignal(res);
-      this._toasty.success("Вы завершили экспертизу объекта.");
-    });
+    this._projectService.finishProject(this.project)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.updateProjectSignal(res);
+        this._toasty.success("Вы завершили экспертизу объекта.");
+      });
   }
 
   private finishProjectConfirmDialog() {
@@ -690,29 +988,37 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
   }
 
   finishProjectWithoutSign() {
-    this.finishProjectConfirmDialog().subscribe(() => this.finishProject());
+    this.finishProjectConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.finishProject());
   }
 
   finishProjectWithSign() {
-    this.finishProjectConfirmDialog().subscribe(() => {
-      this._progress.show();
-      this._cryptoService.signLifecycleGroupDecisions(this.project).subscribe(res => {
-        console.log('complete sign decision');
-        if (res) {
-          this.finishProject();
-        } else {
-          this._toasty.error('Ошибка подписи.');
-        }
-        this._progress.hide();
-      }, () => this._progress.hide());
-    });
+    this.finishProjectConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._progress.show();
+        this._cryptoService.signLifecycleGroupDecisions(this.project)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            console.log('complete sign decision');
+            if (res) {
+              this.finishProject();
+            } else {
+              this._toasty.error('Ошибка подписи.');
+            }
+            this._progress.hide();
+          }, () => this._progress.hide());
+      });
   }
 
   private returnProject() {
-    this._projectService.returnProject(this.project).subscribe(res => {
-      this.updateProjectSignal(res);
-      this._toasty.success("Вы вернули объект экспертизы заказчику без дальнейшего рассмотрения.");
-    });
+    this._projectService.returnProject(this.project)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.updateProjectSignal(res);
+        this._toasty.success("Вы вернули объект экспертизы заказчику без дальнейшего рассмотрения.");
+      });
   }
 
   private returnProjectConfirmDialog() {
@@ -721,29 +1027,37 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
   }
 
   returnProjectWithoutSign() {
-    this.returnProjectConfirmDialog().subscribe(() => this.returnProject());
+    this.returnProjectConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.returnProject());
   }
 
   returnProjectWithSign() {
-    this.returnProjectConfirmDialog().subscribe(() => {
-      this._progress.show();
-      this._cryptoService.signDoc(this.project.decisionDocument).subscribe(res => {
-        console.log('complete sign decision');
-        if (res) {
-          this.returnProject();
-        } else {
-          this._toasty.error('Ошибка подписи.');
-        }
-        this._progress.hide();
-      }, () => this._progress.hide());
-    });
+    this.returnProjectConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._progress.show();
+        this._cryptoService.signDoc(this.project.decisionDocument)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            console.log('complete sign decision');
+            if (res) {
+              this.returnProject();
+            } else {
+              this._toasty.error('Ошибка подписи.');
+            }
+            this._progress.hide();
+          }, () => this._progress.hide());
+      });
   }
 
   private sendOnSigning() {
-    this._projectService.sendOnSigning(this.project).subscribe(res => {
-      this.updateProjectSignal(res);
-      this._toasty.success("Вы отправили документы зам. Председателя ГКНТ.");
-    });
+    this._projectService.sendOnSigning(this.project)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.updateProjectSignal(res);
+        this._toasty.success("Вы отправили документы зам. Председателя ГКНТ.");
+      });
   }
 
   private sendOnSigningConfirmDialog() {
@@ -757,71 +1071,91 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
   }
 
   sendOnSigningWithoutSign() {
-    this.sendOnSigningConfirmDialog().subscribe(() => this.sendOnSigning());
+    this.sendOnSigningConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.sendOnSigning());
   }
 
   sendOnSigningWithSignDecision() {
-    this.sendOnSigningConfirmDialog().subscribe(() => {
-      this._progress.show();
-      this._cryptoService.signDoc(this.project.decisionDocument).subscribe(res => {
-        console.log('complete sign decision');
-        if (res) {
-          this.sendOnSigning();
-        } else {
-          this._toasty.error('Ошибка подписи.');
-        }
-        this._progress.hide();
-      }, () => this._progress.hide());
-    });
+    this.sendOnSigningConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._progress.show();
+        this._cryptoService.signDoc(this.project.decisionDocument)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            console.log('complete sign decision');
+            if (res) {
+              this.sendOnSigning();
+            } else {
+              this._toasty.error('Ошибка подписи.');
+            }
+            this._progress.hide();
+          }, () => this._progress.hide());
+      });
   }
 
   sendOnSigningWithSignReferrals() {
-    this.sendOnSigningConfirmDialog().subscribe(() => {
-      this._progress.show();
-      this._cryptoService.signReferrals(this.project).subscribe(res => {
-        console.log('get sign result');
-        if (res) {
-          this.sendOnSigning();
-        } else {
-          this._toasty.error('Ошибка подписи.');
-        }
-        this._progress.hide();
-      }, () => this._progress.hide());
-    });
+    this.sendOnSigningConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._progress.show();
+        this._cryptoService.signReferrals(this.project)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            console.log('get sign result');
+            if (res) {
+              this.sendOnSigning();
+            } else {
+              this._toasty.error('Ошибка подписи.');
+            }
+            this._progress.hide();
+          }, () => this._progress.hide());
+      });
   }
 
   private sendOnFinalSigning() {
-    this._projectService.sendOnFinalSigning(this.project).subscribe((dto) => {
-      this.updateProjectSignal(dto);
-      this._toasty.success("Вы отправили документы зам. Председателя ГКНТ.");
-    });
+    this._projectService.sendOnFinalSigning(this.project)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((dto) => {
+        this.updateProjectSignal(dto);
+        this._toasty.success("Вы отправили документы зам. Председателя ГКНТ.");
+      });
   }
 
   sendOnFinalSigningWithoutSign() {
-    this.sendOnSigningConfirmDialog().subscribe(() => this.sendOnFinalSigning());
+    this.sendOnSigningConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.sendOnFinalSigning());
   }
 
   sendOnFinalSigningWithSign() {
-    this.sendOnSigningConfirmDialog().subscribe(() => {
-      this._progress.show();
-      this._cryptoService.signLifecycleGroupDecisions(this.project).subscribe(res => {
-        console.log('get sign result');
-        if (res) {
-          this.sendOnFinalSigning();
-        } else {
-          this._toasty.error('Ошибка подписи.');
-        }
-        this._progress.hide();
-      }, () => this._progress.hide());
-    });
+    this.sendOnSigningConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._progress.show();
+        this._cryptoService.signLifecycleGroupDecisions(this.project)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            console.log('get sign result');
+            if (res) {
+              this.sendOnFinalSigning();
+            } else {
+              this._toasty.error('Ошибка подписи.');
+            }
+            this._progress.hide();
+          }, () => this._progress.hide());
+      });
   }
 
   private sendOnExaminationToCouncils() {
-    this._projectService.sendOnExaminationToCouncils(this.project).subscribe((res) => {
-      this.updateProjectSignal(res);
-      this.loadLifecycleGroups();
-      this._toasty.success("Отправлен на экспертизу в ГЭС.");
-    })
+    this._projectService.sendOnExaminationToCouncils(this.project)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        this.updateProjectSignal(res);
+        this.loadLifecycleGroups();
+        this._toasty.success("Отправлен на экспертизу в ГЭС.");
+      })
   }
 
   private sendOnExaminationToCouncilsConfirmDialog() {
@@ -830,40 +1164,56 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
   }
 
   sendOnExaminationToCouncilsWithoutSign() {
-    this.sendOnExaminationToCouncilsConfirmDialog().subscribe(() => this.sendOnExaminationToCouncils());
+    this.sendOnExaminationToCouncilsConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.sendOnExaminationToCouncils());
   }
 
   sendOnExaminationToCouncilsWithSign() {
-    this.sendOnExaminationToCouncilsConfirmDialog().subscribe(() => {
-      this._progress.show();
-      this._cryptoService.signReferrals(this.project).subscribe(res => {
-        console.log('get sign result');
-        if (res) {
-          this.sendOnExaminationToCouncils();
-        } else {
-          this._toasty.error('Ошибка подписи.');
-        }
-        this._progress.hide();
-      }, () => this._progress.hide());
-    });
+    this.sendOnExaminationToCouncilsConfirmDialog()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._progress.show();
+        this._cryptoService.signReferrals(this.project)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            console.log('get sign result');
+            if (res) {
+              this.sendOnExaminationToCouncils();
+            } else {
+              this._toasty.error('Ошибка подписи.');
+            }
+            this._progress.hide();
+          }, () => this._progress.hide());
+      });
   }
 
   onGwSelected(person) {
-    this.searchGkntWorkerComponent.hide();
+    const project = this.requireProject();
+    if (!project) return;
+
+    this.searchGkntWorkerComponent?.hide();
     this._dialogService.showConfirmDialog(
       'Назначение сотрудника на объект экспертизы',
-      `Назначить сотрудника "${this._personPipe.transform(person)}" на объект экспертизы "${this.project.title}"?`
-    ).subscribe(() => {
-      this._projectService.attachWorker(this.project, person.id).subscribe((res) => {
-        this.updateProjectSignal(res);
-        this._toasty.success(`На этот объект экспертизы назначен ${this._personPipe.transform(person)}.`);
+      `Назначить сотрудника "${this._personPipe.transform(person)}" на объект экспертизы "${project.title}"?`
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._projectService.attachWorker(project, person.id)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe((res) => {
+            this.updateProjectSignal(res);
+            this._toasty.success(`На этот объект экспертизы назначен ${this._personPipe.transform(person)}.`);
+          });
       });
-    });
   }
 
   copyProject() {
-    this.editedProject = _.cloneDeep(this.project);
-    this.copyProjectModal.show();
+    const project = this.requireProject();
+    if (!project) return;
+
+    this.editedProject = _.cloneDeep(project);
+    this.copyProjectModal?.show();
   }
 
   findTheSameProjects(title: string) {
@@ -871,27 +1221,33 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
       return;
     }
     this.sameProjectsLoading.set(true);
-    this.sameProjectList.setTitle(title);
+    this.sameProjectList?.setTitle(title);
     this._projectService.getTheSameProjectsByTitle(title)
-      .pipe(finalize(() => this.sameProjectsLoading.set(false)))
+      .pipe(
+        finalize(() => this.sameProjectsLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
         next: (value) => {
           this.listSameProjects = value;
-          this.listProjects.show();
-          // markForCheck не нужен: sameProjectsLoading.set() обновляет signal, который автоматически триггерит change detection
-          // listSameProjects - обычное свойство, но используется только в модальном окне, которое само управляет своим отображением
+          this.listProjects?.show();
         },
         error: () => {
-          // markForCheck не нужен: sameProjectsLoading.set(false) обновляет signal, который автоматически триггерит change detection
+          // Ошибка уже обработана
         }
       });
   }
 
 
   deleteProject() {
+    const project = this.requireProject();
+    if (!project) return;
+
     this._dialogService.showConfirmDialog('Удаление объекта экспертизы')
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        this._projectService.deleteProject(this.project)
+        this._projectService.deleteProject(project)
+          .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe(() => {
             this._toasty.success("Объект экспертизы удален");
             this.router.navigateByUrl('/projects');
@@ -900,50 +1256,73 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
   }
 
   editProject() {
-    this.editedProject = _.cloneDeep(this.project);
-    this.editProjectModal.show();
+    const project = this.requireProject();
+    if (!project) return;
+
+    this.editedProject = _.cloneDeep(project);
+    this.editProjectModal?.show();
   }
 
 
   finishLifecycleGroup() {
+    const project = this.requireProject();
+    const group = this.requireLifecycleGroup();
+    if (!project || !group) return;
+
     this._dialogService.showConfirmDialog(
       'Утверждение заключения ГЭС',
-      `Утвердить заключение ГЭС и завершить экспертизу объекта "${this.project.title}"?`
-    ).subscribe(() => {
-      this._groupService.finishLifecycleGroup(this.lifecycleGroup).subscribe(res => {
-        this.updateLifecycleGroupSignal(res);
-        this.loadProject(this.project, null);
-        this._toasty.success("Вы завершили экспертизу объекта.");
+      `Утвердить заключение ГЭС и завершить экспертизу объекта "${project.title}"?`
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this._groupService.finishLifecycleGroup(group)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(res => {
+            this.updateLifecycleGroupSignal(res);
+            this.loadProject(project, null);
+            this._toasty.success("Вы завершили экспертизу объекта.");
+          });
       });
-    });
   }
 
   showReturnFromCouncilModal() {
-    this.returnFromCouncilWithoutExpertiseModal.show();
+    this.returnFromCouncilWithoutExpertiseModal?.show();
   }
 
   returnFromCouncil(formContent: ReturnFromCouncilWithoutExpertiseFormContent) {
-      this._groupService.returnToGknt(this.lifecycleGroup, formContent)
+      const project = this.requireProject();
+      const group = this.requireLifecycleGroup();
+      if (!project || !group) return;
+
+      this._groupService.returnToGknt(group, formContent)
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(res => {
           this.updateLifecycleGroupSignal(res);
-          this.returnFromCouncilWithoutExpertiseModal.hide();
-          this.loadProject(new IdDto(this.project.id), null);
+          this.returnFromCouncilWithoutExpertiseModal?.hide();
+          this.loadProject(new IdDto(project.id), null);
           this._toasty.success("Вы отклонили экспертизу объекта.");
         });
   }
 
   onUpdate(project) {
-    this._projectService.updateProject(this.project, project)
+    const current = this.requireProject();
+    if (!current) return;
+
+    this._projectService.updateProject(current, project)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(res => {
         this.updateProjectSignal(res);
         this._toasty.success("Сохранено.");
-        this.editProjectModal.hide();
+        this.editProjectModal?.hide();
       });
   }
 
   onCopy(project) {
+    const current = this.requireProject();
+    if (!current) return;
+
     this.editedProject = project;
-    this.editedProject.id = this.project.id;
+    this.editedProject.id = current.id;
     this.copiedProject = new ProjectCopyDto();
     this.copiedProject.title = this.editedProject.title;
     // Преобразуем DocumentDto[] в number[] (ID документов) для ProjectCopyDto
@@ -953,10 +1332,11 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
     // 2) Сразу "докидываем" остальные поля из project-form через update/{newId}
     // Это позволяет копировать ВСЕ поля без изменений бэкенда.
     this._projectService.saveCopyProject(this.copiedProject)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(res => {
         const newId = res?.id;
         if (!newId) {
-          this.copyProjectModal.hide();
+          this.copyProjectModal?.hide();
           this.router.navigate(['/projects', res?.id]);
           return;
         }
@@ -974,15 +1354,16 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
         }
 
         this._projectService.updateProject({ id: newId } as any, fullProjectToSave)
+          .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({
             next: (updated) => {
-              this.copyProjectModal.hide();
+              this.copyProjectModal?.hide();
               this.router.navigate(['/projects', updated?.id || newId]);
             },
             error: () => {
               // Если update по какой-то причине не прошёл (валидации/права/состояние),
               // всё равно оставляем созданную копию, чтобы операция была обратимой.
-              this.copyProjectModal.hide();
+              this.copyProjectModal?.hide();
               this._toasty?.warn?.("Копия создана, но часть полей не удалось перенести автоматически. Проверьте данные в созданном объекте.");
               this.router.navigate(['/projects', newId]);
             }
@@ -1025,7 +1406,6 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
     // (signals отслеживают изменения по ссылкам, поэтому мутации объекта не видны)
     const updatedProject = { ...this.project, expertReviews: [...reviews] };
     this.project = updatedProject;
-    this._projectSignal.set(updatedProject);
   }
 
   // Обработчики событий от дочерних компонентов для обновления signals
@@ -1047,14 +1427,15 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
 
 
   reloadProject(project: ProjectDto) {
-    this._projectService.getProject(project).subscribe(value => {
-      this.updateProjectSignal(value);
-      // Перезагружаем lifecycleGroups для CUSTOMER, чтобы обновить состояние lifecycle'ов после ответа на замечания
-      if (this.role == Role.CUSTOMER) {
-        this.loadLifecycleGroups();
-      }
-      // markForCheck не нужен: updateProjectSignal и loadLifecycleGroups обновляют signals, которые автоматически триггерят change detection
-    });
+    this._projectService.getProject(project)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(value => {
+        this.updateProjectSignal(value);
+        // Перезагружаем lifecycleGroups для CUSTOMER, чтобы обновить состояние lifecycle'ов после ответа на замечания
+        if (this.role == Role.CUSTOMER) {
+          this.loadLifecycleGroups();
+        }
+      });
   }
 
   checkPossibleToReturnToGKNT(lifecycleGroup?: LifecycleGroupDto, project?: ProjectDto, role?: string): boolean {
@@ -1077,20 +1458,18 @@ export class ProjectInfoComponent implements OnInit, OnDestroy {
   }
 
   viewDocument(doc: DocumentDto) {
-    this._documentService.checkPdfView(doc).subscribe(res => {
-      if (!res) {
-        this._toasty.warn("Формат файла не поддерживается для предпросмотра. " +
-            "Вместо этого, пожалуйста, скачайте его и откройте у себя на компьютере предустановленной программой");
-      } else {
-        this._dialogService.showPDFViewer("document", doc).subscribe();
-        // this.selectedDocument = doc;
-        // this.fileViewerModal.show();
-      }
-    });
-  }
-
-  private geAcquainted() {
-    this.agreement = true;
+    this._documentService.checkPdfView(doc)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        if (!res) {
+          this._toasty.warn("Формат файла не поддерживается для предпросмотра. " +
+              "Вместо этого, пожалуйста, скачайте его и откройте у себя на компьютере предустановленной программой");
+        } else {
+          this._dialogService.showPDFViewer("document", doc)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe();
+        }
+      });
   }
 }
 

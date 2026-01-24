@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, output, viewChild} from '@angular/core';
 import {ModalDirective} from "ngx-bootstrap/modal";
 import dayjs from 'dayjs';
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
@@ -24,7 +24,7 @@ export class MeetingFormComponent {
   id: number;
   place: string;
   isEdit: boolean;
-  @ViewChild('modal', { static: false }) modal: ModalDirective;
+  readonly modal = viewChild<ModalDirective>('modal');
   readonly onAdd = output<MeetingDto>();
 
   constructor(private _meetingService: MeetingService,
@@ -48,7 +48,7 @@ export class MeetingFormComponent {
     let meeting = new MeetingPostDto(this.period, this.place, this.projects.filter(project => project.isChecked));
     this._meetingService.createMeeting(meeting).subscribe(res => {
       this._toasty.success("Заседание создано.");
-      this.modal.hide();
+      this.modal()?.hide();
       this.onAdd.emit(res);
       this.cdr?.markForCheck?.();
     });
@@ -62,7 +62,7 @@ export class MeetingFormComponent {
     let meeting = new MeetingPostDto(this.period, this.place, this.projects.filter(project => project.isChecked), this.id);
     this._meetingService.editMeeting(meeting).subscribe(res => {
       this._toasty.success("Заседание перенесено.");
-      this.modal.hide();
+      this.modal()?.hide();
       this.onAdd.emit(res);
       this.cdr?.markForCheck?.();
     });
@@ -70,7 +70,7 @@ export class MeetingFormComponent {
 
 
   cancel() {
-    this.modal.hide();
+    this.modal()?.hide();
   }
 
   validateProject() {
@@ -111,6 +111,6 @@ export class MeetingFormComponent {
       this.isEdit = false;
       this.loadProjectsForMeeting();
     }
-    this.modal.show();
+    this.modal()?.show();
   }
 }

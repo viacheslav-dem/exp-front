@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, Type, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, effect, input} from "@angular/core";
+import {Component, ComponentFactoryResolver, Type, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, effect, input, viewChild} from "@angular/core";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {FormContent} from "@app/components/document-form/form-model/FormContent";
 import {environment} from "../../../../environments/environment";
@@ -16,7 +16,7 @@ export class DocumentFormContainerComponent<Form extends FormContent> extends Do
 
   _formRenderer: Type<DocumentForm<Form>>;
   formComponent: DocumentForm<Form>;
-  @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
+  readonly formContainer = viewChild('form', { read: ViewContainerRef });
 
   readonly formRenderer = input<Type<DocumentForm<Form>> | undefined>(undefined);
   private readonly _formRendererEffect = effect(() => {
@@ -36,11 +36,12 @@ export class DocumentFormContainerComponent<Form extends FormContent> extends Do
 
   updateFormComponent(formRenderer) {
     if (formRenderer) {
-      while (this.formContainer.length > 0) {
-        this.formContainer.get(0).destroy();
+      const container = this.formContainer();
+      while (container?.length > 0) {
+        container.get(0).destroy();
       }
       const componentFactory = this.resolver.resolveComponentFactory(formRenderer);
-      const componentRef = this.formContainer.createComponent(componentFactory);
+      const componentRef = this.formContainer()!.createComponent(componentFactory);
       this.formComponent = componentRef.instance as DocumentForm<Form>;
       if (this._formRenderer && this._formRenderer != formRenderer) {
         console.warn('change of document form container is bad practice!');

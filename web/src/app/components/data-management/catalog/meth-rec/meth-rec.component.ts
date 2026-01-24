@@ -1,4 +1,4 @@
-import {Component, ViewChild} from "@angular/core";
+import {Component, viewChild} from "@angular/core";
 import {DocType} from "@app/components/common-components/file-uploader/doc-type";
 import {SERVER_URL} from "@app/config";
 import {SilentFileUploaderComponent} from "@app/components/common-components/file-uploader/silent-file-uploader/silent-file-uploader.component";
@@ -15,7 +15,7 @@ export class MethRecComponent {
     SERVER_URL = SERVER_URL;
     isDragOver: boolean = false;
     
-    @ViewChild(SilentFileUploaderComponent) fileUploader: SilentFileUploaderComponent;
+    readonly fileUploader = viewChild(SilentFileUploaderComponent);
 
     onDragOver(event: DragEvent) {
         event.preventDefault();
@@ -34,8 +34,9 @@ export class MethRecComponent {
         event.stopPropagation();
         this.isDragOver = false;
         const files = event.dataTransfer && event.dataTransfer.files;
-        if (files && files.length && this.fileUploader) {
-            this.fileUploader.onFilesChosen(Array.from(files) as File[]);
+        const fileUploader = this.fileUploader();
+        if (files && files.length && fileUploader) {
+            fileUploader.onFilesChosen(Array.from(files) as File[]);
         }
     }
 }

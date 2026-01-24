@@ -3,7 +3,8 @@ import {ExpertReviewService} from "@app/services/expert-review.service";
 import {ExpertPayInfoDto} from "@app/dto/ExpertPayInfoDto";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {SearchPageRequest} from "@app/components/common-components/page-and-filter/model/SearchPageRequest";
-import {PageRequest} from "@app/components/common-components/page-and-filter/model/PageRequest";
+import {Pagination} from "@app/components/common-components/page-and-filter/model/Pagination";
+import {Page} from "@app/components/common-components/page-and-filter/model/Page";
 
 @Component({
     selector: 'app-expert-pay-info',
@@ -30,11 +31,20 @@ export class ExpertPayInfoComponent extends FilterAndPages<ExpertPayInfoDto> {
             return;
         }
         this.expertInfoDtos.set([]);
-        this._page.page = 0;
-        this._pagination.page = 0;
-        this._searchRequest.paging = new PageRequest();
-        this._searchRequest = new SearchPageRequest(this._pagination);
+
+        // Zoneless/Signals: избегаем мутаций вложенных полей (_page.* / _pagination.page),
+        // чтобы корректно триггерить обновление.
+        this._page = new Page<ExpertPayInfoDto>();
+
+        // Сбрасываем пагинацию на первую страницу (pagination.page — 1-based)
+        const nextPagination = new Pagination(this._pagination?.itemsPerPage);
+        nextPagination.page = 1;
+        this._pagination = nextPagination;
+
+        // Пересоздаём SearchPageRequest с новой пагинацией
+        this._searchRequest = new SearchPageRequest(nextPagination);
         this._expertId.set(expert);
+        this.setLoading(true);
         this.loadPage();
     });
 
@@ -50,9 +60,13 @@ export class ExpertPayInfoComponent extends FilterAndPages<ExpertPayInfoDto> {
         this._expertReviewService.getExpertPayInfo(expertIdValue, this._searchRequest.paging)
             .subscribe({
                 next: (value) => {
-                    console.log(value);
                     this._page = value;
                     this.expertInfoDtos.set(value.content);
+                    this.setLoading(false);
+                    this.cdr.markForCheck();
+                },
+                error: () => {
+                    this.setLoading(false);
                     this.cdr.markForCheck();
                 }
             });

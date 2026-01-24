@@ -1,4 +1,4 @@
-import {Component, ViewChild, input, output, ChangeDetectionStrategy, inject, DestroyRef, effect, signal} from '@angular/core';
+import {Component, input, output, ChangeDetectionStrategy, inject, DestroyRef, effect, signal, viewChild} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {CommonModule} from '@angular/common';
 import {Role} from "app/pipes/role.pipe";
@@ -37,7 +37,7 @@ export class ExpertReviewListComponent {
   readonly onChanged = output<ExpertReviewDto[]>();
   readonly canChooseExperts = input<boolean | undefined>(undefined);
 
-  @ViewChild(SearchExpertComponent, { static: false }) public searchExpertComponent!: SearchExpertComponent;
+  public readonly searchExpertComponent = viewChild.required(SearchExpertComponent);
 
   private readonly _toasty = inject(GlobalToastyService);
   private readonly _projectService = inject(ProjectService);
@@ -99,7 +99,7 @@ export class ExpertReviewListComponent {
       return;
     }
 
-    this.searchExpertComponent.hide();
+    this.searchExpertComponent()?.hide();
     
     this._dialogService.showConfirmDialog(
       'Выбор эксперта',

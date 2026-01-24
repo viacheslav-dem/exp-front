@@ -1,4 +1,4 @@
-import {Component, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {Component, ChangeDetectionStrategy, ChangeDetectorRef, viewChild} from '@angular/core';
 import {PropertyComponent} from "@app/components/settings/property.component";
 import {DataService} from "@app/services/data.service";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
@@ -30,14 +30,15 @@ export class GkntDeputyChairmanProcurationsComponent extends PropertyComponent<P
 
   persons: string[];
   procurations: {[key: string]: Procuration};
-  editedPerson: string;
+  editedPerson: string | null;
   editedProcuration: Procuration;
 
-  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
+  public readonly searchPersonModal = viewChild(SearchPersonByRolesComponent);
 
   override setProperty(property: PropertyDto) {
     super.setProperty(property);
-    this.procurations = this.value.procurations;
+    // Защита от некорректного/пустого значения свойства (прод-устойчивость).
+    this.procurations = this.value?.procurations ?? {};
     this.persons = Object.keys(this.procurations);
     this.persons.sort();
     this.cdr?.markForCheck?.();
@@ -45,6 +46,11 @@ export class GkntDeputyChairmanProcurationsComponent extends PropertyComponent<P
 
   edit(person?: string) {
     this.cancelEdit();
+    if (!person || !this.procurations?.[person]) {
+      // Нечего редактировать — предотвращаем падение по undefined.
+      this.cdr?.markForCheck?.();
+      return;
+    }
     this.editedPerson = person;
     this.procurations[person].isEdit = true;
     this.editedProcuration = _.cloneDeep(this.procurations[person]);
@@ -52,6 +58,9 @@ export class GkntDeputyChairmanProcurationsComponent extends PropertyComponent<P
   }
 
   saveEditedProcuration() {
+    if (!this.editedPerson) {
+      return;
+    }
     this.procurations[this.editedPerson] = this.editedProcuration;
     this.savePropertyValue();
   }
@@ -62,6 +71,9 @@ export class GkntDeputyChairmanProcurationsComponent extends PropertyComponent<P
   }
 
   deleteProcuration() {
+    if (!this.editedPerson) {
+      return;
+    }
     this.persons = this.persons.filter(person => person != this.editedPerson);
     delete this.procurations[this.editedPerson];
     this.savePropertyValue();
@@ -73,7 +85,7 @@ export class GkntDeputyChairmanProcurationsComponent extends PropertyComponent<P
   }
 
   cancelEdit() {
-    if (this.procurations[this.editedPerson]) {
+    if (this.editedPerson && this.procurations[this.editedPerson]) {
       this.procurations[this.editedPerson].isEdit = false;
     }
     this.editedPerson = null;
@@ -84,12 +96,12 @@ export class GkntDeputyChairmanProcurationsComponent extends PropertyComponent<P
     let fullName = person.personName.lastName + ' ' + person.personName.firstName + ' ' + person.personName.middleName;
     this.procurations[fullName] = new Procuration();
     this.savePropertyValue();
-    this.searchPersonModal.hide();
+    this.searchPersonModal()?.hide();
     this.cdr?.markForCheck?.();
   }
 
   showSearchPersonModal() {
-    this.searchPersonModal.show();
+    this.searchPersonModal()?.show();
   }
 }
 

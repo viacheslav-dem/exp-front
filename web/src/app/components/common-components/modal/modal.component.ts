@@ -7,11 +7,11 @@ import {
   ElementRef,
   OnDestroy,
   OnInit,
-  ViewChild,
   input,
   inject,
   signal,
-  output
+  output,
+  viewChild
 } from '@angular/core';
 import {ModalDirective, ModalOptions} from "ngx-bootstrap/modal";
 import {environment} from "../../../../environments/environment";
@@ -61,9 +61,9 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly closePermission = input<boolean>(true);
   config: ModalOptions = new ModalOptions();
 
-  @ViewChild('ng2Modal') public modal: ModalDirective;
-  @ViewChild('modalRoot', { static: true }) public modalRoot?: ElementRef<HTMLElement>;
-  @ViewChild('modalBody', { static: true }) public modalBody?: ElementRef<HTMLElement>;
+  public readonly modal = viewChild<ModalDirective>('ng2Modal');
+  public readonly modalRoot = viewChild<ElementRef<HTMLElement>>('modalRoot');
+  public readonly modalBody = viewChild<ElementRef<HTMLElement>>('modalBody');
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -82,7 +82,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
     // В ngx-bootstrap scroll обычно происходит на корневом .modal (оверлей),
     // а не на .modal-body, поэтому слушаем modalRoot. Если в будущем появится
     // внутренний scroll у body — fallback сохранён.
-    const el = this.modalRoot?.nativeElement ?? this.modalBody?.nativeElement;
+    const el = this.modalRoot()?.nativeElement ?? this.modalBody()?.nativeElement;
     if (!el) {
       return;
     }
@@ -102,7 +102,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   scrollModalToTop(smooth: boolean = true): void {
-    const el = this.modalRoot?.nativeElement ?? this.modalBody?.nativeElement;
+    const el = this.modalRoot()?.nativeElement ?? this.modalBody()?.nativeElement;
     if (!el) {
       return;
     }
@@ -135,7 +135,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public show(): void {
-    this.modal.show();
+    this.modal()?.show();
     this.lockBodyScroll();
     // Zoneless/OnPush: открытие модалки не меняет @input/сигналы напрямую,
     // поэтому явно помечаем компонент (и его ng-content) на отрисовку.
@@ -149,7 +149,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private checkScrollState(): void {
-    const el = this.modalRoot?.nativeElement ?? this.modalBody?.nativeElement;
+    const el = this.modalRoot()?.nativeElement ?? this.modalBody()?.nativeElement;
     if (!el) {
       return;
     }
@@ -159,7 +159,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public hide(): void {
-    this.modal.hide();
+    this.modal()?.hide();
     this.unlockBodyScroll();
     this.showBackToTop.set(false);
     this.cdr.markForCheck();
@@ -167,7 +167,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
 
   internalHide(): void {
     if (this.closePermission()) {
-      this.modal.hide();
+      this.modal()?.hide();
     }
     this.unlockBodyScroll();
     this.showBackToTop.set(false);

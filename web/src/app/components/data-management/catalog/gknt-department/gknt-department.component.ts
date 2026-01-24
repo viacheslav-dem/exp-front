@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, viewChild} from '@angular/core';
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {Catalog, DataService} from "app/services/data.service";
 import {IdNameDto} from "app/dto/IdNameDto";
@@ -28,7 +28,7 @@ export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> 
   searchPersonFilter: Filter<PersonPlainDto>;
   onPersonSelected: Function;
 
-  @ViewChild(SearchPersonComponent) public searchPersonModal: SearchPersonComponent;
+  public readonly searchPersonModal = viewChild(SearchPersonComponent);
 
   constructor(public _toasty: GlobalToastyService,
               public _dataService: DataService,
@@ -80,12 +80,12 @@ export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> 
   }
 
   showPersonModal() {
-    this.searchPersonModal.show();
+    this.searchPersonModal()?.show();
   }
 
   selectPerson(person: PersonDto) {
     this.onPersonSelected(person);
-    this.searchPersonModal.hide();
+    this.searchPersonModal()?.hide();
     this.cdr.markForCheck();
   }
 

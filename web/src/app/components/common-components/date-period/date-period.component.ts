@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnChanges, ViewChild, forwardRef, input, output} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnChanges, forwardRef, input, output, viewChild} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ControlComponent} from "@app/components/common-components/control-component";
 import dayjs from 'dayjs';
@@ -38,8 +38,8 @@ export const PERIOD_FILTER_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class DatePeriodComponent extends ControlComponent<DateRange> implements OnChanges, AfterViewInit {
 
-  @ViewChild(BsDaterangepickerDirective, { static: false }) datepicker: BsDaterangepickerDirective;
-  @ViewChild('dateInput', { static: false }) dateInput: ElementRef<HTMLInputElement>;
+  readonly datepicker = viewChild(BsDaterangepickerDirective);
+  readonly dateInput = viewChild<ElementRef<HTMLInputElement>>('dateInput');
 
   readonly dateFormat = input<string>('DD.MM.YYYY');
   bsRangeValue: any[] = [];
@@ -60,7 +60,7 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
 
   ngAfterViewInit() {
     // Обновляем отображение после инициализации если есть значение
-    if (this.bsRangeValue && this.bsRangeValue.length === 2 && this.dateInput) {
+    if (this.bsRangeValue && this.bsRangeValue.length === 2 && this.dateInput()) {
       requestAnimationFrame(() => {
         this.updateInputDisplay();
       });
@@ -95,15 +95,16 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
   }
 
   private updateInputDisplay() {
-    if (this.dateInput && this.dateInput.nativeElement && this.bsRangeValue && this.bsRangeValue.length === 2) {
+    const dateInput = this.dateInput();
+    if (dateInput && dateInput.nativeElement && this.bsRangeValue && this.bsRangeValue.length === 2) {
       const startDate = this.bsRangeValue[0];
       const endDate = this.bsRangeValue[1];
       if (startDate && endDate) {
         const formatted = dayjs(startDate).locale('ru').format(this.dateFormat()) + 
                          ' - ' + 
                          dayjs(endDate).locale('ru').format(this.dateFormat());
-        if (this.dateInput.nativeElement.value !== formatted) {
-          this.dateInput.nativeElement.value = formatted;
+        if (dateInput.nativeElement.value !== formatted) {
+          dateInput.nativeElement.value = formatted;
         }
       }
     }
@@ -112,7 +113,7 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
   onModelChange(value: any[]) {
     // Workaround: ngx-bootstrap имеет баг с форматированием года
     // Обновляем отображение после того, как ngx-bootstrap обновит значение
-    if (value && value.length === 2 && value[0] && value[1] && this.dateInput?.nativeElement) {
+    if (value && value.length === 2 && value[0] && value[1] && this.dateInput()?.nativeElement) {
       requestAnimationFrame(() => {
         this.updateDisplayValue(value);
       });
@@ -149,13 +150,14 @@ export class DatePeriodComponent extends ControlComponent<DateRange> implements 
    * Использует dayjs для форматирования с поддержкой формата Moment.js (DD.MM.YYYY)
    */
   private updateDisplayValue(dates: Date[]): void {
-    if (this.dateInput?.nativeElement && dates && dates.length === 2 && dates[0] && dates[1]) {
+    const dateInput = this.dateInput();
+    if (dateInput?.nativeElement && dates && dates.length === 2 && dates[0] && dates[1]) {
       const formatted = dayjs(dates[0]).locale('ru').format(this.dateFormat()) + 
                        ' - ' + 
                        dayjs(dates[1]).locale('ru').format(this.dateFormat());
       // Обновляем только если значение отличается (избегаем лишних обновлений)
-      if (this.dateInput.nativeElement.value !== formatted) {
-        this.dateInput.nativeElement.value = formatted;
+      if (dateInput.nativeElement.value !== formatted) {
+        dateInput.nativeElement.value = formatted;
       }
     }
   }

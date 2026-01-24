@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, viewChild} from '@angular/core';
 import {AuthService} from "@app/services/auth.service";
 import {StorageService} from "@app/services/storage.service";
 import {RoleInfoDto} from "@app/dto/RoleInfoDto";
@@ -19,7 +19,7 @@ export class SelectRoleComponent implements OnInit {
   mapInfoRole: { [key: string]: RoleInfoDto } = {};
   user: any = {};
 
-  @ViewChild(ProjectListComponent) projectListComponent: ProjectListComponent;
+  readonly projectListComponent = viewChild(ProjectListComponent);
 
   constructor(private _storageService: StorageService,
               private _authService: AuthService,
@@ -31,8 +31,9 @@ export class SelectRoleComponent implements OnInit {
     this.currRole = this._storageService.getCurrRole();
     this.route.params.subscribe(() => {
       this.getRolesInfo();
-      if (this.projectListComponent != null) {
-        this.projectListComponent.loadPage();
+      const comp = this.projectListComponent();
+      if (comp != null) {
+        comp.loadPage();
       }
     });
   }

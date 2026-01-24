@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, viewChild} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {DataService} from "@app/services/data.service";
 import {OrgDto} from "@app/dto/OrgDto";
@@ -32,9 +32,9 @@ export class OrgsComponent extends FilterAndPages<OrgDto> {
     return org.id || this._trackKey(org);
   }
 
-  @ViewChild(SearchPersonComponent) public searchPersonModal: SearchPersonComponent;
-  @ViewChild(SearchOrgComponent) public searchOrgModal: SearchOrgComponent;
-  @ViewChild('showSubOrgModal') showSubOrgModal: ModalComponent;
+  public readonly searchPersonModal = viewChild(SearchPersonComponent);
+  public readonly searchOrgModal = viewChild(SearchOrgComponent);
+  readonly showSubOrgModal = viewChild<ModalComponent>('showSubOrgModal');
 
   constructor(private _toasty: GlobalToastyService,
               private _dataService: DataService,
@@ -94,7 +94,7 @@ export class OrgsComponent extends FilterAndPages<OrgDto> {
     this._dataService.saveOrg(this.editedOrg).subscribe(res => {
       this._toasty.success("Сохранено.");
       this.update();
-      this.searchOrgModal.update();
+      this.searchOrgModal()?.update();
       this.cdr?.markForCheck?.();
     });
   }
@@ -112,22 +112,22 @@ export class OrgsComponent extends FilterAndPages<OrgDto> {
   }
 
   showPersonModal() {
-    this.searchPersonModal.show();
+    this.searchPersonModal()?.show();
   }
 
   showOrgModal() {
-    this.searchOrgModal.show();
+    this.searchOrgModal()?.show();
   }
 
   selectPerson(person: PersonPlainDto) {
     this.editedOrg.chairman = person;
-    this.searchPersonModal.hide();
+    this.searchPersonModal()?.hide();
     this.cdr?.markForCheck?.();
   }
 
   selectOrg(org: OrgDto) {
     this.editedOrg.parentOrg = org;
-    this.searchOrgModal.hide();
+    this.searchOrgModal()?.hide();
     this.cdr?.markForCheck?.();
   }
 
@@ -141,6 +141,6 @@ export class OrgsComponent extends FilterAndPages<OrgDto> {
 
   showChildOrgs(orgs: OrgDto[]) {
     this.subOrgs = orgs;
-    this.showSubOrgModal.show();
+    this.showSubOrgModal()?.show();
   }
 }

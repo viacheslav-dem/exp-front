@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, computed, effect, input, Type} from '@angular/core';
+import {Component, ElementRef, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, computed, effect, input, Type, viewChild} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {SearchPersonByRolesComponent} from "@app/components/search/search-person/search-person-by-role.component";
 import {Role} from "@app/pipes/role.pipe";
@@ -54,8 +54,8 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   formComponent: CouncilConclusionForm;
 
 
-  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
-  @ViewChild('form', { read: ViewContainerRef, static: true }) formContainer: any;
+  public readonly searchPersonModal = viewChild(SearchPersonByRolesComponent);
+  readonly formContainer = viewChild('form', { read: ViewContainerRef });
 
   constructor(private _personService: PersonService,
               private _formTypeResolver: CouncilConclusionFormResolver,
@@ -110,8 +110,8 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     if (!_formRenderer) {
       return;
     }
-    this.formContainer.clear();
-    const componentRef = this.formContainer.createComponent(_formRenderer);
+    this.formContainer()?.clear();
+    const componentRef = this.formContainer()!.createComponent(_formRenderer);
     this.formComponent = componentRef.instance;
     this.formComponent.parent = this;
     this.formComponent.project = this.project();
@@ -190,12 +190,12 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   }
 
   showSearchChairmanModal() {
-    this.searchPersonModal.show();
+    this.searchPersonModal()?.show();
   }
 
   selectPerson(person: PersonPlainDto) {
     this._form.chairman = person;
-    this.searchPersonModal.hide();
+    this.searchPersonModal()?.hide();
   }
 
   needSelectDirections() {

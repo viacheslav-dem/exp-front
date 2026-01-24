@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, viewChild} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {PersonService} from "@app/services/person.service";
 import {Catalog, DataService} from "@app/services/data.service";
@@ -46,7 +46,7 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
 
 
   SortClass = SortClass;
-  @ViewChild('showUserInfo', { static: false }) showUserInfo: ModalComponent;
+  readonly showUserInfo = viewChild<ModalComponent>('showUserInfo');
   users: PersonDto[] = [];
   selectedUser: PersonDto;
   sortOrder: SortOrder = new SortOrder('person', Direction.ASC);
@@ -193,7 +193,7 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
 
   showReadUserModal(user: PersonDto){
     this.selectedUser = user;
-    this.showUserInfo.show();
+    this.showUserInfo()?.show();
     this.cdr?.markForCheck?.();
   }
 

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, output} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, output, viewChild} from "@angular/core";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {OrgDto} from "@app/dto/OrgDto";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
@@ -17,7 +17,7 @@ import {environment} from "../../../../environments/environment";
 
 export class SearchOrgComponent extends FilterAndPages<OrgDto> {
 
-  @ViewChild('searchOrgModal', { static: false }) searchOrgModal: ModalComponent;
+  readonly searchOrgModal = viewChild<ModalComponent>('searchOrgModal');
   readonly selected = output<OrgDto>();
 
   constructor(protected _service: DataService, private cdr: ChangeDetectorRef) {
@@ -44,12 +44,12 @@ export class SearchOrgComponent extends FilterAndPages<OrgDto> {
 
 
   show() {
-    this.searchOrgModal.show();
+    this.searchOrgModal()?.show();
     this.cdr?.markForCheck?.();
   }
 
   hide() {
-    this.searchOrgModal.hide();
+    this.searchOrgModal()?.hide();
     this.cdr?.markForCheck?.();
   }
 

@@ -20,6 +20,7 @@ import {economicSignificanceOptions} from "@app/components/document-form/documen
 import {resourcesSufficiencyOptions} from "@app/components/document-form/document-blocks/resources-sufficiency-block.component";
 import {competenceSufficiencyOptions} from "@app/components/document-form/document-blocks/competence-sufficiency-block.component";
 import {PageRequest} from "@app/components/common-components/page-and-filter/model/PageRequest";
+import {Pagination} from "app/components/common-components/page-and-filter/model/Pagination";
 import {forkJoin, of, Subject} from "rxjs";
 import {catchError, switchMap} from "rxjs/operators";
 import {SectionPlainDto} from "@app/dto/SectionPlainDto";
@@ -198,12 +199,16 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
 
                     if (!isNaN(pageFromRoute) && pageFromRoute > 0) {
                         // pagination.page используется пагинатором (1-based)
-                        this._pagination.page = pageFromRoute;
+                        const next = new Pagination(this._pagination?.itemsPerPage);
+                        next.page = pageFromRoute;
+                        this._pagination = next;
                         // paging.page уходит на бэкенд (0-based)
                         this._searchRequest.paging.page = pageFromRoute - 1;
                     } else {
                         // если параметр отсутствует или некорректен — считаем, что страница 1
-                        this._pagination.page = 1;
+                        const next = new Pagination(this._pagination?.itemsPerPage);
+                        next.page = 1;
+                        this._pagination = next;
                         this._searchRequest.paging.page = 0;
                     }
 

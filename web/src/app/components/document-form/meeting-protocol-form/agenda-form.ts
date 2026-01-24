@@ -2,7 +2,7 @@ import {DocumentForm} from "app/components/document-form/document-form";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {AgendaOldFormContent} from "@app/components/document-form/meeting-protocol-form/AgendaOldFormContent";
 import {isEmptyOrNull} from "@app/support/utils";
-import {Injectable, QueryList, ViewChild, ViewChildren} from "@angular/core";
+import {Injectable, viewChildren, viewChild} from "@angular/core";
 import {MeetingProtocolFormComponent} from "@app/components/document-form/meeting-protocol-form/meeting-protocol-form.component";
 import {VoteResultsComponent} from "@app/components/document-form/vote-results/vote-results.component";
 import {VoteResults} from "@app/components/document-form/meeting-protocol-form/VoteResults";
@@ -16,10 +16,10 @@ export abstract class AgendaForm extends DocumentForm<AgendaOldFormContent> {
   customerReplies: boolean = false;
   stages: { name: string }[] = [];
   privacyObjects: { name: string }[] = [];
-  @ViewChildren(VoteResultsComponent) voteComponents: QueryList<VoteResultsComponent>;
+  readonly voteComponents = viewChildren(VoteResultsComponent);
 
-  @ViewChild('singleVote', { static: false }) singleVoteComponent: VoteResultsComponent;
-  @ViewChild('rescheduled', { static: false }) rescheduled: VoteResultsComponent;
+  readonly singleVoteComponent = viewChild<VoteResultsComponent>('singleVote');
+  readonly rescheduled = viewChild<VoteResultsComponent>('rescheduled');
 
   singleVoteResult: VoteResults = new VoteResults();
 
@@ -54,11 +54,16 @@ export abstract class AgendaForm extends DocumentForm<AgendaOldFormContent> {
 
   validate() {
     if (this.singleVoteMode && !this.isRescheduledForm) {
-      this.voteComponents.forEach(item => {
-        item.value.accepted = this.singleVoteComponent.value.accepted;
-        item.value.rejected = this.singleVoteComponent.value.rejected;
-        item.value.isAcceptedByChairman = this.singleVoteComponent.value.isAcceptedByChairman;
-      });
+      const single = this.singleVoteComponent();
+      // В проде возможны временные рассинхронизации viewChild (особенно при zoneless/async рендере).
+      // Не падаем, если single ещё не доступен.
+      if (single) {
+        this.voteComponents().forEach(item => {
+          item.value.accepted = single.value.accepted;
+          item.value.rejected = single.value.rejected;
+          item.value.isAcceptedByChairman = single.value.isAcceptedByChairman;
+        });
+      }
     }
     super.validate();
     if (this.getVoted() > this.parent._form.participants.length) {
@@ -72,10 +77,13 @@ export abstract class AgendaForm extends DocumentForm<AgendaOldFormContent> {
 
   toggleVote(enable: boolean) {
     if (!this.isRescheduledForm) {
-      this.voteComponents.forEach(item => {
+      this.voteComponents().forEach(item => {
         item.display = !enable;
       });
-      this.singleVoteComponent.display = enable;
+      const single = this.singleVoteComponent();
+      if (single) {
+        single.display = enable;
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, signal, computed, inject, DestroyRef} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, signal, computed, inject, DestroyRef, viewChild} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {GlobalToastyService} from "app/services/global-toasty.service";
@@ -107,7 +107,7 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
            council?.sections?.some(s => s.isEdit) || false;
   });
 
-  @ViewChild(SearchPersonComponent) public searchPersonModal: SearchPersonComponent;
+  public readonly searchPersonModal = viewChild(SearchPersonComponent);
 
   constructor() {
     super();
@@ -599,14 +599,14 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   showPersonModal() {
     // Просто показываем модальное окно - фильтр уже установлен в setupPersonSelector
     // Эффект в SearchPersonComponent должен обработать изменение автоматически
-    this.searchPersonModal.show();
+    this.searchPersonModal()?.show();
   }
 
   selectPerson(person: PersonDto) {
     if (this.onPersonSelected) {
       this.onPersonSelected(person);
     }
-    this.searchPersonModal?.hide();
+    this.searchPersonModal()?.hide();
   }
 
   addDirection() {

@@ -116,7 +116,7 @@ export class NestableFormDirective implements OnInit, OnDestroy {
         // console.log("ngSubmit!!!!!!!!", this.ngForm);
         event.stopPropagation();
         if (this.ngForm.control.valid) {
-          this.submitFunc()();
+          this.submitFunc();
         } else {
           this._toasty.error("Пожалуйста, исправьте ошибки.")
         }

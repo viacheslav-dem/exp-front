@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, input, output} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, input, output, viewChild} from "@angular/core";
 import {AuthService} from "app/services/auth.service";
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {ModalComponent} from "app/components/common-components/modal/modal.component";
@@ -29,8 +29,8 @@ export class DocumentUploaderComponent extends UploadHelper {
   readonly typesAccept = input<string>(undefined);
   readonly saved = output<any>();
 
-  @ViewChild('fileLoaderModal') fileLoaderModal: ModalComponent;
-  @ViewChild(ChooseFilesComponent) chooseFilesComponent: ChooseFilesComponent;
+  readonly fileLoaderModal = viewChild<ModalComponent>('fileLoaderModal');
+  readonly chooseFilesComponent = viewChild(ChooseFilesComponent);
 
   constructor(private _toasty: GlobalToastyService,
               protected _authService: AuthService,
@@ -67,14 +67,14 @@ export class DocumentUploaderComponent extends UploadHelper {
   ngOnInit() {
     super.ngOnInit();
     this.onSuccess = (item: any, response: string) => {
-      this.fileLoaderModal.hide();
+      this.fileLoaderModal()?.hide();
       this._toasty.success("Файл успешно загружен.");
       this.saved.emit(JSON.parse(response));
       // callbacks загрузчика могут приходить вне angular zone/из стороннего кода
       this.cdr.markForCheck();
     };
     this.onError = (item: any, response: string, status: number) => {
-      this.fileLoaderModal.hide();
+      this.fileLoaderModal()?.hide();
       if (this.file.size > 10485760) {
         response = 'Загрузка была прервана. Возможно, Ваш файл превышает разрешённый размер в 10 Мб';
       }
@@ -89,13 +89,13 @@ export class DocumentUploaderComponent extends UploadHelper {
       this.fileName = removeFileSuffix(this.file.name);
       this.fileDescription = null;
       this.progressValue = 0;
-      this.fileLoaderModal.show();
+      this.fileLoaderModal()?.show();
       this.cdr.markForCheck();
       this.onError = (item: any, response: string, status: number) => {
         if (this.file.size.valueOf() > 10*1024*1024) {
           response = 'Загрузка была прервана. Возможно, Ваш файл превышает разрешённый размер в 10 Мб';
         }
-        this.fileLoaderModal.hide();
+        this.fileLoaderModal()?.hide();
         this._toasty.err(status, response);
         this.cdr.markForCheck();
       };
@@ -112,6 +112,6 @@ export class DocumentUploaderComponent extends UploadHelper {
   }
 
   openFileDialog() {
-    this.chooseFilesComponent?.fileInput?.nativeElement?.click();
+    this.chooseFilesComponent()?.fileInput()?.nativeElement?.click();
   }
 }

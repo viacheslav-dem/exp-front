@@ -1,4 +1,4 @@
-import {Component, ViewChild, ChangeDetectionStrategy, signal, ChangeDetectorRef, AfterViewInit, OnDestroy, ElementRef, QueryList, ViewChildren} from '@angular/core';
+import {Component, ChangeDetectionStrategy, signal, ChangeDetectorRef, AfterViewInit, OnDestroy, ElementRef, effect, viewChild, viewChildren} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {PersonService} from "@app/services/person.service";
@@ -35,13 +35,18 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
   Role = Role;
   expertId = signal<number | undefined>(undefined);
   showFilter = signal<boolean>(false);
-  @ViewChild('expertPayInfo', { static: false }) expertPayInfoModal: ModalComponent;
-  @ViewChildren('chartContainer') chartContainers!: QueryList<ElementRef>;
-  
+  readonly expertPayInfoModal = viewChild<ModalComponent>('expertPayInfo');
+  readonly chartContainers = viewChildren<ElementRef>('chartContainer');
+
   // Map для отслеживания загруженных графиков по ID эксперта
   chartsLoaded = signal<Set<number>>(new Set());
   private observer?: IntersectionObserver;
   private subscriptions: Subscription[] = [];
+
+  private readonly chartContainersEffect = effect(() => {
+    this.chartContainers();
+    this.observeChartContainers();
+  });
 
   constructor(
     private toasty: GlobalToastyService,
@@ -132,13 +137,8 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
 
   ngAfterViewInit() {
     this.setupIntersectionObserver();
-    // Подписываемся на изменения QueryList
-    this.subscriptions.push(
-      this.chartContainers.changes.subscribe(() => {
-        this.observeChartContainers();
-      })
-    );
-    // Первоначальная установка observer
+    // effect может сработать до ngAfterViewInit (observer ещё undefined). Гарантируем
+    // первичную подписку на контейнеры после инициализации observer.
     setTimeout(() => this.observeChartContainers(), 0);
   }
 
@@ -147,6 +147,7 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
     this.subscriptions = [];
     if (this.observer) {
       this.observer.disconnect();
+      this.observer = undefined;
     }
   }
 
@@ -179,7 +180,7 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
     this.observer.disconnect();
     
     // Добавляем наблюдение за новыми контейнерами
-    this.chartContainers.forEach(container => {
+    this.chartContainers().forEach(container => {
       if (container.nativeElement) {
         this.observer?.observe(container.nativeElement);
       }
@@ -241,6 +242,6 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
 
   showExpertPayInfoDialog(expert: PersonExpertDto) {
     this.expertId.set(expert.id);
-    this.expertPayInfoModal.show();
+    this.expertPayInfoModal()?.show();
   }
 }

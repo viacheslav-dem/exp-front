@@ -1,4 +1,4 @@
-import {Component, ViewChild, input, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy, ChangeDetectorRef, viewChild} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {Role} from "@app/pipes/role.pipe";
@@ -77,7 +77,7 @@ export class ReferralFormComponent extends DocumentForm<ReferralFormContent> {
   readonly council = input<any>(undefined);
   readonly loading = input<boolean>(false);
 
-  @ViewChild(SearchPersonByRolesComponent, { static: false }) public searchPersonModal: SearchPersonByRolesComponent;
+  public readonly searchPersonModal = viewChild(SearchPersonByRolesComponent);
 
   constructor(private cdr: ChangeDetectorRef) {
     super();
@@ -95,12 +95,12 @@ export class ReferralFormComponent extends DocumentForm<ReferralFormContent> {
   }
 
   showSearchChairmanModal() {
-    this.searchPersonModal.show();
+    this.searchPersonModal()?.show();
   }
 
   selectPerson(person: PersonPlainDto) {
     this._form.gkntDepartmentChairman = person;
-    this.searchPersonModal.hide();
+    this.searchPersonModal()?.hide();
     this.cdr?.markForCheck?.();
   }
 

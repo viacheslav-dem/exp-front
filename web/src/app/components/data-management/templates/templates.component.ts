@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, ViewChildren, QueryList, AfterViewInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, AfterViewInit, effect, viewChildren} from '@angular/core';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
@@ -28,33 +28,34 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> impl
   
   isDragOverDocx: number | null = null;
   isDragOverXml: number | null = null;
-  
-  @ViewChildren(SilentFileUploaderComponent) fileUploaders: QueryList<SilentFileUploaderComponent>;
-  
+
+  readonly fileUploaders = viewChildren(SilentFileUploaderComponent);
+
   private uploaderMap: Map<string, SilentFileUploaderComponent> = new Map();
+
+  private readonly fileUploadersEffect = effect(() => {
+    this.fileUploaders();
+    this.updateUploaderMap();
+  });
 
   constructor(private _toasty: GlobalToastyService,
               private _documentService: DocumentService,
               private cdr: ChangeDetectorRef) {
     super();
   }
-  
+
   ngAfterViewInit() {
-    // Регистрируем загрузчики после инициализации представления
-    this.fileUploaders.changes.subscribe(() => {
-      this.updateUploaderMap();
-    });
     this.updateUploaderMap();
   }
-  
+
   private updateUploaderMap() {
     this.uploaderMap.clear();
-    if (!this.templates || !this.fileUploaders) {
+    const uploaders = this.fileUploaders();
+    if (!this.templates || !uploaders?.length) {
       return;
     }
-    
+
     // Сопоставляем загрузчики с шаблонами по URL
-    const uploaders = this.fileUploaders.toArray();
     for (const template of this.templates) {
       if (template.isEdit) {
         const docxUrl = `${this.SERVER_URL}/document/template/source?id=${template.id}`;
