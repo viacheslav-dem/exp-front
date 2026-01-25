@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-analog-params-description-block',
@@ -10,6 +10,7 @@ import {Component, input} from '@angular/core';
       </label>
       <textarea
         [(ngModel)]="_form().analogParamsText"
+        (ngModelChange)="onConditionsChanged.emit(true)"
         [attr.name]="'analogParamsText_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -43,5 +44,7 @@ export class AnalogParamsDescriptionBlockComponent {
 
   readonly _form = input<{
     analogParamsText: string;
-}>(undefined);
+  }>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
 }

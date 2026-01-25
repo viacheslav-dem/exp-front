@@ -3,65 +3,73 @@
   <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
   <app-novelty-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'1'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-novelty-block>
 
   <hr/>
 
   <app-economic-significance-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'2'"
     [project]="project"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-economic-significance-block>
 
   <hr/>
 
   <app-resources-sufficiency-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'3'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-resources-sufficiency-block>
 
   <hr/>
 
   <app-competence-sufficiency-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'4'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-competence-sufficiency-block>
 
   <hr/>
 
   <app-marketing-research-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'5'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-marketing-research-block>
 
   <hr/>
 
   <app-risks-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'6'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-risks-block>
 
   <hr/>
 
   <app-privacy-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'7'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-privacy-block>
 
   <hr/>
 
   <app-stages-exists-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'8'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-stages-exists-block>
 
@@ -74,36 +82,40 @@
   <hr/>
 
   <app-name-accordance-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'9.1'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-name-accordance-block>
 
   <hr/>
 
   <app-terms-accordance-block
-    [form]="_form"
+    [form]="formValue()"
     [num]="'9.2'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-terms-accordance-block>
 
   <hr/>
 
   <app-finance-accordance-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'9.3'"
     [project]="project"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-finance-accordance-block>
 
   <hr/>
 
   <app-finance-conclusion-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'9.4'"
     [noveltyNum]="'1'"
     [economicSignificanceNum]="'2'"
     [project]="project"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
     [disabled]="isFinanceConclusionDisabled()"
   ></app-finance-conclusion-block>
@@ -112,8 +124,9 @@
 <hr/>
 
 <app-conclusion-block
-  [_form]="_form"
+  [_form]="formValue()"
   [financeConclusionNum]="'9.4'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
   [disabled]="isConclusionDisabled()"
 ></app-conclusion-block>
@@ -121,6 +134,7 @@
 <hr/>
 
 <app-notes-block
-  [_form]="_form"
+  [_form]="formValue()"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-notes-block>

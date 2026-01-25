@@ -8,12 +8,13 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы
         в части объемов их финансирования для достижения запланированных государственной программой показателей:
       </label>
-      <app-boolean-button name="programSufficiency" required [(ngModel)]="_form().programSufficiency"
+      <input type="hidden" [ngModel]="_form()?.programSufficiency" name="programSufficiency" required>
+      <app-boolean-button name="programSufficiency" required [ngModel]="_form()?.programSufficiency"
         [trueLabel]="'достаточно'"
         [falseLabel]="'недостаточно'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ programSufficiency: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().programSufficiencyText" name="programSufficiencyText" rows="3" class="form-control mt-05"
+        <textarea [ngModel]="_form()?.programSufficiencyText" (ngModelChange)="emitPatch({ programSufficiencyText: $event })" name="programSufficiencyText" rows="3" class="form-control mt-05"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
       @if (full()) {
@@ -42,10 +43,18 @@ export class ProgramSufficiencyFinanceBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    programSufficiency: boolean;
-    programSufficiencyText: string;
-}>(undefined);
+  readonly _form = input<ProgramSufficiencyFinanceBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ProgramSufficiencyFinanceBlockForm>>();
+
+  emitPatch(patch: Partial<ProgramSufficiencyFinanceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ProgramSufficiencyFinanceBlockForm = {
+  programSufficiency: boolean;
+  programSufficiencyText: string;
+};

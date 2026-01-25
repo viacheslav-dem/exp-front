@@ -7,11 +7,12 @@ import {Component, OnInit, input, output} from "@angular/core";
       <label>
         {{num()}}. Соответствие приоритетным направлениям научной, научно-технической и инновационной деятельности в Республике Беларусь
       </label>
+      <input type="hidden" [ngModel]="_form()?.priorityAreas" name="priorityAreas" required>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().priorityAreas === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form()?.priorityAreas === true}" (click)="stateButton(true)">
           Соответствует
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().priorityAreas === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form()?.priorityAreas === false}" (click)="stateButton(false)">
           Не соответствует
         </button>
       </div>
@@ -28,8 +29,10 @@ import {Component, OnInit, input, output} from "@angular/core";
       </div>
     }
     @if (full()) {
-      <textarea [(ngModel)]="_form().priorityAreasText"
-        [attr.name]="'priorityAreasText_' + num().split('.').join('_')"
+      <textarea
+        [ngModel]="_form()?.priorityAreasText"
+        (ngModelChange)="emitPatch({ priorityAreasText: $event })"
+        [name]="'priorityAreasText_' + num().split('.').join('_')"
         required
         minlength="30"
         maxlength="5000"
@@ -57,23 +60,29 @@ export class PriorityAreasBlock2025Components implements OnInit{
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    priorityAreas: boolean;
-    priorityAreasText: string;
-}>(undefined);
+    readonly _form = input<PriorityAreasBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<PriorityAreasBlock2025Form>>();
 
+    emitPatch(patch: Partial<PriorityAreasBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean) {
-        if(flag){
-            this._form().priorityAreas = true;
-        } else{
-            this._form().priorityAreas = false;
-        }
+        this.emitPatch({ priorityAreas: flag });
     }
 
     ngOnInit(): void {
-        this.stateButton(false);
+        // Инициализация через emitPatch вместо прямой мутации
+        this.emitPatch({ priorityAreas: false });
     }
 }
+
+type PriorityAreasBlock2025Form = {
+    priorityAreas: boolean;
+    priorityAreasText: string;
+};

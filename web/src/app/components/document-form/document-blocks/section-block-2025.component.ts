@@ -10,22 +10,26 @@ import {Catalog} from "@app/services/data.service";
         {{num()}}. Секция и подсекция основного вида экономической деятельности, которому соответствует
         планируемый к реализации инновационный проект:
       </label>
-      <app-select-catalog name="section" [catalog]="Catalog.INDUSTRY"
+      <app-select-catalog
+        name="section"
+        [catalog]="Catalog.INDUSTRY"
         [optionToString]="sectionToString"
         required
-        [(ngModel)]="_form().section"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-select-catalog>
+        [ngModel]="_form()?.section"
+        (ngModelChange)="emitPatch({ section: $event })"
+      ></app-select-catalog>
       @if (full()) {
         <div class="hint">
           <p>
             Пороговое значение валовой добавленной стоимости в расчете на одного занятого
-            по основным видам экономической деятельности в Европейском союзе: <b>{{_form().section?.addedValueBound || '-'}}</b> евро.
+            по основным видам экономической деятельности в Европейском союзе: <b>{{_form()?.section?.addedValueBound || '-'}}</b> евро.
           </p>
         </div>
       }
       <textarea
-        [(ngModel)]="_form().sectionText"
-        [attr.name]="'sectionText_' + num().split('.').join('_')"
+        [ngModel]="_form()?.sectionText"
+        (ngModelChange)="emitPatch({ sectionText: $event })"
+        [name]="'sectionText_' + num().split('.').join('_')"
         required
         minlength="30"
         rows="3"
@@ -58,10 +62,20 @@ export class SectionBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    section: IndustryDto;
-    sectionText: string;
-}>(undefined);
+    readonly _form = input<SectionBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<SectionBlock2025Form>>();
+
+    emitPatch(patch: Partial<SectionBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type SectionBlock2025Form = {
+    section: IndustryDto;
+    sectionText: string;
+};

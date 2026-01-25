@@ -13,6 +13,10 @@ export class Agenda_8_12IP_NewFormComponent extends AgendaNewForm {
     this.financeConclusionNum = '7.4';
   }
 
+  onConditionsChanged() {
+    this.markFormChanged();
+  }
+
   validate() {
     // Инкрементальная миграция: обязательность/мин.длина выражаются через template-driven validators (required/minlength),
     // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.

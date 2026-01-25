@@ -1,4 +1,4 @@
-import {Component, input} from "@angular/core";
+import {Component, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-scientific-level-block-2025',
@@ -9,8 +9,9 @@ import {Component, input} from "@angular/core";
         используемыми в мире, и возможности их применения на соответствующем производстве.
       </label>
       <textarea
-        [(ngModel)]="_form().scientificLevel"
-        [attr.name]="'scientificLevel_' + num().split('.').join('_')"
+        [ngModel]="_form()?.scientificLevel"
+        (ngModelChange)="emitPatch({ scientificLevel: $event })"
+        [name]="'scientificLevel_' + num().split('.').join('_')"
         required
         minlength="30"
         maxlength="5000"
@@ -42,7 +43,19 @@ export class ScientificLevelBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    scientificLevel: string;
-}>(undefined);
+    readonly _form = input<ScientificLevelBlock2025Form>(undefined);
+
+    readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<ScientificLevelBlock2025Form>>();
+
+    emitPatch(patch: Partial<ScientificLevelBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type ScientificLevelBlock2025Form = {
+    scientificLevel: string;
+};

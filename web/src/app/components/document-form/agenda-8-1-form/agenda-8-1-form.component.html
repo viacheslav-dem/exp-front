@@ -15,7 +15,10 @@
     Целесообразность реализации объекта государственной экспертизы и его финансирования
     за счет средств республиканского бюджета и (или) других источников финансирования:
   </label>
-  <app-vote-results [(ngModel)]="_form.finance" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results
+    [ngModel]="formValue().finance"
+    (ngModelChange)="patchForm({ finance: $event })"
+    [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
 </div>
 
 <div class="form-sub-group">
@@ -26,8 +29,11 @@
     пункта&nbsp;1 Указа Президента Республики Беларусь от 7&nbsp;сентября 2009&nbsp;г. №&nbsp;441 «О&nbsp;дополнительных мерах
     по стимулированию научной, научно-технической и инновационной деятельности»:
   </label>
-  <app-vote-results [display]="isAccepted()"
-  [(ngModel)]="_form.promotion" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results
+    [display]="isAccepted()"
+    [ngModel]="formValue().promotion"
+    (ngModelChange)="patchForm({ promotion: $event })"
+    [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
   <div [class.d-none]="!isAccepted()" class="italic">
     Голосование не проводилось по причине принятого отрицательного решения в п.{{ind + 1}}.1
   </div>
@@ -43,7 +49,9 @@
     и опытно-технологических работ»:
   </label>
   <app-vote-results [display]="isAccepted()"
-    [(ngModel)]="_form.registration" [all]="parent._form.participants.length">
+    [ngModel]="formValue().registration"
+    (ngModelChange)="patchForm({ registration: $event })"
+    [all]="(parent?.formValue?.()?.participants?.length ?? 0)">
   </app-vote-results>
   <div [class.d-none]="!isAccepted()" class="italic">
     Голосование не проводилось по причине принятого отрицательного решения в п.{{ind + 1}}.1
@@ -66,8 +74,8 @@
     }
     @for (stage of stages; track stage; let i = $index) {
       <div class="input-group input-group-sm btn-group mb-2">
-        <input [(ngModel)]="stage.name" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
-        <button (click)="stages.splice(i, 1)" type="button" class="btn btn-sm btn-outline-danger">&times;</button>
+        <input [(ngModel)]="stage.name" (ngModelChange)="markFormChanged()" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
+        <button (click)="stages.splice(i, 1); markFormChanged()" type="button" class="btn btn-sm btn-outline-danger">&times;</button>
       </div>
     }
     <div class="mb-2">
@@ -75,7 +83,10 @@
         Добавить этап
       </button>
     </div>
-    <app-vote-results [(ngModel)]="_form.stagesVotes" [all]="parent._form.participants.length"></app-vote-results>
+    <app-vote-results
+      [ngModel]="formValue().stagesVotes"
+      (ngModelChange)="patchForm({ stagesVotes: $event })"
+      [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
   </div>
 </div>
 
@@ -91,19 +102,22 @@
     <div class="input-group btn-group input-group-sm mb-2">
       <app-select-catalog
         [catalog]="Catalog.INDUSTRIAL_PROPERTY"
-        [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+        [(ngModel)]="privacyObjects[i]" (ngModelChange)="markFormChanged()" [resetEnabled]="false"
       ></app-select-catalog>
-      <button type="button" class="btn btn-sm btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="privacyObjects.splice(i, 1); markFormChanged()">&times;</button>
     </div>
   }
   <div class="mb-2">
-    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null); markFormChanged()">
       Добавить объект права
     </button>
   </div>
-  <app-vote-results [(ngModel)]="_form.privacy" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results
+    [ngModel]="formValue().privacy"
+    (ngModelChange)="patchForm({ privacy: $event })"
+    [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
   <app-vote-results #singleVote [(ngModel)]="singleVoteResult"
-    [all]="parent._form.participants.length"
+    [all]="(parent?.formValue?.()?.participants?.length ?? 0)"
     [display]="singleVoteMode"
   ></app-vote-results>
 </div>

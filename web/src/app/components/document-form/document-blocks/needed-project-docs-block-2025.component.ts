@@ -9,11 +9,12 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <label>
         {{num()}}. Разработка проектной (предпроектной) документации:
       </label>
+      <input type="hidden" [ngModel]="_form()?.neededProjectDocs" name="neededProjectDocs" required>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().neededProjectDocs === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form()?.neededProjectDocs === true}" (click)="stateButton(true)">
           Требуется
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().neededProjectDocs === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form()?.neededProjectDocs === false}" (click)="stateButton(false)">
           Не требуется
         </button>
       </div>
@@ -21,8 +22,9 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <div>
         @if (full()) {
           <textarea
-            [(ngModel)]="_form().neededProjectDocsText"
-            [attr.name]="'neededProjectDocsText_' + num().split('.').join('_')"
+            [ngModel]="_form()?.neededProjectDocsText"
+            (ngModelChange)="emitPatch({ neededProjectDocsText: $event })"
+            [name]="'neededProjectDocsText_' + num().split('.').join('_')"
             required
             minlength="30"
             maxlength="5000"
@@ -58,19 +60,25 @@ export class NeededProjectDocsBlock2025Component {
 
     readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    readonly _form = input<{
-    neededProjectDocs: boolean;
-    neededProjectDocsText: string;
-}>(undefined);
+    readonly _form = input<NeededProjectDocsBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<NeededProjectDocsBlock2025Form>>();
+
+    emitPatch(patch: Partial<NeededProjectDocsBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean){
-        if(flag){
-            this._form().neededProjectDocs = true;
-        } else {
-            this._form().neededProjectDocs = false;
-        }
+        this.emitPatch({ neededProjectDocs: flag });
     }
 
 }
+
+type NeededProjectDocsBlock2025Form = {
+    neededProjectDocs: boolean;
+    neededProjectDocsText: string;
+};

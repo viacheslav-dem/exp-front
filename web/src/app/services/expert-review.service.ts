@@ -4,7 +4,8 @@ import {ExpertReviewTermsMessages} from "@app/pipes/review-state.pipe";
 import {ExpertReviewDto} from "@app/dto/ExpertReviewDto";
 import {HasStateService} from "@app/services/has-state.service";
 import {AuthService} from "@app/services/auth.service";
-import {Observable} from "rxjs";
+import {Observable, of} from "rxjs";
+import {catchError} from "rxjs/operators";
 import {ExpertReviewPlainDto} from "@app/dto/ExpertReviewPlainDto";
 import {HttpClientSecure} from "@app/services/http.client";
 import {IdDto} from "@app/dto/IdDto";
@@ -78,7 +79,17 @@ export class ExpertReviewService extends HasStateService implements DraftService
     }
 
     getDraft(review: IdDto): Observable<any> {
-        return this._http.getBlock(`${this.url}/get-draft/${review.id}`);
+        // Используем неблокирующий запрос для загрузки черновика, чтобы не блокировать UI
+        // Если черновика нет (404), это нормально - продолжаем с пустой формой
+        return this._http.get(`${this.url}/get-draft/${review.id}`).pipe(
+            catchError(err => {
+                if (err?.status === 404) {
+                    return of(null);
+                }
+                console.warn('Error loading draft:', err);
+                return of(null);
+            })
+        );
     }
 
     getExpertPayInfo(expertId: number, page: PageRequest): Observable<Page<ExpertPayInfoDto>> {

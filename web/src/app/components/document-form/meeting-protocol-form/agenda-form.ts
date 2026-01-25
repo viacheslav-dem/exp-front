@@ -1,13 +1,13 @@
+import {Directive, viewChild, viewChildren} from "@angular/core";
 import {DocumentForm} from "app/components/document-form/document-form";
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {AgendaOldFormContent} from "@app/components/document-form/meeting-protocol-form/AgendaOldFormContent";
 import {isEmptyOrNull} from "@app/support/utils";
-import {Injectable, viewChildren, viewChild} from "@angular/core";
 import {MeetingProtocolFormComponent} from "@app/components/document-form/meeting-protocol-form/meeting-protocol-form.component";
 import {VoteResultsComponent} from "@app/components/document-form/vote-results/vote-results.component";
 import {VoteResults} from "@app/components/document-form/meeting-protocol-form/VoteResults";
 
-@Injectable()
+@Directive()
 export abstract class AgendaForm extends DocumentForm<AgendaOldFormContent> {
 
   ind: number;
@@ -66,7 +66,8 @@ export abstract class AgendaForm extends DocumentForm<AgendaOldFormContent> {
       }
     }
     super.validate();
-    if (this.getVoted() > this.parent._form.participants.length) {
+    const participantsCount = this.parent?.formValue?.()?.participants?.length ?? 0;
+    if (this.getVoted() > participantsCount) {
       throw 'Количество проголосовавших превышает число участников заседания.';
     }
     if (this.isRescheduledForm && !this.isRescheduled()) {

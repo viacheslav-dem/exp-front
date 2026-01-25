@@ -8,16 +8,23 @@ import {Component, input, output} from "@angular/core";
         {{num()}}. Сальдо потока денежных средств в свободно-конвертируемой валюте
         от текущей (операционной) деятельности, евро:
       </label>
-      <input [(ngModel)]="_form().balance" min="0" numberInput type="text" class="form-control"
+      <input
+        [ngModel]="_form()?.balance"
+        (ngModelChange)="emitPatch({ balance: $event })"
+        min="0"
+        numberInput
+        type="text"
+        class="form-control"
         title="Сальдо потока денежных средств"
         placeholder="сумма в евро"
         name="balance"
         required
-        (ngModelChange)="onConditionsChanged.emit(true)">
+      >
         @if (full()) {
           <textarea
-            [(ngModel)]="_form().balanceText"
-            [attr.name]="'balanceText_' + num().split('.').join('_')"
+            [ngModel]="_form()?.balanceText"
+            (ngModelChange)="emitPatch({ balanceText: $event })"
+            [name]="'balanceText_' + num().split('.').join('_')"
             required
             minlength="30"
             maxlength="5000"
@@ -48,10 +55,20 @@ export class BalanceBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    balance: number;
-    balanceText: string;
-}>(undefined);
+    readonly _form = input<BalanceBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<BalanceBlock2025Form>>();
+
+    emitPatch(patch: Partial<BalanceBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type BalanceBlock2025Form = {
+    balance: number;
+    balanceText: string;
+};

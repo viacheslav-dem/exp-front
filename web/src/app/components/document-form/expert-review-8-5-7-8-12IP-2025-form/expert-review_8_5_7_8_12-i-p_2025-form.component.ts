@@ -22,35 +22,36 @@ export class ExpertReview_8_5_7_8_12IP_2025FormComponent extends ExpertReviewFor
     super.validate();
     this.validationConclusionAnalysisAndEvaluation();
     // Бизнес-валидация: проверка суммы финансирования
-    if (this._form.financeSuggestion < 0) {
+    if (this.formValue().financeSuggestion < 0) {
       throw 'Предложенная сумма финансирования не может быть меньше нуля.'
     }
   }
 
   private validationConclusionAnalysisAndEvaluation() {
-    if (isEmptyOrNull(this._form.novelty)) {
+    const f = this.formValue();
+    if (isEmptyOrNull(f.novelty)) {
       throw "В пункте 'Новизна (инновационность) объекта государственной экспертизы.' не выстановленно заключение."
     }
-    if (isEmptyOrNull(this._form.economicSignificance)) {
+    if (isEmptyOrNull(f.economicSignificance)) {
       throw "В пункте 'Экономическая и (или) социальная значимость объекта государственной экспертизы.' не выстановленно заключение.";
     }
-    if (isEmptyOrNull(this._form.section.code)) {
+    if (isEmptyOrNull(f.section?.code)) {
       throw "В пункте 'Секция и подсекция основного вида экономической деятельности, " +
       "которому соответствует планируемый к реализации инновационный проект.' не выстановленно заключение.";
     }
-    if (isEmptyOrNull(this._form.resourcesSufficiency)) {
+    if (isEmptyOrNull(f.resourcesSufficiency)) {
       throw "В пункте 'Достаточность материально-технической базы и кадрового потенциала исполнителя работ.' не выстановленно заключение.";
     }
-    if (isEmptyOrNull(this._form.competenceSufficiency)) {
+    if (isEmptyOrNull(f.competenceSufficiency)) {
       throw "В пункте 'Достаточность компетенции кадрового состава потенциального исполнителя работ' не выстановленно заключение.";
     }
-    if (isEmptyOrNull(this._form.marketingResearch)) {
+    if (isEmptyOrNull(f.marketingResearch)) {
       throw "В пункте 'Проведение маркетинговых и патентных исследований, их результаты.' не выстановленно заключение.";
     }
-    if (isEmptyOrNull(this._form.risks)) {
+    if (isEmptyOrNull(f.risks)) {
       throw "В пункте 'Риски реализации проекта.' не выстановленно заключение.";
     }
-    if (isEmptyOrNull(this._form.privacyObjectsDescription)) {
+    if (isEmptyOrNull(f.privacyObjectsDescription)) {
       throw "В пункте 'Создание объекта права промышленной собственности при реализации объекта государственной экспертизы.' не выстановленно заключение."
     }
   }
@@ -60,26 +61,30 @@ export class ExpertReview_8_5_7_8_12IP_2025FormComponent extends ExpertReviewFor
   }
 
   isFinanceConclusionDisabled() {
-    return !anyMatch(this._form.novelty, 'новый для Республики Беларусь', 'новый для стран СНГ', 'новизна мирового уровня')
-        || !anyMatch(this._form.economicSignificance, 'средняя', 'высокая');
+    const f = this.formValue();
+    return !anyMatch(f.novelty, 'новый для Республики Беларусь', 'новый для стран СНГ', 'новизна мирового уровня')
+        || !anyMatch(f.economicSignificance, 'средняя', 'высокая');
   }
 
   isConclusionDisabled() {
-    return !this._form.financeConclusion;
+    return !this.formValue().financeConclusion;
   }
 
   onConditionsChanged() {
     if (this.isFinanceConclusionDisabled()) {
-      this._form.financeConclusion = false;
+      this.patchForm({ financeConclusion: false });
     }
     if (this.isConclusionDisabled()) {
-      this._form.conclusion = false;
+      this.patchForm({ conclusion: false });
     }
   }
 
-  setForm(form: ExpertReview_8_5_7_8_12IP_2025FormContent) {
+  override setForm(form: ExpertReview_8_5_7_8_12IP_2025FormContent) {
     super.setForm(form);
-    this._form.termsSuggestion = this._form.termsSuggestion || new PeriodDto();
-    this._form.scientificLevelItems = this._form.scientificLevelItems || [];
+    this.updateForm(f => ({
+      ...f,
+      termsSuggestion: f.termsSuggestion || new PeriodDto(),
+      scientificLevelItems: f.scientificLevelItems || [],
+    }));
   }
 }

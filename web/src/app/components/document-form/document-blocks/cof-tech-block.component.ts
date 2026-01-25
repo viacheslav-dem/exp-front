@@ -8,7 +8,7 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Значение коэффициента технологичности товара (работы, услуги), рассчитанного по формуле, указанной в пункте 5 Инструкции):
       </label>
       @if (full()) {
-        <textarea [(ngModel)]="_form().cofTech" name="cofTech" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.cofTech" (ngModelChange)="emitPatch({ cofTech: $event })" name="cofTech" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>
@@ -21,9 +21,17 @@ export class CofTechBlockComponent {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    cofTech: string;
-}>(undefined);
+    readonly _form = input<CofTechBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<CofTechBlockForm>>();
+
+    emitPatch(patch: Partial<CofTechBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type CofTechBlockForm = {
+  cofTech: string;
+};

@@ -1,4 +1,4 @@
-import {Component, ElementRef, input, ChangeDetectionStrategy, ChangeDetectorRef, ComponentFactoryResolver, effect} from "@angular/core";
+import {Component, ElementRef, input, ChangeDetectionStrategy, ChangeDetectorRef, effect} from "@angular/core";
 import {DocumentFormContainerComponent} from "@app/components/document-form/document-form-container/document-form-container.component";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ExpertReviewFormContent} from "@app/components/document-form/form-model/ExpertReviewFormContent";
@@ -37,13 +37,12 @@ import {environment} from "../../../../environments/environment";
 export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormContent> extends DocumentFormContainerComponent<Form> {
   
   constructor(
-    resolver: ComponentFactoryResolver,
     cdr: ChangeDetectorRef,
     private readonly hostRef: ElementRef<HTMLElement>,
     private readonly toasty: GlobalToastyService,
     private readonly validationScrollService: FormValidationScrollService
   ) {
-    super(resolver, cdr);
+    super(cdr);
   }
 
   _project: ProjectDto;
@@ -61,12 +60,11 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
     if (!project) return;
     this._project = project;
     this.update();
-    // OnPush: _project изменился - обновляем шаблон
-    this.cdr.markForCheck();
+    // При использовании signals effect автоматически триггерит change detection,
+    // markForCheck() не нужен и может вызывать бесконечные циклы
   });
 
-  updateFormComponent(formRenderer) {
-    super.updateFormComponent(formRenderer);
+  protected override beforeFormMarkForCheck(): void {
     this.update();
   }
 
@@ -75,6 +73,38 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
       (this.formComponent as ExpertReviewForm<Form>).parent = this;
       (this.formComponent as ExpertReviewForm<Form>).project = this._project;
     }
+  }
+
+  onHoursChange(value: number | null) {
+    const h = value != null ? (typeof value === 'number' ? value : Number(value)) : undefined;
+    this.setField('hours', (h != null && !isNaN(h) ? h : undefined) as any);
+    this.syncContainerFieldsToFormComponent();
+  }
+
+  override patchForm(patch: Partial<Form>) {
+    super.patchForm(patch);
+    this.syncContainerFieldsToFormComponent();
+  }
+
+  private syncContainerFieldsToFormComponent() {
+    if (!this.formComponent) return;
+    const c = this.formValue();
+    if (!c) return;
+    const base = this.formComponent.getForm();
+    let h: number | undefined = c.hours != null ? (typeof c.hours === 'string' ? Number(c.hours) : c.hours) : undefined;
+    if (h != null && isNaN(h)) h = undefined;
+    this.formComponent.setForm({ ...base, hours: h, date: c.date } as Form);
+  }
+
+  override getForm(): Form {
+    const form = super.getForm();
+    const c = this.formValue();
+    if (c) {
+      form.date = c.date;
+      const h = c.hours != null ? (typeof c.hours === 'string' ? Number(c.hours) : c.hours) : undefined;
+      form.hours = h != null && !isNaN(h) ? h : undefined;
+    }
+    return form;
   }
 
   validate() {

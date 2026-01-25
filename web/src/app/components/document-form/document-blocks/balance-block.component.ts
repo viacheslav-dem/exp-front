@@ -8,16 +8,17 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Сальдо потока денежных средств в свободно-конвертируемой валюте
         от текущей (операционной) деятельности, евро:
       </label>
-      <input [(ngModel)]="_form().balance"
+      <input [ngModel]="_form()?.balance"
         [attr.name]="'balance_' + num().split('.').join('_')"
         required
         min="0" numberInput type="text" class="form-control"
         title="Сальдо потока денежных средств"
         placeholder="сумма в евро"
-        (ngModelChange)="onConditionsChanged.emit(true)">
+        (ngModelChange)="emitPatch({ balance: $event })">
         @if (full()) {
           <textarea
-            [(ngModel)]="_form().balanceText"
+            [ngModel]="_form()?.balanceText"
+            (ngModelChange)="emitPatch({ balanceText: $event })"
             [attr.name]="'balanceText_' + num().split('.').join('_')"
             required
             minlength="30"
@@ -49,10 +50,18 @@ export class BalanceBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    balance: number;
-    balanceText: string;
-}>(undefined);
+  readonly _form = input<BalanceBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<BalanceBlockForm>>();
+
+  emitPatch(patch: Partial<BalanceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type BalanceBlockForm = {
+  balance: number;
+  balanceText: string;
+};

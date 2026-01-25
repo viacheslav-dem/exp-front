@@ -9,15 +9,16 @@ import {Component, input, output} from '@angular/core';
         (отнесение товаров (работ, услуг) к высокотехнологичным возможно,
         если в подпункте 5.6 пункта 5 настоящего заключения значение коэффициента технологичности товара (работы, услуги) получено на уровне не менее 50 баллов).
       </label>
+      <input type="hidden" [ngModel]="_form()?.highTech" name="highTech" required>
       <app-boolean-button
         name="highTech"
         required
-        [(ngModel)]="_form().highTech"
+        [ngModel]="_form()?.highTech"
         [trueLabel]="'возможно'"
         [falseLabel]="'невозможно'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ highTech: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().highTechText" name="highTechText" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.highTechText" (ngModelChange)="emitPatch({ highTechText: $event })" name="highTechText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>
@@ -30,10 +31,18 @@ export class HighTechBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    highTech: boolean;
-    highTechText: string;
-}>(undefined);
+  readonly _form = input<HighTechBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<HighTechBlockForm>>();
+
+  emitPatch(patch: Partial<HighTechBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type HighTechBlockForm = {
+  highTech: boolean;
+  highTechText: string;
+};

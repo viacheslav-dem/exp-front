@@ -9,12 +9,18 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <label>
         {{num()}}. Риски реализации проекта:
       </label>
-      <app-dropdown name="risks" required [options]="risksOptions" [(ngModel)]="_form().risks"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown
+        name="risks"
+        required
+        [options]="risksOptions"
+        [ngModel]="_form()?.risks"
+        (ngModelChange)="emitPatch({ risks: $event })"
+      ></app-dropdown>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().risksText"
-          [attr.name]="'risksText_' + num().split('.').join('_')"
+          [ngModel]="_form()?.risksText"
+          (ngModelChange)="emitPatch({ risksText: $event })"
+          [name]="'risksText_' + num().split('.').join('_')"
           required
           minlength="30"
           maxlength="5000"
@@ -27,8 +33,8 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         <div class="hint">
           <div>
             <b>Подсказка.</b>
-            @if (_project().code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025'
-              || _project().code.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
+            @if (_project()?.code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025'
+              || _project()?.code.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
               <div>
                 Эксперт должен провести анализ способов и методов оценки результативности и эффективности реализации объекта
                 государственной экспертизы рисков, сопутствующих объекту государственной экспертизы с обязательным указанием ссылок
@@ -38,7 +44,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
                 эксперт должен указать в данном пункте заключения фразу: «Не представлено в материалах по объекту государственной экспертизы».
               </div>
             }
-            @if (_project().code.expertReviewType == 'EXPERT_REVIEW_8_5_7_8_12IP_2025') {
+            @if (_project()?.code.expertReviewType == 'EXPERT_REVIEW_8_5_7_8_12IP_2025') {
               <div>
                 <p>
                   Оцениваются:
@@ -78,10 +84,20 @@ export class RisksBlock2025Component {
 
     readonly _project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    readonly _form = input<{
-    risks: string;
-    risksText: string;
-}>(undefined);
+    readonly _form = input<RisksBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<RisksBlock2025Form>>();
+
+    emitPatch(patch: Partial<RisksBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type RisksBlock2025Form = {
+    risks: string;
+    risksText: string;
+};

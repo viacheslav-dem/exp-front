@@ -22,13 +22,13 @@ export class ExpertReview_8_10PVT_NewFormComponent extends ExpertReviewForm<Expe
 
   highTechCriteria: HighTechCriteria;
   
-  // Signal для отслеживания изменений формы и критериев
-  private readonly _formSignal = signal<any>(null);
+  // Локальный кэш формы для computed (не конфликтует с базовым _formSignal)
+  private readonly _localFormCache = signal<any>(null);
   private readonly _highTechCriteriaSignal = signal<HighTechCriteria | null>(null);
 
   // Computed signal для вычисляемого значения
   readonly conclusion = computed(() => {
-    const form = this._formSignal();
+    const form = this._localFormCache();
     const highTechCriteria = this._highTechCriteriaSignal();
     if (!form?.highTech || !highTechCriteria) {
       return "";
@@ -46,7 +46,7 @@ export class ExpertReview_8_10PVT_NewFormComponent extends ExpertReviewForm<Expe
   }
   
   private updateFormSignal() {
-    this._formSignal.set({ ...this._form });
+    this._localFormCache.set({ ...this.formValue() });
   }
 
   ngOnInit() {
@@ -59,9 +59,11 @@ export class ExpertReview_8_10PVT_NewFormComponent extends ExpertReviewForm<Expe
     });
   }
 
+  onConditionsChanged() {
+    this.markFormChanged();
+  }
+
   validate() {
-    // Инкрементальная миграция: обязательность/мин.длина выражаются через template-driven validators (required/minlength),
-    // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
   }
 
@@ -89,12 +91,16 @@ export class ExpertReview_8_10PVT_NewFormComponent extends ExpertReviewForm<Expe
   }
 
   initDefaultForm() {
-    if ((this._form.isDefault || !this._form.highTech) && this.highTechCriteria) {
-      this._form.highTech = this.highTechCriteria.highTech.items[0];
-      this._form.exportOrientation = this.highTechCriteria.exportOrientation.items[0];
-      this._form.science = this.highTechCriteria.science.items[0];
-      this._form.addedValue = this.highTechCriteria.addedValue.items[0];
-      this._form.isTitleProtection = this.highTechCriteria.isTitleProtection.items[0];
+    const form = this.formValue();
+    if ((form.isDefault || !form.highTech) && this.highTechCriteria) {
+      const c = this.highTechCriteria;
+      this.patchForm({
+        highTech: c.highTech.items[0],
+        exportOrientation: c.exportOrientation.items[0],
+        science: c.science.items[0],
+        addedValue: c.addedValue.items[0],
+        isTitleProtection: c.isTitleProtection.items[0],
+      });
     }
     this.updateFormSignal();
   }
@@ -103,20 +109,17 @@ export class ExpertReview_8_10PVT_NewFormComponent extends ExpertReviewForm<Expe
     return new ExpertReview_8_10PVT_NewFormContent();
   }
 
-  getForm() {
-    let form = super.getForm();
+  override getForm() {
+    const form = super.getForm();
     if (this.highTechCriteria) {
       form.maxScore = this.highTechCriteria.maxScore;
     }
     return form;
   }
 
-  setForm(form: any) {
+  override setForm(form: any) {
     super.setForm(form);
     this.initDefaultForm();
     this.updateFormSignal();
-  }
-
-  onConditionsChanged() {
   }
 }

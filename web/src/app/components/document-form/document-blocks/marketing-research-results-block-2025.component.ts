@@ -1,4 +1,4 @@
-import {Component, input} from "@angular/core";
+import {Component, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-marketing-research-results-block-2025',
@@ -8,8 +8,9 @@ import {Component, input} from "@angular/core";
         {{num()}}. Сведения о проведении маркетинговых и патентных исследований и их результаты.
       </label>
       <textarea
-        [(ngModel)]="_form().marketingResearchText"
-        [attr.name]="'marketingResearchResultsText_' + num().split('.').join('_')"
+        [ngModel]="_form()?.marketingResearchText"
+        (ngModelChange)="emitPatch({ marketingResearchText: $event })"
+        [name]="'marketingResearchResultsText_' + num().split('.').join('_')"
         required
         minlength="30"
         maxlength="5000"
@@ -45,7 +46,19 @@ export class MarketingResearchResultsBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    marketingResearchText: string;
-}>(undefined);
+    readonly _form = input<MarketingResearchResultsBlock2025Form>(undefined);
+
+    readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<MarketingResearchResultsBlock2025Form>>();
+
+    emitPatch(patch: Partial<MarketingResearchResultsBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type MarketingResearchResultsBlock2025Form = {
+    marketingResearchText: string;
+};

@@ -29,7 +29,7 @@ import {Component, OnInit, input, output} from "@angular/core";
           акт ведомственной экспертизы.
         </li>
       </ul>
-      <input type="hidden" [(ngModel)]="_form().availabilityDoc" name="availabilityDoc" required>
+      <input type="hidden" [ngModel]="_form().availabilityDoc" name="availabilityDoc" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().availabilityDoc === true}" (click)="stateButton(true)">
           Имеются
@@ -39,8 +39,17 @@ import {Component, OnInit, input, output} from "@angular/core";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().availabilityDocText" name="availabilityDocText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
+        <textarea
+          [ngModel]="_form().availabilityDocText"
+          (ngModelChange)="emitPatch({ availabilityDocText: $event })"
+          name="availabilityDocText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)"
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">
@@ -61,24 +70,30 @@ export class AvailabilityOfDocumentsBlock2025Component implements OnInit{
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    availabilityDoc: boolean;
-    availabilityDocSuggestion: string;
-    availabilityDocText: string;
-}>(undefined);
+    readonly _form = input<AvailabilityOfDocumentsBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<AvailabilityOfDocumentsBlock2025Form>>();
 
+    emitPatch(patch: Partial<AvailabilityOfDocumentsBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean) {
-        if(flag){
-            this._form().availabilityDoc = true;
-        } else{
-            this._form().availabilityDoc = false;
-        }
+        this.emitPatch({ availabilityDoc: flag });
     }
 
     ngOnInit(): void {
-        this.stateButton(false);
+        // Инициализация через emitPatch вместо прямой мутации
+        this.emitPatch({ availabilityDoc: false });
     }
 }
+
+type AvailabilityOfDocumentsBlock2025Form = {
+    availabilityDoc: boolean;
+    availabilityDocSuggestion: string;
+    availabilityDocText: string;
+};

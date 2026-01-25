@@ -2,29 +2,32 @@
 
 <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
-<app-product-name-block [_form]="_form"></app-product-name-block>
+<app-product-name-block [_form]="formValue()" (formPatch)="patchForm($event)"></app-product-name-block>
 
 <hr/>
 
 <app-high-tech-accordance-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'1'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-high-tech-accordance-block>
 
 <hr/>
 
 <app-science-block
-        [_form]="_form"
+        [_form]="formValue()"
         [num]="'2'"
+        (formPatch)="patchForm($event)"
         (onConditionsChanged)="onConditionsChanged()"
 ></app-science-block>
 
 <hr/>
 
 <app-export-orientation-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'3'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-export-orientation-block>
 
@@ -32,38 +35,44 @@
 
 
 <app-added-value-accordance-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'4'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-added-value-accordance-block>
 
 <hr/>
 
 <app-title-protection-block
-        [_form]="_form"
+        [_form]="formValue()"
         [num]="'5'"
+        (formPatch)="patchForm($event)"
         (onConditionsChanged)="onConditionsChanged()">
 </app-title-protection-block>
 
 <hr/>
 
-<app-cof-tech-block [_form]="_form"
+<app-cof-tech-block [_form]="formValue()"
 [num]="'6'"
+(formPatch)="patchForm($event)"
 (onConditionsChanged)="onConditionsChanged()">
 </app-cof-tech-block>
 
 <hr/>
 
-<app-high-tech-block [_form]="_form"
+<app-high-tech-block [_form]="formValue()"
                      [num]="'7'"
+                     (formPatch)="patchForm($event)"
                      (onConditionsChanged)="onConditionsChanged()">
 </app-high-tech-block>
 
 <hr/>
 
 <app-conclusion-council-hightech-block
-  [form]="_form"
+  [form]="formValue()"
   [financeConclusionNum]="'7'"
   [project]="project"
   [group]="group"
+  (formPatch)="patchForm($event)"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-conclusion-council-hightech-block>

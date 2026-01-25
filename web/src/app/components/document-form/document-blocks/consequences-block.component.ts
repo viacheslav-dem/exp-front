@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-consequences-block',
@@ -9,7 +9,8 @@ import {Component, input} from '@angular/core';
         и необходимости модернизации (реконструкции) взаимосвязанных действующих производственных объектов.
       </label>
       <textarea
-        [(ngModel)]="_form().consequences"
+        [ngModel]="_form()?.consequences"
+        (ngModelChange)="emitPatch({ consequences: $event })"
         [attr.name]="'consequences_' + num().split('.').join('_')"
         required
         [attr.minlength]="minLen()"
@@ -65,7 +66,17 @@ export class ConsequencesBlockComponent {
    */
   readonly minLen = input<number | null>(null);
 
-  readonly _form = input<{
-    consequences: string;
-}>(undefined);
+  readonly _form = input<ConsequencesBlockForm>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ConsequencesBlockForm>>();
+
+  emitPatch(patch: Partial<ConsequencesBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ConsequencesBlockForm = {
+  consequences: string;
+};

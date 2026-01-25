@@ -9,21 +9,23 @@ import {AgendaForm} from "@app/components/document-form/meeting-protocol-form/ag
 export class Agenda_8_6_FormComponent extends AgendaForm {
 
   isAccepted(): boolean {
-    return this._form.accordance.isAccepted() && this._form.effectAccordance.isAccepted();
+    const f = this.formValue();
+    return (f.accordance?.isAccepted() && f.effectAccordance?.isAccepted()) ?? false;
   }
 
   getVoted(): number {
-    return this._form.accordance.getVoted();
+    return this.formValue().accordance?.getVoted() ?? 0;
   }
 
   validate() {
     super.validate();
-    let voted = this.getVoted();
-    this._form.accordance.validate(voted);
-    this._form.effectAccordance.validate(voted);
+    const voted = this.getVoted();
+    const f = this.formValue();
+    f.accordance?.validate(voted);
+    f.effectAccordance?.validate(voted);
   }
 
   isRescheduled(): boolean {
-    return this._form.rescheduled.isAccepted();
+    return this.formValue().rescheduled?.isAccepted() ?? false;
   }
 }

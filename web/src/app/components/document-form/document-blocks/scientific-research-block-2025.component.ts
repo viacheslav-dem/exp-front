@@ -10,16 +10,35 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         {{num()}}. Вид научного исследования:
       </label>
       @if (showTarget8_3() || showTarget8_4()) {
-        <app-dropdown name="scientificResearch" required [options]="scientificResearchOptions2" [(ngModel)]="_form().scientificResearch"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+        <app-dropdown
+          name="scientificResearch"
+          required
+          [options]="scientificResearchOptions2"
+          [ngModel]="_form().scientificResearch"
+          (ngModelChange)="emitPatch({ scientificResearch: $event })"
+        ></app-dropdown>
       }
       @if (!(showTarget8_3() || showTarget8_4())) {
-        <app-dropdown name="scientificResearch" required [options]="scientificResearchOptions" [(ngModel)]="_form().scientificResearch"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+        <app-dropdown
+          name="scientificResearch"
+          required
+          [options]="scientificResearchOptions"
+          [ngModel]="_form().scientificResearch"
+          (ngModelChange)="emitPatch({ scientificResearch: $event })"
+        ></app-dropdown>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form().scientificResearchText" name="scientificResearchText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
+        <textarea
+          [ngModel]="_form().scientificResearchText"
+          (ngModelChange)="emitPatch({ scientificResearchText: $event })"
+          name="scientificResearchText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">
@@ -36,7 +55,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
             стандартизации Республики Беларусь от 28 октября 2011 г. № 78, в том числе перечню результатов фундаментальных
             и прикладных исследований согласно приложению Л к СТБ 1080-2011.
           </p>
-          @if (project().code.code == '8.4') {
+          @if (project()?.code?.code == '8.4') {
             <p>
               Для объектов государственной экспертизы, указанных в подпункте 8.4 пункта 8 Положения, дополнительно оценивается
               принципиальная новизна новшеств, разработка которых планируется к выполнению в рамках проекта, их научно-технический
@@ -60,24 +79,36 @@ export class ScientificResearchBlock2025Component {
 
     readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    readonly _form = input<{
-    scientificResearch: string;
-    scientificResearchText: string;
-}>(undefined);
+    readonly _form = input<ScientificResearchBlock2025Form>(undefined);
 
     readonly isTextRequired = input<boolean>(false);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<ScientificResearchBlock2025Form>>();
+
+    emitPatch(patch: Partial<ScientificResearchBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     showTarget8_3() {
-        return this.project().code.code.startsWith('8.3');
+        const code = this.project()?.code?.code;
+        return !!code && code.startsWith('8.3');
     }
 
     showTarget8_4() {
-        return this.project().code.code.startsWith('8.4');
+        const code = this.project()?.code?.code;
+        return !!code && code.startsWith('8.4');
     }
 
 }
+
+type ScientificResearchBlock2025Form = {
+    scientificResearch: string;
+    scientificResearchText: string;
+};
 
 export const scientificResearchOptions: string[] = [
     'фундаментальное',

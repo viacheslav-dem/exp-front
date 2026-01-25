@@ -12,24 +12,25 @@ export class Agenda_8_15_FormComponent extends AgendaForm {
   Catalog = Catalog;
 
   isAccepted(): boolean {
-    return this._form.registration.isAccepted();
+    return this.formValue().registration?.isAccepted() ?? false;
   }
 
   getVoted(): number {
-    return this._form.registration.getVoted();
+    return this.formValue().registration?.getVoted() ?? 0;
   }
 
   isRescheduled(): boolean {
-    return this._form.rescheduled.isAccepted();
+    return this.formValue().rescheduled?.isAccepted() ?? false;
   }
 
   validate() {
     super.validate();
-    let voted = this.getVoted();
-    this._form.registration.validate(voted);
-    this._form.privacy.validate(voted);
+    const voted = this.getVoted();
+    const f = this.formValue();
+    f.registration?.validate(voted);
+    f.privacy?.validate(voted);
     if (this.isAccepted()) {
-      this._form.stagesVotes.validate(voted);
+      f.stagesVotes?.validate(voted);
     }
   }
 }

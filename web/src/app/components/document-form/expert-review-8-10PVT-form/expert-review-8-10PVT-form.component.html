@@ -7,15 +7,15 @@
       <div class="dropdown">
         <!-- attention! pre-line class is used here: don't break the text -->
         <button type="button" class="btn btn-block btn-outline-info dropdown-toggle pre-line"
-          data-bs-toggle="dropdown">{{_form.highTech.name}} <span
-        class="bold">({{_form.highTech.score | number: 3}} баллов)</span></button>
+          data-bs-toggle="dropdown">{{formValue().highTech?.name}} <span
+        class="bold">({{formValue().highTech?.score | number: 3}} баллов)</span></button>
         <ul class="dropdown-menu">
           <!-- attention! pre-line class is used here: don't break the text -->
           <li class="dropdown-item pre-line"
-            (click)="_form.highTech = highTechCriteria.highTech.items[0]; updateFormSignal()">{{highTechCriteria.highTech.items[0].name}}<span
+            (click)="patchForm({ highTech: highTechCriteria.highTech.items[0] }); updateFormSignal()">{{highTechCriteria.highTech.items[0].name}}<span
           class="bold">({{highTechCriteria.highTech.items[0].score | number: 3}} баллов)</span></li>
           <li class="dropdown-divider"></li>
-          <li class="dropdown-item" (click)="_form.highTech = highTechCriteria.highTech.items[1]; updateFormSignal()">
+          <li class="dropdown-item" (click)="patchForm({ highTech: highTechCriteria.highTech.items[1] }); updateFormSignal()">
             {{highTechCriteria.highTech.items[1].name}}
             <span class="bold">({{highTechCriteria.highTech.items[1].score | number: 3}} баллов)</span>
           </li>
@@ -27,12 +27,12 @@
       <div class="label">{{highTechCriteria.exportOrientation.description}}</div>
       <div class="dropdown">
         <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-bs-toggle="dropdown">
-          {{_form.exportOrientation.name}} <span class="bold">({{_form.exportOrientation.score | number: 3}} баллов)</span>
+          {{formValue().exportOrientation?.name}} <span class="bold">({{formValue().exportOrientation?.score | number: 3}} баллов)</span>
         </button>
         <ul class="dropdown-menu scrollable-menu">
           @for (item of highTechCriteria.exportOrientation.items; track item) {
             <li class="dropdown-item"
-              (click)="_form.exportOrientation = item; updateFormSignal()">
+              (click)="patchForm({ exportOrientation: item }); updateFormSignal()">
               {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
             </li>
           }
@@ -44,12 +44,12 @@
       <div class="label">{{highTechCriteria.science.description}}</div>
       <div class="dropdown">
         <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-bs-toggle="dropdown">
-          {{_form.science.name}} <span class="bold">({{_form.science.score | number: 3}} баллов)</span>
+          {{formValue().science?.name}} <span class="bold">({{formValue().science?.score | number: 3}} баллов)</span>
         </button>
         <ul class="dropdown-menu scrollable-menu">
           @for (item of highTechCriteria.science.items; track item) {
             <li class="dropdown-item"
-              (click)="_form.science = item; updateFormSignal()">
+              (click)="patchForm({ science: item }); updateFormSignal()">
               {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
             </li>
           }
@@ -61,12 +61,12 @@
       <div class="label">{{highTechCriteria.addedValue.description}}</div>
       <div class="dropdown">
         <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-bs-toggle="dropdown">
-          {{_form.addedValue.name}} <span class="bold">({{_form.addedValue.score | number: 3}} баллов)</span>
+          {{formValue().addedValue?.name}} <span class="bold">({{formValue().addedValue?.score | number: 3}} баллов)</span>
         </button>
         <ul class="dropdown-menu scrollable-menu">
           @for (item of highTechCriteria.addedValue.items; track item) {
             <li class="dropdown-item"
-              (click)="_form.addedValue = item; updateFormSignal()">
+              (click)="patchForm({ addedValue: item }); updateFormSignal()">
               {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
             </li>
           }
@@ -78,13 +78,13 @@
       <div class="label">{{highTechCriteria.isTitleProtection.description}}</div>
       <div class="dropdown">
         <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-bs-toggle="dropdown">
-          {{_form.intellectualProperty.name}}
-          <span class="bold">({{_form.intellectualProperty.score | number: 3}} баллов)</span>
+          {{formValue().intellectualProperty?.name}}
+          <span class="bold">({{formValue().intellectualProperty?.score | number: 3}} баллов)</span>
         </button>
         <ul class="dropdown-menu scrollable-menu">
           @for (item of highTechCriteria.isTitleProtection.items; track item) {
             <li class="dropdown-item"
-              (click)="_form.intellectualProperty = item; updateFormSignal()">
+              (click)="patchForm({ intellectualProperty: item }); updateFormSignal()">
               {{item.name}} <span class="bold">({{item.score | number: 3}} баллов)</span>
             </li>
           }
@@ -100,12 +100,12 @@
         <div class="input-group btn-group mb-2">
           <app-select-catalog
             [catalog]="Catalog.INDUSTRIAL_PROPERTY"
-            [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+            [(ngModel)]="privacyObjects[i]" (ngModelChange)="markFormChanged(); updateFormSignal()" [resetEnabled]="false"
           ></app-select-catalog>
-          <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+          <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1); markFormChanged(); updateFormSignal()">&times;</button>
         </div>
       }
-      <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+      <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null); markFormChanged(); updateFormSignal()">
         Добавить объект права
       </button>
     </div>
@@ -136,7 +136,7 @@
         <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
       </div>
     }
-    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
+    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''}); markFormChanged(); updateFormSignal()">
       Добавить замечание
     </button>
   </div>

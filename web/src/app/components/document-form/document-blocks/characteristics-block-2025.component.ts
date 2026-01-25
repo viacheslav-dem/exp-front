@@ -1,4 +1,4 @@
-import {Component, input} from "@angular/core";
+import {Component, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-characteristics-block-2025',
@@ -8,8 +8,17 @@ import {Component, input} from "@angular/core";
         {{num()}}. Функциональные, технические, технологические и другие характеристики создаваемых и приобретаемых программного обеспечения,
         технических средств и (или) комплексов программно-технических средств, а также возможности достижения заданных значений указанных характеристик:
       </label>
-      <textarea [(ngModel)]="_form().characteristics" name="characteristics" required minlength="30" maxlength="5000" rows="3" class="form-control"
-      placeholder="Обязательный текст (не менее 30 символов)."></textarea>
+      <textarea
+        [ngModel]="_form().characteristics"
+        (ngModelChange)="emitPatch({ characteristics: $event })"
+        name="characteristics"
+        required
+        minlength="30"
+        maxlength="5000"
+        rows="3"
+        class="form-control"
+        placeholder="Обязательный текст (не менее 30 символов)."
+      ></textarea>
       @if (full()) {
         <div class="hint">
           <p>
@@ -32,7 +41,19 @@ export class CharacteristicsBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    characteristics: string;
-}>(undefined);
+    readonly _form = input<CharacteristicsBlock2025Form>(undefined);
+
+    readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<CharacteristicsBlock2025Form>>();
+
+    emitPatch(patch: Partial<CharacteristicsBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type CharacteristicsBlock2025Form = {
+    characteristics: string;
+};

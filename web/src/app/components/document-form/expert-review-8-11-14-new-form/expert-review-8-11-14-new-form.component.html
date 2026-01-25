@@ -2,39 +2,43 @@
 
   <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
-  <app-significance-block [_form]="_form"
+  <app-significance-block [_form]="formValue()"
                           [num]="'1'"></app-significance-block>
   <hr/>
-  <app-marketing-research-block [_form]="_form"
+  <app-marketing-research-block [_form]="formValue()"
                                 [num]="'2'"
+                                (formPatch)="patchForm($event)"
                                 (onConditionsChanged)="onConditionsChanged()"></app-marketing-research-block>
   <hr/>
-  <app-effect-block [_form]="_form"
+  <app-effect-block [_form]="formValue()"
                     [num]="'3'"></app-effect-block>
   <hr/>
-  <app-sufficiency-block [_form]="_form"
+  <app-sufficiency-block [_form]="formValue()"
                          [num]="'4'"
+                         (formPatch)="patchForm($event)"
                          (onConditionsChanged)="onConditionsChanged()"></app-sufficiency-block>
   <hr/>
-  <app-users-block [_form]="_form"
+  <app-users-block [_form]="formValue()"
                    [num]="'5'"></app-users-block>
   <hr/>
-  <app-characteristics-block [_form]="_form"
+  <app-characteristics-block [_form]="formValue()"
                    [num]="'6'"></app-characteristics-block>
   <hr/>
-  <app-work-accordance-block [_form]="_form"
+  <app-work-accordance-block [_form]="formValue()"
                              [num]="'7'"
+                             (formPatch)="patchForm($event)"
                              (onConditionsChanged)="onConditionsChanged()"></app-work-accordance-block>
   <hr/>
-  <app-requirements-block [_form]="_form"
+  <app-requirements-block [_form]="formValue()"
                           [num]="'8'"
                           (onConditionsChanged)="onConditionsChanged()"></app-requirements-block>
   <hr/>
-  <app-assessment-block [_form]="_form"
+  <app-assessment-block [_form]="formValue()"
                         [num]="'9'"></app-assessment-block>
   <hr/>
-  <app-privacy-block [_form]="_form"
+  <app-privacy-block [_form]="formValue()"
                      [num]="'10'"
+                     (formPatch)="patchForm($event)"
                      (onConditionsChanged)="onConditionsChanged()"></app-privacy-block>
 </div>
 
@@ -44,14 +48,16 @@
 
   <label class="form-group-label">Реализация и финансирование объекта государственной экспертизы</label>
 
-  <app-conclusion-8-11-14-block [_form]="_form"
+  <app-conclusion-8-11-14-block [_form]="formValue()"
                                 [num]="'1'"
+                                (formPatch)="patchForm($event)"
                                 (onConditionsChanged)="onConditionsChanged()"></app-conclusion-8-11-14-block>
   <hr/>
-  <app-stages-exists-block [_form]="_form"
+  <app-stages-exists-block [_form]="formValue()"
                            [num]="'2'"
+                           (formPatch)="patchForm($event)"
                            (onConditionsChanged)="onConditionsChanged()"></app-stages-exists-block>
 </div>
 
 <hr/>
-<app-notes-block [_form]="_form" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>
+<app-notes-block [_form]="formValue()" (formPatch)="patchForm($event)" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>

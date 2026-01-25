@@ -15,17 +15,18 @@ export class Agenda_8_12IP_FormComponent extends AgendaForm {
   service: boolean;
 
   isAccepted(): boolean {
-    return this._form.novelty.isAccepted() &&
-      (!this.product && (this._form.organization.isAccepted() || this._form.export.isAccepted()) ||
-        this.product && this._form.organization.isAccepted() && this._form.export.isAccepted());
+    const f = this.formValue();
+    return f.novelty?.isAccepted() &&
+      (!this.product && (f.organization?.isAccepted() || f.export?.isAccepted()) ||
+        this.product && f.organization?.isAccepted() && f.export?.isAccepted());
   }
 
   getVoted(): number {
-    return this._form.novelty.getVoted();
+    return this.formValue().novelty?.getVoted() ?? 0;
   }
 
   isRescheduled(): boolean {
-    return this._form.rescheduled.isAccepted();
+    return this.formValue().rescheduled?.isAccepted() ?? false;
   }
 
   validate() {
@@ -33,10 +34,11 @@ export class Agenda_8_12IP_FormComponent extends AgendaForm {
     if (this.product == null && this.service == null) {
       throw 'Пожалуйста, выберите тип конечного результата проекта.'
     }
-    let voted = this.getVoted();
-    this._form.novelty.validate(voted);
-    this._form.organization.validate(voted);
-    this._form.export.validate(voted);
-    this._form.privacy.validate(voted);
+    const voted = this.getVoted();
+    const f = this.formValue();
+    f.novelty?.validate(voted);
+    f.organization?.validate(voted);
+    f.export?.validate(voted);
+    f.privacy?.validate(voted);
   }
 }

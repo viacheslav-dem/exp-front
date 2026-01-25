@@ -11,12 +11,18 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
         {{num()}}. Значимость (экономическая и (или) социальная), которая должна быть достигнута по итогам выполнения работ,
         предусмотренных объектом государственной экспертизы:
       </label>
-      <app-dropdown name="economicSignificance" required [options]="significanceOptions" [(ngModel)]="_form().economicSignificance"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown
+        name="economicSignificance"
+        required
+        [options]="significanceOptions"
+        [ngModel]="_form()?.economicSignificance"
+        (ngModelChange)="emitPatch({ economicSignificance: $event })"
+      ></app-dropdown>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().economicSignificanceText"
-          [attr.name]="'economicSignificanceText_' + num().split('.').join('_')"
+          [ngModel]="_form()?.economicSignificanceText"
+          (ngModelChange)="emitPatch({ economicSignificanceText: $event })"
+          [name]="'economicSignificanceText_' + num().split('.').join('_')"
           required
           minlength="30"
           maxlength="5000"
@@ -32,7 +38,7 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
             Охарактеризуйте значимость объекта экспертизы для развития научных (технических) школ и направлений,
             а также потенциальный экономический эффект.
           </p>
-          @if (ProjectCodePlainDto.isPni(project().code.code)) {
+          @if (ProjectCodePlainDto.isPni(project()?.code?.code)) {
             <p>
               Если доля внебюджетного софинансирования задания меньше предусмотренной условиями участия в программе
               или если отсутствует подтверждение, что доля внебюджетного софинансирования
@@ -57,7 +63,7 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
               </li>
             </ul>
           }
-          @if (ProjectCodePlainDto.isNtp(project().code.code)) {
+          @if (ProjectCodePlainDto.isNtp(project()?.code?.code)) {
             <p>
               Если доля внебюджетного софинансирования задания меньше предусмотренной условиями участия в программе
               или если отсутствует подтверждение, что доля внебюджетного софинансирования
@@ -79,7 +85,7 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
               </li>
             </ul>
           }
-          @if (ProjectCodePlainDto.isIp(project().code.code)) {
+          @if (ProjectCodePlainDto.isIp(project()?.code?.code)) {
             <p>
               При невыполнении хотя бы одного из необходимых условий для участия в ГПИР,
               определенных указом Президента Республики Беларусь от 07.08.2012 № 357, –
@@ -127,15 +133,23 @@ export class EconomicSignificanceBlockComponent {
 
   readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-  readonly _form = input<{
-    economicSignificance: string;
-    economicSignificanceText: string;
-}>(undefined);
+  readonly _form = input<EconomicSignificanceBlockForm>(undefined);
 
   readonly isTextRequired = input<boolean>(false);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<EconomicSignificanceBlockForm>>();
+
+  emitPatch(patch: Partial<EconomicSignificanceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type EconomicSignificanceBlockForm = {
+  economicSignificance: string;
+  economicSignificanceText: string;
+};
 
 export const economicSignificanceOptions: string[] = [
   'низкая',

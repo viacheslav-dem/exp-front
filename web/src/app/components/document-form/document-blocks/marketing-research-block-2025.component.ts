@@ -9,12 +9,18 @@ import {ProjectDto} from "@app/dto/ProjectDto";
           <label>
             {{ num() }}. Проведение маркетинговых и патентных исследований, их результаты:
           </label>
-          <app-dropdown name="marketingResearch" required [options]="marketingResearchOptions" [(ngModel)]="_form().marketingResearch"
-          (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+          <app-dropdown
+            name="marketingResearch"
+            required
+            [options]="marketingResearchOptions"
+            [ngModel]="_form()?.marketingResearch"
+            (ngModelChange)="emitPatch({ marketingResearch: $event })"
+          ></app-dropdown>
           @if (full()) {
             <textarea
-              [(ngModel)]="_form().marketingResearchText"
-              [attr.name]="'marketingResearchText_' + num().split('.').join('_')"
+              [ngModel]="_form()?.marketingResearchText"
+              (ngModelChange)="emitPatch({ marketingResearchText: $event })"
+              [name]="'marketingResearchText_' + num().split('.').join('_')"
               required
               minlength="30"
               maxlength="5000"
@@ -43,7 +49,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
                   </p>
                 </div>
               }
-              @if (this.project().code.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
+              @if (project()?.code.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
                 <div>
                   <p>
                     Для объектов государственной экспертизы, указанных в подпункте 8.4 пункта 8 Положения,
@@ -95,12 +101,22 @@ export class MarketingResearchBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    marketingResearch: string;
-    marketingResearchText: string;
-}>(undefined);
+    readonly _form = input<MarketingResearchBlock2025Form>(undefined);
 
     readonly isExpertReview = input<boolean>(true);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<MarketingResearchBlock2025Form>>();
+
+    emitPatch(patch: Partial<MarketingResearchBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type MarketingResearchBlock2025Form = {
+    marketingResearch: string;
+    marketingResearchText: string;
+};

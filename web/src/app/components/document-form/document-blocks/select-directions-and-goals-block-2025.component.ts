@@ -38,12 +38,12 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
               </app-checkbox>
             </div>
           }
-          <textarea [(ngModel)]="_form.directionsAndGoalsText" name="directionsAndGoalsText" rows="3" class="form-control mt-05"
+          <textarea [(ngModel)]="_form.directionsAndGoalsText" (ngModelChange)="onConditionsChanged.emit(true)" name="directionsAndGoalsText" rows="3" class="form-control mt-05"
           placeholder="Пояснительный текст (при необходимости)."></textarea>
         </div>
       }
       @if (showTarget8_4()) {
-        <textarea [(ngModel)]="_form.multilateralDirectionsText" name="multilateralDirectionsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+        <textarea [(ngModel)]="_form.multilateralDirectionsText" (ngModelChange)="onConditionsChanged.emit(true)" name="multilateralDirectionsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
       @if (showTarget8_4()) {
@@ -63,7 +63,6 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
     standalone: false
 })
 export class SelectDirectionsAndGoalsBlock2025Component {
-
   _project: ProjectPlainDto | ProjectDto;
   _allDirections: IdNameDto[] = [];
   _allGoals: IdNameDto[] = [];

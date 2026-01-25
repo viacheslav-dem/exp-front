@@ -12,12 +12,18 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <label>
         Степень новизны (уровень инновационности) объекта государственной экспертизы:
       </label>
-      <app-dropdown name="novelty" required [options]="noveltyOptions" [(ngModel)]="_form().novelty"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown
+        name="novelty"
+        required
+        [options]="noveltyOptions"
+        [ngModel]="_form()?.novelty"
+        (ngModelChange)="emitPatch({ novelty: $event })"
+      ></app-dropdown>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().noveltyText"
-          [attr.name]="'noveltyText_' + num()"
+          [ngModel]="_form()?.noveltyText"
+          (ngModelChange)="emitPatch({ noveltyText: $event })"
+          [name]="'noveltyText_' + num()"
           required
           minlength="30"
           maxlength="5000"
@@ -56,15 +62,25 @@ export class NoveltyBlock2025Component {
 
     readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    readonly _form = input<{
-    novelty: string;
-    noveltyText: string;
-}>(undefined);
+    readonly _form = input<NoveltyBlock2025Form>(undefined);
 
     readonly isTextRequired = input<boolean>(false);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<NoveltyBlock2025Form>>();
+
+    emitPatch(patch: Partial<NoveltyBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type NoveltyBlock2025Form = {
+    novelty: string;
+    noveltyText: string;
+};
 
 export const noveltyOptions: string[] = [
     'не является новым для Республики Беларусь',

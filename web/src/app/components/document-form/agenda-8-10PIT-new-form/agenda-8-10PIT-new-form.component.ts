@@ -8,9 +8,13 @@ import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form
 })
 export class Agenda_8_10PIT_NewFormComponent extends AgendaNewForm {
 
+  onConditionsChanged() {
+    this.markFormChanged();
+  }
+
   validate() {
     super.validate();
-    if (!this._form.innovative && this.conclusion.isAccepted()) {
+    if (!this.formValue().innovative && this.conclusion.isAccepted()) {
       throw 'Недопустимо положительное заключение при наличии отрицательной оценки ' +
       'в пункте 1. Проект: ' + this.project.title;
     }

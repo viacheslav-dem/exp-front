@@ -13,13 +13,14 @@ import {DecisionStateBadge} from "@app/pipes/decision.pipe";
           Заключение секции/бюро по объекту государственной экспертизы
           <i>{{project()?.title}}</i>:
         </span>
-        <span class="ml-05" [ngClass]="['badge', DecisionStateBadge[_form().conclusion.getDecision()] || 'badge-info']">
-          {{(_form().conclusion.getDecision() | decision) || 'не указано'}}
+        <span class="ml-05" [ngClass]="['badge', DecisionStateBadge[_form()?.conclusion?.getDecision()] || 'badge-info']">
+          {{(_form()?.conclusion?.getDecision() | decision) || 'не указано'}}
         </span>
       </label>
       <app-new-vote-results
-        [(ngModel)]="_form().conclusion"
+        [ngModel]="_form()?.conclusion"
         [all]="allParticipants()"
+        (ngModelChange)="emitPatch({ conclusion: $event })"
         (onChanged)="onConditionsChanged.emit(true)"
       ></app-new-vote-results>
       @if (financeConclusionNum()) {
@@ -48,11 +49,19 @@ export class ConclusionSectionBlockComponent {
 
   readonly project = input<ProjectPlainDto>(undefined);
 
-  readonly _form = input<{
-    conclusion: NewVoteResults;
-}>(undefined);
+  readonly _form = input<ConclusionSectionBlockForm>(undefined);
 
   readonly allParticipants = input<number>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ConclusionSectionBlockForm>>();
+
+  emitPatch(patch: Partial<ConclusionSectionBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ConclusionSectionBlockForm = {
+  conclusion: NewVoteResults;
+};

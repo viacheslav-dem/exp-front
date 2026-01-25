@@ -8,7 +8,9 @@
 
   <div class="form-group">
     <label>Дата:</label>
-    <app-date-input class="width-100 input-group-sm" [(ngModel)]="_form.date"></app-date-input>
+    <app-date-input class="width-100 input-group-sm"
+                    [ngModel]="formValue().date"
+                    (ngModelChange)="patchForm({ date: $event })"></app-date-input>
   </div>
 
   @if (needCauses()) {

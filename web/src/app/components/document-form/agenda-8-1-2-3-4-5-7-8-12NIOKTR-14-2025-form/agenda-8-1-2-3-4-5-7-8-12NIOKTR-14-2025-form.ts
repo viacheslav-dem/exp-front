@@ -1,4 +1,5 @@
 import {Component} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {anyMatch, isEmptyOrNull} from "@app/support/utils";
 import {AgendaNewForm} from "@app/components/document-form/meeting-protocol-form/agenda-new-form.service";
 import {DataService} from "@app/services/data.service";
@@ -18,7 +19,9 @@ export class Agenda_8_1_2_3_4_5_7_8_12NIOKTR_14_2025_FormComponent extends Agend
     }
 
     ngOnInit() {
-        this._dataService.getCommercializationMethods().subscribe(res => {
+        this._dataService.getCommercializationMethods().pipe(
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(res => {
             res.forEach(option => this.noveltyOptions.push(option.name))
         })
     }
@@ -29,30 +32,34 @@ export class Agenda_8_1_2_3_4_5_7_8_12NIOKTR_14_2025_FormComponent extends Agend
         super.validate();
         this.validateFinanceConclusion();
         // Проверка nameSuggestion, termsSuggestion, financeSuggestion и sufficiencySuggestion оставлена через throw, так как это бизнес-логика
-        if (!this._form.nameAccordance && isEmptyOrNull(this._form.nameSuggestion)) {
+        const form = this.formValue();
+        if (!form.nameAccordance && isEmptyOrNull(form.nameSuggestion)) {
             throw "В пункте 19.1: 'Соответствие объекта государственной экспертизы своему наименованию.' рекомендуемое наименование не введено.";
         }
-        if (!this._form.termsAccordance && (this._form.termsSuggestion.start == undefined || this._form.termsSuggestion.end == undefined)) {
+        if (!form.termsAccordance && (form.termsSuggestion?.start == undefined || form.termsSuggestion?.end == undefined)) {
             throw "В пункте 19.2: 'Соответствие сроков выполнения объекта государственной экспертизы необходимым.' не проставлены рекомендуемые сроки реализации.";
         }
-        if (!this._form.financeAccordance && (this._form.financeSuggestion < 0 || this._form.financeSuggestion == undefined)) {
+        if (!form.financeAccordance && (form.financeSuggestion < 0 || form.financeSuggestion == undefined)) {
             throw "В пункте 19.4: 'Соответствие заявленного финансирования планируемому объему выполняемых работ.' рекомендуемый объем финансирования финансирования не может быть меньше нуля.";
         }
         if (this.showTarget8_14()) {
-            if (!this._form.sufficiency && isEmptyOrNull(this._form.sufficiencySuggestion)) {
+            if (!form.sufficiency && isEmptyOrNull(form.sufficiencySuggestion)) {
                 throw "В пункте 20.1: 'Достаточность запланированных этапов работ (услуг), создаваемого и приобретаемого программного обеспечения, технических средств и (или) комплексов программно-технических средств.' рекомендуемые добавления не введены."
             }
         }
     }
 
     isFinanceConclusionDisabled() {
-        return !anyMatch(this._form.novelty, 'новый для Республики Беларусь', 'новый для стран СНГ', 'новизна мирового уровня')
-            || !anyMatch(this._form.economicSignificance, 'средняя', 'высокая');
+        const form = this.formValue();
+        return !anyMatch(form.novelty, 'новый для Республики Беларусь', 'новый для стран СНГ', 'новизна мирового уровня')
+            || !anyMatch(form.economicSignificance, 'средняя', 'высокая');
     }
 
     onConditionsChanged() {
+        // Блоки формы пока мутируют объект формы напрямую; фиксируем изменения через signal.
+        this.markFormChanged();
         if (this.isFinanceConclusionDisabled()) {
-            this._form.financeConclusion = false;
+            this.patchForm({ financeConclusion: false });
         }
     }
 

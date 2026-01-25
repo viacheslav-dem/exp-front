@@ -9,15 +9,16 @@ import {Component, input, output} from '@angular/core';
         приложения 3 к Инструкции о порядке выдачи заключений об отнесении товаров к высокотехнологичным, утвержденной
         постановлением ГКНТ от 18 декабря 2008 г. № 12:
       </label>
+      <input type="hidden" [ngModel]="_form()?.science" name="science" required>
       <app-boolean-button
         name="science"
         required
-        [(ngModel)]="_form().science"
+        [ngModel]="_form()?.science"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ science: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().scienceText" name="scienceText" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.scienceText" (ngModelChange)="emitPatch({ scienceText: $event })" name="scienceText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>
@@ -30,10 +31,18 @@ export class ScienceBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    science: boolean;
-    scienceText: string;
-}>(undefined);
+  readonly _form = input<ScienceBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ScienceBlockForm>>();
+
+  emitPatch(patch: Partial<ScienceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ScienceBlockForm = {
+  science: boolean;
+  scienceText: string;
+};

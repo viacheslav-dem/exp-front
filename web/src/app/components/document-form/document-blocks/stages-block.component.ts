@@ -9,12 +9,25 @@ import {Component, input, output} from '@angular/core';
             государственной
             регистрации в соответствии с законодательством Республики Беларусь:
           </label>
-          <app-boolean-button name="stages" required [(ngModel)]="_form().stages" [trueLabel]="'имеются'"
+          <app-boolean-button
+            name="stages"
+            required
+            [ngModel]="_form()?.stages"
+            [trueLabel]="'имеются'"
             [falseLabel]="'не имеются'"
-          (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-          @if (full() || _form().stages) {
-            <textarea [(ngModel)]="_form().stagesText" name="stagesText" [attr.required]="isTextRequired() ? '' : null" [attr.minlength]="isTextRequired() ? '30' : null" rows="3" class="form-control mt-05"
-            [attr.placeholder]="isTextRequired() ? 'Обязательный текст (не менее 30 символов).' : 'Пояснительный текст (при необходимости).'"></textarea>
+            (ngModelChange)="emitPatch({ stages: $event })"
+          ></app-boolean-button>
+          @if (full() || _form()?.stages) {
+            <textarea
+              [ngModel]="_form()?.stagesText"
+              (ngModelChange)="emitPatch({ stagesText: $event })"
+              name="stagesText"
+              [required]="isTextRequired()"
+              [minlength]="isTextRequired() ? 30 : null"
+              rows="3"
+              class="form-control mt-05"
+              [placeholder]="isTextRequired() ? 'Обязательный текст (не менее 30 символов).' : 'Пояснительный текст (при необходимости).'"
+            ></textarea>
           }
           @if (full()) {
             <div class="hint">
@@ -37,10 +50,18 @@ export class StagesBlockComponent {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    stages: boolean;
-    stagesText: string;
-}>(undefined);
+    readonly _form = input<StagesBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<StagesBlockForm>>();
+
+    emitPatch(patch: Partial<StagesBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type StagesBlockForm = {
+  stages: boolean;
+  stagesText: string;
+};

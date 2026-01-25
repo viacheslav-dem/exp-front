@@ -20,21 +20,21 @@ export abstract class CouncilConclusionForm extends DocumentForm<AgendaNewFormCo
   }
 
   validateFinanceConclusion() {
-    if (!this._form.financeConclusion && this.group.finalAgendaState == DecisionState.ACCEPTED) {
+    if (!this.formValue().financeConclusion && this.group.finalAgendaState == DecisionState.ACCEPTED) {
       throw 'Недопустимо положительное заключение при наличии отрицательной оценки ' +
       'в пункте ' + this.financeConclusionNum + '.';
     }
   }
 
   validateFinanceSuggestion() {
-    if (this._form.financeSuggestion < 0) {
+    if (this.formValue().financeSuggestion < 0) {
       throw 'Предложенная сумма финансирования не может быть меньше нуля.';
     }
   }
 
-  setForm(form: AgendaNewFormContent) {
+  override setForm(form: AgendaNewFormContent) {
     super.setForm(form);
-    this._form.termsSuggestion = this._form.termsSuggestion || new PeriodDto();
+    this.updateForm(f => ({ ...f, termsSuggestion: f.termsSuggestion || new PeriodDto() }));
   }
 
   onConditionsChanged() {

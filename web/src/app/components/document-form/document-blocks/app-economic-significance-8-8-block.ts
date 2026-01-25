@@ -105,6 +105,7 @@ import {
                   @if (full()) {
                     <textarea
                       [(ngModel)]="_form().economicSignificanceText"
+                      (ngModelChange)="onConditionsChanged.emit(true)"
                       [attr.name]="'economicSignificanceText_8_8_' + num().split('.').join('_')"
                       required
                       minlength="30"

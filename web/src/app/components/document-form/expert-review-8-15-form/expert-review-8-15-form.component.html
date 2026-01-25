@@ -5,7 +5,7 @@
       1. Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
       научно-технической деятельности в Республики Беларусь:
     </label>
-    <textarea [(ngModel)]="_form.accordance" name="accordance" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().accordance" (ngModelChange)="patchForm({ accordance: $event })" name="accordance" required maxlength="5000" rows="3" class="form-control"
       placeholder="cоответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
     </textarea>
   </div>
@@ -14,7 +14,7 @@
     <label>
       2. Значение работы для реализации приоритетов социально-экономического развития:
     </label>
-    <textarea [(ngModel)]="_form.significance" name="significance" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().significance" (ngModelChange)="patchForm({ significance: $event })" name="significance" required maxlength="5000" rows="3" class="form-control"
       placeholder="суть значения и важности работы для республики">
     </textarea>
   </div>
@@ -23,7 +23,7 @@
     <label>
       3. Значение работы для разработки новых технологических процессов, наукоемкой, конкурентоспособной продукции:
     </label>
-    <textarea [(ngModel)]="_form.technologySignificance" name="technologySignificance" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().technologySignificance" (ngModelChange)="patchForm({ technologySignificance: $event })" name="technologySignificance" required maxlength="5000" rows="3" class="form-control"
       placeholder="суть значения и важности работы для республики">
     </textarea>
   </div>
@@ -32,7 +32,7 @@
     <label>
       4. Значение работы для формирования перспективных научных направлений:
     </label>
-    <textarea [(ngModel)]="_form.scientificSignificance" name="scientificSignificance" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().scientificSignificance" (ngModelChange)="patchForm({ scientificSignificance: $event })" name="scientificSignificance" required maxlength="5000" rows="3" class="form-control"
       placeholder="суть значения и важности работы для республики">
     </textarea>
   </div>
@@ -46,12 +46,12 @@
       <div class="input-group btn-group mb-2">
         <app-select-catalog
           [catalog]="Catalog.INDUSTRIAL_PROPERTY"
-          [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+          [(ngModel)]="privacyObjects[i]" (ngModelChange)="markFormChanged()" [resetEnabled]="false"
         ></app-select-catalog>
-        <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+        <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1); markFormChanged()">&times;</button>
       </div>
     }
-    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null); markFormChanged()">
       Добавить объект права
     </button>
   </div>
@@ -63,7 +63,7 @@
     <label>
       1. Возможность государственной регистрации мероприятия (работы):
     </label>
-    <app-boolean-button [(ngModel)]="_form.registration" [falseLabel]="'не допускается'"
+    <app-boolean-button [ngModel]="formValue().registration" (ngModelChange)="patchForm({ registration: $event })" [falseLabel]="'не допускается'"
     [trueLabel]="'допускается'"></app-boolean-button>
   </div>
 
@@ -75,21 +75,21 @@
       Указом Президента Республики Беларусь от 25&nbsp;мая 2006&nbsp;г. №&nbsp;356 «О государственной регистрации
       научно-исследовательских, опытно-конструкторских и опытно-технологических работ»:
     </label>
-    @if (!_form.registration) {
+    @if (!formValue().registration) {
       <div class="font-weight-bold">не имеются согласно пункту 1 данного раздела</div>
     }
-    @if (_form.registration) {
+    @if (formValue().registration) {
       <div>
         @if (stages.length == 0) {
           <div class="mb-2 italic">не имеются</div>
         }
         @for (stage of stages; track stage; let i = $index) {
           <div class="input-group btn-group mb-2">
-            <input [(ngModel)]="stage.name" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
-            <button (click)="stages.splice(i, 1)" type="button" class="btn btn-outline-danger">&times;</button>
+            <input [(ngModel)]="stage.name" (ngModelChange)="markFormChanged()" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
+            <button (click)="stages.splice(i, 1); markFormChanged()" type="button" class="btn btn-outline-danger">&times;</button>
           </div>
         }
-        <button (click)="stages.push({name: ''})" type="button" class="btn btn-primary btn-sm">
+        <button (click)="stages.push({name: ''}); markFormChanged()" type="button" class="btn btn-primary btn-sm">
           Добавить этап
         </button>
       </div>
@@ -106,12 +106,12 @@
     }
     @for (note of notes; track note; let i = $index) {
       <div class="input-group btn-group mb-2">
-        <textarea [(ngModel)]="note.name" rows="2" maxlength="5000" class="form-control"
+        <textarea [(ngModel)]="note.name" (ngModelChange)="markFormChanged()" rows="2" maxlength="5000" class="form-control"
         placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
-        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1); markFormChanged()">&times;</button>
       </div>
     }
-    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
+    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''}); markFormChanged()">
       Добавить замечание
     </button>
   </div>

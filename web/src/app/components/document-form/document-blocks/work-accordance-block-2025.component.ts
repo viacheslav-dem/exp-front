@@ -9,7 +9,7 @@ import {Component, input, output} from "@angular/core";
         и сопровождению программно-технических средств, информационных ресурсов, информационных систем и информационных сетей,
         заявленным объемам финансирования:
       </label>
-      <input type="hidden" [(ngModel)]="_form().workAccordance" name="workAccordance" required>
+      <input type="hidden" [ngModel]="_form().workAccordance" name="workAccordance" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().workAccordance === true}" (click)="stateButton(true)">
           Соответствует
@@ -19,8 +19,17 @@ import {Component, input, output} from "@angular/core";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().workAccordanceText" name="workAccordanceText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
+        <textarea
+          [ngModel]="_form().workAccordanceText"
+          (ngModelChange)="emitPatch({ workAccordanceText: $event })"
+          name="workAccordanceText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
     </div>
     `,
@@ -32,18 +41,24 @@ export class WorkAccordanceBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    workAccordance: boolean;
-    workAccordanceText: string;
-}>(undefined);
+    readonly _form = input<WorkAccordanceBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<WorkAccordanceBlock2025Form>>();
+
+    emitPatch(patch: Partial<WorkAccordanceBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean){
-        if(flag){
-            this._form().workAccordance = true;
-        } else {
-            this._form().workAccordance = false;
-        }
+        this.emitPatch({ workAccordance: flag });
     }
 }
+
+type WorkAccordanceBlock2025Form = {
+    workAccordance: boolean;
+    workAccordanceText: string;
+};

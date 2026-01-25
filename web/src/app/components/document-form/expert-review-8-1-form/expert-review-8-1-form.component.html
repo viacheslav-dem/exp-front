@@ -5,7 +5,7 @@
       1. Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
       научно-технической деятельности в Республики Беларусь:
     </label>
-    <textarea [(ngModel)]="_form.accordance" name="accordance" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().accordance" (ngModelChange)="patchForm({ accordance: $event })" name="accordance" required maxlength="5000" rows="3" class="form-control"
       placeholder="соответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
     </textarea>
   </div>
@@ -14,7 +14,7 @@
     <label>
       2. Соответствие мероприятия современному уровню научных знаний:
     </label>
-    <textarea [(ngModel)]="_form.knowledgeLevel" name="knowledgeLevel" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().knowledgeLevel" (ngModelChange)="patchForm({ knowledgeLevel: $event })" name="knowledgeLevel" required maxlength="5000" rows="3" class="form-control"
       placeholder="соответствие или несоответствие (с описанием уровня современных научных знаний)">
     </textarea>
   </div>
@@ -24,7 +24,7 @@
       3. Новизна целей и (или) методов проведения планируемых фундаментальных и прикладных научных исследований,
       научной и практической значимости ожидаемых результатов:
     </label>
-    <textarea [(ngModel)]="_form.methodsNovelty" name="methodsNovelty" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().methodsNovelty" (ngModelChange)="patchForm({ methodsNovelty: $event })" name="methodsNovelty" required maxlength="5000" rows="3" class="form-control"
       placeholder="суть новизны целей и методов проведения исследований, а также практической значимости">
     </textarea>
   </div>
@@ -34,7 +34,7 @@
       4. Принципиальная новизна, конкурентоспособность, научный и (или) научно-технический уровень,
       экономическая и (или) социальная эффективность:
     </label>
-    <textarea [(ngModel)]="_form.novelty" name="novelty" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().novelty" (ngModelChange)="patchForm({ novelty: $event })" name="novelty" required maxlength="5000" rows="3" class="form-control"
       placeholder="суть новизны, конкурентоспособности, научно-технического уровня и эффективности">
     </textarea>
   </div>
@@ -45,7 +45,7 @@
       объекта экспертизы, в том числе с учетом возможностей расширения экспорта и (или) сокращения импорта продукции,
       поставки потребителю разработанной и осваиваемой продукции:
     </label>
-    <textarea [(ngModel)]="_form.need" name="need" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().need" (ngModelChange)="patchForm({ need: $event })" name="need" required maxlength="5000" rows="3" class="form-control"
       placeholder="потребность республики (объем и потребители) в результатах реализации объекта экспертизы">
     </textarea>
   </div>
@@ -54,7 +54,7 @@
     <label>
       6. Способы и методы оценки результативности, а также экономической и (или) социальной эффективности:
     </label>
-    <textarea [(ngModel)]="_form.methods" name="methods" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().methods" (ngModelChange)="patchForm({ methods: $event })" name="methods" required maxlength="5000" rows="3" class="form-control"
       placeholder="анализ способов и методов оценки результативности и эффективности реализации объекта экспертизы">
     </textarea>
   </div>
@@ -68,12 +68,12 @@
       <div class="input-group btn-group mb-2">
         <app-select-catalog
           [catalog]="Catalog.INDUSTRIAL_PROPERTY"
-          [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+          [(ngModel)]="privacyObjects[i]" (ngModelChange)="markFormChanged()" [resetEnabled]="false"
         ></app-select-catalog>
-        <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+        <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1); markFormChanged()">&times;</button>
       </div>
     }
-    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null); markFormChanged()">
       Добавить объект права
     </button>
   </div>
@@ -87,7 +87,7 @@
       опытно-исследовательская, база потенциального исполнителя, а также кадровый потенциал, включая численность
       сотрудников, привлекаемых для реализации данного мероприятия:
     </label>
-    <textarea [(ngModel)]="_form.potential" name="potential" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().potential" (ngModelChange)="patchForm({ potential: $event })" name="potential" required maxlength="5000" rows="3" class="form-control"
       placeholder="достаточность имеющихся материально-технической базы и кадров исполнителя для реализации объекта экспертизы">
     </textarea>
   </div>
@@ -98,7 +98,7 @@
       выполнения государственных программ научных исследований и научно-технических программ, взятых за основу
       для реализации мероприятия:
     </label>
-    <textarea [(ngModel)]="_form.experience" name="experience" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().experience" (ngModelChange)="patchForm({ experience: $event })" name="experience" required maxlength="5000" rows="3" class="form-control"
       placeholder="имеющийся научный опыт исполнителя для реализации объекта экспертизы">
     </textarea>
   </div>
@@ -108,7 +108,7 @@
       3. Целесообразность проведения новых научных исследований, а также наличие необходимых для реализации
       мероприятия материальных и финансовых ресурсов:
     </label>
-    <textarea [(ngModel)]="_form.financeBase" name="financeBase" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().financeBase" (ngModelChange)="patchForm({ financeBase: $event })" name="financeBase" required maxlength="5000" rows="3" class="form-control"
       placeholder="целесообразность и достаточность финансовых ресурсов на основе анализа государственных реестров НИОК(Т)Р">
     </textarea>
   </div>
@@ -118,7 +118,7 @@
       4. Наличие проведенного потенциальным исполнителем инновационно-технологического мониторинга
       для реализации объекта экспертизы:
     </label>
-    <textarea [(ngModel)]="_form.monitoring" name="monitoring" required maxlength="5000" rows="3" class="form-control"
+    <textarea [ngModel]="formValue().monitoring" (ngModelChange)="patchForm({ monitoring: $event })" name="monitoring" required maxlength="5000" rows="3" class="form-control"
       placeholder="анализ и оценка результатов инновационно-технологического мониторинга для реализации объекта экспертизы">
     </textarea>
   </div>
@@ -130,7 +130,7 @@
     <label>
       1. Финансирование за счет средств республиканского бюджета и (или) других источников финансирования:
     </label>
-    <app-boolean-button [(ngModel)]="_form.finance" [falseLabel]="'нецелесообразно'"
+    <app-boolean-button [ngModel]="formValue().finance" (ngModelChange)="patchForm({ finance: $event })" [falseLabel]="'нецелесообразно'"
     [trueLabel]="'целесообразно'"></app-boolean-button>
   </div>
 </div>
@@ -142,14 +142,14 @@
     пункта&nbsp;1 Указа Президента Республики Беларусь от 7&nbsp;сентября 2009&nbsp;г. №&nbsp;441
     «О дополнительных мерах по стимулированию научной, научно-технической и инновационной деятельности»:
   </label>
-  @if (!_form.finance) {
+  @if (!formValue().finance) {
     <div class="font-weight-bold">нецелесообразно согласно пункту 1 данного раздела</div>
   }
-  @if (_form.finance) {
+  @if (formValue().finance) {
     <div >
-      @if (_form.finance) {
+      @if (formValue().finance) {
         <div>
-          <app-boolean-button [(ngModel)]="_form.promotion" [falseLabel]="'нецелесообразно'"
+          <app-boolean-button [ngModel]="formValue().promotion" (ngModelChange)="patchForm({ promotion: $event })" [falseLabel]="'нецелесообразно'"
           [trueLabel]="'целесообразно'"></app-boolean-button>
         </div>
       }
@@ -165,21 +165,21 @@
     Указом Президента Республики Беларусь от 25&nbsp;мая 2006&nbsp;г. №&nbsp;356 «О государственной регистрации
     научно-исследовательских, опытно-конструкторских и опытно-технологических работ»:
   </label>
-  @if (!_form.finance) {
+  @if (!formValue().finance) {
     <div class="font-weight-bold">не имеются согласно пункту 1 данного раздела</div>
   }
-  @if (_form.finance) {
+  @if (formValue().finance) {
     <div>
       @if (stages.length == 0) {
         <div class="mb-2 italic">не имеются</div>
       }
       @for (stage of stages; track stage; let i = $index) {
         <div class="input-group btn-group mb-2">
-          <input [(ngModel)]="stage.name" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
-          <button (click)="stages.splice(i, 1)" type="button" class="btn btn-outline-danger">&times;</button>
+            <input [(ngModel)]="stage.name" (ngModelChange)="markFormChanged()" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
+            <button (click)="stages.splice(i, 1); markFormChanged()" type="button" class="btn btn-outline-danger">&times;</button>
         </div>
       }
-      <button (click)="stages.push({name: ''})" type="button" class="btn btn-primary btn-sm">
+      <button (click)="stages.push({name: ''}); markFormChanged()" type="button" class="btn btn-primary btn-sm">
         Добавить этап
       </button>
     </div>
@@ -201,7 +201,7 @@
       <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
     </div>
   }
-  <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
-    Добавить замечание
-  </button>
+    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''}); markFormChanged()">
+      Добавить замечание
+    </button>
 </div>

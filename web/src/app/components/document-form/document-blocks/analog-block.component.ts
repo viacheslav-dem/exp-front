@@ -7,10 +7,10 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Укажите, на что направлен объект государственной экспертизы:
       </label>
-      <app-dropdown name="analog" required [options]="analogOptions" [(ngModel)]="_form().analog"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown name="analog" required [options]="analogOptions" [ngModel]="_form()?.analog"
+      (ngModelChange)="emitPatch({ analog: $event })"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().analogText" name="analogText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+        <textarea [ngModel]="_form()?.analogText" (ngModelChange)="emitPatch({ analogText: $event })" name="analogText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full()) {
@@ -37,10 +37,18 @@ export class AnalogBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    analog: string;
-    analogText: string;
-}>(undefined);
+  readonly _form = input<AnalogBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<AnalogBlockForm>>();
+
+  emitPatch(patch: Partial<AnalogBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type AnalogBlockForm = {
+  analog: string;
+  analogText: string;
+};

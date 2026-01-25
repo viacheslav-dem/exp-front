@@ -33,14 +33,15 @@ export abstract class AgendaNewForm extends DocumentForm<AgendaNewFormContent> {
   }
 
   validateFinanceConclusion() {
-    if (!this._form.financeConclusion && this.conclusion.isAccepted()) {
+    const form = this.formValue();
+    if (!form.financeConclusion && this.conclusion.isAccepted()) {
       throw 'Недопустимо положительное заключение при наличии отрицательной оценки ' +
       'в пункте ' + this.financeConclusionNum + '. Проект: ' + this.project.title;
     }
   }
 
   validateFinanceSuggestion() {
-    if (this._form.financeSuggestion < 0) {
+    if (this.formValue().financeSuggestion < 0) {
       throw 'Предложенная сумма финансирования не может быть меньше нуля. Проект: ' + this.project.title;
     }
   }
@@ -53,29 +54,31 @@ export abstract class AgendaNewForm extends DocumentForm<AgendaNewFormContent> {
     this._project = project;
   }
 
-  setForm(form: AgendaNewFormContent) {
-    super.setForm(form);
-    this._form.termsSuggestion = this._form.termsSuggestion || new PeriodDto();
-    this._form.conclusion = this._form.conclusion || new NewVoteResults();
-    // clone to use NewVoteResults methods
-    this._form.conclusion = NewVoteResults.clone(this._form.conclusion);
+  override setForm(form: AgendaNewFormContent) {
+    if (!form) return;
+    const normalized: AgendaNewFormContent = {
+      ...form,
+      termsSuggestion: form.termsSuggestion || new PeriodDto(),
+      // clone to use NewVoteResults methods
+      conclusion: NewVoteResults.clone(form.conclusion || new NewVoteResults()),
+    };
+    super.setForm(normalized);
   }
 
   getForm() {
-    let form: AgendaNewFormContent = super.getForm();
+    const form: AgendaNewFormContent = super.getForm();
     form.conclusion.notVoted = this.getAllParticipants() - this.conclusion.getVoted();
     return form;
   }
 
   getAllParticipants() {
-    if (!this.parent || !this.parent['_form'] || !this.parent['_form'].participants) {
-      return 0;
-    }
-    return this.parent._form.participants.length;
+    const parent = this.parent;
+    const parentForm = parent?.formValue?.();
+    return parentForm?.participants?.length ?? 0;
   }
 
   get conclusion() {
-    return this._form.conclusion;
+    return this.formValue().conclusion;
   }
 
   validate() {
@@ -93,5 +96,8 @@ export abstract class AgendaNewForm extends DocumentForm<AgendaNewFormContent> {
   }
 
   onConditionsChanged() {
+    // Блоки формы мутируют объект формы напрямую (через _form()/ngModel).
+    // Для zoneless/OnPush важно явно триггерить signal-обновление.
+    this.markFormChanged();
   }
 }

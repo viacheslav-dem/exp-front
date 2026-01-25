@@ -8,12 +8,14 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Создание и внедрение новых технологий и (или) производство новой для Республики Беларусь
         и (или) мировой экономики продукции:
       </label>
-      <app-boolean-button name="noveltyExists" required [(ngModel)]="_form().noveltyExists" [trueLabel]="'соответствует'"
+      <input type="hidden" [ngModel]="_form()?.noveltyExists" name="noveltyExists" required>
+      <app-boolean-button name="noveltyExists" required [ngModel]="_form()?.noveltyExists" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ noveltyExists: $event })"></app-boolean-button>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().noveltyExistsText"
+          [ngModel]="_form()?.noveltyExistsText"
+          (ngModelChange)="emitPatch({ noveltyExistsText: $event })"
           [attr.name]="'noveltyExistsText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -33,10 +35,18 @@ export class NoveltyExistsBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    noveltyExists: boolean;
-    noveltyExistsText: string;
-}>(undefined);
+  readonly _form = input<NoveltyExistsBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<NoveltyExistsBlockForm>>();
+
+  emitPatch(patch: Partial<NoveltyExistsBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type NoveltyExistsBlockForm = {
+  noveltyExists: boolean;
+  noveltyExistsText: string;
+};

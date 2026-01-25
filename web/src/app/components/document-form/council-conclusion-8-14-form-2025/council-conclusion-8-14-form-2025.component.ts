@@ -23,10 +23,11 @@ export class CouncilConclusion_8_14_2025_FormComponent extends CouncilConclusion
     }
 
     private validationCommentsOnConclusion() {
-        if (!this._form.termsAccordance && (this._form.termsSuggestion.start == undefined || this._form.termsSuggestion.end == undefined)) {
+        const form = this.formValue();
+        if (!form.termsAccordance && (form.termsSuggestion?.start == undefined || form.termsSuggestion?.end == undefined)) {
             throw "В пункте 'Соответствие сроков выполнения объекта государственной экспертизы необходимым.' не проставлены рекомендуемые сроки реализации."
         }
-        if (!this._form.financeAccordance && (this._form.financeSuggestion < 0 || this._form.financeSuggestion == undefined)) {
+        if (!form.financeAccordance && (form.financeSuggestion < 0 || form.financeSuggestion == undefined)) {
             throw "В пункте 'Соответствие заявленного финансирования планируемому объему выполняемых работ.' рекомендуемый объем финансирования финансирования не может быть меньше нуля."
         }
     }

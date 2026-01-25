@@ -9,11 +9,25 @@ import {Component, input, output} from "@angular/core";
         внутри страны (возможно по сферам экономики, регионам республики, сведения об основных потребителях),
         в рамках Евразийского экономического союза и дальнего зарубежья:
       </label>
-      <app-dropdown name="needs" required [options]="needsOptions" [(ngModel)]="_form().needs"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown
+        name="needs"
+        required
+        [options]="needsOptions"
+        [ngModel]="_form().needs"
+        (ngModelChange)="emitPatch({ needs: $event })"
+      ></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().needsText" name="needsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
+        <textarea
+          [ngModel]="_form().needsText"
+          (ngModelChange)="emitPatch({ needsText: $event })"
+          name="needsText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)"
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">
@@ -46,10 +60,20 @@ export class NeedsBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    needs: string;
-    needsText: string;
-}>(undefined);
+    readonly _form = input<NeedsBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<NeedsBlock2025Form>>();
+
+    emitPatch(patch: Partial<NeedsBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type NeedsBlock2025Form = {
+    needs: string;
+    needsText: string;
+};

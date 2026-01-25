@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-effectiveness-block',
@@ -12,6 +12,7 @@ import {Component, input} from '@angular/core';
       </label>
       <textarea
         [(ngModel)]="_form().effectiveness"
+        (ngModelChange)="onConditionsChanged.emit(true)"
         [attr.name]="'effectiveness_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -31,5 +32,7 @@ export class EffectivenessBlockComponent {
 
   readonly _form = input<{
     effectiveness: string;
-}>(undefined);
+  }>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
 }

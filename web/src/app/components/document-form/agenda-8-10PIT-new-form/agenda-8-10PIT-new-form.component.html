@@ -1,28 +1,34 @@
 <hr/>
 
-<app-agenda-header-block [_form]="_form" [ind]="ind" [project]="_project" [expanded]="expanded()" (toggle)="toggleExpanded()"></app-agenda-header-block>
+<app-agenda-header-block [_form]="formValue()" [ind]="ind" [project]="_project" [expanded]="expanded()" (toggle)="toggleExpanded()"></app-agenda-header-block>
 
 <div class="collapse" [collapse]="!expanded()" [attr.id]="'meeting-project-' + _project?.id">
   <hr/>
 
-  <app-customer-replies-block [_form]="_form"></app-customer-replies-block>
+  <app-customer-replies-block
+    [_form]="formValue()"
+    (formPatch)="patchForm($event)"
+    (onConditionsChanged)="onConditionsChanged()"
+  ></app-customer-replies-block>
 
   <hr/>
 
   <app-innovative-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'1'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-innovative-block>
 
   <hr/>
 
   <app-section-conclusion-block
-    [_form]="_form"
+    [_form]="formValue()"
     [num]="'2'"
     [financeConclusionNum]="'1'"
     [project]="project"
     [allParticipants]="getAllParticipants()"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-section-conclusion-block>
 </div>

@@ -9,13 +9,15 @@ import {Component, input, output} from '@angular/core';
       </label>
       <app-dropdown
         [options]="marketingResearchOptions"
-        [(ngModel)]="_form().marketingResearch"
+        [ngModel]="_form()?.marketingResearch"
+        (ngModelChange)="emitPatch({ marketingResearch: $event })"
         [attr.name]="'marketingResearch_' + num().split('.').join('_')"
         required
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      ></app-dropdown>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().marketingResearchText"
+          [ngModel]="_form()?.marketingResearchText"
+          (ngModelChange)="emitPatch({ marketingResearchText: $event })"
           [attr.name]="'marketingResearchText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -54,10 +56,18 @@ export class MarketingResearchBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    marketingResearch: string;
-    marketingResearchText: string;
-}>(undefined);
+  readonly _form = input<MarketingResearchBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<MarketingResearchBlockForm>>();
+
+  emitPatch(patch: Partial<MarketingResearchBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type MarketingResearchBlockForm = {
+  marketingResearch: string;
+  marketingResearchText: string;
+};

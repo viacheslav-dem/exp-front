@@ -9,6 +9,7 @@ import {PeriodDto} from "@app/dto/PeriodDto";
       <label>
         {{num()}}. Соответствие сроков выполнения объекта государственной экспертизы необходимым:
       </label>
+      <input type="hidden" [ngModel]="_form.termsAccordance" name="termsAccordance" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form.termsAccordance === true}" (click)="stateButton(true)">
           Соответствует
@@ -25,8 +26,10 @@ import {PeriodDto} from "@app/dto/PeriodDto";
         </div>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form.termsAccordanceText"
-          [attr.name]="'termsAccordanceText_' + num().split('.').join('_')"
+        <textarea
+          [ngModel]="_form.termsAccordanceText"
+          (ngModelChange)="emitPatch({ termsAccordanceText: $event })"
+          [name]="'termsAccordanceText_' + num().split('.').join('_')"
           required
           minlength="30"
           maxlength="5000"
@@ -48,8 +51,16 @@ export class TermsAccordanceBlock2025Component {
     readonly full = input<boolean>(true);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<{ termsAccordance: boolean, termsSuggestion: PeriodDto, termsAccordanceText: string }>>();
 
     readonly form = input<{ termsAccordance: boolean, termsSuggestion: PeriodDto, termsAccordanceText: string }>(undefined);
+
+    emitPatch(patch: Partial<{ termsAccordance: boolean, termsSuggestion: PeriodDto, termsAccordanceText: string }>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     private readonly formEffect = effect(() => {
         const _form = this.form();
@@ -57,19 +68,18 @@ export class TermsAccordanceBlock2025Component {
             return;
         }
         this._form = _form;
-        this._terms = new DateRange(this._form.termsSuggestion.start, _form.termsSuggestion.end);
+        const start = _form.termsSuggestion?.start ?? null;
+        const end = _form.termsSuggestion?.end ?? null;
+        this._terms = new DateRange(start, end);
     });
 
     onTermsChanged() {
-        this._form.termsSuggestion = new PeriodDto(this._terms.start, this._terms.end);
+        // Используем emitPatch вместо прямой мутации
+        this.emitPatch({ termsSuggestion: new PeriodDto(this._terms.start, this._terms.end) });
     }
 
     stateButton(flag: boolean){
-        if(flag){
-            this._form.termsAccordance = true;
-        } else {
-            this._form.termsAccordance = false;
-        }
+        this.emitPatch({ termsAccordance: flag });
     }
 
 }

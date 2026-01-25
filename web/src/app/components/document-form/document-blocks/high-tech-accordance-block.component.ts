@@ -9,15 +9,16 @@ import {Component, input, output} from '@angular/core';
         к высокотехнологичным» приложения 2 к Инструкции о порядке выдачи заключений об отнесении товаров к
         высокотехнологичным, утвержденной постановлением ГКНТ от 25 июля 2022 г. № 12:
       </label>
+      <input type="hidden" [ngModel]="_form()?.highTechAccordance" name="highTechAccordance" required>
       <app-boolean-button
         name="highTechAccordance"
         required
-        [(ngModel)]="_form().highTechAccordance"
+        [ngModel]="_form()?.highTechAccordance"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ highTechAccordance: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().highTechAccordanceText" name="highTechAccordanceText" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.highTechAccordanceText" (ngModelChange)="emitPatch({ highTechAccordanceText: $event })" name="highTechAccordanceText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>
@@ -30,10 +31,18 @@ export class HighTechAccordanceBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    highTechAccordance: boolean;
-    highTechAccordanceText: string;
-}>(undefined);
+  readonly _form = input<HighTechAccordanceBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<HighTechAccordanceBlockForm>>();
+
+  emitPatch(patch: Partial<HighTechAccordanceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type HighTechAccordanceBlockForm = {
+  highTechAccordance: boolean;
+  highTechAccordanceText: string;
+};

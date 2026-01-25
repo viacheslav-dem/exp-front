@@ -7,12 +7,14 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Анализ целевых показателей:
       </label>
-      <app-boolean-button name="targetAnalysis" required [(ngModel)]="_form().targetAnalysis" [trueLabel]="'достаточны'"
+      <input type="hidden" [ngModel]="_form()?.targetAnalysis" name="targetAnalysis" required>
+      <app-boolean-button name="targetAnalysis" required [ngModel]="_form()?.targetAnalysis" [trueLabel]="'достаточны'"
         [falseLabel]="'недостаточны'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ targetAnalysis: $event })"></app-boolean-button>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().targetAnalysisText"
+          [ngModel]="_form()?.targetAnalysisText"
+          (ngModelChange)="emitPatch({ targetAnalysisText: $event })"
           [attr.name]="'targetAnalysisText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -45,10 +47,18 @@ export class TargetAnalysisBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    targetAnalysis: boolean;
-    targetAnalysisText: string;
-}>(undefined);
+  readonly _form = input<TargetAnalysisBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<TargetAnalysisBlockForm>>();
+
+  emitPatch(patch: Partial<TargetAnalysisBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type TargetAnalysisBlockForm = {
+  targetAnalysis: boolean;
+  targetAnalysisText: string;
+};

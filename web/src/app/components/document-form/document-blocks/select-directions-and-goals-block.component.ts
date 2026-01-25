@@ -19,8 +19,8 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
           </label>
           @for (direction of _allDirections; track direction.id) {
             <div>
-              <app-checkbox [(ngModel)]="direction.isChecked"
-              (ngModelChange)="onDirectionChanged()">{{direction.name}}</app-checkbox>
+              <app-checkbox [ngModel]="direction.isChecked"
+              (ngModelChange)="onDirectionChanged($event, direction)">{{direction.name}}</app-checkbox>
             </div>
           }
         </div>
@@ -33,10 +33,10 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
           </label>
           @for (item of _allGoals; track item.id) {
             <div>
-              <app-checkbox [(ngModel)]="item.isChecked" (ngModelChange)="onGoalChanged()">{{item.name}}</app-checkbox>
+              <app-checkbox [ngModel]="item.isChecked" (ngModelChange)="onGoalChanged($event, item)">{{item.name}}</app-checkbox>
             </div>
           }
-          <textarea [(ngModel)]="_form.directionsAndGoalsText" name="directionsAndGoalsText" rows="3" class="form-control mt-05"
+          <textarea [ngModel]="_form()?.directionsAndGoalsText" (ngModelChange)="emitPatch({ directionsAndGoalsText: $event })" name="directionsAndGoalsText" rows="3" class="form-control mt-05"
           placeholder="Пояснительный текст (при необходимости)."></textarea>
         </div>
       }
@@ -53,7 +53,6 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
     standalone: false
 })
 export class SelectDirectionsAndGoalsBlockComponent {
-
   _project: ProjectPlainDto | ProjectDto;
   _allDirections: IdNameDto[] = [];
   _allGoals: IdNameDto[] = [];
@@ -68,6 +67,7 @@ export class SelectDirectionsAndGoalsBlockComponent {
   readonly full = input<boolean>(true);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<SelectDirectionsAndGoalsBlockForm>>();
 
   readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
@@ -81,11 +81,10 @@ export class SelectDirectionsAndGoalsBlockComponent {
     const project = this.project();
     const form = this.form();
     this._project = project;
-    this._form = form;
     if (!project || !form) {
       return;
     }
-    this.update();
+    this.update(form);
   });
 
   canHasSocialEconomicGoals() {
@@ -93,36 +92,45 @@ export class SelectDirectionsAndGoalsBlockComponent {
     return this._project?.code?.code === '8.13';
   }
 
-  private update() {
-    if (this._form) {
-      this._form.selectedDirections = this._form.selectedDirections || [];
-      this._form.selectedSocialEconomicGoals = this._form.selectedSocialEconomicGoals || [];
-    }
-    if (this._project && this._form) {
+  private update(form: SelectDirectionsAndGoalsBlockForm) {
+    if (this._project && form) {
       const directions = this._project.directions ?? [];
       const goals = this._project.socialEconomicGoals ?? [];
 
       this._allDirections = directions.map(item => new IdNameDto(item.id, item.name));
-      this._form.selectedDirections = this._form.selectedDirections.filter(selectedItem =>
-        this._allDirections.some(item => item.id == selectedItem.id))
+      const selectedDirections = (form.selectedDirections || []).filter(selectedItem =>
+        this._allDirections.some(item => item.id == selectedItem.id));
       this._allDirections.forEach(item => item.isChecked =
-        this._form.selectedDirections.some(selectedItem => selectedItem.id == item.id));
+        selectedDirections.some(selectedItem => selectedItem.id == item.id));
 
       this._allGoals = goals.map(item => new IdNameDto(item.id, item.name));
-      this._form.selectedSocialEconomicGoals = this._form.selectedSocialEconomicGoals.filter(selectedItem =>
-        this._allGoals.some(item => item.id == selectedItem.id))
+      const selectedSocialEconomicGoals = (form.selectedSocialEconomicGoals || []).filter(selectedItem =>
+        this._allGoals.some(item => item.id == selectedItem.id));
       this._allGoals.forEach(item => item.isChecked =
-        this._form.selectedSocialEconomicGoals.some(selectedItem => selectedItem.id == item.id));
+        selectedSocialEconomicGoals.some(selectedItem => selectedItem.id == item.id));
     }
   }
 
-  onDirectionChanged() {
-    this._form.selectedDirections = this._allDirections.filter(d => d.isChecked).map(d => new IdNameDto(d.id, d.name));
+  emitPatch(patch: Partial<SelectDirectionsAndGoalsBlockForm>) {
+    this.formPatch.emit(patch);
     this.onConditionsChanged.emit(true);
   }
 
-  onGoalChanged() {
-    this._form.selectedSocialEconomicGoals = this._allGoals.filter(d => d.isChecked).map(d => new IdNameDto(d.id, d.name));
-    this.onConditionsChanged.emit(true);
+  onDirectionChanged(isChecked: boolean, direction: IdNameDto) {
+    direction.isChecked = isChecked;
+    const selectedDirections = this._allDirections.filter(d => d.isChecked).map(d => new IdNameDto(d.id, d.name));
+    this.emitPatch({ selectedDirections });
+  }
+
+  onGoalChanged(isChecked: boolean, goal: IdNameDto) {
+    goal.isChecked = isChecked;
+    const selectedSocialEconomicGoals = this._allGoals.filter(d => d.isChecked).map(d => new IdNameDto(d.id, d.name));
+    this.emitPatch({ selectedSocialEconomicGoals });
   }
 }
+
+type SelectDirectionsAndGoalsBlockForm = {
+  selectedDirections: IdNameDto[];
+  selectedSocialEconomicGoals: IdNameDto[];
+  directionsAndGoalsText: string;
+};

@@ -32,21 +32,18 @@ export class ExpertReview_8_16_FormComponent extends ExpertReviewForm<ExpertRevi
     }
   onConditionsChanged() {}
 
-  isCatalogHighTechBlockDisabled() {
-    if (this._form.conclusion == false){
-      return true;
-    }
+  isCatalogHighTechBlockDisabled(): boolean {
+    return this.formValue().conclusion === false;
   }
 
   onChange() {
-    if (this._form.economicActivity && this._form.basedOnHighTech && this._form.exportOrientation ||
-        this._form.economicActivity && this._form.basedOnHighTech && this._form.importOrientation) {
-      this._form.conclusion = true;
+    const f = this.formValue();
+    if (f.economicActivity && f.basedOnHighTech && f.exportOrientation ||
+        f.economicActivity && f.basedOnHighTech && f.importOrientation) {
+      this.patchForm({ conclusion: true });
     } else {
-      this._form.conclusion = false
+      this.patchForm({ conclusion: false });
     }
-    this.isCatalogHighTechBlockDisabled()
-
     this.onConditionsChanged();
   }
 }

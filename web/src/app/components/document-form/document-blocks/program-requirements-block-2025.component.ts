@@ -10,17 +10,20 @@ import {Component, input, output} from "@angular/core";
         о порядке разработки и выполнения научно-технических программ, утвержденном постановлением Совета Министров Республики Беларусь
         от 31 августа 2005 г, № 961:
       </label>
+      <input type="hidden" [ngModel]="_form()?.programRequirements" name="programRequirements" required>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().programRequirements === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form()?.programRequirements === true}" (click)="stateButton(true)">
           Соответствует
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().programRequirements === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form()?.programRequirements === false}" (click)="stateButton(false)">
           Не соответствует
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().programRequirementsText"
-          [attr.name]="'programRequirementsText_' + num().split('.').join('_')"
+        <textarea
+          [ngModel]="_form()?.programRequirementsText"
+          (ngModelChange)="emitPatch({ programRequirementsText: $event })"
+          [name]="'programRequirementsText_' + num().split('.').join('_')"
           required
           minlength="30"
           maxlength="5000"
@@ -58,19 +61,25 @@ export class ProgramRequirementsBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    programRequirements: boolean;
-    programRequirementsText: string;
-}>(undefined);
+    readonly _form = input<ProgramRequirementsBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<ProgramRequirementsBlock2025Form>>();
+
+    emitPatch(patch: Partial<ProgramRequirementsBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean) {
-        if(flag){
-            this._form().programRequirements = true;
-        } else {
-            this._form().programRequirements = false;
-        }
+        this.emitPatch({ programRequirements: flag });
     }
 
 }
+
+type ProgramRequirementsBlock2025Form = {
+    programRequirements: boolean;
+    programRequirementsText: string;
+};

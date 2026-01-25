@@ -1,4 +1,4 @@
-import {Component, input, output} from '@angular/core';
+import {Component, OnInit, input, output} from '@angular/core';
 import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
 import {ProjectDto} from "@app/dto/ProjectDto";
 
@@ -10,18 +10,32 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         {{num()}}. Целесообразность реализации объекта государственной экспертизы и его финансирования за счет средств
         республиканского бюджета и (или) других источников финансирования:
       </label>
+      <input type="hidden" [ngModel]="_form()?.financeConclusion" name="financeConclusion" required>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button [disabled]=disabled() type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().financeConclusion === true}" (click)="stateButton(true)">
+        <button
+          [disabled]="disabled()"
+          type="button"
+          class="btn btn-outline-success"
+          [ngClass]="{'active': _form()?.financeConclusion === true}"
+          (click)="stateButton(true)"
+        >
           Целесообразно
         </button>
-        <button [disabled]=disabled() type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().financeConclusion === false}" (click)="stateButton(false)">
+        <button
+          [disabled]="disabled()"
+          type="button"
+          class="btn btn-outline-danger"
+          [ngClass]="{'active': _form()?.financeConclusion === false && _form()?.financeConclusion !== undefined}"
+          (click)="stateButton(false)"
+        >
           Нецелесообразно
         </button>
       </div>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().financeConclusionText"
-          [attr.name]="'financeConclusionText_' + num().split('.').join('_')"
+          [ngModel]="_form()?.financeConclusionText"
+          (ngModelChange)="emitPatch({ financeConclusionText: $event })"
+          [name]="'financeConclusionText_' + num().split('.').join('_')"
           required
           minlength="30"
           maxlength="5000"
@@ -42,7 +56,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
               оценка <b>«новый для Республики Беларусь»</b>, <b>«новый для стран СНГ»</b>,
               <b>«новизна мирового уровня»</b> в пункте 1;
             </li>
-            @if (project().code.code == '8.8БИФ') {
+            @if (project()?.code?.code == '8.8БИФ') {
               <div >
                 <li>
                   использование в венчурном проекте технологий V или VI технологических укладов (соответствующая оценка «да» в подпункте 1.3);
@@ -59,12 +73,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
     `,
     standalone: false
 })
-export class FinanceConclusionBlockComponent {
-
-  ngOnInit(){
-    this._form().financeConclusion = false;
-  }
-
+export class FinanceConclusionBlockComponent implements OnInit {
 
   readonly num = input<string>("10.6");
 
@@ -78,19 +87,27 @@ export class FinanceConclusionBlockComponent {
 
   readonly disabled = input<boolean>(false);
 
-  readonly _form = input<{
-    financeConclusion: boolean;
-    financeConclusionText: string;
-}>(undefined);
+  readonly _form = input<FinanceConclusionBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<FinanceConclusionBlockForm>>();
 
-  stateButton(flag: boolean) {
-    if(flag){
-      this._form().financeConclusion = true;
-    } else {
-      this._form().financeConclusion = false;
-    }
+  emitPatch(patch: Partial<FinanceConclusionBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
   }
 
+  ngOnInit() {
+    // Инициализация через emitPatch вместо прямой мутации
+    this.emitPatch({ financeConclusion: false });
+  }
+
+  stateButton(flag: boolean) {
+    this.emitPatch({ financeConclusion: flag });
+  }
 }
+
+type FinanceConclusionBlockForm = {
+  financeConclusion: boolean;
+  financeConclusionText: string;
+};

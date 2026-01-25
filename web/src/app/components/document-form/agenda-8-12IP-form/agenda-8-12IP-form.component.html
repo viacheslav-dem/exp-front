@@ -31,14 +31,14 @@
     работающего, аналогичный среднему уровню добавленной стоимости на&nbsp;одного работающего по&nbsp;соответствующему
     виду экономической деятельности в&nbsp;Европейском союзе либо превышающий этот уровень:
   </label>
-  <app-vote-results [(ngModel)]="_form.organization" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results [ngModel]="formValue().organization" (ngModelChange)="patchForm({ organization: $event })" [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
 </div>
 
 <div class="form-sub-group">
   <label>
     <b>{{ind + 1}}.1.2.</b> Экспортная ориентированность инновационного проекта (превышение экспорта над импортом):
   </label>
-  <app-vote-results [(ngModel)]="_form.export" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results [ngModel]="formValue().export" (ngModelChange)="patchForm({ export: $event })" [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
 </div>
 
 <div class="form-sub-group">
@@ -46,7 +46,7 @@
     <b>{{ind + 1}}.1.3.</b> Создание и внедрение новых технологий и&nbsp;(или) производство новой
     для&nbsp;Республики Беларусь и&nbsp;(или) мировой экономики продукции:
   </label>
-  <app-vote-results [(ngModel)]="_form.novelty" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results [ngModel]="formValue().novelty" (ngModelChange)="patchForm({ novelty: $event })" [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
 </div>
 
 <div class="form-sub-group">
@@ -61,19 +61,19 @@
     <div class="input-group btn-group input-group-sm mb-2">
       <app-select-catalog
         [catalog]="Catalog.INDUSTRIAL_PROPERTY"
-        [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+        [(ngModel)]="privacyObjects[i]" (ngModelChange)="markFormChanged()" [resetEnabled]="false"
       ></app-select-catalog>
-      <button type="button" class="btn btn-sm btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="privacyObjects.splice(i, 1); markFormChanged()">&times;</button>
     </div>
   }
   <div class="mb-2">
-    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null); markFormChanged()">
       Добавить объект права
     </button>
   </div>
-  <app-vote-results [(ngModel)]="_form.privacy" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results [ngModel]="formValue().privacy" (ngModelChange)="patchForm({ privacy: $event })" [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
   <app-vote-results #singleVote [(ngModel)]="singleVoteResult"
-    [all]="parent._form.participants.length"
+    [all]="(parent?.formValue?.()?.participants?.length ?? 0)"
     [display]="singleVoteMode"
   ></app-vote-results>
 </div>

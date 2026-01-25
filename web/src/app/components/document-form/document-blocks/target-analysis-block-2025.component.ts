@@ -7,7 +7,7 @@ import {Component, input, output} from "@angular/core";
       <label>
         {{num()}}. Анализ целевых показателей:
       </label>
-      <input type="hidden" [(ngModel)]="_form().targetAnalysis" name="targetAnalysis" required>
+      <input type="hidden" [ngModel]="_form().targetAnalysis" name="targetAnalysis" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().targetAnalysis === true}" (click)="stateButton(true)">
           Достаточны
@@ -17,8 +17,17 @@ import {Component, input, output} from "@angular/core";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().targetAnalysisText" name="targetAnalysisText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
+        <textarea
+          [ngModel]="_form().targetAnalysisText"
+          (ngModelChange)="emitPatch({ targetAnalysisText: $event })"
+          name="targetAnalysisText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)"
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">
@@ -49,18 +58,24 @@ export class TargetAnalysisBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    targetAnalysis: boolean;
-    targetAnalysisText: string;
-}>(undefined);
+    readonly _form = input<TargetAnalysisBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<TargetAnalysisBlock2025Form>>();
+
+    emitPatch(patch: Partial<TargetAnalysisBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean) {
-        if(flag){
-            this._form().targetAnalysis = true;
-        } else {
-            this._form().targetAnalysis = false;
-        }
+        this.emitPatch({ targetAnalysis: flag });
     }
 }
+
+type TargetAnalysisBlock2025Form = {
+    targetAnalysis: boolean;
+    targetAnalysisText: string;
+};

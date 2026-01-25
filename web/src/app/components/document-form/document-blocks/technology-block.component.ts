@@ -7,12 +7,14 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Оптимальность выбранной технологии и ее инновационность для Республики Беларусь:
       </label>
-      <app-boolean-button name="technology" required [(ngModel)]="_form().technology" [trueLabel]="'подтверждается'"
+      <input type="hidden" [ngModel]="_form()?.technology" name="technology" required>
+      <app-boolean-button name="technology" required [ngModel]="_form()?.technology" [trueLabel]="'подтверждается'"
         [falseLabel]="'не подтверждается'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ technology: $event })"></app-boolean-button>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().technologyText"
+          [ngModel]="_form()?.technologyText"
+          (ngModelChange)="emitPatch({ technologyText: $event })"
           [attr.name]="'technologyText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -44,10 +46,18 @@ export class TechnologyBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    technology: boolean;
-    technologyText: string;
-}>(undefined);
+  readonly _form = input<TechnologyBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<TechnologyBlockForm>>();
+
+  emitPatch(patch: Partial<TechnologyBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type TechnologyBlockForm = {
+  technology: boolean;
+  technologyText: string;
+};

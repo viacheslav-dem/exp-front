@@ -7,10 +7,10 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Оценка целевых показателей проекта:
       </label>
-      <app-dropdown name="target" required [options]="targetOptions" [(ngModel)]="_form().target"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown name="target" required [options]="targetOptions" [ngModel]="_form()?.target"
+      (ngModelChange)="emitPatch({ target: $event })"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().targetText" name="targetText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+        <textarea [ngModel]="_form()?.targetText" (ngModelChange)="emitPatch({ targetText: $event })" name="targetText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full()) {
@@ -39,10 +39,18 @@ export class TargetBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    target: string;
-    targetText: string;
-}>(undefined);
+  readonly _form = input<TargetBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<TargetBlockForm>>();
+
+  emitPatch(patch: Partial<TargetBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type TargetBlockForm = {
+  target: string;
+  targetText: string;
+};

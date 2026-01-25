@@ -30,13 +30,14 @@ export class ExpertReview_8_14_2025FormComponent extends ExpertReviewForm<Expert
   }
 
   private validationConclusionAnalysisAndEvaluation() {
-    if (isEmptyOrNull(this._form.marketingResearch)) {
+    const f = this.formValue();
+    if (isEmptyOrNull(f.marketingResearch)) {
       throw "В пункте ' Проведение маркетинговых и патентных исследований, их результаты.' не выстановленно заключение."
     }
-    if (isEmptyOrNull(this._form.privacyObjectsDescription)) {
+    if (isEmptyOrNull(f.privacyObjectsDescription)) {
       throw "В пункте '10. Создание объекта права промышленной собственности :' не выстановленно заключение."
     }
-    if (isEmptyOrNull(this._form.stagesExist)) {
+    if (isEmptyOrNull(f.stagesExist)) {
       throw "В пункте '12. Целесообразность государственной регистрации объекта государственной экспертизы в соответствии " +
       "с законодательством Республики Беларусь:' не выстановленно заключение."
     }

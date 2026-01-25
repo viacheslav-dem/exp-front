@@ -7,11 +7,25 @@ import {Component, input, output} from "@angular/core";
       <label>
         {{num()}}. Оценка перечня задач проекта, планируемый способ их реализации и обеспечение достижения поставленных целей проекта:
       </label>
-      <app-dropdown name="taskLists" required [options]="taskListsOptions" [(ngModel)]="_form().taskLists"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown
+        name="taskLists"
+        required
+        [options]="taskListsOptions"
+        [ngModel]="_form().taskLists"
+        (ngModelChange)="emitPatch({ taskLists: $event })"
+      ></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().taskListsText" name="taskListsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
+        <textarea
+          [ngModel]="_form().taskListsText"
+          (ngModelChange)="emitPatch({ taskListsText: $event })"
+          name="taskListsText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)"
+        ></textarea>
       }
     </div>
     `,
@@ -28,10 +42,20 @@ export class TaskListsBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    taskLists: string;
-    taskListsText: string;
-}>(undefined);
+    readonly _form = input<TaskListsBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<TaskListsBlock2025Form>>();
+
+    emitPatch(patch: Partial<TaskListsBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type TaskListsBlock2025Form = {
+    taskLists: string;
+    taskListsText: string;
+};

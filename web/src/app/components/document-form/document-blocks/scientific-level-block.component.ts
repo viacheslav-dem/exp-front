@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-scientific-level-block',
@@ -9,7 +9,8 @@ import {Component, input} from '@angular/core';
         используемыми в мире, и возможности их применения на соответствующем производстве.
       </label>
       <textarea
-        [(ngModel)]="_form().scientificLevel"
+        [ngModel]="_form()?.scientificLevel"
+        (ngModelChange)="emitPatch({ scientificLevel: $event })"
         [attr.name]="'scientificLevel_' + num().split('.').join('_')"
         required
         maxlength="5000"
@@ -41,7 +42,17 @@ export class ScientificLevelBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    scientificLevel: string;
-}>(undefined);
+  readonly _form = input<ScientificLevelBlockForm>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ScientificLevelBlockForm>>();
+
+  emitPatch(patch: Partial<ScientificLevelBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ScientificLevelBlockForm = {
+  scientificLevel: string;
+};

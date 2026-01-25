@@ -10,19 +10,20 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         {{num()}}. Целесообразность реализации объекта государственной экспертизы и его финансирования за счет средств
         республиканского бюджета и (или) других источников финансирования:
       </label>
-      <input type="hidden" [(ngModel)]="_form().financeConclusion" name="financeConclusion" required>
+      <input type="hidden" [ngModel]="_form()?.financeConclusion" name="financeConclusion" required>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button [disabled]=disabled() type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().financeConclusion === true}" (click)="stateButton(true)">
+        <button [disabled]=disabled() type="button" class="btn btn-outline-success" [ngClass]="{'active': _form()?.financeConclusion === true}" (click)="stateButton(true)">
           Целесообразно
         </button>
-        <button [disabled]=disabled() type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().financeConclusion === false}" (click)="stateButton(false)">
+        <button [disabled]=disabled() type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form()?.financeConclusion === false}" (click)="stateButton(false)">
           Нецелесообразно
         </button>
       </div>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().financeConclusionText"
-          [attr.name]="'financeConclusionText_' + num().split('.').join('_')"
+          [ngModel]="_form()?.financeConclusionText"
+          (ngModelChange)="emitPatch({ financeConclusionText: $event })"
+          [name]="'financeConclusionText_' + num().split('.').join('_')"
           required
           minlength="30"
           maxlength="5000"
@@ -62,11 +63,6 @@ import {ProjectDto} from "@app/dto/ProjectDto";
 })
 export class FinanceConclusionBlock2025Component {
 
-    ngOnInit(){
-        this._form().financeConclusion = false;
-    }
-
-
     readonly num = input<string>("10.6");
 
     readonly noveltyNum = input<string>(undefined);
@@ -79,19 +75,25 @@ export class FinanceConclusionBlock2025Component {
 
     readonly disabled = input<boolean>(false);
 
-    readonly _form = input<{
-    financeConclusion: boolean;
-    financeConclusionText: string;
-}>(undefined);
+    readonly _form = input<FinanceConclusionBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<FinanceConclusionBlock2025Form>>();
+
+    emitPatch(patch: Partial<FinanceConclusionBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean) {
-        if(flag){
-            this._form().financeConclusion = true;
-        } else {
-            this._form().financeConclusion = false;
-        }
+        this.emitPatch({ financeConclusion: flag });
     }
 
 }
+
+type FinanceConclusionBlock2025Form = {
+    financeConclusion: boolean;
+    financeConclusionText: string;
+};

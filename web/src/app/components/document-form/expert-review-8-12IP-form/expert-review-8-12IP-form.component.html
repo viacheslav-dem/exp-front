@@ -3,10 +3,10 @@
     Конечный результат проекта:
   </label>
   <div class="btn-group">
-    <label class="btn btn-sm btn-primary" [class.active]="_form.product" (click)="_form.product = !_form.product">@if (_form.product) {
+    <label class="btn btn-sm btn-primary" [class.active]="formValue().product" (click)="patchForm({ product: !formValue().product }); updateFormSignal()">@if (formValue().product) {
       <fa-icon icon="check"></fa-icon>
     } товар</label>
-    <label class="btn btn-sm btn-primary" [class.active]="_form.service" (click)="_form.service = !_form.service">@if (_form.service) {
+    <label class="btn btn-sm btn-primary" [class.active]="formValue().service" (click)="patchForm({ service: !formValue().service }); updateFormSignal()">@if (formValue().service) {
       <fa-icon icon="check"></fa-icon>
     } услуга</label>
   </div>
@@ -20,7 +20,7 @@
         1. Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
         научно-технической деятельности в Республики Беларусь:
       </label>
-      <textarea [(ngModel)]="_form.accordance" name="accordance" required rows="3" class="form-control"
+      <textarea [ngModel]="formValue().accordance" (ngModelChange)="patchForm({ accordance: $event }); updateFormSignal()" name="accordance" required rows="3" class="form-control"
         placeholder="cоответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
       </textarea>
     </div>
@@ -28,7 +28,7 @@
       <label>
         2. Сведения о проведении маркетинговых и патентных исследований и их результаты:
       </label>
-      <textarea [(ngModel)]="_form.marketing" name="marketing" required rows="3" class="form-control"
+      <textarea [ngModel]="formValue().marketing" (ngModelChange)="patchForm({ marketing: $event }); updateFormSignal()" name="marketing" required rows="3" class="form-control"
         placeholder="результаты проведения маркетинговых и патентных исследований по объекту экспертизы">
       </textarea>
     </div>
@@ -41,12 +41,12 @@
         <div class="input-group btn-group mb-2">
           <app-select-catalog
             [catalog]="Catalog.INDUSTRIAL_PROPERTY"
-            [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+            [(ngModel)]="privacyObjects[i]" (ngModelChange)="markFormChanged(); updateFormSignal()" [resetEnabled]="false"
           ></app-select-catalog>
-          <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+          <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1); markFormChanged(); updateFormSignal()">&times;</button>
         </div>
       }
-      <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+      <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null); markFormChanged(); updateFormSignal()">
         Добавить объект права
       </button>
     </div>
@@ -56,28 +56,28 @@
         планируемый к реализации инновационный проект:
       </label>
       <div class="form-check mb-2" (click)="onChooseSection()">
-        <input type="checkbox" class="form-check-input" title="Выбор" [(ngModel)]="_form.sectionNotPresented" (ngModelChange)="updateFormSignal()">
+        <input type="checkbox" class="form-check-input" title="Выбор" [ngModel]="formValue()?.sectionNotPresented" (ngModelChange)="patchForm({ sectionNotPresented: $event }); updateFormSignal()" name="sectionNotPresented">
         <label class="form-check-label"> - не представлено в материалах по объекту экспертизы</label>
       </div>
-      @if (!_form.sectionNotPresented) {
+      @if (!formValue().sectionNotPresented) {
         <div class="dropdown form-sub-group">
           <button type="button" class="btn btn-block btn-outline-info dropdown-toggle" data-bs-toggle="dropdown">
-            <span class="bold">{{_form.section.code}}</span> - {{_form.section.name}}
+            <span class="bold">{{formValue().section?.code}}</span> - {{formValue().section?.name}}
           </button>
           <ul class="dropdown-menu scrollable-menu">
             @for (item of industries; track item) {
               <li class="dropdown-item"
-                (click)="_form.section = item; updateFormSignal()">
+                (click)="patchForm({ section: item }); updateFormSignal()">
                 <span class="bold">{{item.code}}</span> - {{item.name}}
               </li>
             }
           </ul>
         </div>
       }
-      @if (!_form.sectionNotPresented) {
+      @if (!formValue().sectionNotPresented) {
         <div class="form-sub-group">
           <label>согласно представленным материалам объекта экспертизы</label>
-          <textarea [(ngModel)]="_form.sectionPlace" name="sectionPlace" [required]="!_form.sectionNotPresented" rows="2" class="form-control"
+          <textarea [ngModel]="formValue().sectionPlace" (ngModelChange)="patchForm({ sectionPlace: $event }); updateFormSignal()" name="sectionPlace" [required]="!formValue().sectionNotPresented" rows="2" class="form-control"
             placeholder="ссылки на документы и страницы материалов, где содержится соответствующая информация">
           </textarea>
         </div>
@@ -88,11 +88,11 @@
         5. Пороговое значение валовой добавленной стоимости в расчете на одного занятого
         по основным видам экономической деятельности в Европейском союзе, евро:
       </label>
-      @if (!_form.sectionNotPresented) {
+      @if (!formValue().sectionNotPresented) {
         <input class="form-control" disabled title="Пороговое значение, евро"
-          [value]="_form.section.addedValueBound | number: 1">
+          [value]="formValue().section?.addedValueBound | number: 1">
       }
-      @if (_form.sectionNotPresented) {
+      @if (formValue().sectionNotPresented) {
         <input class="form-control" disabled title="Пороговое значение, евро"
           value="не представлено в материалах по объекту экспертизы">
       }
@@ -102,20 +102,20 @@
         6. Уровень добавленной стоимости на одного работающего по инновационному проекту, соответствующий году,
         следующему за годом выхода на проектную мощность, евро:
       </label>
-      <div class="form-check mb-2" (click)="_form.addedValueNotPresented = !_form.addedValueNotPresented; updateFormSignal()">
-        <input type="checkbox" class="form-check-input" title="Выбор" [(ngModel)]="_form.addedValueNotPresented" (ngModelChange)="updateFormSignal()">
+      <div class="form-check mb-2" (click)="patchForm({ addedValueNotPresented: !formValue().addedValueNotPresented }); updateFormSignal()">
+        <input type="checkbox" class="form-check-input" title="Выбор" [ngModel]="formValue()?.addedValueNotPresented" (ngModelChange)="patchForm({ addedValueNotPresented: $event }); updateFormSignal()" name="addedValueNotPresented">
         <label class="form-check-label"> - не представлено в материалах по объекту экспертизы</label>
       </div>
-      @if (!_form.addedValueNotPresented) {
+      @if (!formValue().addedValueNotPresented) {
         <div class="form-sub-group">
-          <input class="form-control" numberInput type="text" name="addedValue" [required]="!_form.addedValueNotPresented" min="0" title="Уровень добавленной стоимости, евро"
-            [(ngModel)]="_form.addedValue" (ngModelChange)="updateFormSignal()">
+          <input class="form-control" numberInput type="text" name="addedValue" [required]="!formValue().addedValueNotPresented" min="0" title="Уровень добавленной стоимости, евро"
+            [ngModel]="formValue().addedValue" (ngModelChange)="patchForm({ addedValue: $event }); updateFormSignal()">
           </div>
         }
-        @if (!_form.addedValueNotPresented) {
+        @if (!formValue().addedValueNotPresented) {
           <div class="form-sub-group">
             <label>согласно представленным материалам объекта экспертизы</label>
-            <textarea [(ngModel)]="_form.addedValuePlace" name="addedValuePlace" [required]="!_form.addedValueNotPresented" rows="2" class="form-control"
+            <textarea [ngModel]="formValue().addedValuePlace" (ngModelChange)="patchForm({ addedValuePlace: $event }); updateFormSignal()" name="addedValuePlace" [required]="!formValue().addedValueNotPresented" rows="2" class="form-control"
               placeholder="ссылки на документы и страницы материалов, где содержится соответствующая информация">
             </textarea>
           </div>
@@ -125,20 +125,20 @@
         <label>
           7. Сальдо потока денежных средств от текущей (операционной) деятельности, евро:
         </label>
-        <div class="form-check mb-2" (click)="_form.balanceNotPresented = !_form.balanceNotPresented; updateFormSignal()">
-          <input type="checkbox" class="form-check-input" title="Выбор" [(ngModel)]="_form.balanceNotPresented" (ngModelChange)="updateFormSignal()">
+        <div class="form-check mb-2" (click)="patchForm({ balanceNotPresented: !formValue().balanceNotPresented }); updateFormSignal()">
+          <input type="checkbox" class="form-check-input" title="Выбор" [ngModel]="formValue()?.balanceNotPresented" (ngModelChange)="patchForm({ balanceNotPresented: $event }); updateFormSignal()" name="balanceNotPresented">
           <label class="form-check-label"> - не представлено в материалах по объекту экспертизы</label>
         </div>
-        @if (!_form.balanceNotPresented) {
+        @if (!formValue().balanceNotPresented) {
           <div class="form-sub-group">
-            <input class="form-control" numberInput type="text" name="balance" [required]="!_form.balanceNotPresented" min="0" title="Сальдо потока денежных средств, евро"
-              [(ngModel)]="_form.balance" (ngModelChange)="updateFormSignal()">
+            <input class="form-control" numberInput type="text" name="balance" [required]="!formValue().balanceNotPresented" min="0" title="Сальдо потока денежных средств, евро"
+              [ngModel]="formValue().balance" (ngModelChange)="patchForm({ balance: $event }); updateFormSignal()">
             </div>
           }
-          @if (!_form.balanceNotPresented) {
+          @if (!formValue().balanceNotPresented) {
             <div class="form-sub-group">
               <label>согласно представленным материалам объекта экспертизы</label>
-              <textarea [(ngModel)]="_form.balancePlace" name="balancePlace" [required]="!_form.balanceNotPresented" rows="2" class="form-control"
+              <textarea [ngModel]="formValue().balancePlace" (ngModelChange)="patchForm({ balancePlace: $event }); updateFormSignal()" name="balancePlace" [required]="!formValue().balanceNotPresented" rows="2" class="form-control"
                 placeholder="ссылки на документы и страницы материалов, где содержится соответствующая информация">
               </textarea>
             </div>
@@ -149,7 +149,7 @@
             8. Оценка научно-технического уровня внедряемых технологий по сравнению с передовыми технологиями,
             используемыми в мире, и возможности их применения на соответствующем производстве:
           </label>
-          <textarea [(ngModel)]="_form.scientificLevel" name="scientificLevel" required rows="3" class="form-control"
+          <textarea [ngModel]="formValue().scientificLevel" (ngModelChange)="patchForm({ scientificLevel: $event }); updateFormSignal()" name="scientificLevel" required rows="3" class="form-control"
             placeholder="оценка научно-технического уровня внедряемых технологий по сравнению с передовыми технологиями для объекта экспертизы ">
           </textarea>
         </div>
@@ -162,7 +162,7 @@
             лицензионных договоров на предоставление права использования результатов интеллектуальной деятельности,
             договоров на передачу секретов производства (ноу-хау), относящихся к продукту и (или) к способу?
           </label>
-          <app-boolean-button [(ngModel)]="_form.scientificLevelAccordance" [falseLabel]="'не подтверждается'"
+          <app-boolean-button [ngModel]="formValue().scientificLevelAccordance" (ngModelChange)="patchForm({ scientificLevelAccordance: $event }); updateFormSignal()" [falseLabel]="'не подтверждается'"
           [trueLabel]="'подтверждается'"></app-boolean-button>
         </div>
         <div class="form-sub-group">
@@ -170,7 +170,7 @@
             10. Наиболее близкий аналог используемой (выпускаемой) на территории Республики Беларусь
             и (или) в мире технологии и (или) продукции того же назначения:
           </label>
-          <textarea [(ngModel)]="_form.analogue" name="analogue" required rows="3" class="form-control"
+          <textarea [ngModel]="formValue().analogue" (ngModelChange)="patchForm({ analogue: $event }); updateFormSignal()" name="analogue" required rows="3" class="form-control"
             placeholder="наиболее близкий аналог в республике по объекту экспертизы">
           </textarea>
         </div>
@@ -179,7 +179,7 @@
             11. Признаки, которыми технологии и (или) продукция отличаются от аналогов
             на территории Республики Беларусь и (или) в мире:
           </label>
-          <textarea [(ngModel)]="_form.differences" name="differences" required rows="3" class="form-control"
+          <textarea [ngModel]="formValue().differences" (ngModelChange)="patchForm({ differences: $event }); updateFormSignal()" name="differences" required rows="3" class="form-control"
             placeholder="признаки, по которым наиболее близкий аналог в республике отличается от объекта экспертизы">
           </textarea>
         </div>
@@ -188,7 +188,7 @@
             12. Обоснованность расходов по сравнению с аналогичными технологиями и (или) продукцией,
             применяемыми и (или) выпускаемой в Республике Беларусь и (или) мире:
           </label>
-          <textarea [(ngModel)]="_form.relevance" name="relevance" required rows="3" class="form-control"
+          <textarea [ngModel]="formValue().relevance" (ngModelChange)="patchForm({ relevance: $event }); updateFormSignal()" name="relevance" required rows="3" class="form-control"
             placeholder="анализ и оценка обоснованности расходов во внедряемые технологии по объекту экспертизы">
           </textarea>
         </div>
@@ -197,7 +197,7 @@
             13. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
             и необходимости модернизации (реконструкции) взаимосвязанных действующих производственных объектов:
           </label>
-          <textarea [(ngModel)]="_form.consequences" name="consequences" required rows="3" class="form-control"
+          <textarea [ngModel]="formValue().consequences" (ngModelChange)="patchForm({ consequences: $event }); updateFormSignal()" name="consequences" required rows="3" class="form-control"
             placeholder="оценка возможных последствий внедрения выбранных технологий и необходимости модернизации">
           </textarea>
         </div>
@@ -227,7 +227,7 @@
           3. Создание и внедрение новых технологий и (или) производство новой для Республики Беларусь
           и (или) мировой экономики продукции:
         </label>
-        <app-boolean-button [(ngModel)]="_form.innovative" [falseLabel]="'не соответствует'"
+        <app-boolean-button [ngModel]="formValue().innovative" (ngModelChange)="patchForm({ innovative: $event }); updateFormSignal()" [falseLabel]="'не соответствует'"
         [trueLabel]="'соответствует'"></app-boolean-button>
       </div>
 
@@ -241,12 +241,12 @@
         }
         @for (note of notes; track note; let i = $index) {
           <div class="input-group btn-group mb-2">
-            <textarea [(ngModel)]="note.name" rows="2" class="form-control"
+            <textarea [(ngModel)]="note.name" (ngModelChange)="markFormChanged(); updateFormSignal()" rows="2" class="form-control"
             placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
-            <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+            <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1); markFormChanged(); updateFormSignal()">&times;</button>
           </div>
         }
-        <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
+        <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''}); markFormChanged(); updateFormSignal()">
           Добавить замечание
         </button>
       </div>

@@ -2,34 +2,48 @@
 
     <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
-    <app-priority_areas-block-2025 [_form]="_form"
-                                   [num]="'1'"
-                                   (onConditionsChanged)="onConditionsChanged()"></app-priority_areas-block-2025>
+    <app-priority_areas-block-2025
+      [_form]="formValue()"
+      [num]="'1'"
+      (formPatch)="patchForm($event)"
+      (onConditionsChanged)="onConditionsChanged()"
+    ></app-priority_areas-block-2025>
 
-<!--    <app-socio-economic-dev-2025 [_form]="_form"-->
+<!--    <app-socio-economic-dev-2025 [_form]="formValue()"-->
 <!--                                 [num]="'2'"-->
 <!--                                 (onConditionsChanged)="onConditionsChanged()"></app-socio-economic-dev-2025>-->
 
-    <app-program-requirements-block-2025 [_form]="_form"
-                                         [num]="'2'"
-                                         (onConditionsChanged)="onConditionsChanged()"></app-program-requirements-block-2025>
+    <app-program-requirements-block-2025
+      [_form]="formValue()"
+      [num]="'2'"
+      (formPatch)="patchForm($event)"
+      (onConditionsChanged)="onConditionsChanged()"
+    ></app-program-requirements-block-2025>
     <hr/>
-    <app-prognosis-block-2025 [_form]="_form"
+    <app-prognosis-block-2025 [_form]="formValue()"
                               [num]="'3'"
+                              (formPatch)="patchForm($event)"
                               (onConditionsChanged)="onConditionsChanged()"></app-prognosis-block-2025>
     <hr/>
-    <app-target-analysis-block-2025 [_form]="_form"
-                                    [num]="'4'"
-                                    (onConditionsChanged)="onConditionsChanged()"></app-target-analysis-block-2025>
+    <app-target-analysis-block-2025
+      [_form]="formValue()"
+      [num]="'4'"
+      (formPatch)="patchForm($event)"
+      (onConditionsChanged)="onConditionsChanged()"
+    ></app-target-analysis-block-2025>
     <hr/>
-    <app-program-sufficiency-block-2025 [_form]="_form"
+    <app-program-sufficiency-block-2025 [_form]="formValue()"
                                         [num]="'5'"
+                                        (formPatch)="patchForm($event)"
                                         (onConditionsChanged)="onConditionsChanged()"></app-program-sufficiency-block-2025>
 </div>
 
 <hr/>
-<app-conclusion-8-13-block-2025 [_form]="_form"
-                                [disabled]="isConclusionDisabled()"
-                                (onConditionsChanged)="onConditionsChanged()"></app-conclusion-8-13-block-2025>
+<app-conclusion-8-13-block-2025
+  [_form]="formValue()"
+  [disabled]="isConclusionDisabled()"
+  (formPatch)="patchForm($event)"
+  (onConditionsChanged)="onConditionsChanged()"
+></app-conclusion-8-13-block-2025>
 <hr/>
-<app-notes-block [_form]="_form" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>
+<app-notes-block [_form]="formValue()" (formPatch)="patchForm($event)" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>

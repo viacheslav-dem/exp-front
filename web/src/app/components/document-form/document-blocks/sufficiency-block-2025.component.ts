@@ -9,7 +9,7 @@ import {Component, input, output} from "@angular/core";
         технических средств и (или) комплексов программно-технических средств для достижения целей государственной программы,
         либо перечня научных исследований и разработок по развитию государственной системы научно-технической информации Республики Беларусь:
       </label>
-      <input type="hidden" [(ngModel)]="_form().sufficiency" name="sufficiency" required>
+      <input type="hidden" [ngModel]="_form().sufficiency" name="sufficiency" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().sufficiency === true}" (click)="stateButton(true)">
           Достаточно
@@ -21,14 +21,29 @@ import {Component, input, output} from "@angular/core";
       @if (!_form().sufficiency) {
         <label>Рекомендуется добавить:</label>
         <textarea
-          [(ngModel)]="_form().sufficiencySuggestion" name="sufficiencySuggestion" required maxlength="5000" rows="2" class="form-control"
+          [ngModel]="_form().sufficiencySuggestion"
+          (ngModelChange)="emitPatch({ sufficiencySuggestion: $event })"
+          name="sufficiencySuggestion"
+          required
+          maxlength="5000"
+          rows="2"
+          class="form-control"
           title="Рекомендуется добавить"
           placeholder="перечисление ресурсов, которые необходимо добавить в процессе реализации объекта экспертизы"
         ></textarea>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form().sufficiencyText" name="sufficiencyText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
+        <textarea
+          [ngModel]="_form().sufficiencyText"
+          (ngModelChange)="emitPatch({ sufficiencyText: $event })"
+          name="sufficiencyText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
     </div>
     `,
@@ -40,19 +55,25 @@ export class SufficiencyBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
+    readonly _form = input<SufficiencyBlock2025Form>(undefined);
+
+    readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<SufficiencyBlock2025Form>>();
+
+    emitPatch(patch: Partial<SufficiencyBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
+
+    stateButton(flag: boolean){
+        this.emitPatch({ sufficiency: flag });
+    }
+}
+
+type SufficiencyBlock2025Form = {
     sufficiency: boolean;
     sufficiencyText: string;
     sufficiencySuggestion: string;
-}>(undefined);
-
-    readonly onConditionsChanged = output<boolean>();
-
-    stateButton(flag: boolean){
-        if(flag){
-            this._form().sufficiency = true;
-        } else {
-            this._form().sufficiency = false;
-        }
-    }
-}
+};

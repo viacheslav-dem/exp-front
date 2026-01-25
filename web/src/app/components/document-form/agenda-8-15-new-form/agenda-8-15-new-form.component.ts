@@ -23,13 +23,15 @@ export class Agenda_8_15_NewFormComponent extends AgendaNewForm {
   }
 
   isFinanceConclusionDisabled() {
-    return !anyMatch(this._form.novelty, 'новый для Республики Беларусь', 'новый для стран СНГ', 'новизна мирового уровня')
-      || !anyMatch(this._form.economicSignificance, 'средняя', 'высокая');
+    const form = this.formValue();
+    return !anyMatch(form.novelty, 'новый для Республики Беларусь', 'новый для стран СНГ', 'новизна мирового уровня')
+      || !anyMatch(form.economicSignificance, 'средняя', 'высокая');
   }
 
   onConditionsChanged() {
+    this.markFormChanged();
     if (this.isFinanceConclusionDisabled()) {
-      this._form.financeConclusion = false;
+      this.patchForm({ financeConclusion: false });
     }
   }
 }

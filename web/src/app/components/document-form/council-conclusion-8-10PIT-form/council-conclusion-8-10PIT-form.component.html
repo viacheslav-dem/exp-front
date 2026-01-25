@@ -2,12 +2,12 @@
 
 <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
-<app-product-name-block [_form]="_form"></app-product-name-block>
+<app-product-name-block [_form]="formValue()"></app-product-name-block>
 
 <hr/>
 
 <app-patents-accordance-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'1'"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-patents-accordance-block>
@@ -15,7 +15,7 @@
 <hr/>
 
 <app-advantage-accordance-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'2'"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-advantage-accordance-block>
@@ -23,7 +23,7 @@
 <hr/>
 
 <app-competitiveness-accordance-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'3'"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-competitiveness-accordance-block>
@@ -31,8 +31,10 @@
 <hr/>
 
 <app-conclusion-council-block
-  [form]="_form"
+  [form]="formValue()"
   [financeConclusionNum]="'1, 2 и 3'"
   [project]="project"
   [group]="group"
+  (formPatch)="patchForm($event)"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-conclusion-council-block>

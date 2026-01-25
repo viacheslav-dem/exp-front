@@ -9,15 +9,16 @@ import {Component, input, output} from '@angular/core';
         (подрядчиков, исполнителей), претендующих на участие в реализации
         мероприятия, целям рассматриваемого мероприятия:
       </label>
+      <input type="hidden" [ngModel]="_form()?.assessment" name="assessment" required>
       <app-boolean-button
         name="assessment"
         required
-        [(ngModel)]="_form().assessment"
+        [ngModel]="_form()?.assessment"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+        (ngModelChange)="emitPatch({ assessment: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().assessmentText" name="assessmentText" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.assessmentText" (ngModelChange)="emitPatch({ assessmentText: $event })" name="assessmentText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
       @if (full()) {
@@ -43,10 +44,18 @@ export class AssessmentConclusionBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    assessment: boolean;
-    assessmentText: string;
-}>(undefined);
+  readonly _form = input<AssessmentConclusionBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<AssessmentConclusionBlockForm>>();
+
+  emitPatch(patch: Partial<AssessmentConclusionBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type AssessmentConclusionBlockForm = {
+  assessment: boolean;
+  assessmentText: string;
+};

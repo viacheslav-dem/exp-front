@@ -10,14 +10,16 @@ import {Component, input, output} from '@angular/core';
       </label>
       <app-dropdown
         [options]="privacyOptions"
-        [(ngModel)]="_form().privacyObjectsDescription"
-        [attr.name]="'privacyObjectsDescription_' + num().split('.').join('_')"
+        [ngModel]="_form()?.privacyObjectsDescription"
+        [name]="'privacyObjectsDescription_' + num().split('.').join('_')"
         required
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-      @if (full() || _form().privacyObjectsDescription == 'предусматривается') {
+        (ngModelChange)="emitPatch({ privacyObjectsDescription: $event })"
+      ></app-dropdown>
+      @if (full() || _form()?.privacyObjectsDescription == 'предусматривается') {
         <textarea
-          [(ngModel)]="_form().privacyObjectsDescriptionText"
-          [attr.name]="'privacyObjectsDescriptionText_' + num().split('.').join('_')"
+          [ngModel]="_form()?.privacyObjectsDescriptionText"
+          (ngModelChange)="emitPatch({ privacyObjectsDescriptionText: $event })"
+          [name]="'privacyObjectsDescriptionText_' + num().split('.').join('_')"
           required
           minlength="30"
           maxlength="5000"
@@ -54,10 +56,18 @@ export class PrivacyBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    privacyObjectsDescription: string;
-    privacyObjectsDescriptionText: string;
-}>(undefined);
+  readonly _form = input<PrivacyBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<PrivacyBlockForm>>();
+
+  emitPatch(patch: Partial<PrivacyBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type PrivacyBlockForm = {
+  privacyObjectsDescription: string;
+  privacyObjectsDescriptionText: string;
+};

@@ -7,11 +7,12 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Обоснование конкурентоспособности разработки:
       </label>
-      <app-dropdown name="competitiveness" required [options]="competitivenessOptions" [(ngModel)]="_form().competitiveness"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown name="competitiveness" required [options]="competitivenessOptions" [ngModel]="_form()?.competitiveness"
+      (ngModelChange)="emitPatch({ competitiveness: $event })"></app-dropdown>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().competitivenessText"
+          [ngModel]="_form()?.competitivenessText"
+          (ngModelChange)="emitPatch({ competitivenessText: $event })"
           [attr.name]="'competitivenessText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -45,10 +46,18 @@ export class CompetitivenessBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    competitiveness: string;
-    competitivenessText: string;
-}>(undefined);
+  readonly _form = input<CompetitivenessBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<CompetitivenessBlockForm>>();
+
+  emitPatch(patch: Partial<CompetitivenessBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type CompetitivenessBlockForm = {
+  competitiveness: string;
+  competitivenessText: string;
+};

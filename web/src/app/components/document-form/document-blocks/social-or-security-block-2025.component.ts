@@ -9,7 +9,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <label>
         {{num()}}. Объект государственной экспертизы является социально значимым или направленным на обеспечение национальной безопасности:
       </label>
-      <input type="hidden" [(ngModel)]="_form().socialOrSecurity" name="socialOrSecurity" required>
+      <input type="hidden" [ngModel]="_form().socialOrSecurity" name="socialOrSecurity" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().socialOrSecurity === true}" (click)="stateButton(true)">
           Да (социально значимый / направлен на обеспечение национальной безопасности)
@@ -19,7 +19,9 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().socialOrSecurityText"
+        <textarea
+          [ngModel]="_form().socialOrSecurityText"
+          (ngModelChange)="emitPatch({ socialOrSecurityText: $event })"
           name="socialOrSecurityText"
           required
           minlength="30"
@@ -78,21 +80,27 @@ export class SocialOrSecurityBlock2025Component {
 
     readonly isTextRequired = input<boolean>(false);
 
-    readonly _form = input<{
-    socialOrSecurity: boolean;
-    socialOrSecurityText: string;
-}>(undefined);
+    readonly _form = input<SocialOrSecurityBlock2025Form>(undefined);
 
     readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<SocialOrSecurityBlock2025Form>>();
+
+    emitPatch(patch: Partial<SocialOrSecurityBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean) {
-        if(flag){
-            this._form().socialOrSecurity = true;
-        } else {
-            this._form().socialOrSecurity = false;
-        }
+        this.emitPatch({ socialOrSecurity: flag });
     }
 
 }
+
+type SocialOrSecurityBlock2025Form = {
+    socialOrSecurity: boolean;
+    socialOrSecurityText: string;
+};

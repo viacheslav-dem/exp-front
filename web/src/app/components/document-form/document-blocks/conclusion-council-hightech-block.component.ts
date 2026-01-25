@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 import {LifecycleGroupDto} from "@app/dto/LifecycleGroupDto";
 import {DecisionState, DecisionStateBadge} from "@app/pipes/decision.pipe";
 import {ProjectDto} from "@app/dto/ProjectDto";
@@ -9,11 +9,11 @@ import {ProjectDto} from "@app/dto/ProjectDto";
     <div class="form-sub-group">
       <label class="font-weight-bold">
         Заключение государственного экспертного совета по объекту государственной экспертизы <i>{{project()?.title}}</i>:
-        <span class="ml-05" [ngClass]="['badge', DecisionStateBadge[group().finalAgendaState || DecisionState.REJECTED] || 'badge-info']">
-          {{group().finalAgendaState || DecisionState.REJECTED | decision}}
+        <span class="ml-05" [ngClass]="['badge', DecisionStateBadge[group()?.finalAgendaState || DecisionState.REJECTED] || 'badge-info']">
+          {{group()?.finalAgendaState || DecisionState.REJECTED | decision}}
         </span>
       </label>
-      <textarea [(ngModel)]="form().conclusionText" name="conclusionText" rows="3" class="form-control"
+      <textarea [ngModel]="form()?.conclusionText" (ngModelChange)="emitPatch({ conclusionText: $event })" name="conclusionText" rows="3" class="form-control"
       placeholder="Выводы и предложения (при необходимости)."></textarea>
       @if (financeConclusionNum()) {
         <div class="hint">
@@ -36,9 +36,19 @@ export class ConclusionCouncilHightechBlockComponent {
 
     readonly project = input<ProjectDto>(undefined);
 
-    readonly form = input<{
-    conclusionText: string;
-}>(undefined);
+    readonly form = input<ConclusionCouncilHightechBlockForm>(undefined);
 
     readonly group = input<LifecycleGroupDto>(undefined);
+
+    readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<ConclusionCouncilHightechBlockForm>>();
+
+    emitPatch(patch: Partial<ConclusionCouncilHightechBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type ConclusionCouncilHightechBlockForm = {
+  conclusionText: string;
+};

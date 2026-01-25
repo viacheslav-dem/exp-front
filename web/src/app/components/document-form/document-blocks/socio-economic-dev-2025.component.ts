@@ -16,8 +16,13 @@ import {Component, input, output} from "@angular/core";
             </button>
           </div>
           @if (full()) {
-            <textarea [(ngModel)]="_form().socioEconomicText" rows="3" class="form-control mt-05"
-            placeholder="Обязательный текст"></textarea>
+            <textarea
+              [ngModel]="_form().socioEconomicText"
+              (ngModelChange)="emitPatch({ socioEconomicText: $event })"
+              rows="3"
+              class="form-control mt-05"
+              placeholder="Обязательный текст"
+            ></textarea>
           }
         </div>
         `,
@@ -29,18 +34,24 @@ export class SocioEconomivDev2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    socioEconomic: boolean;
-    socioEconomicText: string;
-}>(undefined);
+    readonly _form = input<SocioEconomicDev2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<SocioEconomicDev2025Form>>();
+
+    emitPatch(patch: Partial<SocioEconomicDev2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean) {
-        if(flag){
-            this._form().socioEconomic = true;
-        } else {
-            this._form().socioEconomic = false;
-        }
+        this.emitPatch({ socioEconomic: flag });
     }
 }
+
+type SocioEconomicDev2025Form = {
+    socioEconomic: boolean;
+    socioEconomicText: string;
+};

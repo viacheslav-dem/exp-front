@@ -23,6 +23,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         @if (full()) {
           <textarea
             [(ngModel)]="_form().projectDocsText"
+            (ngModelChange)="onConditionsChanged.emit(true)"
             [attr.name]="'projectDocsText_' + num().split('.').join('_')"
             required
             minlength="30"

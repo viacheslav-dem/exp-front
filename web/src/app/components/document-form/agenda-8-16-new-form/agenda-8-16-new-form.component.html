@@ -1,47 +1,56 @@
 <hr/>
 
-<app-agenda-header-block [_form]="_form" [ind]="ind" [project]="_project" [expanded]="expanded()" (toggle)="toggleExpanded()"></app-agenda-header-block>
+<app-agenda-header-block [_form]="formValue()" [ind]="ind" [project]="_project" [expanded]="expanded()" (toggle)="toggleExpanded()"></app-agenda-header-block>
 
 <div class="collapse" [collapse]="!expanded()" [attr.id]="'meeting-project-' + _project?.id">
     <hr/>
 
-    <app-customer-replies-block [_form]="_form"></app-customer-replies-block>
+    <app-customer-replies-block
+      [_form]="formValue()"
+      (formPatch)="patchForm($event)"
+      (onConditionsChanged)="onConditionsChanged()"
+    ></app-customer-replies-block>
 
 
     <hr/>
     <app-correspondence-of-product-name
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'3.4'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-correspondence-of-product-name>
     <hr/>
     <app-new-and-high-tech
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'3.5'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-new-and-high-tech>
     <hr/>
     <app-percentage-of-export-to-import
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'3.6'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-percentage-of-export-to-import>
     <hr/>
 
     <app-percentage-of-import-to-export
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'3.7'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-percentage-of-import-to-export>
 
     <hr/>
 
     <app-section-conclusion-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'4'"
             [financeConclusionNum]="financeConclusionNum"
             [project]="project"
             [allParticipants]="getAllParticipants()"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-section-conclusion-block>
 </div>

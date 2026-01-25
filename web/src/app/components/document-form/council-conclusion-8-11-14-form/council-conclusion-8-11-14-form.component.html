@@ -3,73 +3,82 @@
 <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
 <app-work-significance-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'1'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-work-significance-block>
 
 <hr/>
 
 <app-marketing-research-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'2'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-marketing-research-block>
 
 <hr/>
 
 <app-effect-conclusion-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'3'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-effect-conclusion-block>
 
 <hr/>
 
 <app-sufficiency-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'4'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-sufficiency-block>
 
 <hr/>
 
 <app-work-accordance-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'5'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-work-accordance-block>
 
 <hr/>
 
 <app-privacy-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'6'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-privacy-block>
 
 <hr/>
 
 <app-assessment-conclusion-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'7'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-assessment-conclusion-block>
 
 <hr/>
 
 <app-terms-accordance-block
-  [form]="_form"
+  [form]="formValue()"
   [num]="'8'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-terms-accordance-block>
 
 <hr/>
 
 <app-finance-conclusion-block
-  [_form]="_form"
+  [_form]="formValue()"
   [project]="project"
   [num]="'9'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-finance-conclusion-block>
 
@@ -82,25 +91,29 @@
 <hr/>
 
 <app-stages-exists-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'10.1'"
   [askStages]="false"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-stages-exists-block>
 
 <hr/>
 
 <app-stages-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'10.2'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-stages-block>
 
 <hr/>
 
 <app-conclusion-council-block
-  [form]="_form"
+  [form]="formValue()"
   [financeConclusionNum]="financeConclusionNum"
   [project]="project"
   [group]="group"
+  (formPatch)="patchForm($event)"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-conclusion-council-block>

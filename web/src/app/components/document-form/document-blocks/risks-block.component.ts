@@ -7,12 +7,18 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Риски реализации проекта:
       </label>
-      <app-dropdown name="risks" required [options]="risksOptions" [(ngModel)]="_form().risks"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown
+        name="risks"
+        required
+        [options]="risksOptions"
+        [ngModel]="_form()?.risks"
+        (ngModelChange)="emitPatch({ risks: $event })"
+      ></app-dropdown>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().risksText"
-          [attr.name]="'risksText_' + num().split('.').join('_')"
+          [ngModel]="_form()?.risksText"
+          (ngModelChange)="emitPatch({ risksText: $event })"
+          [name]="'risksText_' + num().split('.').join('_')"
           required
           minlength="30"
           maxlength="5000"
@@ -62,10 +68,18 @@ export class RisksBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    risks: string;
-    risksText: string;
-}>(undefined);
+  readonly _form = input<RisksBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<RisksBlockForm>>();
+
+  emitPatch(patch: Partial<RisksBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type RisksBlockForm = {
+  risks: string;
+  risksText: string;
+};

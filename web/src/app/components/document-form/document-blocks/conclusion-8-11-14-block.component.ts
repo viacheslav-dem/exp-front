@@ -8,17 +8,19 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Целесообразность реализации объекта государственной экспертизы и его финансирования за счет средств
         республиканского бюджета и (или) других источников финансирования:
       </label>
+      <input type="hidden" [ngModel]="_form()?.conclusion" name="conclusion" required>
       <app-boolean-button
         name="conclusion"
         required
-        [(ngModel)]="_form().conclusion"
+        [ngModel]="_form()?.conclusion"
         [disabled]="disabled()"
         [showDisabledSelection]="true"
         [trueLabel]="'целесообразно'"
         [falseLabel]="'нецелесообразно'"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+        (ngModelChange)="emitPatch({ conclusion: $event })"></app-boolean-button>
       <textarea
-        [(ngModel)]="_form().conclusionText"
+        [ngModel]="_form()?.conclusionText"
+        (ngModelChange)="emitPatch({ conclusionText: $event })"
         [attr.name]="'conclusionText_8_11_14_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -43,10 +45,18 @@ export class Conclusion_8_11_14_BlockComponent {
 
   readonly disabled = input<boolean>(false);
 
-  readonly _form = input<{
-    conclusion: boolean;
-    conclusionText: string;
-}>(undefined);
+  readonly _form = input<Conclusion81114BlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<Conclusion81114BlockForm>>();
+
+  emitPatch(patch: Partial<Conclusion81114BlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type Conclusion81114BlockForm = {
+  conclusion: boolean;
+  conclusionText: string;
+};

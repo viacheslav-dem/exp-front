@@ -8,7 +8,7 @@ import {Component, input, output} from "@angular/core";
             {{ num() }}. Обоснование конкурентоспособности разработки:
           </label>
           <br>
-            <input type="hidden" [(ngModel)]="_form().competitiveness" name="competitiveness" required>
+            <input type="hidden" [ngModel]="_form().competitiveness" name="competitiveness" required>
             <div class="btn-group" role="group" aria-label="Basic example">
               <button type="button" class="btn btn-outline-success"
                 [ngClass]="{'active': _form().competitiveness === true}" (click)="stateButton(true)">
@@ -20,8 +20,17 @@ import {Component, input, output} from "@angular/core";
               </button>
             </div>
             @if (full()) {
-              <textarea [(ngModel)]="_form().competitivenessText" name="competitivenessText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-              placeholder="Обязательный текст (не менее 30 символов)"></textarea>
+              <textarea
+                [ngModel]="_form().competitivenessText"
+                (ngModelChange)="emitPatch({ competitivenessText: $event })"
+                name="competitivenessText"
+                required
+                minlength="30"
+                maxlength="5000"
+                rows="3"
+                class="form-control mt-05"
+                placeholder="Обязательный текст (не менее 30 символов)"
+              ></textarea>
             }
             @if (full()) {
               <div class="hint">
@@ -49,14 +58,24 @@ export class CompetitivenessBlockAgenda2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    competitiveness: boolean;
-    competitivenessText: string;
-}>(undefined);
+    readonly _form = input<CompetitivenessBlockAgenda2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<CompetitivenessBlockAgenda2025Form>>();
+
+    emitPatch(patch: Partial<CompetitivenessBlockAgenda2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean) {
-        this._form().competitiveness = flag;
+        this.emitPatch({ competitiveness: flag });
     }
 }
+
+type CompetitivenessBlockAgenda2025Form = {
+    competitiveness: boolean;
+    competitivenessText: string;
+};

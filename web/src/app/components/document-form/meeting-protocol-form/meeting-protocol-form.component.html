@@ -9,32 +9,36 @@
     <label>Дата составления протокола</label>
     <app-date-input class="width-100 input-group-sm input-group" 
                     name="date" required
-                    [(ngModel)]="_form.date"></app-date-input>
+                    [ngModel]="formValue().date"
+                    (ngModelChange)="patchForm({ date: $event })"></app-date-input>
   </div>
 
   <div class="form-sub-group">
     <label>Фактическое время окончания заседания</label>
     <app-time-input name="endDate" required
-                    [(ngModel)]="_form.endDate"></app-time-input>
+                    [ngModel]="formValue().endDate"
+                    (ngModelChange)="patchForm({ endDate: $event })"></app-time-input>
   </div>
 
   <div class="form-sub-group">
     <label>Время затраченное <b>руководителем</b> для предварительного рассмотрения материалов по объектам экспертизы, подготовки и проведения заседаний секций или бюро экспертного совета, а также оформления соответствующих материалов:</label>
     <input class="form-control" type="number" 
            name="prepareTimeByChairman" min="0"
-           [(ngModel)]="_form.prepareTimeByChairman" numberInput/>
+           [ngModel]="formValue().prepareTimeByChairman"
+           (ngModelChange)="patchForm({ prepareTimeByChairman: $event })" numberInput/>
   </div>
 
   <div class="form-sub-group">
     <label>Время затраченное <b>секретарём</b> для предварительного рассмотрения материалов по объектам экспертизы, подготовки и проведения заседаний секций или бюро экспертного совета, а также оформления соответствующих материалов:</label>
     <input class="form-control" type="number" 
            name="prepareTimeBySecretary" min="0"
-           [(ngModel)]="_form.prepareTimeBySecretary" numberInput/>
+           [ngModel]="formValue().prepareTimeBySecretary"
+           (ngModelChange)="patchForm({ prepareTimeBySecretary: $event })" numberInput/>
   </div>
 
   <div class="form-sub-group">
     <label>Председательствовал:</label>
-    <span class="italic"> {{_form.chairman | fullName}}</span>
+    <span class="italic"> {{formValue().chairman | fullName}}</span>
     <a class="btn btn-icon btn-icon-sm" (click)="showSearchChairmanModal()">
       <fa-icon icon="pencil-alt"></fa-icon>
     </a>
@@ -49,7 +53,7 @@
           <span class="italic">{{i + 1}}. {{assessor | fullName}}</span>
         </app-checkbox>
       }
-      <label class="text-mini italic">Выбрано: {{_form.participants.length}}</label>
+      <label class="text-mini italic">Выбрано: {{formValue().participants.length}}</label>
     </div>
     <div class="col-md-6">
       <label class="form-group-label">Приглашённые лица</label>

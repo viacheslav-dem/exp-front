@@ -1,83 +1,90 @@
 <hr/>
 
-<app-agenda-header-block [_form]="_form" [ind]="ind" [project]="_project" [expanded]="expanded()" (toggle)="toggleExpanded()"></app-agenda-header-block>
+<app-agenda-header-block [_form]="formValue()" [ind]="ind" [project]="_project" [expanded]="expanded()" (toggle)="toggleExpanded()"></app-agenda-header-block>
 
 <div class="collapse" [collapse]="!expanded()" [attr.id]="'meeting-project-' + _project?.id">
     <hr/>
 
-    <app-customer-replies-block [_form]="_form"></app-customer-replies-block>
+    <app-customer-replies-block [_form]="formValue()" (onConditionsChanged)="onConditionsChanged()"></app-customer-replies-block>
 
     <hr/>
 
     <app-novelty-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'1'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-novelty-block>
     <hr/>
 
     <app-technology-type-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'1.1'"
             (onConditionsChanged)="onConditionsChanged()"></app-technology-type-block>
     <hr/>
 
-    <app-needed-project-docs-block [_form]="_form"
+    <app-needed-project-docs-block [_form]="formValue()"
                                    [project]="project"
                                    [num]="'1.2'"></app-needed-project-docs-block>
 
     <app-select-directions-and-goals-block
-            [form]="_form"
+            [form]="formValue()"
             [num]="'2'"
             [project]="_project"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-select-directions-and-goals-block>
 
     <hr/>
 
     <app-rb-needs-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'3'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-rb-needs-block>
 
     <hr/>
 
     <app-economic-significance-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'4'"
             [project]="_project"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-economic-significance-block>
 
     <hr/>
 
     <app-resources-sufficiency-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'5'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-resources-sufficiency-block>
 
     <hr/>
 
     <app-competence-sufficiency-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'6'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-competence-sufficiency-block>
 
     <hr/>
 
     <app-marketing-research-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'7'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-marketing-research-block>
 
     <hr/>
 
     <app-risks-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'8'"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-risks-block>
@@ -85,8 +92,9 @@
     <hr/>
 
     <app-privacy-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'9'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-privacy-block>
 
@@ -99,7 +107,7 @@
     <hr/>
 
     <app-stages-exists-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'10.1'"
             [askStages]="false"
             (onConditionsChanged)="onConditionsChanged()"
@@ -108,8 +116,9 @@
     <hr/>
 
     <app-stages-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'10.2'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-stages-block>
 
@@ -122,36 +131,40 @@
     <hr/>
 
     <app-name-accordance-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'11.1'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-name-accordance-block>
 
     <hr/>
 
     <app-terms-accordance-block
-            [form]="_form"
+            [form]="formValue()"
             [num]="'11.2'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-terms-accordance-block>
 
     <hr/>
 
     <app-finance-accordance-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'11.3'"
             [project]="_project"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-finance-accordance-block>
 
     <hr/>
 
     <app-finance-conclusion-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'11.4'"
             [noveltyNum]="'1'"
             [project]="project"
             [economicSignificanceNum]="'4'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
             [disabled]="isFinanceConclusionDisabled()"
     ></app-finance-conclusion-block>
@@ -159,7 +172,7 @@
     <hr/>
 
     <app-section-conclusion-block
-            [_form]="_form"
+            [_form]="formValue()"
             [num]="'12'"
             [financeConclusionNum]="financeConclusionNum"
             [project]="project"

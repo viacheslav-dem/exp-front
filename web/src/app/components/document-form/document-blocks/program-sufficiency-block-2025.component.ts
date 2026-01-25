@@ -8,7 +8,7 @@ import {Component, input, output} from "@angular/core";
         {{num()}}. Достаточность перечня мероприятий по научному обеспечению государственной программы / перечня заданий
         государственной научно-технической программы для достижения запланированных программой целевых показателей:
       </label>
-      <input type="hidden" [(ngModel)]="_form().programSufficiency" name="programSufficiency" required>
+      <input type="hidden" [ngModel]="_form().programSufficiency" name="programSufficiency" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().programSufficiency === true}" (click)="stateButton(true)">
           Достаточен
@@ -18,8 +18,17 @@ import {Component, input, output} from "@angular/core";
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().programSufficiencyText" name="programSufficiencyText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
+        <textarea
+          [ngModel]="_form().programSufficiencyText"
+          (ngModelChange)="emitPatch({ programSufficiencyText: $event })"
+          name="programSufficiencyText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)"
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">
@@ -59,18 +68,24 @@ export class ProgramSufficiencyBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    programSufficiency: boolean;
-    programSufficiencyText: string;
-}>(undefined);
+    readonly _form = input<ProgramSufficiencyBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<ProgramSufficiencyBlock2025Form>>();
+
+    emitPatch(patch: Partial<ProgramSufficiencyBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean) {
-        if(flag){
-            this._form().programSufficiency = true;
-        } else {
-            this._form().programSufficiency = false;
-        }
+        this.emitPatch({ programSufficiency: flag });
     }
 }
+
+type ProgramSufficiencyBlock2025Form = {
+    programSufficiency: boolean;
+    programSufficiencyText: string;
+};

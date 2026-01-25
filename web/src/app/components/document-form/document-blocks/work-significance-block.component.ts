@@ -9,15 +9,16 @@ import {Component, input, output} from '@angular/core';
         технологических процессов, наукоемкой, конкурентоспособной продукции, формирования перспективных
         научных направлений:
       </label>
+      <input type="hidden" [ngModel]="_form()?.workSignificance" name="workSignificance" required>
       <app-boolean-button
         name="workSignificance"
         required
-        [(ngModel)]="_form().workSignificance"
+        [ngModel]="_form()?.workSignificance"
         [trueLabel]="'присутствует'"
         [falseLabel]="'отсутствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+        (ngModelChange)="emitPatch({ workSignificance: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().workSignificanceText" name="workSignificanceText" required minlength="30" maxlength="5000" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.workSignificanceText" (ngModelChange)="emitPatch({ workSignificanceText: $event })" name="workSignificanceText" required minlength="30" maxlength="5000" rows="3" class="form-control"
         placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
     </div>
@@ -30,10 +31,18 @@ export class WorkSignificanceBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    workSignificance: boolean;
-    workSignificanceText;
-}>(undefined);
+  readonly _form = input<WorkSignificanceBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<WorkSignificanceBlockForm>>();
+
+  emitPatch(patch: Partial<WorkSignificanceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type WorkSignificanceBlockForm = {
+  workSignificance: boolean;
+  workSignificanceText: string;
+};

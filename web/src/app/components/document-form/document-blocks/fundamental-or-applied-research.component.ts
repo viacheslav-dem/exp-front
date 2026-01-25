@@ -24,7 +24,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         </div>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form().fundamentalOrAppliedResearchText" rows="3" class="form-control mt-05"
+        <textarea [(ngModel)]="_form().fundamentalOrAppliedResearchText" (ngModelChange)="onConditionsChanged.emit(true)" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
       @if (full()) {
@@ -63,6 +63,7 @@ export class FundamentalOrAppliedResearchComponent implements OnInit{
         } else{
             this._form().fundamentalOrAppliedResearch = false;
         }
+        this.onConditionsChanged.emit(true);
     }
 
     ngOnInit(): void {

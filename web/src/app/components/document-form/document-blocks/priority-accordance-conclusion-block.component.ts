@@ -7,15 +7,16 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Соответствие приоритетности направления инвестиций в технологии:
       </label>
+      <input type="hidden" [ngModel]="_form()?.priorityAccordance" name="priorityAccordance" required>
       <app-boolean-button
         name="priorityAccordance"
         required
-        [(ngModel)]="_form().priorityAccordance"
+        [ngModel]="_form()?.priorityAccordance"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ priorityAccordance: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().priorityAccordanceText" name="priorityAccordanceText" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.priorityAccordanceText" (ngModelChange)="emitPatch({ priorityAccordanceText: $event })" name="priorityAccordanceText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
       @if (full()) {
@@ -52,10 +53,18 @@ export class PriorityAccordanceConclusionBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    priorityAccordance: boolean;
-    priorityAccordanceText: string;
-}>(undefined);
+  readonly _form = input<PriorityAccordanceConclusionBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<PriorityAccordanceConclusionBlockForm>>();
+
+  emitPatch(patch: Partial<PriorityAccordanceConclusionBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type PriorityAccordanceConclusionBlockForm = {
+  priorityAccordance: boolean;
+  priorityAccordanceText: string;
+};

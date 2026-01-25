@@ -11,14 +11,16 @@ import {Component, input, output} from '@angular/core';
       </label>
       <app-dropdown
         [options]="stagesOptions"
-        [(ngModel)]="_form().stagesExist"
-        [attr.name]="'stagesExist_' + num().split('.').join('_')"
+        [ngModel]="_form()?.stagesExist"
+        [name]="'stagesExist_' + num().split('.').join('_')"
         required
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+        (ngModelChange)="emitPatch({ stagesExist: $event })"
+      ></app-dropdown>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().stagesExistText"
-          [attr.name]="'stagesExistText_' + num().split('.').join('_')"
+          [ngModel]="_form()?.stagesExistText"
+          (ngModelChange)="emitPatch({ stagesExistText: $event })"
+          [name]="'stagesExistText_' + num().split('.').join('_')"
           required
           minlength="30"
           maxlength="5000"
@@ -52,10 +54,18 @@ export class StagesExistsBlockComponent {
 
   readonly askStages = input<boolean>(true);
 
-  readonly _form = input<{
-    stagesExist: string;
-    stagesExistText: string;
-}>(undefined);
+  readonly _form = input<StagesExistsBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<StagesExistsBlockForm>>();
+
+  emitPatch(patch: Partial<StagesExistsBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type StagesExistsBlockForm = {
+  stagesExist: string;
+  stagesExistText: string;
+};

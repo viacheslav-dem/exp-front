@@ -9,10 +9,17 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <label>
         {{num()}}. Способ коммерциализации результата (-ов) научно-технической деятельности:
       </label>
-      <app-dropdown name="commerce" required [options]="noveltyOptions()" [(ngModel)]="_form().commerce"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown
+        name="commerce"
+        required
+        [options]="noveltyOptions()"
+        [ngModel]="_form().commerce"
+        (ngModelChange)="emitPatch({ commerce: $event })"
+      ></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().commerceText"
+        <textarea
+          [ngModel]="_form().commerceText"
+          (ngModelChange)="emitPatch({ commerceText: $event })"
           name="commerceText"
           required
           minlength="30"
@@ -73,15 +80,25 @@ export class CommerceBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    commerce: string;
-    commerceText: string;
-}>(undefined);
+    readonly _form = input<CommerceBlock2025Form>(undefined);
 
     readonly isTextRequired = input<boolean>(false);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<CommerceBlock2025Form>>();
+
+    emitPatch(patch: Partial<CommerceBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type CommerceBlock2025Form = {
+    commerce: string;
+    commerceText: string;
+};
 
 export const noveltyOptions: string[] = [
     'реализация товаров (работ, услуг), создаваемых (выполняемых, оказываемых) с применением результатов научно-технической деятельности ',

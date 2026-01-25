@@ -4,7 +4,7 @@
     <label>
       1. Сопоставительный анализ запланированных результатов и их соответствия достигнутым результатам:
     </label>
-    <textarea [(ngModel)]="_form.results"
+    <textarea [ngModel]="formValue().results" (ngModelChange)="patchForm({ results: $event })"
       name="results"
       required
       rows="4" class="form-control"
@@ -19,7 +19,7 @@
       и инновационных разработок и их внедрения, утвержденными постановлением Государственного комитета
       по науке и технологиям Республики Беларусь от 20 апреля 2017 г. № 9:
     </label>
-    <textarea [(ngModel)]="_form.effectiveness"
+    <textarea [ngModel]="formValue().effectiveness" (ngModelChange)="patchForm({ effectiveness: $event })"
       name="effectiveness"
       required
       rows="3" class="form-control"
@@ -34,7 +34,7 @@
     <label>
       1. Соответствие достигнутого результата запланированному:
     </label>
-    <app-boolean-button [(ngModel)]="_form.accordance" [falseLabel]="'не соответствует'"
+    <app-boolean-button [ngModel]="formValue().accordance" (ngModelChange)="patchForm({ accordance: $event })" [falseLabel]="'не соответствует'"
     [trueLabel]="'соответствует'"></app-boolean-button>
   </div>
 
@@ -42,7 +42,7 @@
     <label>
       2. Соответствие экономического и (или) социального эффекта установленным условиям коммерциализации:
     </label>
-    <app-boolean-button [(ngModel)]="_form.effectAccordance" [falseLabel]="'не соответствует'"
+    <app-boolean-button [ngModel]="formValue().effectAccordance" (ngModelChange)="patchForm({ effectAccordance: $event })" [falseLabel]="'не соответствует'"
     [trueLabel]="'соответствует'"></app-boolean-button>
   </div>
 
@@ -56,12 +56,12 @@
     }
     @for (note of notes; track note; let i = $index) {
       <div class="input-group btn-group mb-2">
-        <textarea [(ngModel)]="note.name" rows="2" class="form-control"
+        <textarea [(ngModel)]="note.name" (ngModelChange)="markFormChanged()" rows="2" class="form-control"
         placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
-        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1); markFormChanged()">&times;</button>
       </div>
     }
-    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
+    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''}); markFormChanged()">
       Добавить замечание
     </button>
   </div>

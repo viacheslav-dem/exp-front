@@ -7,7 +7,7 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}.Импортозамещающая ориентированность товара (соотношение показателей импорта к экспорту):
       </label>
-      <textarea [(ngModel)]="_form().percentageOfImportToExport" name="percentageOfImportToExport" rows="3" class="form-control mt-05"
+      <textarea [ngModel]="_form()?.percentageOfImportToExport" (ngModelChange)="emitPatch({ percentageOfImportToExport: $event })" name="percentageOfImportToExport" rows="3" class="form-control mt-05"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
   `,
@@ -19,9 +19,17 @@ export class PercentageOfImportToExportBlockComponent {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    percentageOfImportToExport: string;
-}>(undefined);
+    readonly _form = input<PercentageOfImportToExportBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<PercentageOfImportToExportBlockForm>>();
+
+    emitPatch(patch: Partial<PercentageOfImportToExportBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type PercentageOfImportToExportBlockForm = {
+  percentageOfImportToExport: string;
+};

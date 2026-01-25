@@ -13,6 +13,10 @@ export class Agenda_8_9_NewFormComponent extends AgendaNewForm {
     this.financeConclusionNum = '5.4';
   }
 
+  onConditionsChanged() {
+    this.markFormChanged();
+  }
+
   validate() {
     super.validate();
     this.validateFinanceConclusion();

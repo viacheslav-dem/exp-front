@@ -14,13 +14,14 @@ export class ExpertReview_8_13_NewFormComponent extends ExpertReviewForm<ExpertR
   }
 
   isConclusionDisabled() {
-    let disabled = !this._form.prognosis
-      || !this._form.programRequirements
-      || !this._form.programSufficiency
-      || !this._form.targetAnalysis
-      || this._form.selectedDirections.length + this._form.selectedSocialEconomicGoals.length == 0;
+    const f = this.formValue();
+    const disabled = !f.prognosis
+      || !f.programRequirements
+      || !f.programSufficiency
+      || !f.targetAnalysis
+      || (f.selectedDirections?.length ?? 0) + (f.selectedSocialEconomicGoals?.length ?? 0) === 0;
     if (disabled) {
-      this._form.conclusion = false;
+      this.patchForm({ conclusion: false });
     }
     return disabled;
   }
@@ -33,7 +34,7 @@ export class ExpertReview_8_13_NewFormComponent extends ExpertReviewForm<ExpertR
 
   onConditionsChanged() {
     if (this.isConclusionDisabled()) {
-      this._form.conclusion = false;
+      this.patchForm({ conclusion: false });
     }
   }
 }

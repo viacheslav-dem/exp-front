@@ -9,7 +9,7 @@
       указанному в абзаце 2 пункта 2 Положения о порядке формирования перечня инновационных товаров,
       утвержденного постановлением Совета Министров Республики Беларусь от 31 октября 2012 г. № 995:
     </label>
-    <textarea [(ngModel)]="_form.privacy"
+    <textarea [ngModel]="formValue().privacy" (ngModelChange)="patchForm({ privacy: $event })"
       name="privacy"
       required
       rows="3" class="form-control"
@@ -24,7 +24,7 @@
       указанному в абзаце 3 пункта 2 Положения о порядке формирования перечня инновационных товаров,
       утвержденного постановлением Совета Министров Республики Беларусь от 31 октября 2012 г. № 995:
     </label>
-    <textarea [(ngModel)]="_form.advantage"
+    <textarea [ngModel]="formValue().advantage" (ngModelChange)="patchForm({ advantage: $event })"
       name="advantage"
       required
       rows="3" class="form-control"
@@ -38,7 +38,7 @@
       Положения о порядке формирования перечня инновационных товаров,
       утвержденного постановлением Совета Министров Республики Беларусь от 31 октября 2012 г. № 995:
     </label>
-    <textarea [(ngModel)]="_form.competitiveness"
+    <textarea [ngModel]="formValue().competitiveness" (ngModelChange)="patchForm({ competitiveness: $event })"
       name="competitiveness"
       required
       rows="3" class="form-control"
@@ -53,7 +53,7 @@
     <label>
       1. Отнесение товара (работы, услуги) к категории инновационных товаров:
     </label>
-    <app-boolean-button [(ngModel)]="_form.innovativeness" [falseLabel]="'не относится'"
+    <app-boolean-button [ngModel]="formValue().innovativeness" (ngModelChange)="patchForm({ innovativeness: $event })" [falseLabel]="'не относится'"
     [trueLabel]="'относится'"></app-boolean-button>
   </div>
 
@@ -67,12 +67,12 @@
     }
     @for (note of notes; track note; let i = $index) {
       <div class="input-group btn-group mb-2">
-        <textarea [(ngModel)]="note.name" rows="2" class="form-control"
+        <textarea [(ngModel)]="note.name" (ngModelChange)="markFormChanged()" rows="2" class="form-control"
         placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
-        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1); markFormChanged()">&times;</button>
       </div>
     }
-    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
+    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''}); markFormChanged()">
       Добавить замечание
     </button>
   </div>

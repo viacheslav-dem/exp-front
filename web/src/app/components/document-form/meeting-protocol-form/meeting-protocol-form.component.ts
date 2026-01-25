@@ -1,4 +1,5 @@
 import {Component, ElementRef, Type, ViewContainerRef, input, ChangeDetectionStrategy, ChangeDetectorRef, signal, effect, viewChild} from "@angular/core";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {MeetingDto} from "@app/dto/MeetingDto";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {Role} from "@app/pipes/role.pipe";
@@ -44,24 +45,34 @@ import {FormValidationScrollService} from "@app/services/form-validation-scroll.
 export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNewFormContent> {
 
   _meeting: MeetingDto;
+  private _currentMeetingId: number | null = null;
   readonly role = input<string>(undefined);
   readonly meeting = input<MeetingDto | undefined>(undefined);
+  // destroyRef уже доступен из базового класса DocumentForm
   private readonly _meetingEffect = effect(() => {
     const meeting = this.meeting();
     if (!meeting) return;
 
+    // Защита от повторных вызовов для того же meeting
+    if (this._currentMeetingId === meeting.id) return;
+    this._currentMeetingId = meeting.id;
+
     this._meeting = meeting;
-    // При смене заседания сбрасываем открытый проект, чтобы не "залипало" состояние.
     this.openedAgendaProjectId.set(null);
-    this._form.endDate = this._form.endDate || this._meeting.period.end;
-    this._meetingService.getMeetingAssessors(this._meeting).subscribe(res => {
-      sortPersonsByName(res);
-      this.assessors = res;
-      this.assessors.forEach(ass => ass.isChecked = this._form.participants.some(selected => selected.id == ass.id));
-      this.cdr?.markForCheck?.();
-    });
+    this.patchForm({ endDate: this.formValue().endDate || this._meeting.period.end } as Partial<MeetingProtocolNewFormContent>);
+    
+    // Добавляем takeUntilDestroyed для предотвращения утечек памяти и бесконечных запросов
+    this._meetingService.getMeetingAssessors(this._meeting)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        sortPersonsByName(res);
+        this.assessors = res;
+        this.assessors.forEach(ass => ass.isChecked = this.formValue().participants.some(selected => selected.id == ass.id));
+        this.cdr?.markForCheck?.(); // Нужен для асинхронного subscribe, так как это не signal операция
+      });
     this.prepareAgendaForms();
-    this.cdr?.markForCheck?.();
+    // При использовании signals effect автоматически триггерит change detection,
+    // markForCheck() в конце effect избыточен и может вызывать бесконечные циклы
   });
   // Управляемое состояние загрузки (прокидывается из контейнера, где выполняется HTTP)
   readonly loading = input<boolean>(false);
@@ -99,11 +110,13 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
 
   ngOnInit() {
     super.ngOnInit();
-    this._personService.getCurrentPerson().subscribe(res => {
-      this.currentPerson = res;
-      this._form.chairman = this._form.chairman || this.currentPerson;
-      this.cdr?.markForCheck?.();
-    });
+    this._personService.getCurrentPerson()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.currentPerson = res;
+        this.patchForm({ chairman: this.formValue().chairman || this.currentPerson } as Partial<MeetingProtocolNewFormContent>);
+        this.cdr?.markForCheck?.();
+      });
   }
 
   createNewForm(): MeetingProtocolNewFormContent {
@@ -133,38 +146,43 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
 
   prepareAgendaForms() {
     const container = this.formContainer();
-    while (container?.length > 0) {
+    if (!container) return;
+    while (container.length > 0) {
       container.get(0).destroy();
     }
+    const form = this.formValue();
     this._meeting.agendas.sort(compareByField('id'));
     this._meeting.agendas.forEach((agenda, i) => {
       let formRenderer: Type<AgendaNewForm> = this._agendaFormResolver.getFormRenderer(agenda.project.code.code);
       if (formRenderer) {
-        const componentRef = this.formContainer()!.createComponent(formRenderer);
+        const componentRef = container.createComponent(formRenderer);
         let component: AgendaNewForm = this.agendaComponents[agenda.project.id] = componentRef.instance;
         component.ind = i;
         component.project = agenda.project;
         component.parent = this;
-        component.setForm(this._form.projectsById[agenda.project.id]);
+        component.setForm(form.projectsById?.[agenda.project.id]);
         let dto = new RemarksContainerDto();
         dto.project = agenda.project;
         dto.meeting = this._meeting;
-        this._meetingService.getRemarks(dto).subscribe(value => {
-          if (((value.sectionMeetingRemark != null && value.sectionMeetingRemark.length > 0)
-            || (value.bureauMeetingRemark != null && value.bureauMeetingRemark.length > 0))
-            && !agenda.isAnswerReceived) {
-            component.canRescheduled = true;
-          } else if (!this._form.projectsById[agenda.project.id]) {
-            component._form.customerReplies = true;
-          }
-          this.cdr?.markForCheck?.();
-        });
+        // Добавляем takeUntilDestroyed для предотвращения утечек памяти и бесконечных запросов
+        this._meetingService.getRemarks(dto)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(value => {
+            if (((value.sectionMeetingRemark != null && value.sectionMeetingRemark.length > 0)
+              || (value.bureauMeetingRemark != null && value.bureauMeetingRemark.length > 0))
+              && !agenda.isAnswerReceived) {
+              component.canRescheduled = true;
+            } else if (!form.projectsById?.[agenda.project.id]) {
+              component.patchForm({ customerReplies: true });
+            }
+            this.cdr?.markForCheck?.();
+          });
       }
     })
   }
 
   participantsChanged() {
-    this._form.participants = this.assessors.filter(assessor => assessor.isChecked);
+    this.patchForm({ participants: this.assessors.filter(assessor => assessor.isChecked) } as Partial<MeetingProtocolNewFormContent>);
   }
 
   showSearchChairmanModal() {
@@ -173,21 +191,22 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
   }
 
   selectPerson(person: PersonPlainDto) {
-    this._form.chairman = person;
+    this.patchForm({ chairman: person } as Partial<MeetingProtocolNewFormContent>);
     this.searchPersonModal()?.hide();
   }
 
   validate() {
-    // Инкрементальная миграция: min="0" реализован через template-driven validators в HTML,
-    // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
-    // Бизнес-валидация: проверка времени окончания заседания
-    let endDate = dayjs(this._form.endDate);
+    const form = this.formValue();
+    let endDate = dayjs(form.endDate);
     let meetingEndWithTime = dayjs(this._meeting.period.end).hour(endDate.hour()).minute(endDate.minute());
     if (meetingEndWithTime.valueOf() <= this._meeting.period.start) {
       throw 'Время окончания должно следовать за временем начала заседания.';
     }
-    this._meeting.agendas.forEach(agenda => this.agendaComponents[agenda.project.id].validate());
+    this._meeting.agendas.forEach(agenda => {
+      const comp = this.agendaComponents[agenda.project.id];
+      if (comp) comp.validate();
+    });
   }
 
   /**
@@ -231,33 +250,40 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
   }
 
   getForm() {
-    let form = super.getForm();
+    const form = super.getForm();
     form.invited = this.invited.map(person => person.name).filter(str => !isEmptyOrNull(str));
-    form.projectsById = {};
-    this._meeting.agendas.map(agenda => agenda.project.id).forEach(projectId =>
-      form.projectsById[projectId] = this.agendaComponents[projectId].getForm());
-    let endDate = dayjs(form.endDate);
+    const existingProjectsById = form.projectsById || {};
+    form.projectsById = { ...existingProjectsById };
+    this._meeting.agendas.forEach(agenda => {
+      const projectId = agenda.project.id;
+      const comp = this.agendaComponents[projectId];
+      if (comp) form.projectsById[projectId] = comp.getForm();
+    });
+    const endDate = dayjs(form.endDate);
     form.endDate = dayjs(this._meeting.period.end).hour(endDate.hour()).minute(endDate.minute()).valueOf();
     return form;
   }
 
   setForm(form: MeetingProtocolNewFormContent) {
     super.setForm(form);
-    this._form.participants = this._form.participants || [];
-    this._form.invited = this._form.invited || [];
-    this._form.projectsById = this._form.projectsById || {};
-    this._form.chairman = this._form.chairman || this.currentPerson;
-    this.invited = this._form.invited.map(name => ({ name }));
+    // Важно: updateForm должен возвращать НОВЫЙ объект, иначе signal может не уведомить (Object.is === true).
+    this.updateForm(f => ({
+      ...f,
+      participants: f.participants || [],
+      invited: f.invited || [],
+      projectsById: f.projectsById || {},
+      chairman: f.chairman || this.currentPerson,
+    }));
+    const f = this.formValue();
+    this.invited = f.invited.map(name => ({ name }));
     if (this._meeting?.agendas) {
       this._meeting.agendas.map(agenda => agenda.project.id).forEach(projectId => {
         if (this.agendaComponents[projectId]) {
-          this.agendaComponents[projectId].setForm(this._form.projectsById[projectId]);
+          this.agendaComponents[projectId].setForm(f.projectsById[projectId]);
         }
       });
     }
-    this.assessors.forEach(ass => ass.isChecked = this._form.participants.some(selected => selected.id == ass.id));
-    // Обновление представления после загрузки данных из черновика
-    // Необходимо для OnPush change detection, чтобы данные отображались сразу после загрузки
+    this.assessors.forEach(ass => ass.isChecked = f.participants.some(selected => selected.id == ass.id));
     this.cdr?.markForCheck?.();
   }
 

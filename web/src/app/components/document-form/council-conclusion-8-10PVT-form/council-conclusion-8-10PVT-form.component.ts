@@ -11,22 +11,21 @@ import {DecisionState} from "@app/pipes/decision.pipe";
 export class CouncilConclusion_8_10PVT_FormComponent extends CouncilConclusionForm {
 
   validate() {
-    // Инкрементальная миграция: обязательность/мин.длина выражаются через template-driven validators (required/minlength),
-    // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
-    // Проверка highTech оставлена через throw, так как это бизнес-логика, не связанная с template-driven валидацией
-    // Ошибка должна выбрасываться только если highTech = false И заключение положительное (ACCEPTED)
-    if (!this._form.highTech && this.group.finalAgendaState == DecisionState.ACCEPTED) {
+    const form = this.formValue();
+    if (!form.highTech && this.group.finalAgendaState == DecisionState.ACCEPTED) {
       throw 'Недопустимо положительное заключение при наличии отрицательной оценки ' +
       'в пункте 7. Проект: ' + this.project.title;
     }
   }
 
   onConditionsChanged() {
-    if (this._form.highTech) {
+    this.markFormChanged();
+    const form = this.formValue();
+    if (form.highTech) {
       this.group.finalAgendaState = DecisionState.ACCEPTED;
     }
-    if (!this._form.highTech) {
+    if (!form.highTech) {
       this.group.finalAgendaState = DecisionState.REJECTED;
     }
   }

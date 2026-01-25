@@ -21,41 +21,47 @@ export class ExpertReviewForm<Form extends ExpertReviewFormContent> extends Docu
   }
 
   getForm() {
-    let form: Form = super.getForm();
+    const form: Form = super.getForm();
     form.wrappedNotes = form.wrappedNotes.filter(note => !isEmptyOrNull(note.text));
-
-    /* for old forms */
     form.privacyObjects = this.privacyObjects.filter(obj => obj != null)
       .map(obj => obj.name)
       .filter(str => !isEmptyOrNull(str));
     form.notes = this.notes.map(obj => obj.name).filter(str => !isEmptyOrNull(str));
     form.stages = this.stages.map(obj => obj.name).filter(str => !isEmptyOrNull(str));
-
     return form;
   }
 
-  setForm(form: Form) {
-    super.setForm(form);
-    this._form.program = this.project.program;
-    if(this.project.study != null){
-      this._form.study = this.project.study.name;
+  override setForm(form: Form) {
+    if (!form) {
+      super.setForm(form);
+      return;
     }
-
-    this._form.wrappedNotes = this._form.wrappedNotes || [];
-
-    /* for old forms */
-    this._form.privacyObjects = this._form.privacyObjects || [];
-    this._form.stages = this._form.stages || [];
-    this._form.notes = this._form.notes || [];
-
-    this.privacyObjects = this._form.privacyObjects.map(name => {
-      return {name: name};
-    });
-    this.stages = this._form.stages.map(name => {
-      return {name: name};
-    });
-    this.notes = this._form.notes.map(name => {
-      return {name: name};
-    });
+    let hours: number | undefined = undefined;
+    if (form.hours != null) {
+      const h = typeof form.hours === 'string' ? Number(form.hours) : form.hours;
+      if (!isNaN(h)) hours = h;
+    }
+    const normalized: Form = {
+      ...form,
+      hours,
+      wrappedNotes: form.wrappedNotes || [],
+      privacyObjects: form.privacyObjects || [],
+      stages: form.stages || [],
+      notes: form.notes || [],
+    };
+    super.setForm(normalized);
+    this.updateForm(f => ({
+      ...f,
+      program: this.project?.program ?? f.program,
+      study: this.project?.study?.name ?? f.study,
+      wrappedNotes: f.wrappedNotes || [],
+      privacyObjects: f.privacyObjects || [],
+      stages: f.stages || [],
+      notes: f.notes || [],
+    }));
+    const f = this.formValue();
+    this.privacyObjects = f.privacyObjects.map(name => ({ name }));
+    this.stages = f.stages.map(name => ({ name }));
+    this.notes = f.notes.map(name => ({ name }));
   }
 }

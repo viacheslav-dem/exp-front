@@ -8,12 +8,14 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Оценка анализа текущего состояния и прогноза
         научно-технического развития соответствующей сферы планирования:
       </label>
-      <app-boolean-button name="prognosis" required [(ngModel)]="_form().prognosis" [trueLabel]="'достаточна'"
+      <input type="hidden" [ngModel]="_form()?.prognosis" name="prognosis" required>
+      <app-boolean-button name="prognosis" required [ngModel]="_form()?.prognosis" [trueLabel]="'достаточна'"
         [falseLabel]="'недостаточна'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ prognosis: $event })"></app-boolean-button>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().prognosisText"
+          [ngModel]="_form()?.prognosisText"
+          (ngModelChange)="emitPatch({ prognosisText: $event })"
           [attr.name]="'prognosisText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -45,10 +47,18 @@ export class PrognosisBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    prognosis: boolean;
-    prognosisText: string;
-}>(undefined);
+  readonly _form = input<PrognosisBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<PrognosisBlockForm>>();
+
+  emitPatch(patch: Partial<PrognosisBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type PrognosisBlockForm = {
+  prognosis: boolean;
+  prognosisText: string;
+};

@@ -12,16 +12,15 @@ import {
 export class ExpertReview_8_13_2025FormComponent extends ExpertReviewForm<ExpertReview_8_13_2025FormContent> {
 
   isConclusionDisabled() {
-    let disabled = !this._form.priorityAreas
-        && !this._form.programRequirements
-        && !this._form.prognosis
-        && !this._form.targetAnalysis
-        && !this._form.programSufficiency
-    // || this._form.selectedDirections.length + this._form.selectedSocialEconomicGoals.length == 0;
+    const form = this.formValue();
+    const disabled = !form.priorityAreas
+        && !form.programRequirements
+        && !form.prognosis
+        && !form.targetAnalysis
+        && !form.programSufficiency;
     if (disabled) {
-      this._form.conclusion = false;
+      this.patchForm({ conclusion: false } as Partial<ExpertReview_8_13_2025FormContent>);
     }
-    console.log(disabled);
     return disabled;
   }
 
@@ -32,8 +31,9 @@ export class ExpertReview_8_13_2025FormComponent extends ExpertReviewForm<Expert
   }
 
   onConditionsChanged() {
+    this.markFormChanged();
     if (this.isConclusionDisabled()) {
-      this._form.conclusion = false;
+      this.patchForm({ conclusion: false } as Partial<ExpertReview_8_13_2025FormContent>);
     }
   }
 

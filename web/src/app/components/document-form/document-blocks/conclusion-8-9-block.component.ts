@@ -11,15 +11,17 @@ import {Component, input, output} from '@angular/core';
       
       <label>Целесообразность реализации внедряемых технологий с учетом их оптимальности и инновационности:</label>
 
+      <input type="hidden" [ngModel]="_form()?.conclusion" name="conclusion" required>
       <app-boolean-button
         name="conclusion"
         required
-        [(ngModel)]="_form().conclusion"
+        [ngModel]="_form()?.conclusion"
         [trueLabel]="'целесообразно'"
         [falseLabel]="'нецелесообразно'"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+        (ngModelChange)="emitPatch({ conclusion: $event })"></app-boolean-button>
       <textarea
-        [(ngModel)]="_form().conclusionText"
+        [ngModel]="_form()?.conclusionText"
+        (ngModelChange)="emitPatch({ conclusionText: $event })"
         [attr.name]="'conclusionText_8_9'"
         required
         minlength="30"
@@ -46,10 +48,18 @@ import {Component, input, output} from '@angular/core';
 })
 export class Conclusion_8_9_BlockComponent {
 
-  readonly _form = input<{
-    conclusion: boolean;
-    conclusionText: string;
-}>(undefined);
+  readonly _form = input<Conclusion89BlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<Conclusion89BlockForm>>();
+
+  emitPatch(patch: Partial<Conclusion89BlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type Conclusion89BlockForm = {
+  conclusion: boolean;
+  conclusionText: string;
+};

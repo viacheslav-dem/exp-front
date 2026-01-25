@@ -9,16 +9,18 @@ import {Component, input, output} from '@angular/core';
         Заключение эксперта по объекту государственной экспертизы 
       </label>
         <br\>
+      <input type="hidden" [ngModel]="_form()?.conclusion" name="conclusion" required>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button [disabled]=disabled() type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().conclusion === true}" (click)="stateButton(true)">
+        <button [disabled]=disabled() type="button" class="btn btn-outline-success" [ngClass]="{'active': _form()?.conclusion === true}" (click)="stateButton(true)">
           Положительное
         </button>
-        <button [disabled]=disabled() type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().conclusion === false}" (click)="stateButton(false)">
+        <button [disabled]=disabled() type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form()?.conclusion === false && _form()?.conclusion !== undefined}" (click)="stateButton(false)">
           Отрицательное
         </button>
       </div>
       <textarea
-        [(ngModel)]="_form().conclusionText"
+        [ngModel]="_form()?.conclusionText"
+        (ngModelChange)="emitPatch({ conclusionText: $event })"
         [attr.name]="'conclusionText'"
         required
         minlength="30"
@@ -43,19 +45,22 @@ export class ConclusionBlockComponent {
 
   readonly financeConclusionNum = input<string>(undefined);
 
-  readonly _form = input<{
-    conclusion: boolean;
-    conclusionText: string;
-}>(undefined);
+  readonly _form = input<ConclusionBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ConclusionBlockForm>>();
 
-  stateButton(flag: boolean) {
-    if(flag){
-      this._form().conclusion = true;
-    } else {
-      this._form().conclusion = false;
-    }
+  emitPatch(patch: Partial<ConclusionBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
   }
 
+  stateButton(flag: boolean) {
+    this.emitPatch({ conclusion: flag });
+  }
 }
+
+type ConclusionBlockForm = {
+  conclusion: boolean;
+  conclusionText: string;
+};

@@ -18,7 +18,7 @@
     от&nbsp;25&nbsp;мая 2006&nbsp;г. №&nbsp;356 «О&nbsp;государственной регистрации научно-исследовательских, опытно-конструкторских
     и опытно-технологических работ»:
   </label>
-  <app-vote-results [(ngModel)]="_form.registration" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results [ngModel]="formValue().registration" (ngModelChange)="patchForm({ registration: $event })" [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
 </div>
 
 <div class="form-sub-group">
@@ -37,16 +37,16 @@
     }
     @for (stage of stages; track stage; let i = $index) {
       <div class="input-group input-group-sm btn-group mb-2">
-        <input [(ngModel)]="stage.name" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
-        <button (click)="stages.splice(i, 1)" type="button" class="btn btn-sm btn-outline-danger">&times;</button>
+        <input [(ngModel)]="stage.name" (ngModelChange)="markFormChanged()" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
+        <button (click)="stages.splice(i, 1); markFormChanged()" type="button" class="btn btn-sm btn-outline-danger">&times;</button>
       </div>
     }
     <div class="mb-2">
-      <button (click)="stages.push({name: ''})" type="button" class="btn btn-primary btn-sm">
+      <button (click)="stages.push({name: ''}); markFormChanged()" type="button" class="btn btn-primary btn-sm">
         Добавить этап
       </button>
     </div>
-    <app-vote-results [(ngModel)]="_form.stagesVotes" [all]="parent._form.participants.length"></app-vote-results>
+    <app-vote-results [ngModel]="formValue().stagesVotes" (ngModelChange)="patchForm({ stagesVotes: $event })" [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
   </div>
 </div>
 
@@ -62,19 +62,19 @@
     <div class="input-group btn-group input-group-sm mb-2">
       <app-select-catalog
         [catalog]="Catalog.INDUSTRIAL_PROPERTY"
-        [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+        [(ngModel)]="privacyObjects[i]" (ngModelChange)="markFormChanged()" [resetEnabled]="false"
       ></app-select-catalog>
-      <button type="button" class="btn btn-sm btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="privacyObjects.splice(i, 1); markFormChanged()">&times;</button>
     </div>
   }
   <div class="mb-2">
-    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null); markFormChanged()">
       Добавить объект права
     </button>
   </div>
-  <app-vote-results [(ngModel)]="_form.privacy" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results [ngModel]="formValue().privacy" (ngModelChange)="patchForm({ privacy: $event })" [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
   <app-vote-results #singleVote [(ngModel)]="singleVoteResult"
-    [all]="parent._form.participants.length"
+    [all]="(parent?.formValue?.()?.participants?.length ?? 0)"
     [display]="singleVoteMode"
   ></app-vote-results>
 </div>

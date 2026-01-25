@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-analog-description-block',
@@ -17,6 +17,7 @@ import {Component, input} from '@angular/core';
         @if (full()) {
           <textarea
             [(ngModel)]="_form().analogText"
+            (ngModelChange)="onConditionsChanged.emit(true)"
             [attr.name]="'analogText_' + num().split('.').join('_')"
             required
             minlength="30"
@@ -51,5 +52,7 @@ export class AnalogDescriptionBlockComponent {
   readonly _form = input<{
     analog: string;
     analogText: string;
-}>(undefined);
+  }>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
 }

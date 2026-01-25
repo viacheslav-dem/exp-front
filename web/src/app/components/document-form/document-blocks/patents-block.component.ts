@@ -15,6 +15,7 @@ import {Component, input, output} from '@angular/core';
       @if (full()) {
         <textarea
           [(ngModel)]="_form().patentsText"
+          (ngModelChange)="onConditionsChanged.emit(true)"
           [attr.name]="'patentsText_' + num().split('.').join('_')"
           required
           minlength="30"

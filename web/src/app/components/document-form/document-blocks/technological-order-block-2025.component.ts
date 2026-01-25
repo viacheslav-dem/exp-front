@@ -7,11 +7,25 @@ import {Component, input, output} from "@angular/core";
       <label>
         {{num()}}. Уровень технологического уклада научно-технической продукции:
       </label>
-      <app-dropdown name="technologicalOrder" required [options]="targetOptions" [(ngModel)]="_form().technologicalOrder"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown
+        name="technologicalOrder"
+        required
+        [options]="targetOptions"
+        [ngModel]="_form().technologicalOrder"
+        (ngModelChange)="emitPatch({ technologicalOrder: $event })"
+      ></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().technologicalOrderText" name="technologicalOrderText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
+        <textarea
+          [ngModel]="_form().technologicalOrderText"
+          (ngModelChange)="emitPatch({ technologicalOrderText: $event })"
+          name="technologicalOrderText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)"
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">
@@ -42,10 +56,20 @@ export class TechnologicalOrderBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    technologicalOrder: string;
-    technologicalOrderText: string;
-}>(undefined);
+    readonly _form = input<TechnologicalOrderBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<TechnologicalOrderBlock2025Form>>();
+
+    emitPatch(patch: Partial<TechnologicalOrderBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type TechnologicalOrderBlock2025Form = {
+    technologicalOrder: string;
+    technologicalOrderText: string;
+};

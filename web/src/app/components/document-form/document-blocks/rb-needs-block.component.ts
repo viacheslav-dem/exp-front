@@ -10,10 +10,10 @@ import {Component, input, output} from '@angular/core';
         в том числе с учетом возможностей расширения экспорта и (или) сокращения импорта продукции,
         поставки потребителю разработанной и осваиваемой продукции:
       </label>
-      <app-dropdown name="needs" required [options]="needsOptions" [(ngModel)]="_form().needs"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown name="needs" required [options]="needsOptions" [ngModel]="_form()?.needs"
+      (ngModelChange)="emitPatch({ needs: $event })"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().needsText" name="needsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+        <textarea [ngModel]="_form()?.needsText" (ngModelChange)="emitPatch({ needsText: $event })" name="needsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
       @if (full()) {
@@ -41,10 +41,18 @@ export class RbNeedsBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    needs: string;
-    needsText: string;
-}>(undefined);
+  readonly _form = input<RbNeedsBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<RbNeedsBlockForm>>();
+
+  emitPatch(patch: Partial<RbNeedsBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type RbNeedsBlockForm = {
+  needs: string;
+  needsText: string;
+};

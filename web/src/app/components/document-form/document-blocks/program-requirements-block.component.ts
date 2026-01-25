@@ -7,12 +7,14 @@ import {Component, input, output} from '@angular/core';
         <label>
           {{ num() }}. Соответствие требованиям, указанным в Положении о порядке реализации государственных программ:
         </label>
-        <app-boolean-button name="programRequirements" required [(ngModel)]="_form().programRequirements" [trueLabel]="'соответствует'"
+        <input type="hidden" [ngModel]="_form()?.programRequirements" name="programRequirements" required>
+        <app-boolean-button name="programRequirements" required [ngModel]="_form()?.programRequirements" [trueLabel]="'соответствует'"
           [falseLabel]="'не соответствует'"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+        (ngModelChange)="emitPatch({ programRequirements: $event })"></app-boolean-button>
         @if (full()) {
           <textarea
-            [(ngModel)]="_form().programRequirementsText"
+            [ngModel]="_form()?.programRequirementsText"
+            (ngModelChange)="emitPatch({ programRequirementsText: $event })"
             [attr.name]="'programRequirementsText_' + num().split('.').join('_')"
             required
             minlength="30"
@@ -56,10 +58,18 @@ export class ProgramRequirementsBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    programRequirements: boolean;
-    programRequirementsText: string;
-}>(undefined);
+  readonly _form = input<ProgramRequirementsBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ProgramRequirementsBlockForm>>();
+
+  emitPatch(patch: Partial<ProgramRequirementsBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ProgramRequirementsBlockForm = {
+  programRequirements: boolean;
+  programRequirementsText: string;
+};

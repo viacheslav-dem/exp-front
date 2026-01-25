@@ -2,26 +2,31 @@
 
   <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
-  <app-program-requirements-block [_form]="_form"
+  <app-program-requirements-block [_form]="formValue()"
                                   [num]="'1'"
+                                  (formPatch)="patchForm($event)"
                                   (onConditionsChanged)="onConditionsChanged()"></app-program-requirements-block>
   <hr/>
-  <app-prognosis-block [_form]="_form"
+  <app-prognosis-block [_form]="formValue()"
                        [num]="'2'"
+                       (formPatch)="patchForm($event)"
                        (onConditionsChanged)="onConditionsChanged()"></app-prognosis-block>
   <hr/>
-  <app-target-analysis-block [_form]="_form"
+  <app-target-analysis-block [_form]="formValue()"
                              [num]="'3'"
+                             (formPatch)="patchForm($event)"
                              (onConditionsChanged)="onConditionsChanged()"></app-target-analysis-block>
   <hr/>
-  <app-program-sufficiency-block [_form]="_form"
+  <app-program-sufficiency-block [_form]="formValue()"
                                  [num]="'4'"
+                                 (formPatch)="patchForm($event)"
                                  (onConditionsChanged)="onConditionsChanged()"></app-program-sufficiency-block>
 </div>
 
 <hr/>
-<app-conclusion-8-13-block [_form]="_form"
+<app-conclusion-8-13-block [_form]="formValue()"
                            [disabled]="isConclusionDisabled()"
+                           (formPatch)="patchForm($event)"
                            (onConditionsChanged)="onConditionsChanged()"></app-conclusion-8-13-block>
 <hr/>
-<app-notes-block [_form]="_form" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>
+<app-notes-block [_form]="formValue()" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>

@@ -7,12 +7,14 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Экспортная ориентированность товара:
       </label><br>
-      <app-boolean-button [(ngModel)]="_form().exportOrientation" [trueLabel]="'соответствует'"
+      <input type="hidden" [ngModel]="_form()?.exportOrientation" name="exportOrientation" required>
+      <app-boolean-button [ngModel]="_form()?.exportOrientation" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full() || _form().exportOrientation) {
+      (ngModelChange)="emitPatch({ exportOrientation: $event })"></app-boolean-button>
+      @if (full() || _form()?.exportOrientation) {
         <textarea
-          [(ngModel)]="_form().exportOrientationText"
+          [ngModel]="_form()?.exportOrientationText"
+          (ngModelChange)="emitPatch({ exportOrientationText: $event })"
           [attr.name]="'exportOrientationText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -31,10 +33,18 @@ export class ExportOrientatedBlockComponent {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    exportOrientation: boolean;
-    exportOrientationText: string;
-}>(undefined);
+    readonly _form = input<ExportOrientatedBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<ExportOrientatedBlockForm>>();
+
+    emitPatch(patch: Partial<ExportOrientatedBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type ExportOrientatedBlockForm = {
+  exportOrientation: boolean;
+  exportOrientationText: string;
+};

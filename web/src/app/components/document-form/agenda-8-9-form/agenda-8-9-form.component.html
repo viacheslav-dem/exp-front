@@ -15,7 +15,7 @@
     и&nbsp;(или) стимулирование реализации объекта государственной экспертизы
   </label>
   <label>Целесообразность реализации внедряемых технологий с учетом их оптимальности и инновационности:</label>
-  <app-vote-results [(ngModel)]="_form.realization" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results [ngModel]="formValue().realization" (ngModelChange)="patchForm({ realization: $event })" [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
 </div>
 
 <div class="form-sub-group">
@@ -30,19 +30,19 @@
     <div class="input-group btn-group input-group-sm mb-2">
       <app-select-catalog
         [catalog]="Catalog.INDUSTRIAL_PROPERTY"
-        [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+        [(ngModel)]="privacyObjects[i]" (ngModelChange)="markFormChanged()" [resetEnabled]="false"
       ></app-select-catalog>
-      <button type="button" class="btn btn-sm btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="privacyObjects.splice(i, 1); markFormChanged()">&times;</button>
     </div>
   }
   <div class="mb-2">
-    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null); markFormChanged()">
       Добавить объект права
     </button>
   </div>
-  <app-vote-results [(ngModel)]="_form.privacy" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results [ngModel]="formValue().privacy" (ngModelChange)="patchForm({ privacy: $event })" [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
   <app-vote-results #singleVote [(ngModel)]="singleVoteResult"
-    [all]="parent._form.participants.length"
+    [all]="(parent?.formValue?.()?.participants?.length ?? 0)"
     [display]="singleVoteMode"
   ></app-vote-results>
 </div>

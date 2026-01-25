@@ -11,7 +11,8 @@ export class CouncilConclusion_8_6_FormComponent extends CouncilConclusionForm {
 
   validate() {
     super.validate();
-    if ((!this._form.accordance || !this._form.effectAccordance)
+    const form = this.formValue();
+    if ((!form.accordance || !form.effectAccordance)
       && this.group.finalAgendaState == DecisionState.ACCEPTED) {
       throw 'Недопустимо положительное заключение при наличии отрицательной оценки ' +
       'в пункте 1 или 2.';

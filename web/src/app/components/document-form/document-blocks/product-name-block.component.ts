@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-product-name-block',
@@ -8,7 +8,8 @@ import {Component, input} from '@angular/core';
         Наименование товаров (работ, услуг):
       </label>
       <textarea
-        [(ngModel)]="_form().productName"
+        [ngModel]="_form()?.productName"
+        (ngModelChange)="emitPatch({ productName: $event })"
         name="productName"
         required
         rows="2"
@@ -22,7 +23,17 @@ import {Component, input} from '@angular/core';
 })
 export class ProductNameBlockComponent {
 
-  readonly _form = input<{
-    productName: string;
-}>(undefined);
+  readonly _form = input<ProductNameBlockForm>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ProductNameBlockForm>>();
+
+  emitPatch(patch: Partial<ProductNameBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ProductNameBlockForm = {
+  productName: string;
+};

@@ -6,13 +6,13 @@
 
   <div class="form-group">
     <label>Дата</label>
-    <app-date-input class="width-100" [(ngModel)]="_form.date"></app-date-input>
+    <app-date-input class="width-100" [ngModel]="formValue().date" (ngModelChange)="patchForm({ date: $event })"></app-date-input>
   </div>
 
   <div class="form-group">
     <div>Исполняющий обязанности Председателя ГЭС:</div>
     <div>
-      <span class="italic">{{_form.chairman | fullName}}</span>
+      <span class="italic">{{formValue().chairman | fullName}}</span>
       <a class="btn btn-icon btn-icon-sm" (click)="showSearchChairmanModal()">
         <fa-icon icon="pencil-alt"></fa-icon>
       </a>
@@ -24,7 +24,7 @@
       Вы возвращаете объект экспертизы, потому что он не соответствует профилю Вашего ГЭС.
       При необходимости сделайте дополнительные пояснения по поводу причины возврата:
     </label>
-    <textarea title="Причины возврата" [(ngModel)]="_form.rejectionReason"
+    <textarea title="Причины возврата" [ngModel]="formValue().rejectionReason" (ngModelChange)="patchForm({ rejectionReason: $event })"
               rows="2" class="form-control"
               placeholder="причины возврата"></textarea>
   </div>
@@ -33,7 +33,7 @@
     <label>
       Рекомендуем направить объект экспертизы в следующий ГЭС:
     </label>
-    <app-select-catalog [catalog]="Catalog.COUNCIL" [(ngModel)]="_form.targetCouncil"></app-select-catalog>
+    <app-select-catalog [catalog]="Catalog.COUNCIL" [ngModel]="formValue().targetCouncil" (ngModelChange)="patchForm({ targetCouncil: $event })"></app-select-catalog>
   </div>
 
   <div class="mt-2">

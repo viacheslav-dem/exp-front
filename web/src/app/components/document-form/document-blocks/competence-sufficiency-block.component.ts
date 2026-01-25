@@ -7,12 +7,18 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Достаточность компетенции кадрового состава потенциального исполнителя работ:
       </label>
-      <app-dropdown name="competenceSufficiency" required [options]="competenceSufficiencyOptions" [(ngModel)]="_form().competenceSufficiency"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown
+        name="competenceSufficiency"
+        required
+        [options]="competenceSufficiencyOptions"
+        [ngModel]="_form()?.competenceSufficiency"
+        (ngModelChange)="emitPatch({ competenceSufficiency: $event })"
+      ></app-dropdown>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().competenceSufficiencyText"
-          [attr.name]="'competenceSufficiencyText_' + num().split('.').join('_')"
+          [ngModel]="_form()?.competenceSufficiencyText"
+          (ngModelChange)="emitPatch({ competenceSufficiencyText: $event })"
+          [name]="'competenceSufficiencyText_' + num().split('.').join('_')"
           required
           minlength="30"
           maxlength="5000"
@@ -48,13 +54,21 @@ export class CompetenceSufficiencyBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    competenceSufficiency: string;
-    competenceSufficiencyText: string;
-}>(undefined);
+  readonly _form = input<CompetenceSufficiencyBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<CompetenceSufficiencyBlockForm>>();
+
+  emitPatch(patch: Partial<CompetenceSufficiencyBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type CompetenceSufficiencyBlockForm = {
+  competenceSufficiency: string;
+  competenceSufficiencyText: string;
+};
 
 export const competenceSufficiencyOptions: string[] = [
   'достаточна',

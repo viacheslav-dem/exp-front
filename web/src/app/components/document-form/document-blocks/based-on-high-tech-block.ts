@@ -8,12 +8,14 @@ import {EconomicActivityBlockComponent} from "@app/components/document-form/docu
       <label>
         {{num()}}. Производство товара на основе новых и высоких технологий и (или) с использованием высокотехнологичных производств:
       </label>
-      <app-boolean-button [(ngModel)]="_form().basedOnHighTech" [trueLabel]="trueLabel()"
+      <input type="hidden" [ngModel]="_form()?.basedOnHighTech" name="basedOnHighTech" required>
+      <app-boolean-button [ngModel]="_form()?.basedOnHighTech" [trueLabel]="trueLabel()"
         [falseLabel]="falseLabel()"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full() || _form().basedOnHighTech) {
+      (ngModelChange)="emitPatch({ basedOnHighTech: $event })"></app-boolean-button>
+      @if (full() || _form()?.basedOnHighTech) {
         <textarea
-          [(ngModel)]="_form().basedOnHighTechText"
+          [ngModel]="_form()?.basedOnHighTechText"
+          (ngModelChange)="emitPatch({ basedOnHighTechText: $event })"
           [attr.name]="'basedOnHighTechText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -35,10 +37,18 @@ export class BasedOnHighTechBlockComponent {
 
     readonly falseLabel = input<string>("не осуществляется");
 
-    readonly _form = input<{
-    basedOnHighTech: boolean;
-    basedOnHighTechText: string;
-}>(undefined);
+    readonly _form = input<BasedOnHighTechBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<BasedOnHighTechBlockForm>>();
+
+    emitPatch(patch: Partial<BasedOnHighTechBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type BasedOnHighTechBlockForm = {
+  basedOnHighTech: boolean;
+  basedOnHighTechText: string;
+};

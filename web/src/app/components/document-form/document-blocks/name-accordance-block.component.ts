@@ -1,4 +1,4 @@
-import {Component, input, output} from '@angular/core';
+import {Component, OnInit, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-name-accordance-block',
@@ -7,52 +7,72 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Соответствие объекта государственной экспертизы своему наименованию:
       </label>
+      <input type="hidden" [ngModel]="_form()?.nameAccordance" name="nameAccordance" required>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().nameAccordance === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form()?.nameAccordance === true}" (click)="stateButton(true)">
           Соответствует
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().nameAccordance === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form()?.nameAccordance === false && _form()?.nameAccordance !== undefined}" (click)="stateButton(false)">
           Не соответствует
         </button>
       </div>
-      @if (!_form().nameAccordance) {
+      @if (!_form()?.nameAccordance) {
         <label class="ml-2">Рекомендуемое наименование:</label>
-        <textarea [(ngModel)]="_form().nameSuggestion" rows="2" class="form-control mt-2"
+        <textarea
+          [ngModel]="_form()?.nameSuggestion"
+          (ngModelChange)="emitPatch({ nameSuggestion: $event })"
+          name="nameSuggestion"
+          rows="2"
+          class="form-control mt-2"
           title="Рекомендуемое наименование"
-        placeholder="Предлагаемое наименование"></textarea>
+          placeholder="Предлагаемое наименование"
+        ></textarea>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form().nameAccordanceText" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea
+          [ngModel]="_form()?.nameAccordanceText"
+          (ngModelChange)="emitPatch({ nameAccordanceText: $event })"
+          [name]="'nameAccordanceText_' + num().split('.').join('_')"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст"
+        ></textarea>
       }
     </div>
     `,
     standalone: false
 })
-export class NameAccordanceBlockComponent {
-
-  ngOnInit() {
-    this._form().nameAccordance = false;
-  }
+export class NameAccordanceBlockComponent implements OnInit {
 
   readonly num = input<string>("10.1");
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    nameAccordance: boolean;
-    nameSuggestion: string;
-    nameAccordanceText: string;
-}>(undefined);
+  readonly _form = input<NameAccordanceBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<NameAccordanceBlockForm>>();
 
+  emitPatch(patch: Partial<NameAccordanceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
+
+  ngOnInit() {
+    // Инициализация через emitPatch вместо прямой мутации
+    this.emitPatch({ nameAccordance: false });
+  }
 
   stateButton(flag: boolean) {
-    if(flag){
-      this._form().nameAccordance = true;
-    } else{
-      this._form().nameAccordance = false;
-    }
+    this.emitPatch({ nameAccordance: flag });
   }
 }
+
+type NameAccordanceBlockForm = {
+  nameAccordance: boolean;
+  nameSuggestion: string;
+  nameAccordanceText: string;
+};

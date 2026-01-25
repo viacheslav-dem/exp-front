@@ -1,4 +1,4 @@
-import {Component, input} from "@angular/core";
+import {Component, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-users-block-2025',
@@ -8,8 +8,17 @@ import {Component, input} from "@angular/core";
         {{num()}}. Сведения о предполагаемом владельце, операторе, пользователях программно-технических средств,
         информационных ресурсов, информационных систем и информационных сетей.
       </label>
-      <textarea [(ngModel)]="_form().users" name="users" required minlength="30" maxlength="5000" rows="3" class="form-control"
-      placeholder="Обязательный текст (не менее 30 символов)."></textarea>
+      <textarea
+        [ngModel]="_form().users"
+        (ngModelChange)="emitPatch({ users: $event })"
+        name="users"
+        required
+        minlength="30"
+        maxlength="5000"
+        rows="3"
+        class="form-control"
+        placeholder="Обязательный текст (не менее 30 символов)."
+      ></textarea>
       @if (full()) {
         <div class="hint">
           <p>
@@ -32,7 +41,19 @@ export class UsersBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    users: string;
-}>(undefined);
+    readonly _form = input<UsersBlock2025Form>(undefined);
+
+    readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<UsersBlock2025Form>>();
+
+    emitPatch(patch: Partial<UsersBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type UsersBlock2025Form = {
+    users: string;
+};

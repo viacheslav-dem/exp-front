@@ -11,7 +11,7 @@
 
 <div class="form-sub-group">
   <label><b>{{ind + 1}}.1.</b> Соответствие достигнутого результата запланированному:</label>
-  <app-vote-results [(ngModel)]="_form.accordance" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results [ngModel]="formValue().accordance" (ngModelChange)="patchForm({ accordance: $event })" [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
 </div>
 
 <div class="form-sub-group">
@@ -19,9 +19,9 @@
     <b>{{ind + 1}}.2.</b> Соответствие экономического
     и (или) социального эффекта установленным условиям коммерциализации:
   </label>
-  <app-vote-results [(ngModel)]="_form.effectAccordance" [all]="parent._form.participants.length"></app-vote-results>
+  <app-vote-results [ngModel]="formValue().effectAccordance" (ngModelChange)="patchForm({ effectAccordance: $event })" [all]="(parent?.formValue?.()?.participants?.length ?? 0)"></app-vote-results>
   <app-vote-results #singleVote [(ngModel)]="singleVoteResult"
-                    [all]="parent._form.participants.length"
+                    [all]="(parent?.formValue?.()?.participants?.length ?? 0)"
                     [display]="singleVoteMode"
   ></app-vote-results>
 </div>

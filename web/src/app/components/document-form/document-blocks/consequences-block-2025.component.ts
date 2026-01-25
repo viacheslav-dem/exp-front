@@ -1,4 +1,4 @@
-import {Component, input} from "@angular/core";
+import {Component, input, output} from "@angular/core";
 
 @Component({
     selector: 'app-consequences-block-2025',
@@ -9,8 +9,9 @@ import {Component, input} from "@angular/core";
         и необходимости модернизации (реконструкции) взаимосвязанных действующих производственных объектов.
       </label>
       <textarea
-        [(ngModel)]="_form().consequences"
-        [attr.name]="'consequences_' + num().split('.').join('_')"
+        [ngModel]="_form()?.consequences"
+        (ngModelChange)="emitPatch({ consequences: $event })"
+        [name]="'consequences_' + num().split('.').join('_')"
         required
         minlength="30"
         maxlength="5000"
@@ -41,8 +42,19 @@ export class ConsequencesBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    consequences: string;
-}>(undefined);
+    readonly _form = input<ConsequencesBlock2025Form>(undefined);
 
+    readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<ConsequencesBlock2025Form>>();
+
+    emitPatch(patch: Partial<ConsequencesBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type ConsequencesBlock2025Form = {
+    consequences: string;
+};

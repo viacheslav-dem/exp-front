@@ -86,7 +86,7 @@ export class ReferralFormComponent extends DocumentForm<ReferralFormContent> {
   ngOnInit() {
     super.ngOnInit();
     this.searchPersonFilter = FilterBuilder.equals('gkntDepartment', this.project().gkntDepartment);
-    this._form.gkntDepartmentChairman = this.project().gkntDepartmentChairman;
+    this.patchForm({ gkntDepartmentChairman: this.project().gkntDepartmentChairman });
     this.cdr?.markForCheck?.();
   }
 
@@ -99,7 +99,7 @@ export class ReferralFormComponent extends DocumentForm<ReferralFormContent> {
   }
 
   selectPerson(person: PersonPlainDto) {
-    this._form.gkntDepartmentChairman = person;
+    this.patchForm({ gkntDepartmentChairman: person });
     this.searchPersonModal()?.hide();
     this.cdr?.markForCheck?.();
   }

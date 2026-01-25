@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, computed, effect, input, Type, viewChild} from '@angular/core';
+import {Component, ElementRef, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, computed, effect, input, Type, viewChild, untracked} from '@angular/core';
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {SearchPersonByRolesComponent} from "@app/components/search/search-person/search-person-by-role.component";
 import {Role} from "@app/pipes/role.pipe";
@@ -83,12 +83,28 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   readonly projectInput = input<ProjectDto>(undefined, { alias: 'project' });
   readonly project = computed(() => this.projectInput());
 
+  private _lastProjectCode: string | undefined;
+  private _lastFormRenderer: Type<CouncilConclusionForm> | undefined;
+
   private readonly projectEffect = effect(() => {
     const project = this.project();
     if (!project?.code?.code) {
       return;
     }
-    this.updateFormComponent(this._formTypeResolver.getFormRenderer(project.code.code));
+    // Проверяем, действительно ли код проекта изменился
+    if (this._lastProjectCode === project.code.code && this._lastFormRenderer) {
+      return;
+    }
+    const formRenderer = this._formTypeResolver.getFormRenderer(project.code.code);
+    // Проверяем, действительно ли renderer изменился
+    if (this._lastFormRenderer === formRenderer && this.formComponent) {
+      return;
+    }
+    this._lastProjectCode = project.code.code;
+    this._lastFormRenderer = formRenderer;
+    untracked(() => {
+      this.updateFormComponent(formRenderer);
+    });
   });
 
   readonly groupInput = input<LifecycleGroupDto>(undefined, { alias: 'group' });
@@ -99,32 +115,44 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     if (!group) {
       return;
     }
-    this._form.chairman = this._form.chairman || group.bureauChairman;
+    // Используем untracked, чтобы избежать зависимости от formValue() в effect
+    // и проверяем, действительно ли нужно обновить chairman
+    untracked(() => {
+      const currentChairman = this.formValue().chairman;
+      const newChairman = currentChairman || group.bureauChairman;
+      // Обновляем только если значение действительно изменилось
+      if (currentChairman !== newChairman) {
+        this.patchForm({ chairman: newChairman } as Partial<CouncilConclusionFormContent>);
+      }
+    });
     if (this.formComponent) {
       this.formComponent.group = group;
     }
-    this.cdr.markForCheck();
+    // При использовании signals effect автоматически триггерит change detection,
+    // markForCheck() не нужен и может вызывать бесконечные циклы
   });
 
   updateFormComponent(_formRenderer: Type<CouncilConclusionForm>) {
-    if (!_formRenderer) {
-      return;
-    }
-    this.formContainer()?.clear();
-    const componentRef = this.formContainer()!.createComponent(_formRenderer);
+    if (!_formRenderer) return;
+    const container = this.formContainer();
+    if (!container) return;
+    container.clear();
+    const componentRef = container.createComponent(_formRenderer);
     this.formComponent = componentRef.instance;
     this.formComponent.parent = this;
     this.formComponent.project = this.project();
     this.formComponent.group = this.group();
-    this.formComponent.setForm(this._form.projectProtocol);
+    this.formComponent.setForm(this.formValue().projectProtocol);
     // Синхронная отрисовка динамического компонента
     componentRef.changeDetectorRef.detectChanges();
-    this.cdr.markForCheck();
+    // При использовании signals и OnPush: если updateFormComponent вызывается из effect,
+    // effect уже триггерит change detection. markForCheck() избыточен и может вызывать циклы.
+    // detectChanges() уже выполнен выше для синхронной отрисовки.
   }
 
   validate() {
     super.validate();
-    this.formComponent.validate();
+    if (this.formComponent) this.formComponent.validate();
   }
 
   /**
@@ -168,25 +196,32 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   }
 
   getForm(): CouncilConclusionFormContent {
-    let form = super.getForm();
-    form.projectProtocol = this.formComponent.getForm();
+    const form = super.getForm();
+    if (this.formComponent) form.projectProtocol = this.formComponent.getForm();
     form.documents = this.documents.map(obj => obj.text).filter(document => !isEmptyOrNull(document));
     return form;
   }
 
   setForm(form: CouncilConclusionFormContent) {
     super.setForm(form);
-    this._form.projectProtocol = this._form.projectProtocol || new AgendaNewFormContent();
-    const group = this.group();
-    this._form.chairman = this._form.chairman || group?.bureauChairman;
-    this._form.documents = this._form.documents || [];
-    this.documents = this._form.documents.map(d => new Text(d));
-    this._form.innerExpertiseDate = this._form.innerExpertiseDate || dayjs().valueOf();
+    // Важно: updateForm должен возвращать НОВЫЙ объект, иначе signal может не уведомить (Object.is === true).
+    this.updateForm(f => {
+      const group = this.group();
+      return {
+        ...f,
+        projectProtocol: f.projectProtocol || new AgendaNewFormContent(),
+        chairman: f.chairman || group?.bureauChairman,
+        documents: f.documents || [],
+        innerExpertiseDate: f.innerExpertiseDate || dayjs().valueOf(),
+      };
+    });
+    const f = this.formValue();
+    this.documents = f.documents.map(d => new Text(d));
     if (this.formComponent) {
-      this.formComponent.setForm(this._form.projectProtocol);
+      this.formComponent.setForm(f.projectProtocol);
     }
-    // OnPush: данные формы изменились - запрашиваем перерисовку
-    this.cdr.markForCheck();
+    // При использовании signals updateForm() автоматически триггерит change detection,
+    // markForCheck() избыточен и может вызывать бесконечные циклы
   }
 
   showSearchChairmanModal() {
@@ -194,7 +229,7 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   }
 
   selectPerson(person: PersonPlainDto) {
-    this._form.chairman = person;
+    this.patchForm({ chairman: person } as Partial<CouncilConclusionFormContent>);
     this.searchPersonModal()?.hide();
   }
 
@@ -216,5 +251,13 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
    */
   markForCheck() {
     this.cdr.markForCheck();
+  }
+
+  /**
+   * Обработчик изменений условий в дочерних блоках.
+   * Вызывается блоками через onConditionsChanged output для уведомления о мутации формы.
+   */
+  onConditionsChanged() {
+    this.markFormChanged();
   }
 }

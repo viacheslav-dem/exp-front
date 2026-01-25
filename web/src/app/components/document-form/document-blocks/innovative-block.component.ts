@@ -7,15 +7,16 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Возможность отнесения товаров (работ, услуг) к категории инновационных:
       </label>
+      <input type="hidden" [ngModel]="_form()?.innovative" name="innovative" required>
       <app-boolean-button
         name="innovative"
         required
-        [(ngModel)]="_form().innovative"
+        [ngModel]="_form()?.innovative"
         [trueLabel]="'возможно'"
         [falseLabel]="'невозможно'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ innovative: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().innovativeText" name="innovativeText" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.innovativeText" (ngModelChange)="emitPatch({ innovativeText: $event })" name="innovativeText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>
@@ -28,10 +29,18 @@ export class InnovativeBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    innovative: boolean;
-    innovativeText: string;
-}>(undefined);
+  readonly _form = input<InnovativeBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<InnovativeBlockForm>>();
+
+  emitPatch(patch: Partial<InnovativeBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type InnovativeBlockForm = {
+  innovative: boolean;
+  innovativeText: string;
+};

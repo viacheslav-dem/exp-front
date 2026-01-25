@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-marketing-research-results-block',
@@ -9,6 +9,7 @@ import {Component, input} from '@angular/core';
       </label>
       <textarea
         [(ngModel)]="_form().marketingResearchText"
+        (ngModelChange)="onConditionsChanged.emit(true)"
         [attr.name]="'marketingResearchResultsText_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -42,5 +43,7 @@ export class MarketingResearchResultsBlockComponent {
 
   readonly _form = input<{
     marketingResearchText: string;
-}>(undefined);
+  }>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
 }

@@ -36,12 +36,13 @@ export class ReturnFromCouncilWithoutExpertiseFormComponent extends DocumentForm
 
   ngOnInit() {
     super.ngOnInit();
-    this._form.chairman = this.group().bureauChairman;
+    this.patchForm({ chairman: this.group().bureauChairman });
   }
 
   validate() {
     super.validate();
-    if (this._form.targetCouncil && this._form.targetCouncil.id == this.council().id) {
+    const f = this.formValue();
+    if (f.targetCouncil && f.targetCouncil.id == this.council().id) {
       throw 'Рекомендуемый ГЭС совпадает с Вашим.';
     }
   }
@@ -55,7 +56,7 @@ export class ReturnFromCouncilWithoutExpertiseFormComponent extends DocumentForm
   }
 
   selectPerson(person: PersonPlainDto) {
-    this._form.chairman = person;
+    this.patchForm({ chairman: person });
     this.searchPersonModal()?.hide();
   }
 }

@@ -99,7 +99,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
             this.expectedResultList = res;
             this.cdr?.markForCheck?.();
         }))
-        this._dataService.getCommercializationMethods().subscribe((res => {
+        this._dataService.getCatalog<CatalogDto>(Catalog.COMMERCIALIZATION_METHODS).subscribe((res => {
             this.commercializationMethods = res;
             this.cdr?.markForCheck?.();
         }))

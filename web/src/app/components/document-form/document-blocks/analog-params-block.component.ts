@@ -10,10 +10,10 @@ import {Component, input, output} from '@angular/core';
         а также возможности использования промежуточных результатов исследований для других разработок (модификаций,
         а также в иных сферах экономики):
       </label>
-      <app-dropdown name="analogParams" required [options]="analogParamsOptions" [(ngModel)]="_form().analogParams"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown name="analogParams" required [options]="analogParamsOptions" [ngModel]="_form()?.analogParams"
+      (ngModelChange)="emitPatch({ analogParams: $event })"></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().analogParamsText" name="analogParamsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+        <textarea [ngModel]="_form()?.analogParamsText" (ngModelChange)="emitPatch({ analogParamsText: $event })" name="analogParamsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст (не менее 30 символов)"></textarea>
       }
       @if (full()) {
@@ -40,10 +40,18 @@ export class AnalogParamsBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    analogParams: string;
-    analogParamsText: string;
-}>(undefined);
+  readonly _form = input<AnalogParamsBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<AnalogParamsBlockForm>>();
+
+  emitPatch(patch: Partial<AnalogParamsBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type AnalogParamsBlockForm = {
+  analogParams: string;
+  analogParamsText: string;
+};

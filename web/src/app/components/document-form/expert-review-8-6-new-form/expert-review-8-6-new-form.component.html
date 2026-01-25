@@ -2,10 +2,10 @@
 
   <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
-  <app-results-block [_form]="_form"
+  <app-results-block [_form]="formValue()"
                      [num]="'1'"></app-results-block>
   <hr/>
-  <app-effectiveness-block [_form]="_form"
+  <app-effectiveness-block [_form]="formValue()"
                            [num]="'2'"></app-effectiveness-block>
 </div>
 
@@ -15,11 +15,13 @@
 
   <label class="form-group-label">Заключительные решения эксперта по объекту государственной экспертизы</label>
 
-  <app-result-accordance-block [_form]="_form"
+  <app-result-accordance-block [_form]="formValue()"
+                               (formPatch)="patchForm($event)"
                                (onConditionsChanged)="onConditionsChanged()"></app-result-accordance-block>
   <hr/>
-  <app-effect-accordance-block [_form]="_form"
+  <app-effect-accordance-block [_form]="formValue()"
+                               (formPatch)="patchForm($event)"
                                (onConditionsChanged)="onConditionsChanged()"></app-effect-accordance-block>
   <hr/>
-  <app-conclusion-8-6-block [_form]="_form"></app-conclusion-8-6-block>
+  <app-conclusion-8-6-block [_form]="formValue()"></app-conclusion-8-6-block>
 </div>

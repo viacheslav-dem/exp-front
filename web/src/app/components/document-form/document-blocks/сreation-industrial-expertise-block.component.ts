@@ -10,7 +10,7 @@ import {Component, input, output} from '@angular/core';
       </label>
     </div>
     @if (full()) {
-      <textarea [(ngModel)]="_form().industrialExpertiseText" name="industrialExpertiseText" rows="3" class="form-control mt-05"
+      <textarea [(ngModel)]="_form().industrialExpertiseText" (ngModelChange)="onConditionsChanged.emit(true)" name="industrialExpertiseText" rows="3" class="form-control mt-05"
       placeholder="Пояснительный текст (при необходимости)."></textarea>
     }
     `,

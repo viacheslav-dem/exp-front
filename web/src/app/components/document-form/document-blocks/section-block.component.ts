@@ -14,18 +14,19 @@ import {Catalog} from "@app/services/data.service";
         [optionToString]="sectionToString"
         name="section"
         required
-        [(ngModel)]="_form().section"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-select-catalog>
+        [ngModel]="_form()?.section"
+      (ngModelChange)="emitPatch({ section: $event })"></app-select-catalog>
       @if (full()) {
         <div class="hint">
           <p>
             Пороговое значение валовой добавленной стоимости в расчете на одного занятого
-            по основным видам экономической деятельности в Европейском союзе: <b>{{_form().section?.addedValueBound || '-'}}</b> евро.
+            по основным видам экономической деятельности в Европейском союзе: <b>{{_form()?.section?.addedValueBound || '-'}}</b> евро.
           </p>
         </div>
       }
       <textarea
-        [(ngModel)]="_form().sectionText"
+        [ngModel]="_form()?.sectionText"
+        (ngModelChange)="emitPatch({ sectionText: $event })"
         [attr.name]="'sectionText_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -54,10 +55,18 @@ export class SectionBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    section: IndustryDto;
-    sectionText: string;
-}>(undefined);
+  readonly _form = input<SectionBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<SectionBlockForm>>();
+
+  emitPatch(patch: Partial<SectionBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type SectionBlockForm = {
+  section: IndustryDto;
+  sectionText: string;
+};

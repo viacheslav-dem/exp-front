@@ -8,15 +8,16 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы
         в части научно-технического уровня для достижения запланированных государственной программой показателей:
       </label>
+      <input type="hidden" [ngModel]="_form()?.programLevel" name="programLevel" required>
       <app-boolean-button
         name="programLevel"
         required
-        [(ngModel)]="_form().programLevel"
+        [ngModel]="_form()?.programLevel"
         [trueLabel]="'достаточно'"
         [falseLabel]="'недостаточно'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ programLevel: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().programLevelText" name="programLevelText" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.programLevelText" (ngModelChange)="emitPatch({ programLevelText: $event })" name="programLevelText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
       @if (full()) {
@@ -45,10 +46,18 @@ export class ProgramLevelBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    programLevel: boolean;
-    programLevelText: string;
-}>(undefined);
+  readonly _form = input<ProgramLevelBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ProgramLevelBlockForm>>();
+
+  emitPatch(patch: Partial<ProgramLevelBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ProgramLevelBlockForm = {
+  programLevel: boolean;
+  programLevelText: string;
+};

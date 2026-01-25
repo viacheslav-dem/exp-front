@@ -3,58 +3,66 @@
 <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
 <app-select-directions-and-goals-block
-  [form]="_form"
+  [form]="formValue()"
   [num]="'1'"
   [project]="project"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-select-directions-and-goals-block>
 
 <hr/>
 
 <app-program-requirements-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'2'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-program-requirements-block>
 
 <hr/>
 
 <app-prognosis-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'3'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-prognosis-block>
 
 <hr/>
 
 <app-target-analysis-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'4'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-target-analysis-block>
 
 <hr/>
 
 <app-program-sufficiency-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'5'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-program-sufficiency-block>
 
 <hr/>
 
 <app-finance-conclusion-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'6'"
   [project]="project"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-finance-conclusion-block>
 
 <hr/>
 
 <app-conclusion-council-block
-  [form]="_form"
+  [form]="formValue()"
   [financeConclusionNum]="financeConclusionNum"
   [project]="project"
   [group]="group"
+  (formPatch)="patchForm($event)"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-conclusion-council-block>

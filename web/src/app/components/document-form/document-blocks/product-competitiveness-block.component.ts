@@ -13,6 +13,7 @@ import {Component, input, output} from '@angular/core';
       @if (full()) {
         <textarea
           [(ngModel)]="_form().competitivenessText"
+          (ngModelChange)="onConditionsChanged.emit(true)"
           [attr.name]="'competitivenessText_' + num().split('.').join('_')"
           required
           minlength="30"

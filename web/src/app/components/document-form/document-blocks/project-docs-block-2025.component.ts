@@ -9,19 +9,21 @@ import {ProjectDto} from "@app/dto/ProjectDto";
       <label>
         {{num()}}. Наличие проектной (предпроектной) документации:
       </label>
+      <input type="hidden" [ngModel]="_form()?.projectDocs" name="projectDocs" required>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().projectDocs === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form()?.projectDocs === true}" (click)="stateButton(true)">
           Разработана
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().projectDocs === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form()?.projectDocs === false}" (click)="stateButton(false)">
           Не разработана
         </button>
       </div>
       <div>
         @if (full()) {
           <textarea
-            [(ngModel)]="_form().projectDocsText"
-            [attr.name]="'projectDocsText_' + num().split('.').join('_')"
+            [ngModel]="_form()?.projectDocsText"
+            (ngModelChange)="emitPatch({ projectDocsText: $event })"
+            [name]="'projectDocsText_' + num().split('.').join('_')"
             required
             minlength="30"
             maxlength="5000"
@@ -53,18 +55,24 @@ export class ProjectDocsBlock2025Component {
 
     readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    readonly _form = input<{
-    projectDocs: boolean;
-    projectDocsText: string;
-}>(undefined);
+    readonly _form = input<ProjectDocsBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<ProjectDocsBlock2025Form>>();
+
+    emitPatch(patch: Partial<ProjectDocsBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean){
-        if(flag){
-            this._form().projectDocs = true;
-        } else {
-            this._form().projectDocs = false;
-        }
+        this.emitPatch({ projectDocs: flag });
     }
 }
+
+type ProjectDocsBlock2025Form = {
+    projectDocs: boolean;
+    projectDocsText: string;
+};

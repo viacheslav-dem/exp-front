@@ -7,12 +7,14 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Соответствие товара перечню кодов продукции по видам экономической деятельности согласно приложению к Положению:
       </label>
-      <app-boolean-button [(ngModel)]="_form().economicActivity" [trueLabel]="'соответствует'"
+      <input type="hidden" [ngModel]="_form()?.economicActivity" name="economicActivity" required>
+      <app-boolean-button [ngModel]="_form()?.economicActivity" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
-      @if (full() || _form().economicActivity) {
+      (ngModelChange)="emitPatch({ economicActivity: $event })"></app-boolean-button>
+      @if (full() || _form()?.economicActivity) {
         <textarea
-          [(ngModel)]="_form().economicActivityText"
+          [ngModel]="_form()?.economicActivityText"
+          (ngModelChange)="emitPatch({ economicActivityText: $event })"
           [attr.name]="'economicActivityText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -30,10 +32,18 @@ export class EconomicActivityBlockComponent {
     readonly num = input<string>("9.1");
 
     readonly full = input<boolean>(true);
-    readonly _form = input<{
-    economicActivity: boolean;
-    economicActivityText: string;
-}>(undefined);
+    readonly _form = input<EconomicActivityBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<EconomicActivityBlockForm>>();
+
+    emitPatch(patch: Partial<EconomicActivityBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type EconomicActivityBlockForm = {
+  economicActivity: boolean;
+  economicActivityText: string;
+};

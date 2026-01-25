@@ -2,24 +2,26 @@
 
   <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
-  <app-scientific-level-ex-block [_form]="_form"
+  <app-scientific-level-ex-block [_form]="formValue()"
                                  [num]="'1'"></app-scientific-level-ex-block>
   <hr/>
-  <app-priority-accordance-block [_form]="_form"
+  <app-priority-accordance-block [_form]="formValue()"
                                  [num]="'2'"></app-priority-accordance-block>
   <hr/>
-  <app-technology-block [_form]="_form"
+  <app-technology-block [_form]="formValue()"
                         [num]="'3'"
+                        (formPatch)="patchForm($event)"
                         (onConditionsChanged)="onConditionsChanged()"></app-technology-block>
   <hr/>
-  <app-consequences-block [_form]="_form"
+  <app-consequences-block [_form]="formValue()"
                           [minLen]="30"
                           [num]="'4'"></app-consequences-block>
 </div>
 
 <hr/>
-<app-conclusion-8-9-block [_form]="_form"
+<app-conclusion-8-9-block [_form]="formValue()"
+                          (formPatch)="patchForm($event)"
                           (onConditionsChanged)="onConditionsChanged()"></app-conclusion-8-9-block>
 
 <hr/>
-<app-notes-block [_form]="_form" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>
+<app-notes-block [_form]="formValue()" (formPatch)="patchForm($event)" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>

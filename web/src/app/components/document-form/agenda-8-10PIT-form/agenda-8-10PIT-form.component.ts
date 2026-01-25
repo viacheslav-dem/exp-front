@@ -12,21 +12,21 @@ export class Agenda_8_10PIT_FormComponent extends AgendaForm {
   Catalog = Catalog;
 
   isAccepted(): boolean {
-    return this._form.innovativeness.isAccepted();
+    return this.formValue().innovativeness?.isAccepted() ?? false;
   }
 
   getVoted(): number {
-    return this._form.innovativeness.getVoted();
+    return this.formValue().innovativeness?.getVoted() ?? 0;
   }
 
   isRescheduled(): boolean {
-    return this._form.rescheduled.isAccepted();
+    return this.formValue().rescheduled?.isAccepted() ?? false;
   }
 
   validate() {
     super.validate();
-    let voted = this.getVoted();
-    this._form.innovativeness.validate(voted);
-    this._form.privacy.validate(voted);
+    const voted = this.getVoted();
+    this.formValue().innovativeness?.validate(voted);
+    this.formValue().privacy?.validate(voted);
   }
 }

@@ -16,12 +16,18 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
             работ,
             предусмотренных объектом государственной экспертизы:
           </label>
-          <app-dropdown name="economicSignificance" required [options]="significanceOptions" [(ngModel)]="_form().economicSignificance"
-          (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+          <app-dropdown
+            name="economicSignificance"
+            required
+            [options]="significanceOptions"
+            [ngModel]="_form()?.economicSignificance"
+            (ngModelChange)="emitPatch({ economicSignificance: $event })"
+          ></app-dropdown>
           @if (full()) {
             <textarea
-              [(ngModel)]="_form().economicSignificanceText"
-              [attr.name]="'economicSignificanceText_' + num().split('.').join('_')"
+              [ngModel]="_form()?.economicSignificanceText"
+              (ngModelChange)="emitPatch({ economicSignificanceText: $event })"
+              [name]="'economicSignificanceText_' + num().split('.').join('_')"
               required
               minlength="30"
               maxlength="5000"
@@ -37,7 +43,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
                 <!-- Для экспертов и для протокола заседания разные тексты подсказок -->
                 @if (isExpertReview()) {
                   <div>
-                    @if (project().code.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
+                    @if (project()?.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
                       <div>
                         Эксперт должен (кроме объекта экспертизы, указанного в подпункте 8.4 пункта 8 Положения):
                         <ul>
@@ -52,8 +58,8 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
                         </ul>
                       </div>
                     }
-                    @if (project().code.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025'
-                      || project().code.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
+                    @if (project()?.code?.expertReviewType == 'EXPERT_REVIEW_8_1_2_15_2025'
+                      || project()?.code?.expertReviewType == 'EXPERT_REVIEW_8_3_4_12NIOKTR_2025') {
                       <div>
                         <div>
                           <p>
@@ -94,7 +100,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
                         </div>
                       </div>
                     }
-                    @if (project().code.code == '8.4') {
+                    @if (project()?.code?.code == '8.4') {
                       <div>
                         <p>
                           Для объектов государственной экспертизы, указанных в подпункте 8.4 пункта 8 Положения:
@@ -153,7 +159,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
                     </ul>
                   </div>
                 }
-                @if (project().code.expertReviewType == 'EXPERT_REVIEW_8_5_7_8_12IP_2025') {
+                @if (project()?.code?.expertReviewType == 'EXPERT_REVIEW_8_5_7_8_12IP_2025') {
                   <div>
                     <p>
                       Эксперт должен оценить:
@@ -301,7 +307,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
             }
             @if (!isExpertReview()) {
               <div>
-                @if (
+                @if (project()?.code?.code && (
                   (
                   project().code.code.startsWith('8.1') &&
                   !project().code.code.startsWith('8.11') &&
@@ -318,7 +324,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
                   project().code.code.startsWith('8.7') ||
                   project().code.code.startsWith('8.8') ||
                   project().code.code.startsWith('8.12') ||
-                  project().code.code.startsWith('8.14')) {
+                  project().code.code.startsWith('8.14'))) {
                   <div>
                     <p>
                       <b>1. Для заданий государственных программ научных исследований и проектов
@@ -540,7 +546,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
           </p>
         </div>
         }
-        @if (project().code.code.startsWith('8.12')) {
+        @if (project()?.code?.code?.startsWith('8.12')) {
           <div>
             <p>
               Для проектов государственной программы инновационного развития Республики Беларусь при
@@ -597,7 +603,7 @@ import {TemplateType} from "@app/components/document-form/form-model/TemplateTyp
             </p>
           </div>
         }
-        @if (project().code.code.startsWith('8.15')) {
+        @if (project()?.code?.code?.startsWith('8.15')) {
           <div>
             <p>
               <b>1. Для заданий государственных программ научных исследований и проектов
@@ -722,17 +728,27 @@ export class EconomicSignificanceBlock2025Component {
 
     readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    readonly _form = input<{
-    economicSignificance: string;
-    economicSignificanceText: string;
-}>(undefined);
+    readonly _form = input<EconomicSignificanceBlock2025Form>(undefined);
 
     readonly isTextRequired = input<boolean>(false);
 
     readonly isExpertReview = input<boolean>(true);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<EconomicSignificanceBlock2025Form>>();
+
+    emitPatch(patch: Partial<EconomicSignificanceBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type EconomicSignificanceBlock2025Form = {
+    economicSignificance: string;
+    economicSignificanceText: string;
+};
 
 export const economicSignificanceOptions: string[] = [
     'низкая',

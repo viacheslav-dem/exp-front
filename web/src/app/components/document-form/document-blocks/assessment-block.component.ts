@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-assessment-block',
@@ -11,6 +11,7 @@ import {Component, input} from '@angular/core';
       </label>
       <textarea
         [(ngModel)]="_form().assessment"
+        (ngModelChange)="onConditionsChanged.emit(true)"
         [attr.name]="'assessment_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -43,5 +44,7 @@ export class AssessmentBlockComponent {
 
   readonly _form = input<{
     assessment: string;
-}>(undefined);
+  }>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
 }

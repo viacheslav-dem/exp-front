@@ -7,12 +7,18 @@ import {Component, input, output} from '@angular/core';
           <label>
             {{ num() }}. Достаточность компетенции кадрового состава потенциального исполнителя работ:
           </label>
-          <app-dropdown name="competenceSufficiency" required [options]="competenceSufficiencyOptions" [(ngModel)]="_form().competenceSufficiency"
-          (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+          <app-dropdown
+            name="competenceSufficiency"
+            required
+            [options]="competenceSufficiencyOptions"
+            [ngModel]="_form()?.competenceSufficiency"
+            (ngModelChange)="emitPatch({ competenceSufficiency: $event })"
+          ></app-dropdown>
           @if (full()) {
             <textarea
-              [(ngModel)]="_form().competenceSufficiencyText"
-              [attr.name]="'competenceSufficiencyText_' + num().split('.').join('_')"
+              [ngModel]="_form()?.competenceSufficiencyText"
+              (ngModelChange)="emitPatch({ competenceSufficiencyText: $event })"
+              [name]="'competenceSufficiencyText_' + num().split('.').join('_')"
               required
               minlength="30"
               maxlength="5000"
@@ -68,15 +74,25 @@ export class CompetenceSufficiencyBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    competenceSufficiency: string;
-    competenceSufficiencyText: string;
-}>(undefined);
+    readonly _form = input<CompetenceSufficiencyBlock2025Form>(undefined);
 
     readonly isExpertReview = input<boolean>(true);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<CompetenceSufficiencyBlock2025Form>>();
+
+    emitPatch(patch: Partial<CompetenceSufficiencyBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type CompetenceSufficiencyBlock2025Form = {
+    competenceSufficiency: string;
+    competenceSufficiencyText: string;
+};
 
 export const competenceSufficiencyOptions: string[] = [
     'достаточна',

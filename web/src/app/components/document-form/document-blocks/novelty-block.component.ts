@@ -10,12 +10,18 @@ import {Component, input, output} from '@angular/core';
       <label>
         Степень новизны (уровень инновационности) объекта государственной экспертизы:
       </label>
-      <app-dropdown name="novelty" required [options]="noveltyOptions" [(ngModel)]="_form().novelty"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown
+        name="novelty"
+        required
+        [options]="noveltyOptions"
+        [ngModel]="_form()?.novelty"
+        (ngModelChange)="emitPatch({ novelty: $event })"
+      ></app-dropdown>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().noveltyText"
-          [attr.name]="'noveltyText_' + num()"
+          [ngModel]="_form()?.noveltyText"
+          (ngModelChange)="emitPatch({ noveltyText: $event })"
+          [name]="'noveltyText_' + num()"
           required
           minlength="30"
           maxlength="5000"
@@ -50,15 +56,23 @@ export class NoveltyBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    novelty: string;
-    noveltyText: string;
-}>(undefined);
+  readonly _form = input<NoveltyBlockForm>(undefined);
 
   readonly isTextRequired = input<boolean>(false);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<NoveltyBlockForm>>();
+
+  emitPatch(patch: Partial<NoveltyBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type NoveltyBlockForm = {
+  novelty: string;
+  noveltyText: string;
+};
 
 export const noveltyOptions: string[] = [
   'не является новым для Республики Беларусь',

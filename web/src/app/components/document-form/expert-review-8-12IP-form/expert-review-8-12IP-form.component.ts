@@ -13,12 +13,12 @@ export class ExpertReview_8_12IP_FormComponent extends ExpertReviewForm<any> {
   industries: IndustryDto[];
   Catalog = Catalog;
 
-  // Signal для отслеживания изменений формы
-  private readonly _formSignal = signal<any>(null);
+  // Локальный кэш формы для computed (не конфликтует с базовым _formSignal)
+  private readonly _localFormCache = signal<any>(null);
   
   // Computed signals для вычисляемых значений
   readonly organizationLabel = computed(() => {
-    const form = this._formSignal();
+    const form = this._localFormCache();
     if (!form) return "не соответствует";
     if (form.addedValue != null && !form.addedValueNotPresented && form.section != null &&
       !form.sectionNotPresented && form.addedValue >= form.section.addedValueBound) {
@@ -28,7 +28,7 @@ export class ExpertReview_8_12IP_FormComponent extends ExpertReviewForm<any> {
   });
 
   readonly exportLabel = computed(() => {
-    const form = this._formSignal();
+    const form = this._localFormCache();
     if (!form) return "не соответствует";
     if (form.balance != null && !form.balanceNotPresented && form.balance > 0) {
       return "соответствует";
@@ -40,8 +40,8 @@ export class ExpertReview_8_12IP_FormComponent extends ExpertReviewForm<any> {
     super();
   }
   
-  private updateFormSignal() {
-    this._formSignal.set({ ...this._form });
+  updateFormSignal() {
+    this._localFormCache.set({ ...this.formValue() });
   }
 
   ngOnInit() {
@@ -54,41 +54,40 @@ export class ExpertReview_8_12IP_FormComponent extends ExpertReviewForm<any> {
   }
 
   onChooseSection() {
-    this._form.sectionNotPresented = !this._form.sectionNotPresented;
-    if (!this._form.sectionNotPresented && !this._form.section) {
-      this._form.sectionNotPresented = this.industries.length == 0;
-      this._form.section = this.industries.length == 0 ? null : this.industries[0];
+    const f = this.formValue();
+    const sectionNotPresented = !f.sectionNotPresented;
+    this.patchForm({ sectionNotPresented });
+    const next = this.formValue();
+    if (!next.sectionNotPresented && !next.section) {
+      const empty = this.industries.length == 0;
+      this.patchForm({ sectionNotPresented: empty, section: empty ? null : this.industries[0] });
     }
     this.updateFormSignal();
   }
 
   initDefaultForm() {
-    if (this._form.isDefault && this.industries) {
-      this._form.sectionNotPresented = this.industries.length == 0;
-      this._form.section = this.industries.length == 0 ? null : this.industries[0];
+    const f = this.formValue();
+    if (f.isDefault && this.industries) {
+      const empty = this.industries.length == 0;
+      this.patchForm({ sectionNotPresented: empty, section: empty ? null : this.industries[0] });
     }
-    // for test purposes
-    if (!this._form.section && !this._form.sectionNotPresented) {
-      this._form.sectionNotPresented = true;
+    const form = this.formValue();
+    if (!form.section && !form.sectionNotPresented) {
+      this.patchForm({ sectionNotPresented: true });
     }
     this.updateFormSignal();
   }
 
-  getForm() {
-    let form = super.getForm();
-    if (this._form.sectionNotPresented) {
-      form.section = null;
-    }
-    if (this._form.addedValueNotPresented) {
-      form.addedValue = null;
-    }
-    if (this._form.balanceNotPresented) {
-      form.balance = null;
-    }
+  override getForm() {
+    const form = super.getForm();
+    const f = this.formValue();
+    if (f.sectionNotPresented) form.section = null;
+    if (f.addedValueNotPresented) form.addedValue = null;
+    if (f.balanceNotPresented) form.balance = null;
     return form;
   }
 
-  setForm(form: any) {
+  override setForm(form: any) {
     super.setForm(form);
     this.initDefaultForm();
     this.updateFormSignal();
@@ -99,7 +98,8 @@ export class ExpertReview_8_12IP_FormComponent extends ExpertReviewForm<any> {
     // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
     // Проверка product/service оставлена через throw, так как это boolean и сложно валидировать через template-driven
-    if (this._form.product == null && this._form.service == null) {
+    const f = this.formValue();
+    if (f.product == null && f.service == null) {
       throw 'Пожалуйста, выберите тип конечного результата проекта.'
     }
   }

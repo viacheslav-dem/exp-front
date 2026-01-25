@@ -10,12 +10,14 @@ import {Component, input, output} from '@angular/core';
         }
         Соответствие экономического и (или) социального эффекта установленным условиям коммерциализации:
       </label>
-      <app-boolean-button name="effectAccordance" required [(ngModel)]="_form().effectAccordance" [trueLabel]="'соответствует'"
+      <input type="hidden" [ngModel]="_form()?.effectAccordance" name="effectAccordance" required>
+      <app-boolean-button name="effectAccordance" required [ngModel]="_form()?.effectAccordance" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ effectAccordance: $event })"></app-boolean-button>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().effectAccordanceText"
+          [ngModel]="_form()?.effectAccordanceText"
+          (ngModelChange)="emitPatch({ effectAccordanceText: $event })"
           [attr.name]="'effectAccordanceText_' + (num() ? num().split('.').join('_') : 'effect')"
           required
           minlength="30"
@@ -42,10 +44,18 @@ export class EffectAccordanceBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    effectAccordance: boolean;
-    effectAccordanceText: string;
-}>(undefined);
+  readonly _form = input<EffectAccordanceBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<EffectAccordanceBlockForm>>();
+
+  emitPatch(patch: Partial<EffectAccordanceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type EffectAccordanceBlockForm = {
+  effectAccordance: boolean;
+  effectAccordanceText: string;
+};

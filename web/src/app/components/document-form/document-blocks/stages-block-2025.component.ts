@@ -9,7 +9,7 @@ import {Component, input, output} from '@angular/core';
         государственной
         регистрации в соответствии с законодательством Республики Беларусь:
       </label>
-      <input type="hidden" [(ngModel)]="_form().stages" name="stages" required>
+      <input type="hidden" [ngModel]="_form().stages" name="stages" required>
       <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().stages === true}"
         (click)="stateButton(true)">
         Имеются
@@ -20,8 +20,17 @@ import {Component, input, output} from '@angular/core';
       </button>
     
       @if (full() || _form().stages) {
-        <textarea [(ngModel)]="_form().stagesText" name="stagesText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
+        <textarea
+          [ngModel]="_form().stagesText"
+          (ngModelChange)="emitPatch({ stagesText: $event })"
+          name="stagesText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">
@@ -42,15 +51,25 @@ export class StagesBlock2025Component {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    stages: boolean;
-    stagesText: string;
-}>(undefined);
+  readonly _form = input<StagesBlock2025Form>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<StagesBlock2025Form>>();
+
+  emitPatch(patch: Partial<StagesBlock2025Form>) {
+      // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+      this.formPatch.emit(patch);
+      // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+      this.onConditionsChanged.emit(true);
+  }
 
   stateButton(flag: boolean) {
-    this._form().stages = flag;
+      this.emitPatch({ stages: flag });
   }
 
 }
+
+type StagesBlock2025Form = {
+    stages: boolean;
+    stagesText: string;
+};

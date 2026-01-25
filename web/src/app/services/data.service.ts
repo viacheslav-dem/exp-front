@@ -90,22 +90,26 @@ export class DataService {
    * Получает справочник с кешированием.
    * Кеш автоматически инвалидируется при logout.
    * 
-   * Использует shareReplay(1) для:
+   * Использует shareReplay(1) с refCount: false для:
    * - Кеширования результата между подписчиками
    * - Избежания множественных HTTP-запросов для одного справочника
-   * - Автоматической очистки при отсутствии подписчиков (refCount: true)
+   * - Сохранения Observable активным даже без подписчиков (refCount: false)
+   * 
+   * ВАЖНО: refCount: false необходим, чтобы Observable не завершался при отписке подписчиков.
+   * Это предотвращает создание новых HTTP-запросов при пересоздании компонентов.
+   * Кеш очищается при logout через invalidateCatalogCache().
    */
   getCatalog<T extends CatalogDto>(type: string | Catalog): Observable<T[]> {
-    // Используем строковое представление типа как ключ кеша
-    const cacheKey = typeof type === 'string' ? type : String(type);
-    
-    // Проверяем кеш
+    const cacheKey = String(type);
+
     if (!this.catalogCache.has(cacheKey)) {
       // Создаём новый Observable с кешированием
-      // shareReplay с refCount: true автоматически завершит Observable,
-      // когда не останется подписчиков, освобождая память
+      // ВАЖНО: используем refCount: false, чтобы Observable оставался активным даже без подписчиков.
+      // Это необходимо для кеширования справочников - они должны оставаться в памяти до logout.
+      // При refCount: true Observable завершается когда все подписчики отписываются,
+      // что приводит к созданию новых HTTP-запросов при каждом пересоздании компонентов.
       const cached$ = this._http.getBlock<T[]>(`${this.url}/${type}`).pipe(
-        shareReplay({ bufferSize: 1, refCount: true })
+        shareReplay({ bufferSize: 1, refCount: false })
       );
       this.catalogCache.set(cacheKey, cached$ as Observable<CatalogDto[]>);
     }
@@ -191,8 +195,12 @@ export class DataService {
     return this._http.get(`${this.url}/expected-result`);
   }
 
+  /**
+   * Получает способы коммерциализации с кешированием.
+   * Использует общий механизм кеширования справочников через getCatalog().
+   */
   getCommercializationMethods(): Observable<CatalogDto[]> {
-    return this._http.get(`${this.url}/commercialization-methods`)
+    return this.getCatalog<CatalogDto>(Catalog.COMMERCIALIZATION_METHODS);
   }
 }
 

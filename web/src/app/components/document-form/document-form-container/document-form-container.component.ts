@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, Type, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, effect, input, viewChild} from "@angular/core";
+import {Component, Type, ViewContainerRef, ChangeDetectionStrategy, ChangeDetectorRef, effect, input, viewChild, untracked} from "@angular/core";
 import {DocumentForm} from "@app/components/document-form/document-form";
 import {FormContent} from "@app/components/document-form/form-model/FormContent";
 import {environment} from "../../../../environments/environment";
@@ -13,7 +13,6 @@ import {environment} from "../../../../environments/environment";
       : ChangeDetectionStrategy.Default
 })
 export class DocumentFormContainerComponent<Form extends FormContent> extends DocumentForm<Form> {
-
   _formRenderer: Type<DocumentForm<Form>>;
   formComponent: DocumentForm<Form>;
   readonly formContainer = viewChild('form', { read: ViewContainerRef });
@@ -22,53 +21,64 @@ export class DocumentFormContainerComponent<Form extends FormContent> extends Do
   private readonly _formRendererEffect = effect(() => {
     const formRenderer = this.formRenderer();
     if (!formRenderer) return;
-    this.updateFormComponent(formRenderer);
+    // Важно: effect должен зависеть ТОЛЬКО от formRenderer().
+    // updateFormComponent() читает другие signals (formContainer(), formValue()) и может сам спровоцировать цикл CD (NG0103),
+    // если их чтение попадёт в dependency-tracking effect'а.
+    if (this._formRenderer === formRenderer && this.formComponent) {
+      return;
+    }
+    untracked(() => this.updateFormComponent(formRenderer));
   });
 
-  constructor(private resolver: ComponentFactoryResolver,
-              protected cdr: ChangeDetectorRef) {
+  constructor(protected cdr: ChangeDetectorRef) {
     super();
   }
 
-  createNewForm(): Form {
-    return null;
+  updateFormComponent(formRenderer) {
+    const container = this.formContainer();
+    if (!container) {
+      return;
+    }
+    container.clear();
+
+    const componentRef = container.createComponent(formRenderer);
+    this.formComponent = componentRef.instance as DocumentForm<Form>;
+    if (this._formRenderer && this._formRenderer !== formRenderer) {
+      console.warn('change of document form container is bad practice!');
+    }
+    this._formRenderer = formRenderer;
+    const current = this.formValue();
+    if (current) {
+      this.formComponent.setForm(current);
+    }
+    this.beforeFormMarkForCheck?.();
   }
 
-  updateFormComponent(formRenderer) {
-    if (formRenderer) {
-      const container = this.formContainer();
-      while (container?.length > 0) {
-        container.get(0).destroy();
-      }
-      const componentFactory = this.resolver.resolveComponentFactory(formRenderer);
-      const componentRef = this.formContainer()!.createComponent(componentFactory);
-      this.formComponent = componentRef.instance as DocumentForm<Form>;
-      if (this._formRenderer && this._formRenderer != formRenderer) {
-        console.warn('change of document form container is bad practice!');
-      }
-      this._formRenderer = formRenderer;
-      if (!this._form) {
-        this._form = this.formComponent._form;
-      } else {
-        this.formComponent.setForm(this._form);
-      }
-      this.cdr?.markForCheck?.();
-    }
-  }
+  /**
+   * Хук для подклассов: вызывается после setForm и до markForCheck.
+   * Используется, например, чтобы установить project на форме до первой отрисовки.
+   */
+  protected beforeFormMarkForCheck?(): void;
 
   getForm(): Form {
+    if (!this.formComponent) throw new Error('DocumentFormContainer: form not initialized');
     return this.formComponent.getForm();
   }
 
   validate() {
+    if (!this.formComponent) return;
     this.formComponent.validate();
   }
 
   override setForm(form: Form) {
     super.setForm(form)
     if (this.formComponent) {
-      this.formComponent.setForm(this._form);
+      // Используем untracked, чтобы избежать бесконечного цикла change detection
+      untracked(() => {
+        this.formComponent.setForm(this.formValue());
+      });
     }
-    this.cdr?.markForCheck?.();
+    // При использовании signals setForm() обновляет signal, который автоматически триггерит CD,
+    // markForCheck() не нужен и может вызывать бесконечные циклы
   }
 }

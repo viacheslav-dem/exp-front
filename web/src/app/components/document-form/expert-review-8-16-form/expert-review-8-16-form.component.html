@@ -1,31 +1,31 @@
 <div class="form-group">
   <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
   <app-economic-activity-block
-          [_form]="_form"
+          [_form]="formValue()"
           [num]="'1'"
           (onConditionsChanged)="onChange()">
   </app-economic-activity-block>
   <hr/>
   <app-based-on-high-tech-block
-          [_form]="_form"
+          [_form]="formValue()"
           [num]="'2'"
           (onConditionsChanged)="onChange()">
   </app-based-on-high-tech-block>
   <hr/>
    <app-export-orientated-block
-           [_form]="_form"
+           [_form]="formValue()"
            [num]="'3'"
            (onConditionsChanged)="onChange()">
    </app-export-orientated-block>
   <hr/>
   <app-import-orientation-block
-          [_form]="_form"
+          [_form]="formValue()"
           [num]="'4'"
           (onConditionsChanged)="onChange()">
   </app-import-orientation-block>
   <hr/>
   <app-catalog-high-tech-block
-          [_form]="_form"
+          [_form]="formValue()"
           [disabled]="isCatalogHighTechBlockDisabled()"
           (onConditionsChanged)="onConditionsChanged()">
   </app-catalog-high-tech-block>
@@ -40,6 +40,6 @@
 <!--                             (onConditionsChanged)="onConditionsChanged()">-->
 <!--  </app-conclusion-8-16-block>-->
   <hr/>
-  <app-notes-block [_form]="_form" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>
+  <app-notes-block [_form]="formValue()" (formPatch)="patchForm($event)" (onConditionsChanged)="onConditionsChanged()"></app-notes-block>
 
 </div>

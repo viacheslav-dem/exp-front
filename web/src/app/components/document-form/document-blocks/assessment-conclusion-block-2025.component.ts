@@ -8,7 +8,7 @@ import {Component, input, output} from '@angular/core';
         {{ num() }}. Оценка соответствия предложений поставщиков (подрядчиков, исполнителей), претендующих на участие в
         реализации мероприятий, целям названных мероприятий:
       </label>
-      <input type="hidden" [(ngModel)]="_form().assessment" name="assessment" required>
+      <input type="hidden" [ngModel]="_form().assessment" name="assessment" required>
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().assessment === true}" (click)="stateButton(true)">
           Соответствует
@@ -18,8 +18,17 @@ import {Component, input, output} from '@angular/core';
         </button>
       </div>
       @if (full()) {
-        <textarea [(ngModel)]="_form().assessmentText" name="assessmentText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
+        <textarea
+          [ngModel]="_form().assessmentText"
+          (ngModelChange)="emitPatch({ assessmentText: $event })"
+          name="assessmentText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">
@@ -44,15 +53,25 @@ export class AssessmentConclusionBlock2025Component {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    assessment: boolean;
-    assessmentText: string;
-}>(undefined);
+  readonly _form = input<AssessmentConclusionBlock2025Form>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<AssessmentConclusionBlock2025Form>>();
+
+  emitPatch(patch: Partial<AssessmentConclusionBlock2025Form>) {
+      // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+      this.formPatch.emit(patch);
+      // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+      this.onConditionsChanged.emit(true);
+  }
 
   stateButton(flag: boolean){
-    this._form().assessment = flag;
+      this.emitPatch({ assessment: flag });
   }
 
 }
+
+type AssessmentConclusionBlock2025Form = {
+    assessment: boolean;
+    assessmentText: string;
+};

@@ -11,15 +11,16 @@ import {Component, input, output} from '@angular/core';
         приложения 2 к Инструкции о порядке выдачи заключений об отнесении товаров к высокотехнологичным,
         утвержденной постановлением ГКНТ от 25 июля 2022 г. № 12:
       </label>
+      <input type="hidden" [ngModel]="_form()?.titleProtection" name="titleProtection" required>
       <app-boolean-button
         name="titleProtection"
         required
-        [(ngModel)]="_form().titleProtection"
+        [ngModel]="_form()?.titleProtection"
         [trueLabel]="'да'"
         [falseLabel]="'нет'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ titleProtection: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().titleProtectionText" name="titleProtectionText" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.titleProtectionText" (ngModelChange)="emitPatch({ titleProtectionText: $event })" name="titleProtectionText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>
@@ -32,10 +33,18 @@ export class TitleProtectionBlockComponent {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    titleProtection: boolean;
-    titleProtectionText: string;
-}>(undefined);
+    readonly _form = input<TitleProtectionBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<TitleProtectionBlockForm>>();
+
+    emitPatch(patch: Partial<TitleProtectionBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type TitleProtectionBlockForm = {
+  titleProtection: boolean;
+  titleProtectionText: string;
+};

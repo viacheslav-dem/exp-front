@@ -1,4 +1,5 @@
 import {Component} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {
     CouncilConclusion_8_1_2_FormComponent
 } from "@app/components/document-form/council-conclusion-8-1-2-form/council-conclusion-8-1-2-form.component";
@@ -19,7 +20,9 @@ export class CouncilConclusion_8_3_4_5_7_8_12_15_FormComponent extends CouncilCo
     }
 
     ngOnInit() {
-        this._dataService.getCommercializationMethods().subscribe(res => {
+        this._dataService.getCommercializationMethods().pipe(
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(res => {
             res.forEach(option => this.noveltyOptions.push(option.name))
         })
     }
@@ -82,11 +85,11 @@ export class CouncilConclusion_8_3_4_5_7_8_12_15_FormComponent extends CouncilCo
 
 
     private validationCommentsOnConclusion() {
-        // Проверка termsSuggestion и financeSuggestion оставлена через throw, так как это бизнес-логика, не связанная с template-driven валидацией
-        if (!this._form.termsAccordance && (this._form.termsSuggestion.start == undefined || this._form.termsSuggestion.end == undefined)) {
+        const form = this.formValue();
+        if (!form.termsAccordance && (form.termsSuggestion?.start == undefined || form.termsSuggestion?.end == undefined)) {
             throw "В пункте 'Соответствие сроков выполнения объекта государственной экспертизы необходимым.' не проставлены рекомендуемые сроки реализации."
         }
-        if (!this._form.financeAccordance && (this._form.financeSuggestion < 0 || this._form.financeSuggestion == undefined)) {
+        if (!form.financeAccordance && (form.financeSuggestion < 0 || form.financeSuggestion == undefined)) {
             throw "В пункте 'Соответствие заявленного финансирования планируемому объему выполняемых работ.' рекомендуемый объем финансирования финансирования не может быть меньше нуля.";
         }
     }

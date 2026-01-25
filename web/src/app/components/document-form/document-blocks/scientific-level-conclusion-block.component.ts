@@ -8,15 +8,16 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Соответствие научно-технического уровня внедряемых технологий
         передовым технологиям, используемым в мире, и возможность ее применения на соответствующем производстве:
       </label>
+      <input type="hidden" [ngModel]="_form()?.scientificLevel" name="scientificLevel" required>
       <app-boolean-button
         name="scientificLevel"
         required
-        [(ngModel)]="_form().scientificLevel"
+        [ngModel]="_form()?.scientificLevel"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ scientificLevel: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().scientificLevelText" name="scientificLevelText" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.scientificLevelText" (ngModelChange)="emitPatch({ scientificLevelText: $event })" name="scientificLevelText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
       @if (full()) {
@@ -63,10 +64,18 @@ export class ScientificLevelConclusionBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    scientificLevel: boolean;
-    scientificLevelText: string;
-}>(undefined);
+  readonly _form = input<ScientificLevelConclusionBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ScientificLevelConclusionBlockForm>>();
+
+  emitPatch(patch: Partial<ScientificLevelConclusionBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ScientificLevelConclusionBlockForm = {
+  scientificLevel: boolean;
+  scientificLevelText: string;
+};

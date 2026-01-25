@@ -22,13 +22,27 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
       </div>
       @if (_form().softwareTool == 2) {
         <label class="mt-2">Рекомендуемые программный инструмент:</label>
-        <textarea [(ngModel)]="_form().softwareToolSuggestion" rows="2" class="form-control"
+        <textarea
+          [ngModel]="_form().softwareToolSuggestion"
+          (ngModelChange)="emitPatch({ softwareToolSuggestion: $event })"
+          rows="2"
+          class="form-control"
           title="Рекомендуемый программный инструмент"
-        placeholder="Рекомендуемый программный инструмент"></textarea>
+          placeholder="Рекомендуемый программный инструмент"
+        ></textarea>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form().softwareToolText" name="softwareToolText" [required]="isTextRequired()" minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст"></textarea>
+        <textarea
+          [ngModel]="_form().softwareToolText"
+          (ngModelChange)="emitPatch({ softwareToolText: $event })"
+          name="softwareToolText"
+          [required]="isTextRequired()"
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст"
+        ></textarea>
       }
     </div>
     @if (full()) {
@@ -56,23 +70,26 @@ export class SoftwareToolBlock2025Component {
 
     readonly isTextRequired = input<boolean>(false);
 
-    readonly _form = input<{
-    softwareTool: number;
-    softwareToolSuggestion: string;
-    softwareToolText: string;
-}>(undefined);
-
+    readonly _form = input<SoftwareToolBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<SoftwareToolBlock2025Form>>();
+
+    emitPatch(patch: Partial<SoftwareToolBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 
     stateButton(number: number) {
-        if(number == 1){
-            this._form().softwareTool = 1;
-        } else if (number == 2){
-            this._form().softwareTool = 2;
-        } else if (number == 3){
-            this._form().softwareTool = 3;
-        }
+        this.emitPatch({ softwareTool: number });
     }
 
 }
+
+type SoftwareToolBlock2025Form = {
+    softwareTool: number;
+    softwareToolSuggestion: string;
+    softwareToolText: string;
+};

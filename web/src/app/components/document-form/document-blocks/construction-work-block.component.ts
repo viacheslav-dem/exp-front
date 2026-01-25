@@ -14,6 +14,7 @@ import {Component, input, output} from '@angular/core';
       @if (full()) {
         <textarea
           [(ngModel)]="_form().constructionWorksText"
+          (ngModelChange)="onConditionsChanged.emit(true)"
           [attr.name]="'constructionWorksText_' + num().split('.').join('_')"
           required
           minlength="30"

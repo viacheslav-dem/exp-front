@@ -84,25 +84,26 @@ export class ExpertReview_8_3_4_12NIOKTR_NewFormComponent extends ExpertReviewFo
     }
 
     isFinanceConclusionDisabled() {
-        return !anyMatch(this._form.novelty, 'новый для Республики Беларусь', 'новый для стран СНГ', 'новизна мирового уровня')
-            || !anyMatch(this._form.economicSignificance, 'средняя', 'высокая');
+        const f = this.formValue();
+        return !anyMatch(f.novelty, 'новый для Республики Беларусь', 'новый для стран СНГ', 'новизна мирового уровня')
+            || !anyMatch(f.economicSignificance, 'средняя', 'высокая');
     }
 
     isConclusionDisabled() {
-        return !this._form.financeConclusion;
+        return !this.formValue().financeConclusion;
     }
 
     onConditionsChanged() {
         if (this.isFinanceConclusionDisabled()) {
-            this._form.financeConclusion = false;
+            this.patchForm({ financeConclusion: false });
         }
         if (this.isConclusionDisabled()) {
-            this._form.conclusion = false;
+            this.patchForm({ conclusion: false });
         }
     }
 
-    setForm(form: ExpertReview_8_3_4_12NIOKTR_NewFormContent) {
+    override setForm(form: ExpertReview_8_3_4_12NIOKTR_NewFormContent) {
         super.setForm(form);
-        this._form.termsSuggestion = this._form.termsSuggestion || new PeriodDto();
+        this.updateForm(f => ({ ...f, termsSuggestion: f.termsSuggestion || new PeriodDto() }));
     }
 }

@@ -7,12 +7,18 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Достаточность материально-технической базы и кадрового потенциала исполнителя работ:
       </label>
-      <app-dropdown name="resourcesSufficiency" required [options]="resourcesSufficiencyOptions" [(ngModel)]="_form().resourcesSufficiency"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown
+        name="resourcesSufficiency"
+        required
+        [options]="resourcesSufficiencyOptions"
+        [ngModel]="_form()?.resourcesSufficiency"
+        (ngModelChange)="emitPatch({ resourcesSufficiency: $event })"
+      ></app-dropdown>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().resourcesSufficiencyText"
-          [attr.name]="'resourcesSufficiencyText_' + num().split('.').join('_')"
+          [ngModel]="_form()?.resourcesSufficiencyText"
+          (ngModelChange)="emitPatch({ resourcesSufficiencyText: $event })"
+          [name]="'resourcesSufficiencyText_' + num().split('.').join('_')"
           required
           minlength="30"
           maxlength="5000"
@@ -48,13 +54,21 @@ export class ResourcesSufficiencyBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    resourcesSufficiency: string;
-    resourcesSufficiencyText: string;
-}>(undefined);
+  readonly _form = input<ResourcesSufficiencyBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ResourcesSufficiencyBlockForm>>();
+
+  emitPatch(patch: Partial<ResourcesSufficiencyBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ResourcesSufficiencyBlockForm = {
+  resourcesSufficiency: string;
+  resourcesSufficiencyText: string;
+};
 
 export const resourcesSufficiencyOptions: string[] = [
   'достаточна',

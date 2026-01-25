@@ -3,24 +3,28 @@
 <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
 <app-result-accordance-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'1'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-result-accordance-block>
 
 <hr/>
 
 <app-effect-accordance-block
-  [_form]="_form"
+  [_form]="formValue()"
   [num]="'2'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-effect-accordance-block>
 
 <hr/>
 
 <app-conclusion-council-block
-  [form]="_form"
+  [form]="formValue()"
   [financeConclusionNum]="'1 и 2'"
   [project]="project"
   [group]="group"
+  (formPatch)="patchForm($event)"
+  (onConditionsChanged)="onConditionsChanged()"
 ></app-conclusion-council-block>

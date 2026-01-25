@@ -20,5 +20,6 @@ export class ExpertReview_8_11_14_NewFormComponent extends ExpertReviewForm<Expe
   }
 
   onConditionsChanged() {
+    this.markFormChanged();
   }
 }

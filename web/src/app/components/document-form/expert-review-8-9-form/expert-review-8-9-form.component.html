@@ -5,7 +5,7 @@
       1. Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
       научно-технической деятельности в Республики Беларусь:
     </label>
-    <textarea [(ngModel)]="_form.accordance"
+    <textarea [ngModel]="formValue().accordance" (ngModelChange)="patchForm({ accordance: $event })"
       name="accordance"
       required
       rows="3" class="form-control"
@@ -17,7 +17,7 @@
     <label>
       2. Сведения о проведении маркетинговых и патентных исследований и их результаты:
     </label>
-    <textarea [(ngModel)]="_form.marketing"
+    <textarea [ngModel]="formValue().marketing" (ngModelChange)="patchForm({ marketing: $event })"
       name="marketing"
       required
       rows="3" class="form-control"
@@ -29,7 +29,7 @@
     <label>
       3. Приоритетность направления инвестиций во внедряемые технологии:
     </label>
-    <textarea [(ngModel)]="_form.investments"
+    <textarea [ngModel]="formValue().investments" (ngModelChange)="patchForm({ investments: $event })"
       name="investments"
       required
       rows="3" class="form-control"
@@ -41,7 +41,7 @@
     <label>
       4. Обоснованность расходов по внедряемым технологиям:
     </label>
-    <textarea [(ngModel)]="_form.costJustification"
+    <textarea [ngModel]="formValue().costJustification" (ngModelChange)="patchForm({ costJustification: $event })"
       name="costJustification"
       required
       rows="3" class="form-control"
@@ -53,7 +53,7 @@
     <label>
       5. Оценка возможности применения внедряемых технологий на соответствующем производстве:
     </label>
-    <textarea [(ngModel)]="_form.application"
+    <textarea [ngModel]="formValue().application" (ngModelChange)="patchForm({ application: $event })"
       name="application"
       required
       rows="3" class="form-control"
@@ -65,7 +65,7 @@
     <label>
       6. Оптимальность выбранных технологий и их инновационность для Республики Беларусь:
     </label>
-    <textarea [(ngModel)]="_form.optimality"
+    <textarea [ngModel]="formValue().optimality" (ngModelChange)="patchForm({ optimality: $event })"
       name="optimality"
       required
       rows="3" class="form-control"
@@ -82,12 +82,12 @@
       <div class="input-group btn-group mb-2">
         <app-select-catalog
           [catalog]="Catalog.INDUSTRIAL_PROPERTY"
-          [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+          [(ngModel)]="privacyObjects[i]" (ngModelChange)="markFormChanged()" [resetEnabled]="false"
         ></app-select-catalog>
-        <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+        <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1); markFormChanged()">&times;</button>
       </div>
     }
-    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null); markFormChanged()">
       Добавить объект права
     </button>
   </div>
@@ -97,7 +97,7 @@
       8. Оценка научно-технического уровня внедряемых технологий по сравнению
       с передовыми технологиями, используемыми в мире:
     </label>
-    <textarea [(ngModel)]="_form.technologyLevel"
+    <textarea [ngModel]="formValue().technologyLevel" (ngModelChange)="patchForm({ technologyLevel: $event })"
       name="technologyLevel"
       required
       rows="3" class="form-control"
@@ -110,7 +110,7 @@
       9. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
       и необходимости модернизации (реконструкции) взаимосвязанных действующих производственных объектов:
     </label>
-    <textarea [(ngModel)]="_form.consequences"
+    <textarea [ngModel]="formValue().consequences" (ngModelChange)="patchForm({ consequences: $event })"
       name="consequences"
       required
       rows="3" class="form-control"
@@ -125,7 +125,7 @@
     <label>
       1. Целесообразность реализации внедряемых технологий с учетом их оптимальности и инновационности:
     </label>
-    <app-boolean-button [(ngModel)]="_form.realization" [falseLabel]="'нецелесообразно'"
+    <app-boolean-button [ngModel]="formValue().realization" (ngModelChange)="patchForm({ realization: $event })" [falseLabel]="'нецелесообразно'"
     [trueLabel]="'целесообразно'"></app-boolean-button>
   </div>
 
@@ -139,12 +139,12 @@
     }
     @for (note of notes; track note; let i = $index) {
       <div class="input-group btn-group mb-2">
-        <textarea [(ngModel)]="note.name" rows="2" class="form-control"
+        <textarea [(ngModel)]="note.name" (ngModelChange)="markFormChanged()" rows="2" class="form-control"
         placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
-        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1); markFormChanged()">&times;</button>
       </div>
     }
-    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
+    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''}); markFormChanged()">
       Добавить замечание
     </button>
   </div>

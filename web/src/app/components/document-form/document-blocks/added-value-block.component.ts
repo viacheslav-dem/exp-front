@@ -8,15 +8,16 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Уровень добавленной стоимости на одного работающего по инновационному проекту,
         соответствующий году, следующему за годом выхода на проектную мощность, евро:
       </label>
-      <input [(ngModel)]="_form().addedValue" min="0" numberInput type="text" class="form-control"
+      <input [ngModel]="_form()?.addedValue" min="0" numberInput type="text" class="form-control"
         title="Уровень добавленной стоимости"
         placeholder="сумма в евро"
         name="addedValue"
         required
-        (ngModelChange)="onConditionsChanged.emit(true)">
+        (ngModelChange)="emitPatch({ addedValue: $event })">
         @if (full()) {
           <textarea
-            [(ngModel)]="_form().addedValueText"
+            [ngModel]="_form()?.addedValueText"
+            (ngModelChange)="emitPatch({ addedValueText: $event })"
             [attr.name]="'addedValueText_' + num().split('.').join('_')"
             required
             minlength="30"
@@ -49,10 +50,18 @@ export class AddedValueBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    addedValue: number;
-    addedValueText: string;
-}>(undefined);
+  readonly _form = input<AddedValueBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<AddedValueBlockForm>>();
+
+  emitPatch(patch: Partial<AddedValueBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type AddedValueBlockForm = {
+  addedValue: number;
+  addedValueText: string;
+};

@@ -9,13 +9,15 @@ import {Component, input, output} from '@angular/core';
         включая работы (услуги) по технической поддержке и сопровождению программно-технических средств,
         информационных ресурсов, информационных систем и информационных сетей, заявленным объемам финансирования:
       </label>
-      <app-boolean-button name="workAccordance" required [(ngModel)]="_form().workAccordance"
+      <input type="hidden" [ngModel]="_form()?.workAccordance" name="workAccordance" required>
+      <app-boolean-button name="workAccordance" required [ngModel]="_form()?.workAccordance"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+        (ngModelChange)="emitPatch({ workAccordance: $event })"></app-boolean-button>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().workAccordanceText"
+          [ngModel]="_form()?.workAccordanceText"
+          (ngModelChange)="emitPatch({ workAccordanceText: $event })"
           [attr.name]="'workAccordanceText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -34,10 +36,18 @@ export class WorkAccordanceBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    workAccordance: boolean;
-    workAccordanceText: string;
-}>(undefined);
+  readonly _form = input<WorkAccordanceBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<WorkAccordanceBlockForm>>();
+
+  emitPatch(patch: Partial<WorkAccordanceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type WorkAccordanceBlockForm = {
+  workAccordance: boolean;
+  workAccordanceText: string;
+};

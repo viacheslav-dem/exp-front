@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-pvt-product-name-block',
@@ -11,7 +11,7 @@ import {Component, input} from '@angular/core';
           утверждённого постановлением Государственного комитета по стандартизации Республики Беларусь от 28 декабря 2012 г. № 83,
           и в отношении товаров (работ, услуг) когда единой Товарной номенклатуры внешнеэкономической деятельности Евразийского экономического союза (далее – ТН ВЭД ЕАЭС)).
       </label>
-      <textarea [(ngModel)]="_form().productName" name="productName" rows="2" class="form-control"
+      <textarea [ngModel]="_form()?.productName" (ngModelChange)="emitPatch({ productName: $event })" name="productName" rows="2" class="form-control"
                 title="Наименование товаров"
                 placeholder="наименование"></textarea>
     </div>
@@ -20,9 +20,19 @@ import {Component, input} from '@angular/core';
 })
 export class PvtProductNamingBlockComponent {
 
-    readonly _form = input<{
-    productName: string;
-}>(undefined);
+    readonly _form = input<PvtProductNamingBlockForm>(undefined);
 
     readonly num = input<string>("1");
+
+    readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<PvtProductNamingBlockForm>>();
+
+    emitPatch(patch: Partial<PvtProductNamingBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type PvtProductNamingBlockForm = {
+  productName: string;
+};

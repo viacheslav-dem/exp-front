@@ -9,11 +9,11 @@ import {DateRange} from "@app/components/common-components/page-and-filter/model
           {{num()}}. Создание объекта права промышленной собственности
           при реализации объекта государственной экспертизы:
         </label>
-        <app-dropdown name="deadlinesCompliance" required [options]="deadlinesCompliance" [(ngModel)]="_form().deadlinesCompliance"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
-        @if (full() || _form().deadlinesCompliance == 'предусматривается') {
+        <app-dropdown name="deadlinesCompliance" required [options]="deadlinesCompliance" [ngModel]="_form()?.deadlinesCompliance"
+        (ngModelChange)="emitPatch({ deadlinesCompliance: $event })"></app-dropdown>
+        @if (full() || _form()?.deadlinesCompliance == 'предусматривается') {
           <textarea
-            [(ngModel)]="_form().deadlinesComplianceText" name="deadlinesComplianceText" required minlength="30" rows="3" class="form-control mt-05"
+            [ngModel]="_form()?.deadlinesComplianceText" (ngModelChange)="emitPatch({ deadlinesComplianceText: $event })" name="deadlinesComplianceText" required minlength="30" rows="3" class="form-control mt-05"
           placeholder="Обязательный текст (не менее 30 символов)"></textarea>
         }
         @if (full()) {
@@ -45,10 +45,18 @@ export class DeadlinesComplianceBlockComponent {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    deadlinesCompliance: string;
-    deadlinesComplianceText: string;
-}>(undefined);
+    readonly _form = input<DeadlinesComplianceBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<DeadlinesComplianceBlockForm>>();
+
+    emitPatch(patch: Partial<DeadlinesComplianceBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type DeadlinesComplianceBlockForm = {
+  deadlinesCompliance: string;
+  deadlinesComplianceText: string;
+};

@@ -17,7 +17,7 @@ import {Component, input, output} from '@angular/core';
         [falseLabel]="'не соответствует'"
       (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().competitivenessText" name="competitivenessText" rows="3" class="form-control"
+        <textarea [(ngModel)]="_form().competitivenessText" (ngModelChange)="onConditionsChanged.emit(true)" name="competitivenessText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>

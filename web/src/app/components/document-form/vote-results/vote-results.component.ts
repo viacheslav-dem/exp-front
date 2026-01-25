@@ -20,7 +20,7 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
             <div class="col-md-4 pe-2">
               <div class="input-group input-group-sm">
                 <input min="0" [max]="all() - _value.rejected" numberInput type="text" class="form-control"
-                  [(ngModel)]="_value.accepted" placeholder="проголосовали за" required>
+                  [(ngModel)]="_value.accepted" name="voteAccepted" placeholder="проголосовали за" required>
                   <div class="input-group-append">
                     <div class="input-group-text">
                       за
@@ -31,7 +31,7 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
               <div class="col-md-4 ps-2 pe-2">
                 <div class="input-group input-group-sm">
                   <input min="0" [max]="all() - _value.accepted" numberInput type="text" class="form-control"
-                    [(ngModel)]="_value.rejected" placeholder="проголосовали против" required>
+                    [(ngModel)]="_value.rejected" name="voteRejected" placeholder="проголосовали против" required>
                     <div class="input-group-append">
                       <div class="input-group-text">
                         против
@@ -42,7 +42,7 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
                 <div class="col-md-4 ps-2">
                   <div class="input-group input-group-sm">
                     <input min="0" disabled numberInput type="text" class="form-control" [value]="all() - _value.getVoted()"
-                      placeholder="не участвовали в голосовании" required>
+                      name="voteNotVoted" placeholder="не участвовали в голосовании" required>
                       <div class="input-group-append">
                         <div class="input-group-text">
                           не голосовали

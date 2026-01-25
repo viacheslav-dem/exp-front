@@ -12,7 +12,7 @@ import {Component, input, output} from '@angular/core';
           Товарной номенклатурой внешнеэкономической деятельности Евразийского экономического союза (далее – ТН ВЭД
           ЕАЭС), к которому относится товар:
       </label>
-      <textarea [(ngModel)]="_form().correspondenceOfProductName" name="correspondenceOfProductName" rows="3" class="form-control mt-05"
+      <textarea [ngModel]="_form()?.correspondenceOfProductName" (ngModelChange)="emitPatch({ correspondenceOfProductName: $event })" name="correspondenceOfProductName" rows="3" class="form-control mt-05"
                 placeholder="Пояснительный текст (при необходимости)."></textarea>
     </div>
   `,
@@ -24,9 +24,17 @@ export class CorrespondenceOfProductNameComponent {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    correspondenceOfProductName: string;
-}>(undefined);
+    readonly _form = input<CorrespondenceOfProductNameBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<CorrespondenceOfProductNameBlockForm>>();
+
+    emitPatch(patch: Partial<CorrespondenceOfProductNameBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type CorrespondenceOfProductNameBlockForm = {
+  correspondenceOfProductName: string;
+};

@@ -5,7 +5,7 @@
       1. Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
       научно-технической деятельности в Республики Беларусь:
     </label>
-    <textarea [(ngModel)]="_form.accordance"
+    <textarea [ngModel]="formValue().accordance" (ngModelChange)="patchForm({ accordance: $event })"
       name="accordance"
       required
       maxlength="5000"
@@ -18,7 +18,7 @@
     <label>
       2. Оценка текущего состояния соответствующей сферы планирования по проекту государственной программы:
     </label>
-    <textarea [(ngModel)]="_form.state"
+    <textarea [ngModel]="formValue().state" (ngModelChange)="patchForm({ state: $event })"
       name="state"
       required
       maxlength="5000"
@@ -32,7 +32,7 @@
       3. Оценка прогноза научно-технического развития соответствующей сферы планирования
       по проекту государственной программы:
     </label>
-    <textarea [(ngModel)]="_form.prognosis"
+    <textarea [ngModel]="formValue().prognosis" (ngModelChange)="patchForm({ prognosis: $event })"
       name="prognosis"
       required
       maxlength="5000"
@@ -50,12 +50,12 @@
       <div class="input-group btn-group mb-2">
         <app-select-catalog
           [catalog]="Catalog.INDUSTRIAL_PROPERTY"
-          [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+          [(ngModel)]="privacyObjects[i]" (ngModelChange)="markFormChanged()" [resetEnabled]="false"
         ></app-select-catalog>
-        <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+        <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1); markFormChanged()">&times;</button>
       </div>
     }
-    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null); markFormChanged()">
       Добавить объект права
     </button>
   </div>
@@ -68,7 +68,7 @@
       1. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы
       в части научно-технического уровня для достижения запланированных государственной программой показателей:
     </label>
-    <app-boolean-button [(ngModel)]="_form.finance" [falseLabel]="'недостаточен'"
+    <app-boolean-button [ngModel]="formValue().finance" (ngModelChange)="patchForm({ finance: $event })" [falseLabel]="'недостаточен'"
     [trueLabel]="'достаточен'"></app-boolean-button>
   </div>
 
@@ -77,7 +77,7 @@
       2. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы
       в части объемов их финансирования для достижения запланированных государственной программой показателей:
     </label>
-    <app-boolean-button [(ngModel)]="_form.scientificLevel" [falseLabel]="'недостаточен'"
+    <app-boolean-button [ngModel]="formValue().scientificLevel" (ngModelChange)="patchForm({ scientificLevel: $event })" [falseLabel]="'недостаточен'"
     [trueLabel]="'достаточен'"></app-boolean-button>
   </div>
 
@@ -91,12 +91,12 @@
     }
     @for (note of notes; track note; let i = $index) {
       <div class="input-group btn-group mb-2">
-        <textarea [(ngModel)]="note.name" rows="2" maxlength="5000" class="form-control"
+        <textarea [(ngModel)]="note.name" (ngModelChange)="markFormChanged()" rows="2" maxlength="5000" class="form-control"
         placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
-        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1); markFormChanged()">&times;</button>
       </div>
     }
-    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
+    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''}); markFormChanged()">
       Добавить замечание
     </button>
   </div>

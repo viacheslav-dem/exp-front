@@ -9,11 +9,12 @@ import {Component, input, output} from '@angular/core';
         внутри страны (возможно по сферам экономики, регионам республики, сведения об основных потребителях),
         в рамках Евразийского экономического союза и дальнего зарубежья:
       </label>
-      <app-dropdown name="needs" required [options]="needsOptions" [(ngModel)]="_form().needs"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown name="needs" required [options]="needsOptions" [ngModel]="_form()?.needs"
+      (ngModelChange)="emitPatch({ needs: $event })"></app-dropdown>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().needsText"
+          [ngModel]="_form()?.needsText"
+          (ngModelChange)="emitPatch({ needsText: $event })"
           [attr.name]="'needsText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -47,10 +48,18 @@ export class NeedsBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    needs: string;
-    needsText: string;
-}>(undefined);
+  readonly _form = input<NeedsBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<NeedsBlockForm>>();
+
+  emitPatch(patch: Partial<NeedsBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type NeedsBlockForm = {
+  needs: string;
+  needsText: string;
+};

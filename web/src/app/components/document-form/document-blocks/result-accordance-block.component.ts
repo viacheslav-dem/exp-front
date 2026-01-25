@@ -10,12 +10,14 @@ import {Component, input, output} from '@angular/core';
         }
         Соответствие достигнутого результата запланированному:
       </label>
-      <app-boolean-button name="accordance" required [(ngModel)]="_form().accordance" [trueLabel]="'соответствует'"
+      <input type="hidden" [ngModel]="_form()?.accordance" name="accordance" required>
+      <app-boolean-button name="accordance" required [ngModel]="_form()?.accordance" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ accordance: $event })"></app-boolean-button>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().accordanceText"
+          [ngModel]="_form()?.accordanceText"
+          (ngModelChange)="emitPatch({ accordanceText: $event })"
           [attr.name]="'accordanceText_' + (num() ? num().split('.').join('_') : 'result')"
           required
           minlength="30"
@@ -42,10 +44,18 @@ export class ResultAccordanceBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    accordance: boolean;
-    accordanceText: string;
-}>(undefined);
+  readonly _form = input<ResultAccordanceBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ResultAccordanceBlockForm>>();
+
+  emitPatch(patch: Partial<ResultAccordanceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ResultAccordanceBlockForm = {
+  accordance: boolean;
+  accordanceText: string;
+};

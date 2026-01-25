@@ -8,16 +8,23 @@ import {Component, input, output} from "@angular/core";
         {{num()}}. Уровень добавленной стоимости на одного работающего по инновационному проекту,
         соответствующий году, следующему за годом выхода на проектную мощность, евро:
       </label>
-      <input [(ngModel)]="_form().addedValue" min="0" numberInput type="text" class="form-control"
+      <input
+        [ngModel]="_form()?.addedValue"
+        (ngModelChange)="emitPatch({ addedValue: $event })"
+        min="0"
+        numberInput
+        type="text"
+        class="form-control"
         title="Уровень добавленной стоимости"
         placeholder="сумма в евро"
         name="addedValue"
         required
-        (ngModelChange)="onConditionsChanged.emit(true)">
+      >
         @if (full()) {
           <textarea
-            [(ngModel)]="_form().addedValueText"
-            [attr.name]="'addedValueText_' + num().split('.').join('_')"
+            [ngModel]="_form()?.addedValueText"
+            (ngModelChange)="emitPatch({ addedValueText: $event })"
+            [name]="'addedValueText_' + num().split('.').join('_')"
             required
             minlength="30"
             maxlength="5000"
@@ -48,10 +55,20 @@ export class AddedValueBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    addedValue: number;
-    addedValueText: string;
-}>(undefined);
+    readonly _form = input<AddedValueBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<AddedValueBlock2025Form>>();
+
+    emitPatch(patch: Partial<AddedValueBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type AddedValueBlock2025Form = {
+    addedValue: number;
+    addedValueText: string;
+};

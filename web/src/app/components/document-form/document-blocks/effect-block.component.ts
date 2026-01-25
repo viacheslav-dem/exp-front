@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-effect-block',
@@ -9,6 +9,7 @@ import {Component, input} from '@angular/core';
       </label>
       <textarea
         [(ngModel)]="_form().effect"
+        (ngModelChange)="onConditionsChanged.emit(true)"
         [attr.name]="'effect_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -40,5 +41,7 @@ export class EffectBlockComponent {
 
   readonly _form = input<{
     effect: string;
-}>(undefined);
+  }>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
 }

@@ -7,11 +7,25 @@ import {Component, input, output} from "@angular/core";
       <label>
         {{num()}}. Направленность объекта государственной экспертизы:
       </label>
-      <app-dropdown name="analog" required [options]="analogOptions" [(ngModel)]="_form().analog"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown
+        name="analog"
+        required
+        [options]="analogOptions"
+        [ngModel]="_form().analog"
+        (ngModelChange)="emitPatch({ analog: $event })"
+      ></app-dropdown>
       @if (full()) {
-        <textarea [(ngModel)]="_form().analogText" name="analogText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)"></textarea>
+        <textarea
+          [ngModel]="_form().analogText"
+          (ngModelChange)="emitPatch({ analogText: $event })"
+          name="analogText"
+          required
+          minlength="30"
+          maxlength="5000"
+          rows="3"
+          class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)"
+        ></textarea>
       }
       @if (full()) {
         <div class="hint">
@@ -44,10 +58,20 @@ export class AnalogBlock2025Component {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    analog: string;
-    analogText: string;
-}>(undefined);
+    readonly _form = input<AnalogBlock2025Form>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<AnalogBlock2025Form>>();
+
+    emitPatch(patch: Partial<AnalogBlock2025Form>) {
+        // Иммутабельный путь: не мутируем input-форму, а просим контейнер применить patch.
+        this.formPatch.emit(patch);
+        // Оставляем событие для обратной совместимости (часть форм привязана к нему).
+        this.onConditionsChanged.emit(true);
+    }
 }
+
+type AnalogBlock2025Form = {
+    analog: string;
+    analogText: string;
+};

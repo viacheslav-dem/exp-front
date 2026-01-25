@@ -13,12 +13,12 @@
 
   <div class="form-group">
     <label>Дата</label>
-    <app-date-input class="width-100" [(ngModel)]="_form.date"></app-date-input>
+    <app-date-input class="width-100" [ngModel]="formValue().date" (ngModelChange)="patchForm({ date: $event })"></app-date-input>
   </div>
 
   <div class="form-group">
     <label>Исполняющий обязанности начальника подразделения:</label>
-    <span class="italic ml-05">{{_form.gkntDepartmentChairman | fullName}}</span>
+    <span class="italic ml-05">{{formValue().gkntDepartmentChairman | fullName}}</span>
     <a class="btn btn-icon btn-icon-sm" (click)="showSearchChairmanModal()">
       <fa-icon icon="pencil-alt"></fa-icon>
     </a>
@@ -29,11 +29,11 @@
       <label class="form-group-label">Информация о письме заказчика:</label>
       <div class="form-sub-group">
         <label>Дата</label>
-        <app-date-input class="width-100" [(ngModel)]="_form.customerRequestDate" [placeholder]="'дата письма заказчика'"></app-date-input>
+        <app-date-input class="width-100" [ngModel]="formValue().customerRequestDate" (ngModelChange)="patchForm({ customerRequestDate: $event })" [placeholder]="'дата письма заказчика'"></app-date-input>
       </div>
       <div class="form-sub-group">
         <label>Номер</label>
-        <input title="Номер письма заказчика" [(ngModel)]="_form.customerRequestNum" type="text" class="form-control"
+        <input title="Номер письма заказчика" [ngModel]="formValue().customerRequestNum" (ngModelChange)="patchForm({ customerRequestNum: $event })" type="text" class="form-control"
           placeholder="номер письма заказчика">
         </div>
         <div class="form-sub-group">
@@ -41,7 +41,7 @@
             При проведении государственной экспертизы Заказчик экспертизы просит
             дать оценку в части поставленных вопросов:
           </label>
-          <textarea title="Перечень предложенных характеристик от заказчика" [(ngModel)]="_form.customerRequestQuestions"
+          <textarea title="Перечень предложенных характеристик от заказчика" [ngModel]="formValue().customerRequestQuestions" (ngModelChange)="patchForm({ customerRequestQuestions: $event })"
             rows="2" class="form-control"
           placeholder="перечень предложенных характеристик от заказчика"></textarea>
           <div class="hint">

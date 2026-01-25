@@ -5,7 +5,7 @@
       1. Соответствие указанному приоритетному направлению научных исследований в Республике Беларусь и (или)
       научно-технической деятельности в Республики Беларусь:
     </label>
-    <textarea [(ngModel)]="_form.accordance" name="accordance" required rows="3" class="form-control"
+    <textarea [ngModel]="formValue().accordance" (ngModelChange)="patchForm({ accordance: $event })" name="accordance" required rows="3" class="form-control"
       placeholder="cоответствие или несоответствие по каждому из перечисленных в материалах приоритетному направлению">
     </textarea>
   </div>
@@ -16,7 +16,7 @@
       разработки новых технологических процессов, наукоемкой, конкурентоспособной продукции,
       формирования перспективных научных направлений:
     </label>
-    <textarea [(ngModel)]="_form.significance" name="significance" required rows="3" class="form-control"
+    <textarea [ngModel]="formValue().significance" (ngModelChange)="patchForm({ significance: $event })" name="significance" required rows="3" class="form-control"
       placeholder="суть значения и важности работы для республики">
     </textarea>
   </div>
@@ -25,7 +25,7 @@
     <label>
       3. Научный и (или) технический уровень:
     </label>
-    <textarea [(ngModel)]="_form.scientificLevel" name="scientificLevel" required rows="3" class="form-control"
+    <textarea [ngModel]="formValue().scientificLevel" (ngModelChange)="patchForm({ scientificLevel: $event })" name="scientificLevel" required rows="3" class="form-control"
       placeholder="научный и (или) научно-технический уровень">
     </textarea>
   </div>
@@ -34,7 +34,7 @@
     <label>
       4. Целесообразность реализации работы:
     </label>
-    <textarea [(ngModel)]="_form.expedience" name="expedience" required rows="3" class="form-control"
+    <textarea [ngModel]="formValue().expedience" (ngModelChange)="patchForm({ expedience: $event })" name="expedience" required rows="3" class="form-control"
       placeholder="целесообразность реализации работы">
     </textarea>
   </div>
@@ -43,7 +43,7 @@
     <label>
       5. Эффективность реализации работы:
     </label>
-    <textarea [(ngModel)]="_form.efficiency" name="efficiency" required rows="3" class="form-control"
+    <textarea [ngModel]="formValue().efficiency" (ngModelChange)="patchForm({ efficiency: $event })" name="efficiency" required rows="3" class="form-control"
       placeholder="эффективность реализации работы">
     </textarea>
   </div>
@@ -52,7 +52,7 @@
     <label>
       6. Возможность реализации работы:
     </label>
-    <textarea [(ngModel)]="_form.realization" name="realization" required rows="3" class="form-control"
+    <textarea [ngModel]="formValue().realization" (ngModelChange)="patchForm({ realization: $event })" name="realization" required rows="3" class="form-control"
       placeholder="возможность реализации работы">
     </textarea>
   </div>
@@ -61,7 +61,7 @@
     <label>
       7. Возможные социальные последствия реализации работы:
     </label>
-    <textarea [(ngModel)]="_form.socialEffects" name="socialEffects" required rows="3" class="form-control"
+    <textarea [ngModel]="formValue().socialEffects" (ngModelChange)="patchForm({ socialEffects: $event })" name="socialEffects" required rows="3" class="form-control"
       placeholder="возможные последствия">
     </textarea>
   </div>
@@ -70,7 +70,7 @@
     <label>
       8. Возможные экономические последствия реализации работы:
     </label>
-    <textarea [(ngModel)]="_form.economicEffects" name="economicEffects" required rows="3" class="form-control"
+    <textarea [ngModel]="formValue().economicEffects" (ngModelChange)="patchForm({ economicEffects: $event })" name="economicEffects" required rows="3" class="form-control"
       placeholder="возможные последствия">
     </textarea>
   </div>
@@ -79,7 +79,7 @@
     <label>
       9. Возможные экологические последствия реализации работы:
     </label>
-    <textarea [(ngModel)]="_form.ecologicEffects" name="ecologicEffects" required rows="3" class="form-control"
+    <textarea [ngModel]="formValue().ecologicEffects" (ngModelChange)="patchForm({ ecologicEffects: $event })" name="ecologicEffects" required rows="3" class="form-control"
       placeholder="возможные последствия">
     </textarea>
   </div>
@@ -88,7 +88,7 @@
     <label>
       10. Сведения о проведении маркетинговых и патентных исследований и их результаты:
     </label>
-    <textarea [(ngModel)]="_form.marketing" name="marketing" required rows="3" class="form-control"
+    <textarea [ngModel]="formValue().marketing" (ngModelChange)="patchForm({ marketing: $event })" name="marketing" required rows="3" class="form-control"
       placeholder="результаты проведения маркетинговых и патентных исследований по объекту экспертизы">
     </textarea>
   </div>
@@ -102,12 +102,12 @@
       <div class="input-group btn-group mb-2">
         <app-select-catalog
           [catalog]="Catalog.INDUSTRIAL_PROPERTY"
-          [(ngModel)]="privacyObjects[i]" [resetEnabled]="false"
+          [(ngModel)]="privacyObjects[i]" (ngModelChange)="markFormChanged()" [resetEnabled]="false"
         ></app-select-catalog>
-        <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1)">&times;</button>
+        <button type="button" class="btn btn-outline-danger" (click)="privacyObjects.splice(i, 1); markFormChanged()">&times;</button>
       </div>
     }
-    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null)">
+    <button type="button" class="btn btn-primary btn-sm" (click)="privacyObjects.push(null); markFormChanged()">
       Добавить объект права
     </button>
   </div>
@@ -119,7 +119,7 @@
     <label>
       1. Финансирование за счет средств республиканского бюджета и (или) других источников финансирования:
     </label>
-    <app-boolean-button [(ngModel)]="_form.finance" [falseLabel]="'нецелесообразно'"
+    <app-boolean-button [ngModel]="formValue().finance" (ngModelChange)="patchForm({ finance: $event })" [falseLabel]="'нецелесообразно'"
     [trueLabel]="'целесообразно'"></app-boolean-button>
   </div>
 
@@ -130,12 +130,12 @@
       пункта&nbsp;1 Указа Президента Республики Беларусь от 7&nbsp;сентября 2009&nbsp;г. №&nbsp;441
       «О дополнительных мерах по стимулированию научной, научно-технической и инновационной деятельности»:
     </label>
-    @if (!_form.finance) {
+    @if (!formValue().finance) {
       <div class="font-weight-bold">нецелесообразно согласно пункту 1 данного раздела</div>
     }
-    @if (_form.finance) {
+    @if (formValue().finance) {
       <div >
-        <app-boolean-button [(ngModel)]="_form.promotion" [falseLabel]="'нецелесообразно'"
+        <app-boolean-button [ngModel]="formValue().promotion" (ngModelChange)="patchForm({ promotion: $event })" [falseLabel]="'нецелесообразно'"
         [trueLabel]="'целесообразно'"></app-boolean-button>
       </div>
     }
@@ -149,18 +149,18 @@
       Указом Президента Республики Беларусь от 25&nbsp;мая 2006&nbsp;г. №&nbsp;356 «О государственной регистрации
       научно-исследовательских, опытно-конструкторских и опытно-технологических работ»:
     </label>
-    @if (!_form.finance) {
+    @if (!formValue().finance) {
       <div class="font-weight-bold">не имеются согласно пункту 1 данного раздела</div>
     }
-    @if (_form.finance) {
+    @if (formValue().finance) {
       <div>
         @if (stages.length == 0) {
           <div class="mb-2 italic">не имеются</div>
         }
         @for (stage of stages; track stage; let i = $index) {
           <div class="input-group btn-group mb-2">
-            <input [(ngModel)]="stage.name" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
-            <button (click)="stages.splice(i, 1)" type="button" class="btn btn-outline-danger">&times;</button>
+            <input [(ngModel)]="stage.name" (ngModelChange)="markFormChanged()" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
+            <button (click)="stages.splice(i, 1); markFormChanged()" type="button" class="btn btn-outline-danger">&times;</button>
           </div>
         }
         <button (click)="stages.push({name: ''})" type="button" class="btn btn-primary btn-sm">
@@ -180,9 +180,9 @@
     }
     @for (note of notes; track note; let i = $index) {
       <div class="input-group btn-group mb-2">
-        <textarea [(ngModel)]="note.name" rows="2" class="form-control"
+        <textarea [(ngModel)]="note.name" (ngModelChange)="markFormChanged()" rows="2" class="form-control"
         placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
-        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1); markFormChanged()">&times;</button>
       </div>
     }
     <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">

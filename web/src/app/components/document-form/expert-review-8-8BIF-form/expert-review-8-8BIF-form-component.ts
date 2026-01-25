@@ -31,17 +31,18 @@ export class ExpertReview_8_8BIF_FormComponent extends ExpertReviewForm<ExpertRe
     }
     onConditionsChanged() {
         if (this.isFinanceConclusionDisabled()) {
-            this._form.financeConclusion = false;
+            this.patchForm({ financeConclusion: false });
         }
-        this._form.conclusion = this._form.financeConclusion;
+        this.patchForm({ conclusion: this.formValue().financeConclusion });
     }
     isFinanceConclusionDisabled() {
-        return !anyMatch(this._form.novelty, 'новый для Республики Беларусь', 'новый для стран СНГ', 'новизна мирового уровня')
-            || !anyMatch(this._form.economicSignificance, 'средняя', 'высокая');
+        const f = this.formValue();
+        return !anyMatch(f.novelty, 'новый для Республики Беларусь', 'новый для стран СНГ', 'новизна мирового уровня')
+            || !anyMatch(f.economicSignificance, 'средняя', 'высокая');
     }
     ngOnInit() {
         super.ngOnInit();
-        this._form.termsSuggestion = this._form.termsSuggestion || new PeriodDto();
+        this.updateForm(f => ({ ...f, termsSuggestion: f.termsSuggestion || new PeriodDto() }));
     }
 
 }

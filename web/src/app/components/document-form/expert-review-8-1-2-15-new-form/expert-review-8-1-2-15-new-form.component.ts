@@ -24,25 +24,27 @@ export class ExpertReview_8_1_2_15_NewFormComponent extends ExpertReviewForm<Exp
     }
 
     isFinanceConclusionDisabled() {
-        return !anyMatch(this._form.novelty, 'новый для Республики Беларусь', 'новый для стран СНГ', 'новизна мирового уровня')
-            || !anyMatch(this._form.economicSignificance, 'средняя', 'высокая');
+        const form = this.formValue();
+        return !anyMatch(form.novelty, 'новый для Республики Беларусь', 'новый для стран СНГ', 'новизна мирового уровня')
+            || !anyMatch(form.economicSignificance, 'средняя', 'высокая');
     }
 
     isConclusionDisabled() {
-        return !this._form.financeConclusion;
+        return !this.formValue().financeConclusion;
     }
 
     onConditionsChanged() {
+        this.markFormChanged();
         if (this.isFinanceConclusionDisabled()) {
-            this._form.financeConclusion = false;
+            this.patchForm({ financeConclusion: false } as Partial<ExpertReview_8_1_2_15_NewFormContent>);
         }
         if (this.isConclusionDisabled()) {
-            this._form.conclusion = false;
+            this.patchForm({ conclusion: false } as Partial<ExpertReview_8_1_2_15_NewFormContent>);
         }
     }
 
-    setForm(form: ExpertReview_8_1_2_15_NewFormContent) {
+    override setForm(form: ExpertReview_8_1_2_15_NewFormContent) {
         super.setForm(form);
-        this._form.termsSuggestion = this._form.termsSuggestion || new PeriodDto();
+        this.updateForm(f => ({ ...f, termsSuggestion: f.termsSuggestion || new PeriodDto() }));
     }
 }

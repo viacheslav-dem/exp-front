@@ -14,7 +14,8 @@ export class CouncilConclusion_8_10PIT_FormComponent extends CouncilConclusionFo
     // чтобы контейнер мог гарантированно найти .ng-invalid и проскроллить без зависимости от throw.
     super.validate();
     // Проверка patents/advantage/competitiveness оставлена через throw, так как это бизнес-логика, не связанная с template-driven валидацией
-    if ((!this._form.patents || !this._form.advantage || !this._form.competitiveness)
+    const form = this.formValue();
+    if ((!form.patents || !form.advantage || !form.competitiveness)
       && this.group.finalAgendaState == DecisionState.ACCEPTED) {
       throw 'Недопустимо положительное заключение при наличии отрицательной оценки ' +
       'в пунктах 1, 2, 3.';

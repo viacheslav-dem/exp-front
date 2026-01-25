@@ -8,11 +8,12 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Оценка возможных социальных, экономических и экологических последствий внедрения выбранных технологий
         и необходимости модернизации (реконструкции) взаимосвязанных действующих производственных объектов:
       </label>
-      <app-boolean-button name="consequences" required [(ngModel)]="_form().consequences" [trueLabel]="'значительные'"
+      <input type="hidden" [ngModel]="_form()?.consequences" name="consequences" required>
+      <app-boolean-button name="consequences" required [ngModel]="_form()?.consequences" [trueLabel]="'значительные'"
         [falseLabel]="'незначительные'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ consequences: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().consequencesText" name="consequencesText" rows="3" class="form-control mt-05"
+        <textarea [ngModel]="_form()?.consequencesText" (ngModelChange)="emitPatch({ consequencesText: $event })" name="consequencesText" rows="3" class="form-control mt-05"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
       @if (full()) {
@@ -55,10 +56,18 @@ export class ConsequencesConclusionBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    consequences: boolean;
-    consequencesText: string;
-}>(undefined);
+  readonly _form = input<ConsequencesConclusionBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ConsequencesConclusionBlockForm>>();
+
+  emitPatch(patch: Partial<ConsequencesConclusionBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ConsequencesConclusionBlockForm = {
+  consequences: boolean;
+  consequencesText: string;
+};
