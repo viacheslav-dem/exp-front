@@ -142,6 +142,6 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
         event.preventDefault();
 
         // Откройте страницу в новой вкладке
-        window.open(`#/projects/${id}`, '_blank');
+        window.open(`/projects/${id}`, '_blank');
     }
 }

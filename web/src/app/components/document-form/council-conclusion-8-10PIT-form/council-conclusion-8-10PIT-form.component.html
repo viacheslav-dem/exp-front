@@ -2,7 +2,7 @@
 
 <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
-<app-product-name-block [_form]="formValue()"></app-product-name-block>
+<app-product-name-block [_form]="formValue()" (formPatch)="patchForm($event)"></app-product-name-block>
 
 <hr/>
 

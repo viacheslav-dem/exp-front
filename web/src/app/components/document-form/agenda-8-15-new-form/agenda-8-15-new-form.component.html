@@ -45,6 +45,7 @@
   <app-resources-sufficiency-block
     [_form]="formValue()"
     [num]="'4'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-resources-sufficiency-block>
 
@@ -71,6 +72,7 @@
   <app-risks-block
     [_form]="formValue()"
     [num]="'7'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-risks-block>
 

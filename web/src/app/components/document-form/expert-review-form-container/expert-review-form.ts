@@ -1,6 +1,6 @@
 import {DocumentForm} from "app/components/document-form/document-form";
 import {isEmptyOrNull} from "@app/support/utils";
-import {Injectable} from "@angular/core";
+import {Injectable, signal} from "@angular/core";
 import {ExpertReviewFormContent} from "@app/components/document-form/form-model/ExpertReviewFormContent";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ExpertReviewFormContainerComponent} from "@app/components/document-form/expert-review-form-container/expert-review-form-container.component";
@@ -13,8 +13,32 @@ export class ExpertReviewForm<Form extends ExpertReviewFormContent> extends Docu
 
   /* for old forms */
   privacyObjects: { name: string }[] = [];
-  stages: { name: string }[] = [];
-  notes: { name: string }[] = [];
+  readonly stages = signal<{ name: string }[]>([]);
+  readonly notes = signal<{ name: string }[]>([]);
+
+  /** Добавить замечание. Обновление через signal — без markForCheck. */
+  addNote(): void {
+    this.notes.update(n => [...n, { name: '' }]);
+    this.markFormChanged();
+  }
+
+  /** Удалить замечание по индексу. */
+  removeNote(i: number): void {
+    this.notes.update(n => n.filter((_, idx) => idx !== i));
+    this.markFormChanged();
+  }
+
+  /** Добавить этап. Обновление через signal — без markForCheck. */
+  addStage(): void {
+    this.stages.update(s => [...s, { name: '' }]);
+    this.markFormChanged();
+  }
+
+  /** Удалить этап по индексу. */
+  removeStage(i: number): void {
+    this.stages.update(s => s.filter((_, idx) => idx !== i));
+    this.markFormChanged();
+  }
 
   createNewForm(): Form {
     return new ExpertReviewFormContent() as Form;
@@ -26,8 +50,8 @@ export class ExpertReviewForm<Form extends ExpertReviewFormContent> extends Docu
     form.privacyObjects = this.privacyObjects.filter(obj => obj != null)
       .map(obj => obj.name)
       .filter(str => !isEmptyOrNull(str));
-    form.notes = this.notes.map(obj => obj.name).filter(str => !isEmptyOrNull(str));
-    form.stages = this.stages.map(obj => obj.name).filter(str => !isEmptyOrNull(str));
+    form.notes = this.notes().map(obj => obj.name).filter(str => !isEmptyOrNull(str));
+    form.stages = this.stages().map(obj => obj.name).filter(str => !isEmptyOrNull(str));
     return form;
   }
 
@@ -61,7 +85,7 @@ export class ExpertReviewForm<Form extends ExpertReviewFormContent> extends Docu
     }));
     const f = this.formValue();
     this.privacyObjects = f.privacyObjects.map(name => ({ name }));
-    this.stages = f.stages.map(name => ({ name }));
-    this.notes = f.notes.map(name => ({ name }));
+    this.stages.set(f.stages.map(name => ({ name })));
+    this.notes.set(f.notes.map(name => ({ name })));
   }
 }

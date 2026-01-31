@@ -166,16 +166,16 @@
     }
     @if (formValue().finance) {
       <div>
-        @if (stages.length == 0) {
+        @if (stages().length == 0) {
           <div class="mb-2 italic">не имеются</div>
         }
-        @for (stage of stages; track stage; let i = $index) {
+        @for (stage of stages(); track $index; let i = $index) {
           <div class="input-group btn-group mb-2">
             <input [(ngModel)]="stage.name" type="text" class="form-control" placeholder="{{i + 1}}) Этап {{i + 1}}.">
-            <button (click)="stages.splice(i, 1)" type="button" class="btn btn-outline-danger">&times;</button>
+            <button (click)="removeStage(i)" type="button" class="btn btn-outline-danger">&times;</button>
           </div>
         }
-        <button (click)="stages.push({name: ''})" type="button" class="btn btn-primary btn-sm">
+        <button (click)="addStage()" type="button" class="btn btn-primary btn-sm">
           Добавить этап
         </button>
       </div>
@@ -187,17 +187,17 @@
       4. Замечания по материалам объекта экспертизы, конкретные предложения о необходимости доработки и (или)
       корректировки материалов по объекту экспертизы:
     </label>
-    @if (notes.length == 0) {
+    @if (notes().length == 0) {
       <div class="mb-2 italic">не имеются</div>
     }
-    @for (note of notes; track note; let i = $index) {
+    @for (note of notes(); track $index; let i = $index) {
       <div class="input-group btn-group mb-2">
         <textarea [(ngModel)]="note.name" rows="2" maxlength="5000" class="form-control"
         placeholder="{{i + 1}}) Замечание {{i + 1}}."></textarea>
-        <button type="button" class="btn btn-outline-danger" (click)="notes.splice(i, 1)">&times;</button>
+        <button type="button" class="btn btn-outline-danger" (click)="removeNote(i)">&times;</button>
       </div>
     }
-    <button type="button" class="btn btn-primary btn-sm" (click)="notes.push({name: ''})">
+    <button type="button" class="btn btn-primary btn-sm" (click)="addNote()">
       Добавить замечание
     </button>
   </div>

@@ -257,6 +257,7 @@
     [noveltyNum]="'1'"
     [project]="project"
     [economicSignificanceNum]="'4'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
     [disabled]="isFinanceConclusionDisabled()"
   ></app-finance-conclusion-block-2025>
@@ -318,6 +319,7 @@
     [financeConclusionNum]="financeConclusionNum"
     [project]="project"
     [allParticipants]="getAllParticipants()"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-section-conclusion-block>
 </div>

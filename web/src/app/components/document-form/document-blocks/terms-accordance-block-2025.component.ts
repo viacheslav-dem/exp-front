@@ -70,7 +70,14 @@ export class TermsAccordanceBlock2025Component {
         this._form = _form;
         const start = _form.termsSuggestion?.start ?? null;
         const end = _form.termsSuggestion?.end ?? null;
-        this._terms = new DateRange(start, end);
+        // Обновляем _terms только при реальном изменении дат, иначе новый объект DateRange
+        // триггерит writeValue в app-date-period → при открытии календаря бесконечный цикл
+        const same = this._terms != null
+            && (this._terms.start === start || (this._terms.start == null && start == null))
+            && (this._terms.end === end || (this._terms.end == null && end == null));
+        if (!same) {
+            this._terms = new DateRange(start, end);
+        }
     });
 
     onTermsChanged() {

@@ -168,6 +168,8 @@ export class AuthErrorInterceptor implements HttpInterceptor {
   private logoutAndRedirect(message: string) {
     this.storage.resetCredentials();
     this.storage.clear();
+    // Уведомляем о logout для инвалидации кеша справочников и других компонентов
+    this.authService.onLogout$.next();
     this.toasty.err(AuthErrorInterceptor.HTTP_STATUS_FORBIDDEN, message);
     this.redirectToLoginIfNeeded();
   }
@@ -183,6 +185,8 @@ export class AuthErrorInterceptor implements HttpInterceptor {
       if (!refreshToken && this.isRefreshTokenInvalid) {
         this.storage.resetCredentials();
         this.storage.clear();
+        // Уведомляем о logout для инвалидации кеша справочников и других компонентов
+        this.authService.onLogout$.next();
         this.redirectToLoginIfNeeded();
         return EMPTY;
       }
@@ -216,6 +220,8 @@ export class AuthErrorInterceptor implements HttpInterceptor {
                 // Очищаем токены и перенаправляем на login
                 this.storage.resetCredentials();
                 this.storage.clear();
+                // Уведомляем о logout для инвалидации кеша справочников и других компонентов
+                this.authService.onLogout$.next();
                 this.redirectToLoginIfNeeded();
                 
                 // Создаем ошибку для уведомления ожидающих запросов
@@ -293,6 +299,8 @@ export class AuthErrorInterceptor implements HttpInterceptor {
                 
                 this.storage.resetCredentials();
                 this.storage.clear();
+                // Уведомляем о logout для инвалидации кеша справочников и других компонентов
+                this.authService.onLogout$.next();
                 this.redirectToLoginIfNeeded();
                 return EMPTY;
               }
@@ -314,6 +322,8 @@ export class AuthErrorInterceptor implements HttpInterceptor {
                 // Это позволит при следующем логине попытаться обновить токен снова
                 this.storage.resetCredentials();
                 this.storage.clear();
+                // Уведомляем о logout для инвалидации кеша справочников и других компонентов
+                this.authService.onLogout$.next();
                 this.redirectToLoginIfNeeded();
                 return EMPTY;
               }
@@ -335,6 +345,8 @@ export class AuthErrorInterceptor implements HttpInterceptor {
       // Если нет refresh token, перенаправляем на login
       this.isRefreshing = false;
       this.storage.resetCredentials();
+      // Уведомляем о logout для инвалидации кеша справочников и других компонентов
+      this.authService.onLogout$.next();
       this.redirectToLoginIfNeeded();
       return EMPTY;
     }

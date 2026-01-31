@@ -65,9 +65,16 @@ export class TermsAccordanceBlockComponent {
     }
     const start = form.termsSuggestion?.start ?? null;
     const end = form.termsSuggestion?.end ?? null;
-    untracked(() => {
-      this._terms = new DateRange(start, end);
-    });
+    // Обновляем _terms только при реальном изменении дат, иначе новый объект DateRange
+    // триггерит writeValue в app-date-period → prepareValue → при открытии календаря цикл
+    const same = this._terms != null
+      && (this._terms.start === start || (this._terms.start == null && start == null))
+      && (this._terms.end === end || (this._terms.end == null && end == null));
+    if (!same) {
+      untracked(() => {
+        this._terms = new DateRange(start, end);
+      });
+    }
   });
 
   emitPatch(patch: Partial<TermsAccordanceBlockForm>) {

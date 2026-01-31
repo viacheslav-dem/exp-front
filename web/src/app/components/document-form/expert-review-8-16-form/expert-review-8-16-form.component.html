@@ -3,30 +3,35 @@
   <app-economic-activity-block
           [_form]="formValue()"
           [num]="'1'"
+          (formPatch)="patchForm($event)"
           (onConditionsChanged)="onChange()">
   </app-economic-activity-block>
   <hr/>
   <app-based-on-high-tech-block
           [_form]="formValue()"
           [num]="'2'"
+          (formPatch)="patchForm($event)"
           (onConditionsChanged)="onChange()">
   </app-based-on-high-tech-block>
   <hr/>
    <app-export-orientated-block
            [_form]="formValue()"
            [num]="'3'"
+           (formPatch)="patchForm($event)"
            (onConditionsChanged)="onChange()">
    </app-export-orientated-block>
   <hr/>
   <app-import-orientation-block
           [_form]="formValue()"
           [num]="'4'"
+          (formPatch)="patchForm($event)"
           (onConditionsChanged)="onChange()">
   </app-import-orientation-block>
   <hr/>
   <app-catalog-high-tech-block
           [_form]="formValue()"
           [disabled]="isCatalogHighTechBlockDisabled()"
+          (formPatch)="patchForm($event)"
           (onConditionsChanged)="onConditionsChanged()">
   </app-catalog-high-tech-block>
 

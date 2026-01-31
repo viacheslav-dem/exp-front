@@ -5,7 +5,7 @@
 <div class="collapse" [collapse]="!expanded()" [attr.id]="'meeting-project-' + _project?.id">
     <hr/>
 
-    <app-customer-replies-block [_form]="formValue()" (onConditionsChanged)="onConditionsChanged()"></app-customer-replies-block>
+    <app-customer-replies-block [_form]="formValue()" (formPatch)="patchForm($event)" (onConditionsChanged)="onConditionsChanged()"></app-customer-replies-block>
 
     <hr/>
 
@@ -23,6 +23,7 @@
     <app-resources-sufficiency-block-2025
             [_form]="formValue()"
             [num]="'2'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-resources-sufficiency-block-2025>
 
@@ -119,6 +120,7 @@
             [financeConclusionNum]="financeConclusionNum"
             [project]="project"
             [allParticipants]="getAllParticipants()"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-section-conclusion-block>
 </div>

@@ -26,6 +26,7 @@
     [form]="formValue()"
     [num]="'2'"
     [project]="_project"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-select-directions-and-goals-block>
 
@@ -34,6 +35,7 @@
   <app-rb-needs-block
     [_form]="formValue()"
     [num]="'3'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-rb-needs-block>
 
@@ -61,6 +63,7 @@
   <app-competence-sufficiency-block
     [_form]="formValue()"
     [num]="'6'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-competence-sufficiency-block>
 
@@ -78,6 +81,7 @@
   <app-risks-block
     [_form]="formValue()"
     [num]="'8'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-risks-block>
 
@@ -86,6 +90,7 @@
   <app-privacy-block
     [_form]="formValue()"
     [num]="'9'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-privacy-block>
 
@@ -101,6 +106,7 @@
     [_form]="formValue()"
     [num]="'10.1'"
     [askStages]="false"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-stages-exists-block>
 
@@ -109,6 +115,7 @@
   <app-stages-block
     [_form]="formValue()"
     [num]="'10.2'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-stages-block>
 
@@ -132,6 +139,7 @@
   <app-terms-accordance-block
     [form]="formValue()"
     [num]="'11.2'"
+    (formPatch)="patchForm($event)"
     (onConditionsChanged)="onConditionsChanged()"
   ></app-terms-accordance-block>
 

@@ -72,6 +72,11 @@
         Предварительный результат: <span [ngClass]="['badge', expertReview().expectedBadge]">{{expertReview().expectedState | reviewState}}</span>
       </div>
     }
+    @if (role() === Role.EXPERT && expertReview().state === ExpertReviewState.ON_EXAMINATION && (expertReview().documents?.length ?? 0) > 0) {
+      <div class="alert alert-info py-2 px-3 my-2 small" role="status">
+        <strong>Напоминание.</strong> Заключение создано. Чтобы завершить экспертизу, нажмите кнопку «Завершить» в блоке действий слева (над карточкой объекта).
+      </div>
+    }
     <app-document-list
         [documents]="canEditReviewDocument() || expertReview().state != ExpertReviewState.ON_EXAMINATION ? expertReview().documents : []"
         [canDelete]="canEditReviewDocument()" (onDelete)="deleteReviewDocument($event)">

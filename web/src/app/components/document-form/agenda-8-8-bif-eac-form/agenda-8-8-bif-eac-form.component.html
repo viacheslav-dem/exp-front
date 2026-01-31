@@ -5,7 +5,7 @@
 <div class="collapse" [collapse]="!expanded()" [attr.id]="'meeting-project-' + _project?.id">
     <hr/>
 
-    <app-customer-replies-block [_form]="formValue()" (onConditionsChanged)="onConditionsChanged()"></app-customer-replies-block>
+    <app-customer-replies-block [_form]="formValue()" (formPatch)="patchForm($event)" (onConditionsChanged)="onConditionsChanged()"></app-customer-replies-block>
 
     <hr/>
 
@@ -20,6 +20,7 @@
     <app-technology-type-block
             [_form]="formValue()"
             [num]="'1.1'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"></app-technology-type-block>
     <hr/>
 
@@ -86,6 +87,7 @@
     <app-risks-block
             [_form]="formValue()"
             [num]="'8'"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-risks-block>
 
@@ -110,6 +112,7 @@
             [_form]="formValue()"
             [num]="'10.1'"
             [askStages]="false"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-stages-exists-block>
 
@@ -177,6 +180,7 @@
             [financeConclusionNum]="financeConclusionNum"
             [project]="project"
             [allParticipants]="getAllParticipants()"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-section-conclusion-block>
 </div>

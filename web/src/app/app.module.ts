@@ -9,7 +9,7 @@ import {AuthService} from "./services/auth.service";
 import {DefineRole} from "./services/define-role";
 import {LoginComponent} from "./base/login/login.component";
 import {StorageService} from "./services/storage.service";
-import {HashLocationStrategy, LocationStrategy, registerLocaleData} from "@angular/common";
+import {registerLocaleData} from "@angular/common";
 import localeRu from '@angular/common/locales/ru';
 import localeRuExtra from '@angular/common/locales/extra/ru';
 import {ProgressService} from "./components/common-components/progress/progress.service";
@@ -179,7 +179,6 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         BsDatepickerModule.forRoot(),
         TimepickerModule.forRoot(),
         BsDropdownModule.forRoot()], providers: [
-        { provide: LocationStrategy, useClass: HashLocationStrategy },
         { provide: ErrorHandler, useClass: CustomErrorHandler },
         { provide: LOCALE_ID, useValue: 'ru' },
         { provide: HTTP_INTERCEPTORS, useClass: AuthErrorInterceptor, multi: true },

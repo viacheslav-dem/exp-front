@@ -15,7 +15,9 @@
   <hr/>
   <app-consequences-block [_form]="formValue()"
                           [minLen]="30"
-                          [num]="'4'"></app-consequences-block>
+                          [num]="'4'"
+                          (formPatch)="patchForm($event)"
+                          (onConditionsChanged)="onConditionsChanged()"></app-consequences-block>
 </div>
 
 <hr/>

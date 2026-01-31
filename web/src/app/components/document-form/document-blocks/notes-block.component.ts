@@ -15,7 +15,7 @@ import {Text} from "@app/components/document-form/form-model/Text";
         @if (_form().wrappedNotes.length == 0) {
           <div class="mb-2 italic">не имеются</div>
         }
-        @for (note of _form()?.wrappedNotes || []; track note; let i = $index) {
+        @for (note of _form()?.wrappedNotes || []; track $index; let i = $index) {
           <div class="input-group mb-2">
             <textarea [ngModel]="note.text" (ngModelChange)="updateNoteText(i, $event)" [attr.name]="'note_' + i" rows="2" class="form-control"
               title="Замечание"
