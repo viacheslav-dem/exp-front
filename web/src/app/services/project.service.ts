@@ -323,4 +323,8 @@ export class ProjectService extends HasStateService {
   automaticExpertSelection(projectId: number): Observable<ExpertReviewDto[]> {
     return this._http.post(`${this.url}/automatic-expert-selection`, projectId)
   }
+
+  sendAllOnExpertExamination(idList: number[]): Observable<any> {
+    return this._http.post(`${this.url}/send-all/on-expert-examination`, idList);
+  }
 }

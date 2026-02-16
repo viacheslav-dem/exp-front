@@ -1,4 +1,12 @@
-import {Component, ChangeDetectionStrategy, signal, ChangeDetectorRef, DestroyRef, inject} from '@angular/core';
+import {
+    Component,
+    ChangeDetectionStrategy,
+    signal,
+    ChangeDetectorRef,
+    DestroyRef,
+    inject,
+    ViewChild
+} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthService} from "@app/services/auth.service";
@@ -24,6 +32,8 @@ import {Pagination} from "app/components/common-components/page-and-filter/model
 import {forkJoin, of, Subject} from "rxjs";
 import {catchError, switchMap} from "rxjs/operators";
 import {SectionPlainDto} from "@app/dto/SectionPlainDto";
+import {GlobalToastyService} from "@app/services/global-toasty.service";
+import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 
 @Component({
     selector: 'app-project-list',
@@ -44,6 +54,9 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
     
     private readonly destroyRef = inject(DestroyRef);
     private readonly councilsChange$ = new Subject<any[]>();
+    protected readonly ProjectState = ProjectState;
+
+    @ViewChild('sendIdListModal', { static: false }) sendIdListModal: ModalComponent;
 
     constructor(private _projectService: ProjectService,
                 private _authService: AuthService,
@@ -51,8 +64,59 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
                 private _councilPipe: CouncilPipe,
                 private _route: ActivatedRoute,
                 private _router: Router,
-                private cdr: ChangeDetectorRef) {
+                private cdr: ChangeDetectorRef,
+                private _toasty: GlobalToastyService) {
         super();
+    }
+
+    projectsList: ProjectLiDto[] = [];
+
+    showModal() {
+        this.sendIdListModal.show()
+    }
+
+    sendAllOnExpertExamination() {
+        if (this.projectsList.length !== 0) {
+            const idList = this.projectsList.map(project => project.id);
+            this._projectService.sendAllOnExpertExamination(idList).subscribe({
+                next: () => {
+                    this.projectsList = [];
+                    this.loadPage();
+                    this._toasty.success('Проекты отправлены в ГЭС.');
+                },
+                error: (err) => {
+                    this._toasty.err(err.status, "Ошибка на сервере. Пожалуйста, обратитесь к администратору.");
+                }}
+
+            );
+        } else {
+            throw "Список пуст. Выберите хотя бы один проект для отправки";
+        }
+
+    }
+
+    addIdToList(project: ProjectLiDto) {
+        if (!this.projectsList.includes(project)){
+            this.projectsList.push(project)
+            this._toasty.success('Проект добавлен в список группировки.');
+        } else {
+            throw 'Этот проект уже находится в списке группировки.';
+        }
+    }
+
+    deleteIdFromList(project: ProjectLiDto) {
+        if (this.projectsList.includes(project)){
+            this.projectsList = this.projectsList.filter(item => item !== project);
+            this._toasty.success('Проект удалён из списка группировки.');
+        } else {
+            throw 'Этого проекта нет в списке группировки.';
+        }
+    }
+
+    closeModal() {
+        if (this.sendIdListModal){
+            this.sendIdListModal.hide();
+        }
     }
 
     ngOnInit() {
