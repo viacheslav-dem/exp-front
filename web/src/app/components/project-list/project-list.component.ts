@@ -43,6 +43,8 @@ import {ModalComponent} from "@app/components/common-components/modal/modal.comp
 })
 export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
 
+
+
     Role = Role; // enum for template
     projects = signal<ProjectLiDto[]>([]);
     role = signal<string>('');
@@ -55,6 +57,7 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
     private readonly destroyRef = inject(DestroyRef);
     private readonly councilsChange$ = new Subject<any[]>();
     protected readonly ProjectState = ProjectState;
+    selectedProjectIds: Set<number> = new Set(); // Используем Set для уникальности
 
     @ViewChild('sendIdListModal', { static: false }) sendIdListModal: ModalComponent;
 
@@ -96,20 +99,17 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
     }
 
     addIdToList(project: ProjectLiDto) {
-        if (!this.projectsList.includes(project)){
-            this.projectsList.push(project)
-            this._toasty.success('Проект добавлен в список группировки.');
-        } else {
-            throw 'Этот проект уже находится в списке группировки.';
+        if (!this.selectedProjectIds.has(project.id)) {
+            this.selectedProjectIds.add(project.id);
+            this.projectsList.push(project);
         }
     }
 
+    // Удаление проекта из списка
     deleteIdFromList(project: ProjectLiDto) {
-        if (this.projectsList.includes(project)){
-            this.projectsList = this.projectsList.filter(item => item !== project);
-            this._toasty.success('Проект удалён из списка группировки.');
-        } else {
-            throw 'Этого проекта нет в списке группировки.';
+        if (this.selectedProjectIds.has(project.id)) {
+            this.selectedProjectIds.delete(project.id);
+            this.projectsList = this.projectsList.filter(p => p.id !== project.id);
         }
     }
 
