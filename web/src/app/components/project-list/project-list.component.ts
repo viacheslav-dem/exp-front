@@ -57,7 +57,7 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
     private readonly destroyRef = inject(DestroyRef);
     private readonly councilsChange$ = new Subject<any[]>();
     protected readonly ProjectState = ProjectState;
-    selectedProjectIds: Set<number> = new Set(); // Используем Set для уникальности
+    selectedProjectIds: Set<number> = new Set();
 
     @ViewChild('sendIdListModal', { static: false }) sendIdListModal: ModalComponent;
 
@@ -86,16 +86,16 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
                     this.projectsList = [];
                     this.loadPage();
                     this._toasty.success('Проекты отправлены в ГЭС.');
+
+                    this.closeModal();
                 },
                 error: (err) => {
                     this._toasty.err(err.status, "Ошибка на сервере. Пожалуйста, обратитесь к администратору.");
-                }}
-
-            );
+                }
+            });
         } else {
             throw "Список пуст. Выберите хотя бы один проект для отправки";
         }
-
     }
 
     addIdToList(project: ProjectLiDto) {
@@ -105,11 +105,11 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
         }
     }
 
-    // Удаление проекта из списка
     deleteIdFromList(project: ProjectLiDto) {
         if (this.selectedProjectIds.has(project.id)) {
             this.selectedProjectIds.delete(project.id);
             this.projectsList = this.projectsList.filter(p => p.id !== project.id);
+            this.cdr.markForCheck();
         }
     }
 
