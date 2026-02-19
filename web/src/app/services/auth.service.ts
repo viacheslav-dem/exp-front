@@ -15,9 +15,13 @@ import {DocumentDto} from "@app/dto/DocumentDto";
 import {TokenDto} from "@app/dto/TokenDto";
 import {catchError, finalize, map as rxMap, shareReplay} from "rxjs/operators";
 import {TokenRefreshCoordinatorService} from "@app/services/token-refresh-coordinator.service";
+import {Data} from "@app/dto/Data";
+import {HttpHeaders, HttpResponse} from "@angular/common/http";
 
 @Injectable()
 export class AuthService implements OnInit {
+
+  private apiUrl = 'http://127.0.0.1:8084/select_auth';
 
   private restoreSessionInFlight$?: Observable<boolean>;
   
@@ -235,4 +239,25 @@ export class AuthService implements OnInit {
     );
   }
 
+    inputISEFUL(): Observable<Data> {
+      return this.http.getBlock(`${SERVER_URL}/data/log-in`);
+    }
+
+
+  inputCP(signed_data_to_check_in_cp: string): Observable<String> {
+    return this.http.postBlock(this.apiUrl, {data: signed_data_to_check_in_cp});
+  }
+
+  redirectToEsiful(): Observable<HttpResponse<any>> {
+    return this.http.get(`${SERVER_URL}/data/redirect-to-esiful`, {
+      observe: 'response',
+      withCredentials: true
+    });
+  }
+
+  dataParams(dataParam: string) {
+   return this.http.get(`${SERVER_URL}/data/login-callback`, {
+     params: { data: dataParam }
+   });
+  }
 }
