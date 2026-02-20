@@ -11,10 +11,11 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
                 научно-технической деятельности в Республики Беларусь:
             </label>
             <app-boolean-button class="d-inline-block"
-                                [(ngModel)]="_form().isAccordance"
+                                [ngModel]="_form()?.isAccordance"
+                                (ngModelChange)="emitPatch({ isAccordance: $event })"
                                 [trueLabel]="'да'"
                                 [falseLabel]="'нет'"
-                                (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+            ></app-boolean-button>
         </div>
   `,
     standalone: false
@@ -27,11 +28,19 @@ export class DocumentAccordanceBlock {
 
     readonly isTextRequired = input<boolean>(false);
 
-    readonly _form = input<{
-    isAccordance: boolean;
-}>(undefined);
+    readonly _form = input<DocumentAccordanceBlockForm>(undefined);
 
     readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<DocumentAccordanceBlockForm>>();
+
+    emitPatch(patch: Partial<DocumentAccordanceBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type DocumentAccordanceBlockForm = {
+  isAccordance: boolean;
+};

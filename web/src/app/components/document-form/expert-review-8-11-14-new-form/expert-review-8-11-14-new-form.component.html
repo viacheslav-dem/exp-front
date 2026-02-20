@@ -3,7 +3,9 @@
   <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
   <app-significance-block [_form]="formValue()"
-                          [num]="'1'"></app-significance-block>
+                          [num]="'1'"
+                          (formPatch)="patchForm($event)"
+                          (onConditionsChanged)="onConditionsChanged()"></app-significance-block>
   <hr/>
   <app-marketing-research-block [_form]="formValue()"
                                 [num]="'2'"
@@ -19,10 +21,14 @@
                          (onConditionsChanged)="onConditionsChanged()"></app-sufficiency-block>
   <hr/>
   <app-users-block [_form]="formValue()"
-                   [num]="'5'"></app-users-block>
+                   [num]="'5'"
+                   (formPatch)="patchForm($event)"
+                   (onConditionsChanged)="onConditionsChanged()"></app-users-block>
   <hr/>
   <app-characteristics-block [_form]="formValue()"
-                   [num]="'6'"></app-characteristics-block>
+                   [num]="'6'"
+                   (formPatch)="patchForm($event)"
+                   (onConditionsChanged)="onConditionsChanged()"></app-characteristics-block>
   <hr/>
   <app-work-accordance-block [_form]="formValue()"
                              [num]="'7'"

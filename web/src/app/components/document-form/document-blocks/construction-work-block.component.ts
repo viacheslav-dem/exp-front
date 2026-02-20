@@ -8,13 +8,14 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Необходимость осуществления работ в сфере строительной деятельности. Возведение, реконструкция,
         реставрация, капитальный ремонт, техническая модернизация зданий и сооружений, их благоустройство:
       </label>
-      <app-boolean-button name="constructionWorks" required [(ngModel)]="_form().constructionWorks" [trueLabel]="'требуется'"
+      <input type="hidden" [ngModel]="_form()?.constructionWorks" name="constructionWorks" required>
+      <app-boolean-button name="constructionWorks" required [ngModel]="_form()?.constructionWorks" [trueLabel]="'требуется'"
         [falseLabel]="'не требуется'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ constructionWorks: $event })"></app-boolean-button>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().constructionWorksText"
-          (ngModelChange)="onConditionsChanged.emit(true)"
+          [ngModel]="_form()?.constructionWorksText"
+          (ngModelChange)="emitPatch({ constructionWorksText: $event })"
           [attr.name]="'constructionWorksText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -44,10 +45,18 @@ export class ConstructionWorkBlockComponent {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    constructionWorks: boolean;
-    constructionWorksText: string;
-}>(undefined);
+    readonly _form = input<ConstructionWorkBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<ConstructionWorkBlockForm>>();
+
+    emitPatch(patch: Partial<ConstructionWorkBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type ConstructionWorkBlockForm = {
+  constructionWorks: boolean;
+  constructionWorksText: string;
+};

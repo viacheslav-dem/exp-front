@@ -24,12 +24,14 @@
     <hr/>
     <app-document-accordance-block [_form]="formValue()"
                                [num]="'1.4'"
+                               (formPatch)="patchForm($event)"
                                (onConditionsChanged)="onConditionsChanged()"></app-document-accordance-block>
     <hr/>
     <app-economic-significance-bif-block
             [_form]="formValue()"
             [num]="'2'"
             [project]="project"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-economic-significance-bif-block>
     <hr/>
@@ -75,6 +77,7 @@
     <hr/>
     <app-marketing-research-8-8-plain-block [_form]="formValue()"
                                         [num]="'6'"
+                                        (formPatch)="patchForm($event)"
                                         (onConditionsChanged)="onConditionsChanged()"></app-marketing-research-8-8-plain-block>
     <hr/>
     <app-marketing-research-results-block [_form]="formValue()"

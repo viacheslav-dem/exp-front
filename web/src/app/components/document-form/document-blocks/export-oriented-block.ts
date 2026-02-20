@@ -10,10 +10,11 @@ import {Component, input, output} from '@angular/core';
       </label>
       <div>
         <app-boolean-button class="d-inline-block"
-          [(ngModel)]="_form().isExportOriented"
+          [ngModel]="_form()?.isExportOriented"
+          (ngModelChange)="emitPatch({ isExportOriented: $event })"
           [trueLabel]="'да'"
           [falseLabel]="'нет'"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+        ></app-boolean-button>
       </div>
       @if (full()) {
         <div class="hint">
@@ -29,9 +30,17 @@ export class ExportOrientedBlockComponent {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    isExportOriented: boolean;
-}>(undefined);
+    readonly _form = input<ExportOrientedBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<ExportOrientedBlockForm>>();
+
+    emitPatch(patch: Partial<ExportOrientedBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type ExportOrientedBlockForm = {
+  isExportOriented: boolean;
+};

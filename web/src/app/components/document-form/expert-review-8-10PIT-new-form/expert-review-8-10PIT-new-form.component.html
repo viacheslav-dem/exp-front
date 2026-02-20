@@ -6,14 +6,17 @@
   <hr/>
   <app-patents-block [_form]="formValue()"
                      [num]="'1'"
+                     (formPatch)="patchForm($event)"
                      (onConditionsChanged)="onConditionsChanged()"></app-patents-block>
   <hr/>
   <app-advantage-block [_form]="formValue()"
                        [num]="'2'"
+                       (formPatch)="patchForm($event)"
                        (onConditionsChanged)="onConditionsChanged()"></app-advantage-block>
   <hr/>
   <app-product-competitiveness-block [_form]="formValue()"
                                      [num]="'3'"
+                                     (formPatch)="patchForm($event)"
                                      (onConditionsChanged)="onConditionsChanged()"></app-product-competitiveness-block>
 </div>
 

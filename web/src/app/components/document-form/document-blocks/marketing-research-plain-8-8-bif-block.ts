@@ -9,10 +9,11 @@ import {Component, input, output} from '@angular/core';
       </label>
       <app-dropdown
         [options]="marketingResearchOptions"
-        [(ngModel)]="_form().marketingResearch"
+        [ngModel]="_form()?.marketingResearch"
+        (ngModelChange)="emitPatch({ marketingResearch: $event })"
         [attr.name]="'marketingResearch_8_8_' + num().split('.').join('_')"
         required
-                    (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      ></app-dropdown>
     </div>
   `,
     standalone: false
@@ -28,9 +29,17 @@ export class MarketingResearchPlainBifBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    marketingResearch: string;
-}>(undefined);
+  readonly _form = input<MarketingResearchPlainBifBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<MarketingResearchPlainBifBlockForm>>();
+
+  emitPatch(patch: Partial<MarketingResearchPlainBifBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type MarketingResearchPlainBifBlockForm = {
+  marketingResearch: string;
+};

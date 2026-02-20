@@ -10,20 +10,21 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         {{num()}}. Разработка проектной (предпроектной) документации:
       </label>
       <div>
+        <input type="hidden" [ngModel]="_form()?.neededProjectDocs" name="neededProjectDocs" required>
         <app-boolean-button class="d-inline-block"
           name="neededProjectDocs"
           required
-          [(ngModel)]="_form().neededProjectDocs"
+          [ngModel]="_form()?.neededProjectDocs"
           [trueLabel]="'требуется'"
           [falseLabel]="'не требуется'"
-        (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+        (ngModelChange)="emitPatch({ neededProjectDocs: $event })"></app-boolean-button>
       </div>
     
       <div>
         @if (full()) {
           <textarea
-            [(ngModel)]="_form().neededProjectDocsText"
-            (ngModelChange)="onConditionsChanged.emit(true)"
+            [ngModel]="_form()?.neededProjectDocsText"
+            (ngModelChange)="emitPatch({ neededProjectDocsText: $event })"
             [attr.name]="'neededProjectDocsText_' + num().split('.').join('_')"
             required
             minlength="30"
@@ -59,10 +60,18 @@ export class NeededProjectDocsBlockComponent {
 
     readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    readonly _form = input<{
-    neededProjectDocs: boolean;
-    neededProjectDocsText: string;
-}>(undefined);
+    readonly _form = input<NeededProjectDocsBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<NeededProjectDocsBlockForm>>();
+
+    emitPatch(patch: Partial<NeededProjectDocsBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type NeededProjectDocsBlockForm = {
+  neededProjectDocs: boolean;
+  neededProjectDocsText: string;
+};

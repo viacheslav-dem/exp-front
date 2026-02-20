@@ -19,7 +19,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
           </label>
           @for (direction of _allDirections; track direction.id) {
             <div>
-              <app-checkbox [(ngModel)]="direction.isChecked"
+              <app-checkbox [ngModel]="direction.isChecked"
                 (ngModelChange)="onDirectionChanged()">{{ direction.name }}
               </app-checkbox>
             </div>
@@ -34,16 +34,16 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
           </label>
           @for (item of _allGoals; track item.id) {
             <div>
-              <app-checkbox [(ngModel)]="item.isChecked" (ngModelChange)="onGoalChanged()">{{ item.name }}
+              <app-checkbox [ngModel]="item.isChecked" (ngModelChange)="onGoalChanged()">{{ item.name }}
               </app-checkbox>
             </div>
           }
-          <textarea [(ngModel)]="_form.directionsAndGoalsText" (ngModelChange)="onConditionsChanged.emit(true)" name="directionsAndGoalsText" rows="3" class="form-control mt-05"
+          <textarea [ngModel]="_form?.directionsAndGoalsText" (ngModelChange)="emitPatch({ directionsAndGoalsText: $event })" name="directionsAndGoalsText" rows="3" class="form-control mt-05"
           placeholder="Пояснительный текст (при необходимости)."></textarea>
         </div>
       }
       @if (showTarget8_4()) {
-        <textarea [(ngModel)]="_form.multilateralDirectionsText" (ngModelChange)="onConditionsChanged.emit(true)" name="multilateralDirectionsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+        <textarea [ngModel]="_form?.multilateralDirectionsText" (ngModelChange)="emitPatch({ multilateralDirectionsText: $event })" name="multilateralDirectionsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
       @if (showTarget8_4()) {
@@ -66,25 +66,23 @@ export class SelectDirectionsAndGoalsBlock2025Component {
   _project: ProjectPlainDto | ProjectDto;
   _allDirections: IdNameDto[] = [];
   _allGoals: IdNameDto[] = [];
-  _form: {
-    selectedDirections: IdNameDto[],
-    selectedSocialEconomicGoals: IdNameDto[],
-    directionsAndGoalsText: string
-  };
+  _form: SelectDirectionsAndGoalsBlock2025Form | undefined;
 
   readonly num = input<string>(undefined);
 
   readonly full = input<boolean>(true);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<SelectDirectionsAndGoalsBlock2025Form>>();
 
   readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-  readonly form = input<{
-    selectedDirections: IdNameDto[],
-    selectedSocialEconomicGoals: IdNameDto[],
-    directionsAndGoalsText: string
-  }>(undefined);
+  readonly form = input<SelectDirectionsAndGoalsBlock2025Form>(undefined);
+
+  emitPatch(patch: Partial<SelectDirectionsAndGoalsBlock2025Form>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 
   private readonly inputsEffect = effect(() => {
     const project = this.project();
@@ -107,36 +105,37 @@ export class SelectDirectionsAndGoalsBlock2025Component {
   }
 
   private update() {
-    if (this._form) {
-      this._form.selectedDirections = this._form.selectedDirections || [];
-      this._form.selectedSocialEconomicGoals = this._form.selectedSocialEconomicGoals || [];
+    if (!this._project || !this._form) {
+      return;
     }
-    if (this._project && this._form) {
-      const directions = this._project.directions ?? [];
-      const goals = this._project.socialEconomicGoals ?? [];
+    const directions = this._project.directions ?? [];
+    const goals = this._project.socialEconomicGoals ?? [];
+    const selectedDirections = this._form.selectedDirections ?? [];
+    const selectedGoals = this._form.selectedSocialEconomicGoals ?? [];
 
-      this._allDirections = directions.map(item => new IdNameDto(item.id, item.name));
-      this._form.selectedDirections = this._form.selectedDirections.filter(selectedItem =>
-        this._allDirections.some(item => item.id == selectedItem.id))
-      this._allDirections.forEach(item => item.isChecked =
-        this._form.selectedDirections.some(selectedItem => selectedItem.id == item.id));
+    this._allDirections = directions.map(item => new IdNameDto(item.id, item.name));
+    this._allDirections.forEach(item => item.isChecked =
+      selectedDirections.some(selectedItem => selectedItem.id == item.id));
 
-      this._allGoals = goals.map(item => new IdNameDto(item.id, item.name));
-      this._form.selectedSocialEconomicGoals = this._form.selectedSocialEconomicGoals.filter(selectedItem =>
-        this._allGoals.some(item => item.id == selectedItem.id))
-      this._allGoals.forEach(item => item.isChecked =
-        this._form.selectedSocialEconomicGoals.some(selectedItem => selectedItem.id == item.id));
-    }
+    this._allGoals = goals.map(item => new IdNameDto(item.id, item.name));
+    this._allGoals.forEach(item => item.isChecked =
+      selectedGoals.some(selectedItem => selectedItem.id == item.id));
   }
 
   onDirectionChanged() {
-    this._form.selectedDirections = this._allDirections.filter(d => d.isChecked).map(d => new IdNameDto(d.id, d.name));
-    this.onConditionsChanged.emit(true);
+    const selected = this._allDirections.filter(d => d.isChecked).map(d => new IdNameDto(d.id, d.name));
+    this.emitPatch({ selectedDirections: selected });
   }
 
   onGoalChanged() {
-    this._form.selectedSocialEconomicGoals = this._allGoals.filter(d => d.isChecked).map(d => new IdNameDto(d.id, d.name));
-    this.onConditionsChanged.emit(true);
+    const selected = this._allGoals.filter(d => d.isChecked).map(d => new IdNameDto(d.id, d.name));
+    this.emitPatch({ selectedSocialEconomicGoals: selected });
   }
-
 }
+
+type SelectDirectionsAndGoalsBlock2025Form = {
+  selectedDirections: IdNameDto[];
+  selectedSocialEconomicGoals: IdNameDto[];
+  directionsAndGoalsText: string;
+  multilateralDirectionsText?: string;
+};

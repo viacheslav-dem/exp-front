@@ -10,11 +10,11 @@ import {Text} from "@app/components/document-form/form-model/Text";
       </label>
       @for (opt of scientificLevelItems; track opt) {
         <div>
-          <app-checkbox [(ngModel)]="opt.isChecked" (onChecked)="onChecked()"> {{opt.text}}</app-checkbox>
+          <app-checkbox [ngModel]="opt.isChecked" (onChecked)="onChecked()"> {{opt.text}}</app-checkbox>
         </div>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form.scientificLevelItemsText" (ngModelChange)="onConditionsChanged.emit(true)" name="scientificLevelItemsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+        <textarea [ngModel]="_form?.scientificLevelItemsText" (ngModelChange)="emitPatch({ scientificLevelItemsText: $event })" name="scientificLevelItemsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст (не менее 30 символов)."></textarea>
       }
     </div>
@@ -31,15 +31,21 @@ export class ScientificLevelItemsBlockComponent {
     new Text('лицензионные договоры на предоставление права использования результатов интеллектуальной деятельности'),
     new Text('договоры на передачу секретов производства (ноу-хау)'),
   ];
-  _form: { scientificLevelItems: Text[], scientificLevelItemsText: string };
+  _form: ScientificLevelItemsBlockForm | undefined;
 
   readonly num = input<string>("5.2");
 
   readonly full = input<boolean>(true);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ScientificLevelItemsBlockForm>>();
 
-  readonly form = input<{ scientificLevelItems: Text[], scientificLevelItemsText: string }>(undefined);
+  readonly form = input<ScientificLevelItemsBlockForm>(undefined);
+
+  emitPatch(patch: Partial<ScientificLevelItemsBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 
   private readonly formEffect = effect(() => {
     const _form = this.form();
@@ -47,13 +53,20 @@ export class ScientificLevelItemsBlockComponent {
       return;
     }
     this._form = _form;
-    this.scientificLevelItems.forEach(item => item.isChecked = _form.scientificLevelItems.some(checked => checked.text == item.text));
+    const items = _form.scientificLevelItems ?? [];
+    this.scientificLevelItems.forEach(item => item.isChecked = items.some(checked => checked.text == item.text));
   });
 
   onChecked() {
-    this._form.scientificLevelItems = this.scientificLevelItems
+    const scientificLevelItems = this.scientificLevelItems
       .filter(item => item.isChecked)
       .map(item => new Text(item.text));
+    this.formPatch.emit({ scientificLevelItems });
     this.onConditionsChanged.emit(true);
   }
 }
+
+type ScientificLevelItemsBlockForm = {
+  scientificLevelItems: Text[];
+  scientificLevelItemsText: string;
+};

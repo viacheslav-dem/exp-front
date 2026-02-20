@@ -21,8 +21,8 @@ import {PeriodDto} from "@app/dto/PeriodDto";
       @if (!_form.termsAccordance) {
         <label class="ml-2">Рекомендуемые сроки реализации:</label>
         <div class="input-group">
-          <app-date-period class="form-control mt-2" [(ngModel)]="_terms"
-          (ngModelChange)="onTermsChanged()"></app-date-period>
+          <app-date-period class="form-control mt-2" [ngModel]="_terms"
+          (ngModelChange)="onDateRangeChange($event)"></app-date-period>
         </div>
       }
       @if (full()) {
@@ -80,9 +80,10 @@ export class TermsAccordanceBlock2025Component {
         }
     });
 
-    onTermsChanged() {
-        // Используем emitPatch вместо прямой мутации
-        this.emitPatch({ termsSuggestion: new PeriodDto(this._terms.start, this._terms.end) });
+    onDateRangeChange(value: DateRange) {
+        if (value == null) return;
+        this._terms = value;
+        this.emitPatch({ termsSuggestion: new PeriodDto(value.start, value.end) });
     }
 
     stateButton(flag: boolean){

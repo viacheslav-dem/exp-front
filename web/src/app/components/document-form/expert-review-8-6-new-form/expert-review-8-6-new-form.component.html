@@ -3,10 +3,14 @@
   <label class="form-group-label">Анализ и оценка объекта экспертизы</label>
 
   <app-results-block [_form]="formValue()"
-                     [num]="'1'"></app-results-block>
+                     [num]="'1'"
+                     (formPatch)="patchForm($event)"
+                     (onConditionsChanged)="onConditionsChanged()"></app-results-block>
   <hr/>
   <app-effectiveness-block [_form]="formValue()"
-                           [num]="'2'"></app-effectiveness-block>
+                           [num]="'2'"
+                           (formPatch)="patchForm($event)"
+                           (onConditionsChanged)="onConditionsChanged()"></app-effectiveness-block>
 </div>
 
 <hr/>

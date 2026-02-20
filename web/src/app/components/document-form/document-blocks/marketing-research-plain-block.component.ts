@@ -7,8 +7,8 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Проведение маркетинговых и патентных исследований, их результаты:
       </label>
-      <app-dropdown name="marketingResearch" required [options]="marketingResearchOptions" [(ngModel)]="_form().marketingResearch"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      <app-dropdown name="marketingResearch" required [options]="marketingResearchOptions" [ngModel]="_form()?.marketingResearch"
+      (ngModelChange)="emitPatch({ marketingResearch: $event })"></app-dropdown>
       @if (full()) {
         <div class="hint">
           <p>
@@ -34,9 +34,17 @@ export class MarketingResearchPlainBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    marketingResearch: string;
-}>(undefined);
+  readonly _form = input<MarketingResearchPlainBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<MarketingResearchPlainBlockForm>>();
+
+  emitPatch(patch: Partial<MarketingResearchPlainBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type MarketingResearchPlainBlockForm = {
+  marketingResearch: string;
+};

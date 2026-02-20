@@ -13,6 +13,7 @@
             [form]="formValue()"
             [num]="'1'"
             [project]="_project"
+            (formPatch)="patchForm($event)"
             (onConditionsChanged)="onConditionsChanged()"
     ></app-select-directions-and-goals-block-2025>
 

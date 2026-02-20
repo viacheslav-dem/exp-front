@@ -8,9 +8,10 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Научно-технический уровень внедряемых технологий
       </label>
       <br/>
-      <app-boolean-button name="scientificLevelOfInjectedTech" required [(ngModel)]="_form().scientificLevelOfInjectedTech" [trueLabel]="'подтверждается'"
+      <input type="hidden" [ngModel]="_form()?.scientificLevelOfInjectedTech" name="scientificLevelOfInjectedTech" required>
+      <app-boolean-button name="scientificLevelOfInjectedTech" required [ngModel]="_form()?.scientificLevelOfInjectedTech" [trueLabel]="'подтверждается'"
         [falseLabel]="'не подтверждается'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ scientificLevelOfInjectedTech: $event })"></app-boolean-button>
       @if (full()) {
         <div class="hint">
           <p>
@@ -34,8 +35,16 @@ export class ScientificLevelOfInjectedTechBlockComponent {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    scientificLevelOfInjectedTech: string;
-}>(undefined);
+    readonly _form = input<ScientificLevelOfInjectedTechBlockForm>(undefined);
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<ScientificLevelOfInjectedTechBlockForm>>();
+
+    emitPatch(patch: Partial<ScientificLevelOfInjectedTechBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type ScientificLevelOfInjectedTechBlockForm = {
+  scientificLevelOfInjectedTech: boolean;
+};

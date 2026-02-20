@@ -13,14 +13,15 @@ import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
       </label>
       <app-dropdown
         [options]="significanceOptions"
-        [(ngModel)]="_form().economicSignificance"
+        [ngModel]="_form()?.economicSignificance"
+        (ngModelChange)="emitPatch({ economicSignificance: $event })"
         [attr.name]="'economicSignificance_8_8BIF_' + num().split('.').join('_')"
         required
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+      ></app-dropdown>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().economicSignificanceText"
-          (ngModelChange)="onConditionsChanged.emit(true)"
+          [ngModel]="_form()?.economicSignificanceText"
+          (ngModelChange)="emitPatch({ economicSignificanceText: $event })"
           [attr.name]="'economicSignificanceText_8_8BIF_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -87,13 +88,21 @@ export class EconomicSignificance88BIFBlockComponent {
 
     readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    readonly _form = input<{
-    economicSignificance: string;
-    economicSignificanceText: string;
-}>(undefined);
+    readonly _form = input<EconomicSignificance88BIFBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<EconomicSignificance88BIFBlockForm>>();
+
+    emitPatch(patch: Partial<EconomicSignificance88BIFBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type EconomicSignificance88BIFBlockForm = {
+  economicSignificance: string;
+  economicSignificanceText: string;
+};
 
 export const economicSignificanceOptions: string[] = [
     'низкая',

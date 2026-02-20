@@ -9,15 +9,16 @@ import {Component, input, output} from '@angular/core';
         высокотехнологичным» приложения 3 к Инструкции о порядке выдачи заключений об отнесении товаров к
         высокотехнологичным, утвержденной постановлением ГКНТ от 18 декабря 2008 г. № 12:
       </label>
+      <input type="hidden" [ngModel]="_form()?.noveltyAccordance" name="noveltyAccordance" required>
       <app-boolean-button
         name="noveltyAccordance"
         required
-        [(ngModel)]="_form().noveltyAccordance"
+        [ngModel]="_form()?.noveltyAccordance"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ noveltyAccordance: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().noveltyAccordanceText" (ngModelChange)="onConditionsChanged.emit(true)" name="noveltyAccordanceText" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.noveltyAccordanceText" (ngModelChange)="emitPatch({ noveltyAccordanceText: $event })" name="noveltyAccordanceText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>
@@ -30,10 +31,18 @@ export class NoveltyAccordanceBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    noveltyAccordance: boolean;
-    noveltyAccordanceText: string;
-}>(undefined);
+  readonly _form = input<NoveltyAccordanceBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<NoveltyAccordanceBlockForm>>();
+
+  emitPatch(patch: Partial<NoveltyAccordanceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type NoveltyAccordanceBlockForm = {
+  noveltyAccordance: boolean;
+  noveltyAccordanceText: string;
+};

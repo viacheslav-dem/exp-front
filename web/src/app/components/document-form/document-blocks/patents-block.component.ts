@@ -9,13 +9,14 @@ import {Component, input, output} from '@angular/core';
         (изобретений, полезных моделей, промышленных образцов, топологий интегральных микросхем, сортов растений,
         на которые в установленном порядке получены патенты (свидетельства) либо приняты решения патентного органа об их выдаче):
       </label>
-      <app-boolean-button name="patents" required [(ngModel)]="_form().patents" [trueLabel]="'да'"
+      <input type="hidden" [ngModel]="_form()?.patents" name="patents" required>
+      <app-boolean-button name="patents" required [ngModel]="_form()?.patents" [trueLabel]="'да'"
         [falseLabel]="'нет'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ patents: $event })"></app-boolean-button>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().patentsText"
-          (ngModelChange)="onConditionsChanged.emit(true)"
+          [ngModel]="_form()?.patentsText"
+          (ngModelChange)="emitPatch({ patentsText: $event })"
           [attr.name]="'patentsText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -42,10 +43,18 @@ export class PatentsBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    patents: boolean;
-    patentsText: string;
-}>(undefined);
+  readonly _form = input<PatentsBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<PatentsBlockForm>>();
+
+  emitPatch(patch: Partial<PatentsBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type PatentsBlockForm = {
+  patents: boolean;
+  patentsText: string;
+};

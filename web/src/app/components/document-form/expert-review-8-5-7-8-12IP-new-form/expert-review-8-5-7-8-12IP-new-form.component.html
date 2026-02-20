@@ -83,6 +83,7 @@
     <hr/>
     <app-marketing-research-plain-block [_form]="formValue()"
                                         [num]="'6'"
+                                        (formPatch)="patchForm($event)"
                                         (onConditionsChanged)="onConditionsChanged()"></app-marketing-research-plain-block>
     <hr/>
     <app-marketing-research-results-block [_form]="formValue()"
@@ -90,6 +91,7 @@
     <hr/>
     <app-scientific-level-items-block [form]="formValue()"
                                       [num]="'6.2'"
+                                      (formPatch)="patchForm($event)"
                                       (onConditionsChanged)="onConditionsChanged()"></app-scientific-level-items-block>
     <hr/>
     <app-analog-description-block [_form]="formValue()"

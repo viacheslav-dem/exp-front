@@ -8,13 +8,14 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Обладание товаром более высокими технико-экономическими показателями по сравнению с другими товарами,
         представленными на определенном сегменте рынка:
       </label>
-      <app-boolean-button name="advantage" required [(ngModel)]="_form().advantage" [trueLabel]="'да'"
+      <input type="hidden" [ngModel]="_form()?.advantage" name="advantage" required>
+      <app-boolean-button name="advantage" required [ngModel]="_form()?.advantage" [trueLabel]="'да'"
         [falseLabel]="'нет'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ advantage: $event })"></app-boolean-button>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().advantageText"
-          (ngModelChange)="onConditionsChanged.emit(true)"
+          [ngModel]="_form()?.advantageText"
+          (ngModelChange)="emitPatch({ advantageText: $event })"
           [attr.name]="'advantageText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -41,10 +42,18 @@ export class AdvantageBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    advantage: boolean;
-    advantageText: string;
-}>(undefined);
+  readonly _form = input<AdvantageBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<AdvantageBlockForm>>();
+
+  emitPatch(patch: Partial<AdvantageBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type AdvantageBlockForm = {
+  advantage: boolean;
+  advantageText: string;
+};

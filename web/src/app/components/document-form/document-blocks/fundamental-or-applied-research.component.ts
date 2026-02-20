@@ -10,10 +10,10 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         {{num()}}. Соответствие научного исследования по объекту государственной экспертизы:
       </label>
       <div class="btn-group" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form().fundamentalOrAppliedResearch === true}" (click)="stateButton(true)">
+        <button type="button" class="btn btn-outline-success" [ngClass]="{'active': _form()?.fundamentalOrAppliedResearch === true}" (click)="stateButton(true)">
           Соответствует
         </button>
-        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form().fundamentalOrAppliedResearch === false}" (click)="stateButton(false)">
+        <button type="button" class="btn btn-outline-danger" [ngClass]="{'active': _form()?.fundamentalOrAppliedResearch === false}" (click)="stateButton(false)">
           Не соответствует
         </button>
       </div>
@@ -24,7 +24,7 @@ import {ProjectDto} from "@app/dto/ProjectDto";
         </div>
       }
       @if (full()) {
-        <textarea [(ngModel)]="_form().fundamentalOrAppliedResearchText" (ngModelChange)="onConditionsChanged.emit(true)" rows="3" class="form-control mt-05"
+        <textarea [ngModel]="_form()?.fundamentalOrAppliedResearchText" (ngModelChange)="emitPatch({ fundamentalOrAppliedResearchText: $event })" rows="3" class="form-control mt-05"
         placeholder="Обязательный текст"></textarea>
       }
       @if (full()) {
@@ -49,25 +49,26 @@ export class FundamentalOrAppliedResearchComponent implements OnInit{
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    fundamentalOrAppliedResearch: boolean;
-    fundamentalOrAppliedResearchText: string;
-}>(undefined);
+    readonly _form = input<FundamentalOrAppliedResearchForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<FundamentalOrAppliedResearchForm>>();
 
+    emitPatch(patch: Partial<FundamentalOrAppliedResearchForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 
     stateButton(flag: boolean) {
-        if(flag){
-            this._form().fundamentalOrAppliedResearch = true;
-        } else{
-            this._form().fundamentalOrAppliedResearch = false;
-        }
-        this.onConditionsChanged.emit(true);
+        this.emitPatch({ fundamentalOrAppliedResearch: flag });
     }
 
     ngOnInit(): void {
         this.stateButton(false);
     }
-
 }
+
+type FundamentalOrAppliedResearchForm = {
+  fundamentalOrAppliedResearch: boolean;
+  fundamentalOrAppliedResearchText: string;
+};

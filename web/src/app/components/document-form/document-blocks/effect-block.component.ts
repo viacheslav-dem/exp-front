@@ -8,8 +8,8 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Возможный экономический и (или) социальный и (или) экологический эффект от реализации мероприятия.
       </label>
       <textarea
-        [(ngModel)]="_form().effect"
-        (ngModelChange)="onConditionsChanged.emit(true)"
+        [ngModel]="_form()?.effect"
+        (ngModelChange)="emitPatch({ effect: $event })"
         [attr.name]="'effect_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -39,9 +39,17 @@ export class EffectBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    effect: string;
-  }>(undefined);
+  readonly _form = input<EffectBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<EffectBlockForm>>();
+
+  emitPatch(patch: Partial<EffectBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type EffectBlockForm = {
+  effect: string;
+};

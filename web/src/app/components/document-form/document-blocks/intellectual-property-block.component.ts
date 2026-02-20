@@ -9,15 +9,16 @@ import {Component, input, output} from '@angular/core';
         отнесения товаров к высокотехнологичным» приложения 3 к Инструкции о порядке выдачи заключений об отнесении
         товаров к высокотехнологичным, утвержденной постановлением ГКНТ от 18 декабря 2008 г. № 12:
       </label>
+      <input type="hidden" [ngModel]="_form()?.intellectualProperty" name="intellectualProperty" required>
       <app-boolean-button
         name="intellectualProperty"
         required
-        [(ngModel)]="_form().intellectualProperty"
+        [ngModel]="_form()?.intellectualProperty"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ intellectualProperty: $event })"></app-boolean-button>
       @if (full()) {
-        <textarea [(ngModel)]="_form().intellectualPropertyText" (ngModelChange)="onConditionsChanged.emit(true)" name="intellectualPropertyText" rows="3" class="form-control"
+        <textarea [ngModel]="_form()?.intellectualPropertyText" (ngModelChange)="emitPatch({ intellectualPropertyText: $event })" name="intellectualPropertyText" rows="3" class="form-control"
         placeholder="Пояснительный текст (при необходимости)."></textarea>
       }
     </div>
@@ -30,10 +31,18 @@ export class IntellectualPropertyBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    intellectualProperty: boolean;
-    intellectualPropertyText: string;
-}>(undefined);
+  readonly _form = input<IntellectualPropertyBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<IntellectualPropertyBlockForm>>();
+
+  emitPatch(patch: Partial<IntellectualPropertyBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type IntellectualPropertyBlockForm = {
+  intellectualProperty: boolean;
+  intellectualPropertyText: string;
+};

@@ -122,6 +122,7 @@
     <hr/>
     <app-scientific-level-items-block [form]="formValue()"
                                       [num]="'7.2'"
+                                      (formPatch)="patchForm($event)"
                                       (onConditionsChanged)="onConditionsChanged()"></app-scientific-level-items-block>
     <hr/>
     <app-analog-description-block [_form]="formValue()"

@@ -9,8 +9,8 @@ import {Component, input, output} from '@angular/core';
         территории Республики Беларусь и (или) в мире.
       </label>
       <textarea
-        [(ngModel)]="_form().analogParamsText"
-        (ngModelChange)="onConditionsChanged.emit(true)"
+        [ngModel]="_form()?.analogParamsText"
+        (ngModelChange)="emitPatch({ analogParamsText: $event })"
         [attr.name]="'analogParamsText_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -42,9 +42,17 @@ export class AnalogParamsDescriptionBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    analogParamsText: string;
-  }>(undefined);
+  readonly _form = input<AnalogParamsDescriptionBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<AnalogParamsDescriptionBlockForm>>();
+
+  emitPatch(patch: Partial<AnalogParamsDescriptionBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type AnalogParamsDescriptionBlockForm = {
+  analogParamsText: string;
+};

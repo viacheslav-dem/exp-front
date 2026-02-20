@@ -11,8 +11,8 @@ import {Component, input, output} from '@angular/core';
         Республики Беларусь от 20 апреля 2017 г. № 9.
       </label>
       <textarea
-        [(ngModel)]="_form().effectiveness"
-        (ngModelChange)="onConditionsChanged.emit(true)"
+        [ngModel]="_form()?.effectiveness"
+        (ngModelChange)="emitPatch({ effectiveness: $event })"
         [attr.name]="'effectiveness_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -30,9 +30,17 @@ export class EffectivenessBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    effectiveness: string;
-  }>(undefined);
+  readonly _form = input<EffectivenessBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<EffectivenessBlockForm>>();
+
+  emitPatch(patch: Partial<EffectivenessBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type EffectivenessBlockForm = {
+  effectiveness: string;
+};

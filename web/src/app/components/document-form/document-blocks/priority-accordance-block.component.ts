@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-priority-accordance-block',
@@ -8,7 +8,8 @@ import {Component, input} from '@angular/core';
         {{num()}}. Приоритетность направления инвестиций в технологию, обоснованность расходов.
       </label>
       <textarea
-        [(ngModel)]="_form().priorityAccordance"
+        [ngModel]="_form()?.priorityAccordance"
+        (ngModelChange)="emitPatch({ priorityAccordance: $event })"
         [attr.name]="'priorityAccordance_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -50,7 +51,17 @@ export class PriorityAccordanceBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    priorityAccordance: string;
-}>(undefined);
+  readonly _form = input<PriorityAccordanceBlockForm>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<PriorityAccordanceBlockForm>>();
+
+  emitPatch(patch: Partial<PriorityAccordanceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type PriorityAccordanceBlockForm = {
+  priorityAccordance: string;
+};

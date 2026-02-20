@@ -8,8 +8,8 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Сведения о проведении маркетинговых и патентных исследований и их результаты.
       </label>
       <textarea
-        [(ngModel)]="_form().marketingResearchText"
-        (ngModelChange)="onConditionsChanged.emit(true)"
+        [ngModel]="_form()?.marketingResearchText"
+        (ngModelChange)="emitPatch({ marketingResearchText: $event })"
         [attr.name]="'marketingResearchResultsText_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -41,9 +41,17 @@ export class MarketingResearchResultsBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    marketingResearchText: string;
-  }>(undefined);
+  readonly _form = input<MarketingResearchResultsBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<MarketingResearchResultsBlockForm>>();
+
+  emitPatch(patch: Partial<MarketingResearchResultsBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type MarketingResearchResultsBlockForm = {
+  marketingResearchText: string;
+};

@@ -10,7 +10,7 @@ import {Component, input, output} from '@angular/core';
       </label>
     </div>
     @if (full()) {
-      <textarea [(ngModel)]="_form().industrialExpertiseText" (ngModelChange)="onConditionsChanged.emit(true)" name="industrialExpertiseText" rows="3" class="form-control mt-05"
+      <textarea [ngModel]="_form()?.industrialExpertiseText" (ngModelChange)="emitPatch({ industrialExpertiseText: $event })" name="industrialExpertiseText" rows="3" class="form-control mt-05"
       placeholder="Пояснительный текст (при необходимости)."></textarea>
     }
     `,
@@ -22,9 +22,17 @@ export class CreationIndustrialExpertiseBlock {
 
     readonly full = input<boolean>(true);
 
-    readonly _form = input<{
-    industrialExpertiseText: string;
-}>(undefined);
+    readonly _form = input<CreationIndustrialExpertiseBlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<CreationIndustrialExpertiseBlockForm>>();
+
+    emitPatch(patch: Partial<CreationIndustrialExpertiseBlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type CreationIndustrialExpertiseBlockForm = {
+  industrialExpertiseText: string;
+};

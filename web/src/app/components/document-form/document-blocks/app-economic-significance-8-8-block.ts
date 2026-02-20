@@ -22,10 +22,11 @@ import {
           </label>
           <div>
             <app-boolean-button class="d-inline-block"
-              [(ngModel)]="_form().isOpeningOfSubsidiaries"
+              [ngModel]="_form()?.isOpeningOfSubsidiaries"
+              (ngModelChange)="emitPatch({ isOpeningOfSubsidiaries: $event })"
               [trueLabel]="'да'"
               [falseLabel]="'нет'"
-            (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+            ></app-boolean-button>
           </div>
           <br>
             <label>
@@ -37,10 +38,11 @@ import {
             </label>
             <div>
               <app-boolean-button class="d-inline-block"
-                [(ngModel)]="_form().isParticipationInnovationAndInvestment"
+                [ngModel]="_form()?.isParticipationInnovationAndInvestment"
+                (ngModelChange)="emitPatch({ isParticipationInnovationAndInvestment: $event })"
                 [trueLabel]="'да'"
                 [falseLabel]="'нет'"
-              (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+              ></app-boolean-button>
             </div>
             <br>
               <label>
@@ -49,10 +51,11 @@ import {
               </label>
               <div>
                 <app-boolean-button class="d-inline-block"
-                  [(ngModel)]="_form().isBuyMaterialSupplies"
+                  [ngModel]="_form()?.isBuyMaterialSupplies"
+                  (ngModelChange)="emitPatch({ isBuyMaterialSupplies: $event })"
                   [trueLabel]="'да'"
                   [falseLabel]="'нет'"
-                (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+                ></app-boolean-button>
               </div>
               <br>
                 <label>
@@ -62,10 +65,11 @@ import {
                 </label>
                 <div>
                   <app-boolean-button class="d-inline-block"
-                    [(ngModel)]="_form().isUseOfIntellectualProperty"
+                    [ngModel]="_form()?.isUseOfIntellectualProperty"
+                    (ngModelChange)="emitPatch({ isUseOfIntellectualProperty: $event })"
                     [trueLabel]="'да'"
                     [falseLabel]="'нет'"
-                  (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+                  ></app-boolean-button>
                 </div>
                 <br>
                   @if (full()) {
@@ -98,14 +102,15 @@ import {
                   </label>
                   <app-dropdown
                     [options]="significanceOptions"
-                    [(ngModel)]="_form().economicSignificance"
+                    [ngModel]="_form()?.economicSignificance"
+                    (ngModelChange)="emitPatch({ economicSignificance: $event })"
                     [attr.name]="'economicSignificance_8_8_' + num().split('.').join('_')"
                     required
-                  (ngModelChange)="onConditionsChanged.emit(true)"></app-dropdown>
+                  ></app-dropdown>
                   @if (full()) {
                     <textarea
-                      [(ngModel)]="_form().economicSignificanceText"
-                      (ngModelChange)="onConditionsChanged.emit(true)"
+                      [ngModel]="_form()?.economicSignificanceText"
+                      (ngModelChange)="emitPatch({ economicSignificanceText: $event })"
                       [attr.name]="'economicSignificanceText_8_8_' + num().split('.').join('_')"
                       required
                       minlength="30"
@@ -159,15 +164,23 @@ export class EconomicSignificance_8_8_BlockComponent {
 
     readonly project = input<ProjectPlainDto | ProjectDto>(undefined);
 
-    readonly _form = input<{
-    economicSignificance: string;
-    economicSignificanceText: string;
-    isOpeningOfSubsidiaries: boolean;
-    isParticipationInnovationAndInvestment: boolean;
-    isBuyMaterialSupplies: boolean;
-    isUseOfIntellectualProperty: boolean;
-}>(undefined);
+    readonly _form = input<EconomicSignificance88BlockForm>(undefined);
 
     readonly onConditionsChanged = output<boolean>();
+    readonly formPatch = output<Partial<EconomicSignificance88BlockForm>>();
+
+    emitPatch(patch: Partial<EconomicSignificance88BlockForm>) {
+      this.formPatch.emit(patch);
+      this.onConditionsChanged.emit(true);
+    }
 }
+
+type EconomicSignificance88BlockForm = {
+  economicSignificance: string;
+  economicSignificanceText: string;
+  isOpeningOfSubsidiaries: boolean;
+  isParticipationInnovationAndInvestment: boolean;
+  isBuyMaterialSupplies: boolean;
+  isUseOfIntellectualProperty: boolean;
+};
 

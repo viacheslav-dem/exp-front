@@ -10,8 +10,8 @@ import {Component, input, output} from '@angular/core';
         целям рассматриваемого мероприятия.
       </label>
       <textarea
-        [(ngModel)]="_form().assessment"
-        (ngModelChange)="onConditionsChanged.emit(true)"
+        [ngModel]="_form()?.assessment"
+        (ngModelChange)="emitPatch({ assessment: $event })"
         [attr.name]="'assessment_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -42,9 +42,17 @@ export class AssessmentBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    assessment: string;
-  }>(undefined);
+  readonly _form = input<AssessmentBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<AssessmentBlockForm>>();
+
+  emitPatch(patch: Partial<AssessmentBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type AssessmentBlockForm = {
+  assessment: string;
+};

@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-users-block',
@@ -9,7 +9,8 @@ import {Component, input} from '@angular/core';
         информационных ресурсов, информационных систем и информационных сетей.
       </label>
       <textarea
-        [(ngModel)]="_form().users"
+        [ngModel]="_form()?.users"
+        (ngModelChange)="emitPatch({ users: $event })"
         [attr.name]="'users_' + num().split('.').join('_')"
         required
         maxlength="5000"
@@ -38,7 +39,17 @@ export class UsersBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    users: string;
-}>(undefined);
+  readonly _form = input<UsersBlockForm>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<UsersBlockForm>>();
+
+  emitPatch(patch: Partial<UsersBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type UsersBlockForm = {
+  users: string;
+};

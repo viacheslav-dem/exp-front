@@ -8,7 +8,8 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Наиболее близкий аналог используемой (выпускаемой) на территории Республики Беларусь
         и (или) в мире технологии и (или) продукции того же назначения:
       </label>
-      <input [(ngModel)]="_form().analog"
+      <input [ngModel]="_form()?.analog"
+        (ngModelChange)="emitPatch({ analog: $event })"
         [attr.name]="'analog_' + num().split('.').join('_')"
         required
         type="text" class="form-control"
@@ -16,8 +17,8 @@ import {Component, input, output} from '@angular/core';
         placeholder="наименование аналога">
         @if (full()) {
           <textarea
-            [(ngModel)]="_form().analogText"
-            (ngModelChange)="onConditionsChanged.emit(true)"
+            [ngModel]="_form()?.analogText"
+            (ngModelChange)="emitPatch({ analogText: $event })"
             [attr.name]="'analogText_' + num().split('.').join('_')"
             required
             minlength="30"
@@ -49,10 +50,18 @@ export class AnalogDescriptionBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    analog: string;
-    analogText: string;
-  }>(undefined);
+  readonly _form = input<AnalogDescriptionBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<AnalogDescriptionBlockForm>>();
+
+  emitPatch(patch: Partial<AnalogDescriptionBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type AnalogDescriptionBlockForm = {
+  analog: string;
+  analogText: string;
+};

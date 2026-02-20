@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-significance-block',
@@ -10,7 +10,8 @@ import {Component, input} from '@angular/core';
         формирования перспективных научных направлений.
       </label>
       <textarea
-        [(ngModel)]="_form().significance"
+        [ngModel]="_form()?.significance"
+        (ngModelChange)="emitPatch({ significance: $event })"
         [attr.name]="'significance_' + num().split('.').join('_')"
         required
         maxlength="5000"
@@ -35,7 +36,17 @@ export class SignificanceBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    significance: string;
-}>(undefined);
+  readonly _form = input<SignificanceBlockForm>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<SignificanceBlockForm>>();
+
+  emitPatch(patch: Partial<SignificanceBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type SignificanceBlockForm = {
+  significance: string;
+};

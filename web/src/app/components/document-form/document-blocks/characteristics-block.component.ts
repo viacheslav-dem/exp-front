@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-characteristics-block',
@@ -10,7 +10,8 @@ import {Component, input} from '@angular/core';
         а также возможности достижения заданных значений указанных характеристик.
       </label>
       <textarea
-        [(ngModel)]="_form().characteristics"
+        [ngModel]="_form()?.characteristics"
+        (ngModelChange)="emitPatch({ characteristics: $event })"
         [attr.name]="'characteristics_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -40,7 +41,17 @@ export class CharacteristicsBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    characteristics: string;
-}>(undefined);
+  readonly _form = input<CharacteristicsBlockForm>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<CharacteristicsBlockForm>>();
+
+  emitPatch(patch: Partial<CharacteristicsBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type CharacteristicsBlockForm = {
+  characteristics: string;
+};

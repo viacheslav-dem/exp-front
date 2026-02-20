@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
     selector: 'app-results-block',
@@ -8,7 +8,8 @@ import {Component, input} from '@angular/core';
         {{num()}}. Сопоставительный анализ запланированных результатов и их соответствия достигнутым результатам.
       </label>
       <textarea
-        [(ngModel)]="_form().results"
+        [ngModel]="_form()?.results"
+        (ngModelChange)="emitPatch({ results: $event })"
         [attr.name]="'results_' + num().split('.').join('_')"
         required
         minlength="30"
@@ -35,7 +36,17 @@ export class ResultsBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    results: string;
-}>(undefined);
+  readonly _form = input<ResultsBlockForm>(undefined);
+
+  readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ResultsBlockForm>>();
+
+  emitPatch(patch: Partial<ResultsBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ResultsBlockForm = {
+  results: string;
+};

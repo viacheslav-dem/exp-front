@@ -7,13 +7,14 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Конкурентоспособность товара:
       </label>
-      <app-boolean-button name="competitiveness" required [(ngModel)]="_form().competitiveness" [trueLabel]="'да'"
+      <input type="hidden" [ngModel]="_form()?.competitiveness" name="competitiveness" required>
+      <app-boolean-button name="competitiveness" required [ngModel]="_form()?.competitiveness" [trueLabel]="'да'"
         [falseLabel]="'нет'"
-      (ngModelChange)="onConditionsChanged.emit(true)"></app-boolean-button>
+      (ngModelChange)="emitPatch({ competitiveness: $event })"></app-boolean-button>
       @if (full()) {
         <textarea
-          [(ngModel)]="_form().competitivenessText"
-          (ngModelChange)="onConditionsChanged.emit(true)"
+          [ngModel]="_form()?.competitivenessText"
+          (ngModelChange)="emitPatch({ competitivenessText: $event })"
           [attr.name]="'competitivenessText_' + num().split('.').join('_')"
           required
           minlength="30"
@@ -40,10 +41,18 @@ export class ProductCompetitivenessBlockComponent {
 
   readonly full = input<boolean>(true);
 
-  readonly _form = input<{
-    competitiveness: boolean;
-    competitivenessText: string;
-}>(undefined);
+  readonly _form = input<ProductCompetitivenessBlockForm>(undefined);
 
   readonly onConditionsChanged = output<boolean>();
+  readonly formPatch = output<Partial<ProductCompetitivenessBlockForm>>();
+
+  emitPatch(patch: Partial<ProductCompetitivenessBlockForm>) {
+    this.formPatch.emit(patch);
+    this.onConditionsChanged.emit(true);
+  }
 }
+
+type ProductCompetitivenessBlockForm = {
+  competitiveness: boolean;
+  competitivenessText: string;
+};
