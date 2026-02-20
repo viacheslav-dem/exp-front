@@ -217,24 +217,31 @@ export class MeetingProtocolFormComponent extends DocumentForm<MeetingProtocolNe
     // 1) Сначала проверяем "стандартную" валидацию Angular (required/minlength/etc).
     // Если уже есть .ng-invalid — не запускаем validate()+throw, а мягко ведём пользователя к полю.
     if (this.validationScrollService.hasInvalidControls(this.hostRef?.nativeElement)) {
-      const firstInvalid = this.validationScrollService.getFirstInvalidElement(this.hostRef?.nativeElement);
+      const firstVisibleInvalid = this.validationScrollService.getFirstInvalidElement(this.hostRef?.nativeElement);
+      const firstInvalid = firstVisibleInvalid
+        ?? this.validationScrollService.getFirstInvalidElementIgnoreVisibility(this.hostRef?.nativeElement);
       const fieldName = firstInvalid ? this.validationScrollService.getFieldLabel(firstInvalid) : null;
+      const agendaItemLabel = firstInvalid ? this.validationScrollService.getAgendaItemLabel(firstInvalid) : null;
       const errorType = firstInvalid ? this.validationScrollService.getFieldErrorType(firstInvalid) : null;
+      // Название пункта повестки — только когда проект свёрнут (первый невалидный не виден)
+      const isInsideCollapsedBlock = firstVisibleInvalid == null && firstInvalid != null;
+      const prefix = (agendaItemLabel && isInsideCollapsedBlock) ? `В пункте повестки «${agendaItemLabel}»: ` : '';
       this.validationScrollService.scrollToFirstInvalidSoon(this.hostRef);
-      // Сообщение с названием поля и типом ошибки
       let message = 'Заполните обязательные поля и проверьте минимальную длину текста.';
       if (fieldName) {
         if (errorType === 'required') {
-          message = `Заполните обязательное поле "${fieldName}".`;
+          message = prefix ? `${prefix}заполните обязательное поле "${fieldName}".` : `Заполните обязательное поле "${fieldName}".`;
         } else if (errorType === 'minlength') {
           const minLength = firstInvalid?.getAttribute('minlength') || '30';
-          message = `Поле "${fieldName}" должно содержать не менее ${minLength} символов.`;
+          message = prefix ? `${prefix}поле "${fieldName}" должно содержать не менее ${minLength} символов.` : `Поле "${fieldName}" должно содержать не менее ${minLength} символов.`;
         } else if (errorType === 'min') {
           const min = firstInvalid?.getAttribute('min') || '0';
-          message = `Поле "${fieldName}" должно быть не менее ${min}.`;
+          message = prefix ? `${prefix}поле "${fieldName}" должно быть не менее ${min}.` : `Поле "${fieldName}" должно быть не менее ${min}.`;
         } else {
-          message = `Заполните обязательное поле "${fieldName}" и проверьте минимальную длину текста.`;
+          message = prefix ? `${prefix}заполните обязательное поле "${fieldName}" и проверьте минимальную длину текста.` : `Заполните обязательное поле "${fieldName}" и проверьте минимальную длину текста.`;
         }
+      } else if (agendaItemLabel && isInsideCollapsedBlock) {
+        message = `Заполните обязательные поля в пункте повестки «${agendaItemLabel}».`;
       }
       this.toasty?.warn?.(message);
       return;

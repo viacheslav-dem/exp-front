@@ -71,9 +71,6 @@
                     @if (role() == Role.GKNT_CHAIRMAN && (item.state == ProjectState.ON_SIGNING || item.state == ProjectState.ON_FINAL_SIGNING)) {
                         <div class="project-card-with-grouping mb-3"
                              [class.project-card-selected]="selectedProjectIdsSet().has(item.id)">
-                            <div class="project-card-main">
-                                <app-project-li [item]="item" [baseItemLink]="'/projects/'" [group]="selectedGroup()"></app-project-li>
-                            </div>
                             <label class="project-grouping-strip"
                                    [for]="'grouping-' + item.id">
                                 <input type="checkbox"
@@ -87,6 +84,9 @@
                                     <span class="project-grouping-id">№{{ item.id }}</span>
                                 </span>
                             </label>
+                            <div class="project-card-main">
+                                <app-project-li [item]="item" [baseItemLink]="'/projects/'" [group]="selectedGroup()"></app-project-li>
+                            </div>
                         </div>
                     } @else {
                         <div class="mb-2" [ngClass]="{'project-card-selected': selectedProjectIdsSet().has(item.id)}">
@@ -273,11 +273,12 @@
         .project-card-selected { transition: none; }
     }
 
-    /* ---- Панель «выбрать все»: читаемый блок управления ---- */
+    /* ---- Панель «выбрать все»: читаемый блок управления, 44px touch target ---- */
     .grouping-toolbar {
         background-color: color-mix(in srgb, var(--bs-primary, #0d6efd) 10%, transparent);
         border: 1px solid color-mix(in srgb, var(--bs-primary, #0d6efd) 25%, transparent);
         border-radius: var(--bs-border-radius, 0.375rem);
+        min-height: 44px;
         padding: 0.75rem 1rem;
         margin-bottom: 1rem;
     }
@@ -315,7 +316,7 @@
         border-radius: 9999px;
     }
 
-    /* ---- Полоса «добавить в группировку» под карточкой: один кликабельный блок ---- */
+    /* ---- Полоса «добавить в группировку» над карточкой: чекбокс первым по F-паттерну, 44px touch target ---- */
     .project-card-with-grouping {
         border-radius: var(--bs-border-radius, 0.375rem);
         overflow: hidden;
@@ -328,9 +329,12 @@
         align-items: center;
         gap: 0.5rem;
         margin: 0;
+        min-height: 44px;
         padding: 0.5rem 0.75rem 0.5rem 1rem;
         background-color: var(--bs-tertiary-bg, #f8f9fa);
-        border-top: 1px solid var(--bs-border-color, #dee2e6);
+        border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+        border-top-left-radius: var(--bs-border-radius, 0.375rem);
+        border-top-right-radius: var(--bs-border-radius, 0.375rem);
         cursor: pointer;
         transition: background-color 0.15s ease;
     }

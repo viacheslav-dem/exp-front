@@ -31,25 +31,84 @@ export class FormValidationScrollService {
   }
 
   /**
-   * Извлекает название поля из связанного label элемента
-   * @param element Элемент формы
-   * @param labelSelectors Селекторы для поиска label (по умолчанию: 'form-sub-group', 'form-group')
-   * @returns Текст label или null
+   * Находит первый невалидный элемент в DOM-порядке без учёта видимости.
+   * Используется для сообщения об ошибке, когда все невалидные поля в свёрнутом блоке (напр. пункт повестки).
    */
-  getFieldLabel(element: HTMLElement, labelSelectors: string[] = ['form-sub-group', 'form-group']): string | null {
-    // Ищем родительский контейнер с формой
-    let parent = element.parentElement;
-    while (parent && !labelSelectors.some(selector => parent!.classList.contains(selector))) {
+  getFirstInvalidElementIgnoreVisibility(rootElement: HTMLElement | null): HTMLElement | null {
+    if (!rootElement) return null;
+    const invalidElements = Array.from(rootElement.querySelectorAll<HTMLElement>('.ng-invalid'));
+    return invalidElements.find(el => el !== rootElement) || null;
+  }
+
+  /**
+   * Извлекает название пункта повестки для элемента (текст подписи заголовка пункта).
+   * Поднимается до div.collapse с id="meeting-project-*", берёт предыдущий sibling — app-agenda-header-block, текст label.
+   * @param element Элемент внутри секции повестки (напр. невалидный контрол)
+   * @returns Текст подписи пункта повестки или null
+   */
+  getAgendaItemLabel(element: HTMLElement | null): string | null {
+    if (!element) return null;
+    let parent: HTMLElement | null = element.parentElement;
+    while (parent) {
+      if (parent.classList.contains('collapse') && parent.id?.startsWith('meeting-project-')) {
+        const header = parent.previousElementSibling;
+        if (!header) return null;
+        const label = header.querySelector<HTMLLabelElement>('label') ?? (header.tagName === 'LABEL' ? header : null);
+        if (!label) return null;
+        let text = label.textContent?.trim() || '';
+        // Убираем суффикс «| Решение: …», чтобы в сообщении об ошибке было только название пункта (например "1. Тест визирования 15 (8.4)")
+        const solutionIdx = text.indexOf(' | Решение:');
+        if (solutionIdx !== -1) {
+          text = text.substring(0, solutionIdx).trim();
+        }
+        return text || null;
+      }
       parent = parent.parentElement;
     }
-    if (!parent) return null;
+    return null;
+  }
+
+  /**
+   * Извлекает название поля из связанного label элемента.
+   * Сначала ищется ближайший контейнер с классом form-sub-group, при отсутствии — form-group.
+   * @param element Элемент формы (невалидный контрол)
+   * @param _labelSelectors Не используется; оставлен для обратной совместимости API
+   * @returns Текст первого label в найденном контейнере (без суффикса «| Решение: …») или null
+   */
+  getFieldLabel(element: HTMLElement, _labelSelectors: string[] = ['form-sub-group', 'form-group']): string | null {
+    // Сначала ищем ближайший form-sub-group (подпись конкретного поля), затем form-group
+    let parent: HTMLElement | null = element.parentElement;
+    let found: HTMLElement | null = null;
+    while (parent) {
+      if (parent.classList.contains('form-sub-group')) {
+        found = parent;
+        break;
+      }
+      parent = parent.parentElement;
+    }
+    if (!found) {
+      parent = element.parentElement;
+      while (parent) {
+        if (parent.classList.contains('form-group')) {
+          found = parent;
+          break;
+        }
+        parent = parent.parentElement;
+      }
+    }
+    if (!found) return null;
 
     // Ищем первый label внутри контейнера
-    const label = parent.querySelector<HTMLLabelElement>('label');
+    const label = found.querySelector<HTMLLabelElement>('label');
     if (!label) return null;
 
     // Извлекаем текст из label, убирая лишние пробелы и переносы строк
     let labelText = label.textContent?.trim() || '';
+    // Убираем суффикс пункта повестки «| Решение: …», чтобы в ошибке было только название поля
+    const solutionIdx = labelText.indexOf(' | Решение:');
+    if (solutionIdx !== -1) {
+      labelText = labelText.substring(0, solutionIdx).trim();
+    }
     // Ограничиваем длину для читаемости
     if (labelText.length > 100) {
       labelText = labelText.substring(0, 97) + '...';

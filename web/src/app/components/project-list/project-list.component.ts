@@ -264,7 +264,7 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
                 .setSelectText('Выбрать ГЭС').setSearchFilterEnabled(true)
                 .setTitle('ГЭС'),
             SearchField.multiSelect('groups.lifecycles.section', [], section => section.name)
-                .setSelectText('Выберите ГЭС').setSearchFilterEnabled(true)
+                .setSelectText('Выберите секцию').setSearchFilterEnabled(true)
                 .setTitle('Секция'),
             SearchField.datePeriod('stateStartDate').setTitle('Дата последнего изменения')
                 .setPlaceholder('Выбрать период...')
@@ -457,12 +457,12 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
     }
 
     /**
-     * Инициализирует фильтр секций: устанавливает пустой список и placeholder "Выберите ГЭС"
+     * Инициализирует фильтр секций: устанавливает пустой список и placeholder "Выберите секцию"
      */
     private initializeSectionFilter(): void {
         const sectionField = this.getSearchField('groups.lifecycles.section');
         sectionField.setItems([]);
-        sectionField.setSelectText('Выберите ГЭС');
+        sectionField.setSelectText('Выберите секцию');
     }
 
     /**
@@ -572,7 +572,7 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
         sectionField.setItems([]);
         sectionField.value = null;
         sectionField.selectedItems = [];
-        sectionField.setSelectText('Выберите ГЭС');
+        sectionField.setSelectText('Выберите секцию');
         this.availableSections.set([]);
         this._searchFields = [...this._searchFields];
         this.cdr.markForCheck();

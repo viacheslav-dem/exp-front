@@ -43,8 +43,16 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
         </div>
       }
       @if (showTarget8_4()) {
-        <textarea [ngModel]="_form?.multilateralDirectionsText" (ngModelChange)="emitPatch({ multilateralDirectionsText: $event })" name="multilateralDirectionsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
-        placeholder="Обязательный текст (не менее 30 символов)."></textarea>
+        <div class="form-sub-group">
+          <label>
+            @if (num()) {
+              <span>{{ num() }}.</span>
+            }
+            Соответствие приоритетным направлениям двустороннего (многостороннего) научно-технического сотрудничества:
+          </label>
+          <textarea [ngModel]="_form?.multilateralDirectionsText" (ngModelChange)="emitPatch({ multilateralDirectionsText: $event })" name="multilateralDirectionsText" required minlength="30" maxlength="5000" rows="3" class="form-control mt-05"
+          placeholder="Обязательный текст (не менее 30 символов)."></textarea>
+        </div>
       }
       @if (showTarget8_4()) {
         <div class="hint">
