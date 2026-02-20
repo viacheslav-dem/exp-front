@@ -2,10 +2,13 @@ import {
     Component,
     ChangeDetectionStrategy,
     signal,
+    computed,
+    effect,
     ChangeDetectorRef,
     DestroyRef,
     inject,
-    ViewChild
+    ViewChild,
+    ElementRef
 } from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from "@angular/router";
@@ -57,9 +60,32 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
     private readonly destroyRef = inject(DestroyRef);
     private readonly councilsChange$ = new Subject<any[]>();
     protected readonly ProjectState = ProjectState;
+    /** Мутабельный набор выбранных id (источник истины для projectsList и API). */
     selectedProjectIds: Set<number> = new Set();
+    /** Реактивная копия для шаблона и computed — обновляется при add/delete. */
+    readonly selectedProjectIdsSet = signal<ReadonlySet<number>>(new Set());
 
     @ViewChild('sendIdListModal', { static: false }) sendIdListModal: ModalComponent;
+    @ViewChild('masterGroupingCheckbox', { static: false }) masterGroupingCheckbox: ElementRef<HTMLInputElement> | null = null;
+
+    /** Проекты на текущей странице со статусом «На визировании» (ON_SIGNING или ON_FINAL_SIGNING). */
+    readonly onSigningOnPage = computed(() =>
+        this.projects().filter(p =>
+            p.state === ProjectState.ON_SIGNING || p.state === ProjectState.ON_FINAL_SIGNING
+        )
+    );
+
+    /** Все такие проекты на странице выбраны. */
+    readonly isAllOnSigningSelected = computed(() => {
+        const list = this.onSigningOnPage();
+        const sel = this.selectedProjectIdsSet();
+        return list.length > 0 && list.every(p => sel.has(p.id));
+    });
+
+    /** Часть таких проектов выбрана (для indeterminate общего чекбокса). */
+    readonly isSomeOnSigningSelected = computed(() =>
+        this.onSigningOnPage().some(p => this.selectedProjectIdsSet().has(p.id))
+    );
 
     constructor(private _projectService: ProjectService,
                 private _authService: AuthService,
@@ -70,38 +96,76 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
                 private cdr: ChangeDetectorRef,
                 private _toasty: GlobalToastyService) {
         super();
+        // Обновлять indeterminate общего чекбокса при изменении выбора или списка (без ngAfterViewChecked на каждом CD).
+        effect(() => {
+            this.isAllOnSigningSelected();
+            this.isSomeOnSigningSelected();
+            this.updateMasterCheckboxIndeterminate();
+        });
     }
 
     projectsList: ProjectLiDto[] = [];
+    /** Состояние загрузки при отправке (в ГЭС и/или заказчику). */
+    readonly sending = signal<boolean>(false);
 
-    showModal() {
-        this.sendIdListModal.show()
+    /** Выбранные к отправке в ГЭС (ON_SIGNING). */
+    getProjectsListToGes(): ProjectLiDto[] {
+        return this.projectsList.filter(p => p.state === ProjectState.ON_SIGNING);
     }
 
-    sendAllOnExpertExamination() {
-        if (this.projectsList.length !== 0) {
-            const idList = this.projectsList.map(project => project.id);
-            this._projectService.sendAllOnExpertExamination(idList).subscribe({
-                next: () => {
-                    this.projectsList = [];
-                    this.loadPage();
-                    this._toasty.success('Проекты отправлены в ГЭС.');
+    /** Выбранные к отправке заказчику (ON_FINAL_SIGNING). */
+    getProjectsListToCustomer(): ProjectLiDto[] {
+        return this.projectsList.filter(p => p.state === ProjectState.ON_FINAL_SIGNING);
+    }
 
-                    this.closeModal();
-                },
-                error: (err) => {
-                    this._toasty.err(err.status, "Ошибка на сервере. Пожалуйста, обратитесь к администратору.");
-                }
-            });
-        } else {
-            throw "Список пуст. Выберите хотя бы один проект для отправки";
+    showModal() {
+        this.sendIdListModal.show();
+    }
+
+    /**
+     * Отправляет выбранные: в ГЭС (ON_SIGNING) и заказчику (ON_FINAL_SIGNING) массовыми запросами.
+     */
+    sendSelected() {
+        const toGes = this.getProjectsListToGes();
+        const toCustomer = this.getProjectsListToCustomer();
+        if (toGes.length === 0 && toCustomer.length === 0) {
+            return;
         }
+        this.sending.set(true);
+        const gesIds = toGes.map(p => p.id);
+        const customerIds = toCustomer.map(p => p.id);
+        const gesObs = gesIds.length
+            ? this._projectService.sendAllOnExpertExamination(gesIds)
+            : of(null);
+        const customerObs = customerIds.length
+            ? this._projectService.sendAllFinished(customerIds)
+            : of(null);
+        forkJoin([gesObs, customerObs]).subscribe({
+            next: () => {
+                this.sending.set(false);
+                this.projectsList = [];
+                this.selectedProjectIds.clear();
+                this.selectedProjectIdsSet.set(new Set());
+                this.loadPage();
+                const parts: string[] = [];
+                if (gesIds.length) parts.push('в ГЭС');
+                if (customerIds.length) parts.push('заказчику');
+                this._toasty.success('Объекты отправлены ' + parts.join(' и ') + '.');
+                this.closeModal();
+            },
+            error: (err) => {
+                this.sending.set(false);
+                this._toasty.err(err?.status ?? 0, 'Ошибка на сервере. Пожалуйста, обратитесь к администратору.');
+                this.cdr.markForCheck();
+            }
+        });
     }
 
     addIdToList(project: ProjectLiDto) {
         if (!this.selectedProjectIds.has(project.id)) {
             this.selectedProjectIds.add(project.id);
             this.projectsList.push(project);
+            this.selectedProjectIdsSet.set(new Set(this.selectedProjectIds));
         }
     }
 
@@ -109,14 +173,54 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
         if (this.selectedProjectIds.has(project.id)) {
             this.selectedProjectIds.delete(project.id);
             this.projectsList = this.projectsList.filter(p => p.id !== project.id);
+            this.selectedProjectIdsSet.set(new Set(this.selectedProjectIds));
             this.cdr.markForCheck();
         }
+    }
+
+    /**
+     * Обновляет состояние indeterminate у общего чекбокса «выбрать все».
+     */
+    updateMasterCheckboxIndeterminate(): void {
+        const el = this.masterGroupingCheckbox?.nativeElement;
+        if (!el) return;
+        const some = this.isSomeOnSigningSelected();
+        const all = this.isAllOnSigningSelected();
+        el.indeterminate = some && !all;
+    }
+
+    /**
+     * Обработчик общего чекбокса «выбрать все объекты на визировании на странице».
+     */
+    onSelectAllOnSigningChange(event: Event): void {
+        const checked = (event.target as HTMLInputElement).checked;
+        const list = this.onSigningOnPage();
+        if (checked) {
+            list.forEach(p => this.addIdToList(p));
+        } else {
+            list.forEach(p => this.deleteIdFromList(p));
+        }
+        this.cdr.markForCheck();
+    }
+
+    /**
+     * Обработчик чекбокса «добавить в группировку» для gknt_chairman (проекты on_signing).
+     */
+    onGroupingCheckboxChange(project: ProjectLiDto, event: Event) {
+        const checked = (event.target as HTMLInputElement).checked;
+        if (checked) {
+            this.addIdToList(project);
+        } else {
+            this.deleteIdFromList(project);
+        }
+        this.cdr.markForCheck();
     }
 
     closeModal() {
         if (this.sendIdListModal){
             this.sendIdListModal.hide();
         }
+        this.sending.set(false);
     }
 
     ngOnInit() {

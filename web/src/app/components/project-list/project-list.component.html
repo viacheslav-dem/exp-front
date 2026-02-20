@@ -21,11 +21,17 @@
     @if (role() != Role.CUSTOMER && role() != Role.SUB_CUSTOMER) {
         <div class="mb-4">
             <span class="text-body-secondary fst-italic small">
-                Количество проектов: <strong class="ms-2 fs-6">{{_page.totalElements == null ? '...' : _page.totalElements}}</strong>
+                Количество проектов: <strong class="ms-2 fs-6">{{_page.totalElements == null ? '…' : _page.totalElements}}</strong>
             </span>
             <div class="mt-2">
                 @if (projectsList.length != 0) {
-                    <button class="btn btn-primary btn-sm me-2" (click)="showModal()">Отправить выбранные объекты в ГЭС без ЭЦП</button>
+                    <button type="button"
+                            class="btn btn-primary btn-sm me-2 project-list-send-btn"
+                            (click)="showModal()"
+                            [attr.aria-label]="'Отправить ' + projectsList.length + ' выбранных объектов (в ГЭС и/или заказчику)'">
+                        Отправить выбранные
+                        <span class="project-list-send-count ms-1" aria-hidden="true">({{ projectsList.length }})</span>
+                    </button>
                 }
             </div>
         </div>
@@ -36,26 +42,55 @@
             <div [loadingData]="_loading" class="list-group list-group-flush">
                 @if (_page.totalElements != null && _page.totalElements === 0 && projects().length == 0) {
                     <div class="alert alert-info fst-italic mb-0 rounded-4 shadow-sm border-0 p-3">
-                        <i class="fas fa-info-circle me-2"></i>Объектов экспертизы не найдено
+                        <i class="fas fa-info-circle me-2" aria-hidden="true"></i>Объектов экспертизы не найдено
+                    </div>
+                }
+
+                @if (role() == Role.GKNT_CHAIRMAN && onSigningOnPage().length > 0) {
+                    <div class="grouping-toolbar"
+                         role="group"
+                         aria-labelledby="grouping-master-label"
+                         aria-describedby="grouping-master-count">
+                        <div class="grouping-toolbar-inner">
+                            <input type="checkbox"
+                                   class="form-check-input grouping-master-input"
+                                   #masterGroupingCheckbox
+                                   id="grouping-master"
+                                   [checked]="isAllOnSigningSelected()"
+                                   (change)="onSelectAllOnSigningChange($event)"
+                                   aria-describedby="grouping-master-count">
+                            <label class="grouping-toolbar-label" id="grouping-master-label" for="grouping-master">
+                                Выбрать все объекты на визировании на этой странице
+                            </label>
+                            <span id="grouping-master-count" class="grouping-toolbar-count" aria-live="polite">{{ onSigningOnPage().length }}</span>
+                        </div>
                     </div>
                 }
 
                 @for (item of projects(); track item.id) {
-                    <div class="mb-2" [ngClass]="{'selected': selectedProjectIds.has(item.id)}">
-                        <app-project-li [item]="item" [baseItemLink]="'/projects/'" [group]="selectedGroup()"></app-project-li>
-                    </div>
-                    @if (role() == Role.GKNT_CHAIRMAN && item.state == ProjectState.ON_SIGNING) {
-                        <div class="text-xs-center mb-2">
-                            <button *ngIf="!selectedProjectIds.has(item.id)"
-                                    class="btn btn-primary btn-sm me-2"
-                                    (click)="addIdToList(item)">
-                                Добавить проект №{{item.id}} для группировки
-                            </button>
-                            <button *ngIf="selectedProjectIds.has(item.id)"
-                                    class="btn btn-secondary btn-sm"
-                                    (click)="deleteIdFromList(item); cdr.markForCheck()">
-                                Убрать проект из группировки
-                            </button>
+                    @if (role() == Role.GKNT_CHAIRMAN && (item.state == ProjectState.ON_SIGNING || item.state == ProjectState.ON_FINAL_SIGNING)) {
+                        <div class="project-card-with-grouping mb-3"
+                             [class.project-card-selected]="selectedProjectIdsSet().has(item.id)">
+                            <div class="project-card-main">
+                                <app-project-li [item]="item" [baseItemLink]="'/projects/'" [group]="selectedGroup()"></app-project-li>
+                            </div>
+                            <label class="project-grouping-strip"
+                                   [for]="'grouping-' + item.id">
+                                <input type="checkbox"
+                                       class="form-check-input project-grouping-checkbox"
+                                       [id]="'grouping-' + item.id"
+                                       [checked]="selectedProjectIdsSet().has(item.id)"
+                                       (change)="onGroupingCheckboxChange(item, $event)"
+                                       [attr.aria-label]="'Добавить проект №' + item.id + ' в группировку для отправки'">
+                                <span class="project-grouping-text">
+                                    {{ selectedProjectIdsSet().has(item.id) ? 'В группировке для отправки' : 'Добавить в группировку для отправки' }}
+                                    <span class="project-grouping-id">№{{ item.id }}</span>
+                                </span>
+                            </label>
+                        </div>
+                    } @else {
+                        <div class="mb-2" [ngClass]="{'project-card-selected': selectedProjectIdsSet().has(item.id)}">
+                            <app-project-li [item]="item" [baseItemLink]="'/projects/'" [group]="selectedGroup()"></app-project-li>
                         </div>
                     }
                 }
@@ -130,26 +165,400 @@
     </div>
 </div>
 
-<app-modal #sendIdListModal [title]="'Отправить объекты в ГЭС'" [closePermission]="false" (onClose)="closeModal()">
-    <h5 class="bold">Вы уверены, что хотите отправить выбранные объекты в ГЭС без ЭЦП? </h5>
-    <div class="mt-2 mb-2">
-        @for (project of projectsList; track $index) {
-            <div class="mt-2">
-                <span class="text-body">{{$index + 1}}) {{project.title}} №{{project.id}}</span>
-                <a class="btn btn-icon btn-icon-sm m-lg-1" (click)="deleteIdFromList(project); cdr.markForCheck()">
-                    <fa-icon icon="minus"></fa-icon>
-                </a>
-            </div>
-        }
-    </div>
-    <div class="text-xs-center mb-2">
-        <button class="btn btn-primary btn-sm me-2" (click)="sendAllOnExpertExamination()">Отправить</button>
-        <button class="btn btn-secondary btn-sm" (click)="closeModal()">Отмена</button>
+<app-modal #sendIdListModal [title]="'Отправить объекты'" [closePermission]="!sending()" (onClose)="closeModal()">
+    <div class="send-ges-modal"
+         role="region"
+         aria-labelledby="send-modal-heading"
+         aria-describedby="send-ges-desc"
+         [attr.aria-busy]="sending()">
+        <p id="send-ges-desc" class="send-ges-modal-intro">
+            Отправка выбранных объектов в ГЭС и/или заказчику без ЭЦП. Проверьте списки и при необходимости уберите лишние.
+        </p>
+        <p id="send-modal-heading" class="visually-hidden" aria-live="polite">
+            К отправке в ГЭС: {{ getProjectsListToGes().length }}, заказчику: {{ getProjectsListToCustomer().length }}
+        </p>
+
+        <section class="send-ges-modal-section" aria-labelledby="send-ges-section-heading">
+            <h3 id="send-ges-section-heading" class="send-ges-modal-section-title">
+                К отправке в ГЭС
+                <span class="send-ges-modal-section-count">{{ getProjectsListToGes().length }}</span>
+            </h3>
+            <ul class="send-ges-modal-list"
+                role="list"
+                [attr.aria-busy]="sending()">
+                @for (project of getProjectsListToGes(); track project.id) {
+                    <li class="send-ges-modal-item">
+                        <span class="send-ges-modal-item-text">
+                            <span class="send-ges-modal-item-num" aria-hidden="true">{{ $index + 1 }}</span>
+                            <span class="send-ges-modal-item-title">{{ project.title }}</span>
+                            <span class="send-ges-modal-item-id">№{{ project.id }}</span>
+                        </span>
+                        <button type="button"
+                                class="send-ges-modal-remove"
+                                [disabled]="sending()"
+                                (click)="deleteIdFromList(project); cdr.markForCheck()"
+                                [attr.aria-label]="'Убрать из списка: ' + project.title + ' №' + project.id">
+                            <fa-icon icon="minus" aria-hidden="true"></fa-icon>
+                        </button>
+                    </li>
+                }
+            </ul>
+            @if (getProjectsListToGes().length === 0) {
+                <p class="send-ges-modal-empty">Нет объектов к отправке в ГЭС</p>
+            }
+        </section>
+
+        <section class="send-ges-modal-section" aria-labelledby="send-customer-section-heading">
+            <h3 id="send-customer-section-heading" class="send-ges-modal-section-title send-ges-modal-section-title--customer">
+                К отправке заказчику
+                <span class="send-ges-modal-section-count">{{ getProjectsListToCustomer().length }}</span>
+            </h3>
+            <ul class="send-ges-modal-list"
+                role="list"
+                [attr.aria-busy]="sending()">
+                @for (project of getProjectsListToCustomer(); track project.id) {
+                    <li class="send-ges-modal-item">
+                        <span class="send-ges-modal-item-text">
+                            <span class="send-ges-modal-item-num" aria-hidden="true">{{ $index + 1 }}</span>
+                            <span class="send-ges-modal-item-title">{{ project.title }}</span>
+                            <span class="send-ges-modal-item-id">№{{ project.id }}</span>
+                        </span>
+                        <button type="button"
+                                class="send-ges-modal-remove"
+                                [disabled]="sending()"
+                                (click)="deleteIdFromList(project); cdr.markForCheck()"
+                                [attr.aria-label]="'Убрать из списка: ' + project.title + ' №' + project.id">
+                            <fa-icon icon="minus" aria-hidden="true"></fa-icon>
+                        </button>
+                    </li>
+                }
+            </ul>
+            @if (getProjectsListToCustomer().length === 0) {
+                <p class="send-ges-modal-empty">Нет объектов к отправке заказчику</p>
+            }
+        </section>
+
+        <div class="send-ges-modal-actions">
+            <button type="button"
+                    class="btn btn-primary send-ges-modal-btn-send"
+                    [disabled]="sending() || (getProjectsListToGes().length === 0 && getProjectsListToCustomer().length === 0)"
+                    (click)="sendSelected()">
+                @if (sending()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Отправка…
+                } @else {
+                    Отправить
+                }
+            </button>
+            <button type="button"
+                    class="btn btn-outline-secondary send-ges-modal-btn-cancel"
+                    [disabled]="sending()"
+                    (click)="closeModal()">
+                Отмена
+            </button>
+        </div>
     </div>
 </app-modal>
 
 <style>
-    .selected {
-        background-color: lightgreen;
+    /* ---- Выбранная карточка: акцент границей и лёгким фоном (не плоский зелёный) ---- */
+    .project-card-selected {
+        --grouping-accent: var(--bs-primary, #0d6efd);
+        border-left: 4px solid var(--grouping-accent);
+        background-color: color-mix(in srgb, var(--grouping-accent) 8%, transparent);
+        border-radius: 0 var(--bs-border-radius, 0.375rem) var(--bs-border-radius) 0;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .project-card-selected { transition: none; }
+    }
+
+    /* ---- Панель «выбрать все»: читаемый блок управления ---- */
+    .grouping-toolbar {
+        background-color: color-mix(in srgb, var(--bs-primary, #0d6efd) 10%, transparent);
+        border: 1px solid color-mix(in srgb, var(--bs-primary, #0d6efd) 25%, transparent);
+        border-radius: var(--bs-border-radius, 0.375rem);
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+    }
+    .grouping-toolbar-inner {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem 0.75rem;
+    }
+    .grouping-master-input {
+        flex-shrink: 0;
+        margin-top: 0;
+        margin-right: 0.25rem;
+    }
+    .grouping-master-input:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--bs-body-bg, #fff), 0 0 0 4px var(--bs-primary, #0d6efd);
+    }
+    .grouping-toolbar-label {
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 0;
+        user-select: none;
+    }
+    .grouping-toolbar-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.75rem;
+        padding: 0.15rem 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--bs-primary);
+        background-color: color-mix(in srgb, var(--bs-primary, #0d6efd) 15%, transparent);
+        border-radius: 9999px;
+    }
+
+    /* ---- Полоса «добавить в группировку» под карточкой: один кликабельный блок ---- */
+    .project-card-with-grouping {
+        border-radius: var(--bs-border-radius, 0.375rem);
+        overflow: hidden;
+    }
+    .project-card-with-grouping .project-card-main {
+        margin: 0;
+    }
+    .project-grouping-strip {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0.5rem 0.75rem 0.5rem 1rem;
+        background-color: var(--bs-tertiary-bg, #f8f9fa);
+        border-top: 1px solid var(--bs-border-color, #dee2e6);
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+    }
+    .project-grouping-strip:hover {
+        background-color: color-mix(in srgb, var(--bs-primary, #0d6efd) 6%, var(--bs-tertiary-bg, #f8f9fa));
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .project-grouping-strip { transition: none; }
+    }
+    .project-grouping-strip:focus-within {
+        outline: none;
+        box-shadow: inset 0 0 0 2px var(--bs-primary, #0d6efd);
+    }
+    .project-grouping-checkbox {
+        flex-shrink: 0;
+        margin-top: 0;
+    }
+    .project-grouping-checkbox:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--bs-body-bg, #fff), 0 0 0 4px var(--bs-primary, #0d6efd);
+    }
+    .project-grouping-text {
+        font-size: 0.9rem;
+        color: var(--bs-body-color);
+    }
+    .project-grouping-id {
+        color: var(--bs-secondary-color);
+        font-weight: 500;
+    }
+
+    .project-list-send-count {
+        opacity: 0.95;
+    }
+
+    /* ---- Модальное окно «Отправить в ГЭС»: современный компактный дизайн ---- */
+    .send-ges-modal {
+        --send-ges-gap: 1rem;
+        --send-ges-radius: 0.5rem;
+        --send-ges-muted: color-mix(in srgb, var(--bs-body-color) 70%, transparent);
+        position: relative;
+    }
+    .send-ges-modal[aria-busy="true"]::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: color-mix(in srgb, var(--bs-body-bg, #fff) 85%, transparent);
+        border-radius: var(--send-ges-radius);
+        z-index: 1;
+        pointer-events: none;
+    }
+    .send-ges-modal-intro {
+        margin: 0 0 var(--send-ges-gap);
+        font-size: 0.9375rem;
+        line-height: 1.45;
+        color: var(--send-ges-muted);
+    }
+    .send-ges-modal-section {
+        margin-bottom: var(--send-ges-gap);
+    }
+    .send-ges-modal-section:last-of-type {
+        margin-bottom: calc(var(--send-ges-gap) * 1.5);
+    }
+    .send-ges-modal-section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 0 0.5rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--bs-body-color);
+    }
+    .send-ges-modal-section-title--customer {
+        color: var(--bs-success, #198754);
+    }
+    .send-ges-modal-section-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.5rem;
+        padding: 0.1rem 0.4rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--bs-primary);
+        background-color: color-mix(in srgb, var(--bs-primary, #0d6efd) 15%, transparent);
+        border-radius: 9999px;
+    }
+    .send-ges-modal-section-title--customer .send-ges-modal-section-count {
+        color: var(--bs-success, #198754);
+        background-color: color-mix(in srgb, var(--bs-success, #198754) 15%, transparent);
+    }
+    .send-ges-modal-empty {
+        margin: 0 0 var(--send-ges-gap);
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        color: var(--send-ges-muted);
+        font-style: italic;
+        border: 1px dashed var(--bs-border-color-translucent, rgba(0,0,0,.1));
+        border-radius: var(--send-ges-radius);
+        background-color: var(--bs-tertiary-bg, #f8f9fa);
+    }
+    .send-ges-modal-count {
+        margin: 0 0 var(--send-ges-gap);
+        font-size: 1rem;
+        font-weight: 500;
+    }
+    .send-ges-modal-count strong {
+        color: var(--bs-primary);
+        font-variant-numeric: tabular-nums;
+    }
+    .send-ges-modal-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 var(--send-ges-gap);
+        max-height: min(40vh, 260px);
+        overflow-y: auto;
+        border: 1px solid var(--bs-border-color-translucent, rgba(0,0,0,.1));
+        border-radius: var(--send-ges-radius);
+        background-color: var(--bs-tertiary-bg, #f8f9fa);
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .send-ges-modal-list { scroll-behavior: auto; }
+    }
+    .send-ges-modal-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.625rem 0.75rem;
+        border-bottom: 1px solid var(--bs-border-color-translucent, rgba(0,0,0,.08));
+        min-width: 0;
+    }
+    .send-ges-modal-item:last-child {
+        border-bottom: none;
+    }
+    .send-ges-modal-item-text {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.5rem;
+        min-width: 0;
+    }
+    .send-ges-modal-item-num {
+        flex-shrink: 0;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--send-ges-muted);
+        font-variant-numeric: tabular-nums;
+    }
+    .send-ges-modal-item-title {
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    @media (max-width: 480px) {
+        .send-ges-modal-item-title { white-space: normal; }
+    }
+    .send-ges-modal-item-id {
+        flex-shrink: 0;
+        font-size: 0.875rem;
+        color: var(--send-ges-muted);
+    }
+    .send-ges-modal-remove {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        padding: 0;
+        border: none;
+        border-radius: var(--send-ges-radius);
+        background: transparent;
+        color: var(--send-ges-muted);
+        cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .send-ges-modal-remove:hover {
+        background-color: color-mix(in srgb, var(--bs-danger, #dc3545) 12%, transparent);
+        color: var(--bs-danger, #dc3545);
+    }
+    .send-ges-modal-remove:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--bs-body-bg, #fff), 0 0 0 4px var(--bs-primary);
+    }
+    .send-ges-modal-remove:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .send-ges-modal-remove { transition: none; }
+    }
+    .send-ges-modal-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 0.75rem;
+    }
+    .send-ges-modal-btn-send,
+    .send-ges-modal-btn-cancel {
+        min-height: 2.5rem;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        font-weight: 500;
+        border-radius: var(--send-ges-radius);
+        transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .send-ges-modal-btn-send:focus-visible,
+    .send-ges-modal-btn-cancel:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--bs-body-bg, #fff), 0 0 0 4px var(--bs-primary);
+    }
+    .send-ges-modal-btn-send:hover:not(:disabled),
+    .send-ges-modal-btn-cancel:hover:not(:disabled) {
+        filter: none;
+    }
+    .send-ges-modal-btn-send:disabled,
+    .send-ges-modal-btn-cancel:disabled {
+        cursor: not-allowed;
+        opacity: 0.65;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .send-ges-modal-btn-send,
+        .send-ges-modal-btn-cancel { transition: none; }
+        .send-ges-modal-btn-send .spinner-border { animation: none; }
     }
 </style>

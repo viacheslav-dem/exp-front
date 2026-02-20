@@ -327,4 +327,9 @@ export class ProjectService extends HasStateService {
   sendAllOnExpertExamination(idList: number[]): Observable<any> {
     return this._http.post(`${this.url}/send-all/on-expert-examination`, idList);
   }
+
+  /** Массовая отправка результатов заказчику (завершение проектов). */
+  sendAllFinished(idList: number[]): Observable<any> {
+    return this._http.post(`${this.url}/send-all/finished`, idList);
+  }
 }
