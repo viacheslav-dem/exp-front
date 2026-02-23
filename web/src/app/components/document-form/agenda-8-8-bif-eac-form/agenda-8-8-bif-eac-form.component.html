@@ -26,7 +26,9 @@
 
     <app-needed-project-docs-block [_form]="formValue()"
                                    [project]="project"
-                                   [num]="'1.2'"></app-needed-project-docs-block>
+                                   [num]="'1.2'"
+                                   (formPatch)="patchForm($event)"
+                                   (onConditionsChanged)="onConditionsChanged()"></app-needed-project-docs-block>
 
     <app-select-directions-and-goals-block
             [form]="formValue()"

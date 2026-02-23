@@ -13,7 +13,9 @@
                                 (onConditionsChanged)="onConditionsChanged()"></app-marketing-research-block>
   <hr/>
   <app-effect-block [_form]="formValue()"
-                    [num]="'3'"></app-effect-block>
+                    [num]="'3'"
+                    (formPatch)="patchForm($event)"
+                    (onConditionsChanged)="onConditionsChanged()"></app-effect-block>
   <hr/>
   <app-sufficiency-block [_form]="formValue()"
                          [num]="'4'"
@@ -37,10 +39,13 @@
   <hr/>
   <app-requirements-block [_form]="formValue()"
                           [num]="'8'"
+                          (formPatch)="patchForm($event)"
                           (onConditionsChanged)="onConditionsChanged()"></app-requirements-block>
   <hr/>
   <app-assessment-block [_form]="formValue()"
-                        [num]="'9'"></app-assessment-block>
+                        [num]="'9'"
+                        (formPatch)="patchForm($event)"
+                        (onConditionsChanged)="onConditionsChanged()"></app-assessment-block>
   <hr/>
   <app-privacy-block [_form]="formValue()"
                      [num]="'10'"

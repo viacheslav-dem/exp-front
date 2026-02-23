@@ -59,15 +59,21 @@
                             (onConditionsChanged)="onConditionsChanged()"></app-consequences-block>
     <hr/>
     <app-construction-work-block [_form]="formValue()"
-                                 [num]="'3'"></app-construction-work-block>
+                                 [num]="'3'"
+                                 (formPatch)="patchForm($event)"
+                                 (onConditionsChanged)="onConditionsChanged()"></app-construction-work-block>
     <hr/>
     <app-project-docs-block [_form]="formValue()"
                             [project]="project"
-                            [num]="'3.1'"></app-project-docs-block>
+                            [num]="'3.1'"
+                            (formPatch)="patchForm($event)"
+                            (onConditionsChanged)="onConditionsChanged()"></app-project-docs-block>
     <hr/>
     <app-needed-project-docs-block [_form]="formValue()"
                                    [project]="project"
-                                   [num]="'3.2'"></app-needed-project-docs-block>
+                                   [num]="'3.2'"
+                                   (formPatch)="patchForm($event)"
+                                   (onConditionsChanged)="onConditionsChanged()"></app-needed-project-docs-block>
     <hr/>
     <app-resources-sufficiency-block
       [_form]="formValue()"
@@ -87,7 +93,9 @@
                                         (onConditionsChanged)="onConditionsChanged()"></app-marketing-research-plain-block>
     <hr/>
     <app-marketing-research-results-block [_form]="formValue()"
-                                          [num]="'6.1'"></app-marketing-research-results-block>
+                                          [num]="'6.1'"
+                                          (formPatch)="patchForm($event)"
+                                          (onConditionsChanged)="onConditionsChanged()"></app-marketing-research-results-block>
     <hr/>
     <app-scientific-level-items-block [form]="formValue()"
                                       [num]="'6.2'"
@@ -95,10 +103,14 @@
                                       (onConditionsChanged)="onConditionsChanged()"></app-scientific-level-items-block>
     <hr/>
     <app-analog-description-block [_form]="formValue()"
-                                  [num]="'6.3'"></app-analog-description-block>
+                                  [num]="'6.3'"
+                                  (formPatch)="patchForm($event)"
+                                  (onConditionsChanged)="onConditionsChanged()"></app-analog-description-block>
     <hr/>
     <app-analog-params-description-block [_form]="formValue()"
-                                         [num]="'6.4'"></app-analog-params-description-block>
+                                         [num]="'6.4'"
+                                         (formPatch)="patchForm($event)"
+                                         (onConditionsChanged)="onConditionsChanged()"></app-analog-params-description-block>
     <hr/>
     <app-risks-block
       [_form]="formValue()"
