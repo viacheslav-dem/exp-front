@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, viewChild, ChangeDetectionStrategy, ChangeDetectorRef, effect, input, output} from '@angular/core';
+import {Component, OnDestroy, OnInit, signal, viewChild, ChangeDetectionStrategy, ChangeDetectorRef, effect, input, output} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {ProjectLifecycleState, ProjectLifecycleStateBadge} from "@app/pipes/lifecycle-state.pipe";
 import {Router} from "@angular/router";
@@ -21,6 +21,7 @@ import {DialogService} from "@app/components/dialogs/dialog.service";
 import {RemarkDto} from "@app/dto/RemarkDto";
 import {CouncilConclusionFormContainerComponent} from "@app/components/document-form/council-conclusion-form/council-conclusion-form-container.component";
 import {ProjectDto} from "@app/dto/ProjectDto";
+import {ProjectService} from "@app/services/project.service";
 import {environment} from "../../../environments/environment";
 
 @Component({
@@ -72,11 +73,18 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   readonly lifecycleTransitionHistoryModal = viewChild<ModalComponent>('lifecycleTransitionHistoryModal');
   readonly remarkResponseForSection = viewChild<ModalComponent>('remarkResponseForSection');
   readonly remarkResponseForBureau = viewChild<ModalComponent>('remarkResponseForBureau');
+  readonly expertRemarksModal = viewChild<ModalComponent>('expertRemarksModal');
+
+  readonly expertRemarksList = signal<RemarkDto[]>([]);
+  readonly expertRemarksLoading = signal(false);
+  readonly expertRemarksLoadError = signal(false);
+  private expertRemarksSubscription: Subscription | null = null;
 
   constructor(private _router: Router,
               public _lifecycleGroupService: LifecycleGroupService,
               private _transitionHistoryService: TransitionHistoryService,
               private _lifecycleService: LifecycleService,
+              private _projectService: ProjectService,
               private _toasty: GlobalToastyService,
               private _dialogService: DialogService,
               private cdr: ChangeDetectorRef) {
@@ -188,6 +196,38 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
       return true;
     }
     return false;
+  }
+
+  canShowExpertRemarks(): boolean {
+    return this.role() === Role.BUREAU_CHAIRMAN;
+  }
+
+  showExpertRemarksModal(): void {
+    const projectId = this.projectValue?.id;
+    if (projectId == null) return;
+    if (this.expertRemarksLoading()) return;
+    this.expertRemarksSubscription?.unsubscribe();
+    this.expertRemarksSubscription = null;
+    this.expertRemarksList.set([]);
+    this.expertRemarksLoadError.set(false);
+    this.expertRemarksLoading.set(true);
+    this.expertRemarksModal()?.show();
+    this.expertRemarksSubscription = this._projectService.getExpertRemarksByProject(projectId).subscribe({
+      next: (list) => {
+        this.expertRemarksList.set(list ?? []);
+        this.expertRemarksLoading.set(false);
+        this.expertRemarksLoadError.set(false);
+        this.expertRemarksSubscription = null;
+      },
+      error: () => {
+        this.expertRemarksList.set([]);
+        this.expertRemarksLoading.set(false);
+        this.expertRemarksLoadError.set(true);
+        this.expertRemarksSubscription = null;
+        this._toasty.error('Не удалось загрузить замечания экспертов');
+      }
+    });
+    this.subscriptions.push(this.expertRemarksSubscription);
   }
   replyForSectionRemark(remarks: RemarkDto[]) {
     this.lifecycleRemark.remarks = remarks;
@@ -407,6 +447,8 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.expertRemarksSubscription?.unsubscribe();
+    this.expertRemarksSubscription = null;
     this.subscriptions.forEach(sub => sub.unsubscribe());
     this.subscriptions = [];
   }

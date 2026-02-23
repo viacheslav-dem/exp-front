@@ -14,4 +14,6 @@ export class ProjectLiDto extends HasState {
   councilReferences: CouncilReferenceDto[] = [];
   isExpertReviewFiftyFifty: boolean;
   sections: SectionPlainDto[];
+  /** Признак наличия замечаний экспертов/бюро/секции по объекту (для выделения в списке у аппарата бюро ГЭС). */
+  hasRemarks?: boolean;
 }

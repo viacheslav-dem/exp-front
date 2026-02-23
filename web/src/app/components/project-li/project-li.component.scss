@@ -76,6 +76,25 @@ a:hover {
   border-color: rgba(13, 110, 253, 0.4);
 }
 
+// Карточка с замечаниями экспертов/бюро/секции (для роли «Аппарат бюро ГЭС»)
+.project-list-item.project-card-has-remarks {
+  border-left: 4px solid #fd7e14;
+  background-color: #fff8f0;
+}
+
+.project-list-item.project-card-has-remarks:hover {
+  background-color: #ffecd9;
+  border-left-color: #e8590c;
+}
+
+// Бейдж «Есть замечания» в карточке (аппарат бюро ГЭС)
+.project-list-item .project-remarks-badge {
+  background-color: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ffb74d;
+  font-weight: 600;
+}
+
 // ============================================================================
 // СТИЛИ СОДЕРЖИМОГО КАРТОЧКИ
 // ============================================================================

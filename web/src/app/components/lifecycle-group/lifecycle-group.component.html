@@ -21,6 +21,14 @@
                   (click)="answerForBureauRemark(_group)">Замечания
           </button>
         }
+        @if (canShowExpertRemarks()) {
+          <button type="button"
+                  class="btn btn-sm btn-outline-secondary btn-right me-2"
+                  (click)="showExpertRemarksModal()"
+                  aria-label="Показать замечания экспертов по проекту">
+            Замечания экспертов
+          </button>
+        }
         <span class="text-muted bold text-sm italic">{{_group.termsMessage}}</span>
       </div>
 
@@ -231,4 +239,32 @@
                        [isExpired]="projectValue.isBureauRemarksExpired"
                        [isEdit]="canAnswerForBureauQuestion(_group)"></app-remark-response>
 </app-modal>
+
+@if (canShowExpertRemarks()) {
+  <app-modal #expertRemarksModal [title]="'Замечания экспертов'">
+    <div>
+      @if (expertRemarksLoading()) {
+        <div class="d-flex align-items-center gap-2 py-3 text-muted" role="status" aria-live="polite">
+          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          <span>Загрузка…</span>
+        </div>
+      } @else if (expertRemarksLoadError()) {
+        <div class="alert alert-danger mb-0 rounded-2" role="alert">
+          Не удалось загрузить замечания экспертов. Повторите попытку позже.
+        </div>
+      } @else if (expertRemarksList().length === 0) {
+        <p class="text-muted mb-0 py-2">По проекту пока нет замечаний экспертов.</p>
+      } @else {
+        <p class="small text-muted mb-2">Всего: {{ expertRemarksList().length }}</p>
+        <div class="list-group list-group-flush rounded-2 overflow-hidden border">
+          @for (remark of expertRemarksList(); track $index; let i = $index) {
+            <div class="list-group-item py-2 px-3" style="white-space: pre-wrap">
+              <span class="text-secondary fw-medium me-2">{{ i + 1 }}.</span>{{ remark.question }}
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </app-modal>
+}
 }

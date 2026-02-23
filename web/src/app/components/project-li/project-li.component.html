@@ -6,7 +6,8 @@
        'alert-warning': project.yellow,
        'alert-primary': project.blue,
        'border-danger border-2':(role == Role.GKNT_CHAIRMAN || role== Role.GKNT_WORKER || role == Role.BELISA_EDIT)
-       && project.isExpertReviewFiftyFifty
+       && project.isExpertReviewFiftyFifty,
+       'project-card-has-remarks': showHasRemarksHighlight()
      }">
     <div class="d-flex justify-content-between align-items-start gap-1">
       <div class="flex-grow-1">
@@ -15,6 +16,11 @@
           <span [ngClass]="['badge', 'rounded-pill', 'px-3', 'py-1', 'shadow-sm', 'fw-semibold', ProjectStateBadge[project.state]]">
             {{project.state | projectState}}
           </span>
+          @if (showHasRemarksHighlight()) {
+            <span class="badge rounded-pill px-2 py-1 project-remarks-badge" title="По объекту есть замечания экспертов/бюро/секции">
+              <i class="fas fa-comment-exclamation me-1" aria-hidden="true"></i>Есть замечания
+            </span>
+          }
           @if (project.termsMessage) {
             <span class="text-body-secondary fw-semibold text-md fst-italic">
               <i class="fas fa-clock me-1"></i>{{project.termsMessage}}

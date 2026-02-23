@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, effect, input} from '@angular/core';
-import {ProjectStateBadge} from "@app/pipes/project-state.pipe";
+import {ProjectState, ProjectStateBadge} from "@app/pipes/project-state.pipe";
 import {ProjectService} from "@app/services/project.service";
+import {anyMatch} from "@app/support/utils";
 import {ProjectLiDto} from "@app/dto/ProjectLiDto";
 import {PersonDto} from "@app/dto/PersonDto";
 import {Role} from "@app/pipes/role.pipe";
@@ -51,6 +52,13 @@ export class ProjectLiComponent implements OnInit {
     sel.addRange(range);
   }
 
+
+  /** Выделение «Есть замечания» только для объектов, ещё не рассмотренных (не ACCEPTED/REJECTED/RETURNED). */
+  showHasRemarksHighlight(): boolean {
+    return this.role === Role.BUREAU_CHAIRMAN
+      && !!this.project?.hasRemarks
+      && !anyMatch(this.project?.state, ProjectState.ACCEPTED, ProjectState.REJECTED, ProjectState.RETURNED);
+  }
 
   readonly item = input<ProjectLiDto>(undefined);
 
