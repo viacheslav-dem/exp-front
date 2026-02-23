@@ -14,12 +14,8 @@ export abstract class FilterAndPages<T> implements OnInit {
   /**
    * Важно для zoneless/OnPush:
    * - поля `_page/_pagination/_loading/_searchFields/...` используются во множестве шаблонов как обычные свойства.
-   * - чтобы НЕ переписывать все шаблоны разом и при этом получить реактивность сигналов,
-   *   оставляем публичные имена как getter/setter, а состояние переносим в signals.
-   *
-   * Ограничение (постепенная миграция):
-   * - прямые мутации вложенных свойств (например, `this._page.totalElements = ...`) НЕ триггерят сигнал.
-   *   В таких местах нужно переходить на иммутабельные присваивания: `this._page = {...}`.
+   * - getter/setter переносят состояние в signals; для обновления UI нужны присваивания целого объекта,
+   *   а не мутация вложенных свойств (например, `this._page = { ...this._page, totalElements: null }`).
    */
   private readonly _pageSignal = signal<Page<T>>(new Page<T>());
   private readonly _paginationSignal = signal<Pagination>(new Pagination());
@@ -99,12 +95,9 @@ export abstract class FilterAndPages<T> implements OnInit {
         // Вызываем update() после загрузки значений из кэша
         setTimeout(() => this.update(), 0);
       } else {
-        // Если кэша нет, помечаем что начальная загрузка завершена
-        // чтобы разрешить обычную загрузку данных без фильтров
+        // Если кэша нет, помечаем что начальная загрузка завершена и запускаем первую загрузку
         this._initialLoadDone = true;
-        // Если кэша нет и update() ещё не вызывался — вызываем его
-        // Это нужно для случаев, когда queryParams подписка вызвала update() до нас,
-        // но он был пропущен из-за hasCachedFilters проверки
+        setTimeout(() => this.update(), 0);
       }
     }, 50);
   }
@@ -249,8 +242,8 @@ export abstract class FilterAndPages<T> implements OnInit {
   // for filter
   onFilterChanged() {
     this.setPage(0);
-    // Сбрасываем страницу, чтобы не показывать "не найдено" до загрузки
-    this._page = Object.assign(new Page<T>(), this._page, { totalElements: null });
+    // Иммутабельное обновление: новый объект триггерит сигнал (OnPush/zoneless)
+    this._page = { ...this._page, totalElements: null };
     // Сохраняем состояние перед обновлением, чтобы актуальные значения были сохранены
     if (this._filterCachePageName) {
       this.saveFilterState(this._filterCachePageName);
@@ -267,13 +260,8 @@ export abstract class FilterAndPages<T> implements OnInit {
   }
 
   private setPage(page: number) {
-    // for request
     this._searchRequest.paging.page = page;
-    // for pagination component
-    const prev = this._pagination;
-    const next = new Pagination(prev?.itemsPerPage);
-    next.page = page + 1;
-    this._pagination = next;
+    this._pagination = Object.assign(new Pagination(this._pagination?.itemsPerPage), { page: page + 1 });
   }
 
   // for pagination component
@@ -289,25 +277,13 @@ export abstract class FilterAndPages<T> implements OnInit {
   }
 
   update() {
-    // ЗАЩИТА: не вызываем update() до загрузки кэша, если есть кэш
-    // Проверяем все возможные имена кэша, так как _filterCachePageName может быть еще не установлен
-    // Это предотвращает вызов update() без фильтров до загрузки кэша
-    if (!this._initialLoadDone) {
-      let hasCachedFilters = false;
-      
-      if (this._filterCachePageName) {
-        hasCachedFilters = !!localStorage.getItem(`filter_cache_${this._filterCachePageName}`);
-      } else {
-        // Если _filterCachePageName еще не установлен, проверяем все возможные кэши
-        const possibleCacheNames = ['notification', 'users', 'project-list', 'search-expert'];
-        for (const name of possibleCacheNames) {
-          if (localStorage.getItem(`filter_cache_${name}`)) {
-            hasCachedFilters = true;
-            break;
-          }
-        }
-      }
-      
+    // ЗАЩИТА: не вызываем update() до загрузки кэша только для этой страницы.
+    // Проверяем только ключ кэша текущего компонента (_filterCachePageName).
+    // Не проверяем чужие ключи (project-list, users и т.д.) — иначе страницы без кэша
+    // (gknt-department, projects-filtered и др.) перестают загружать данные при наличии
+    // любого кэша в localStorage.
+    if (!this._initialLoadDone && this._filterCachePageName) {
+      const hasCachedFilters = !!localStorage.getItem(`filter_cache_${this._filterCachePageName}`);
       if (hasCachedFilters) {
         return;
       }

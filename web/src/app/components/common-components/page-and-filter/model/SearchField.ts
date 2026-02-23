@@ -455,6 +455,7 @@ export class CheckboxField extends SearchField {
     this.label = label;
     this.resetEnabled = false;
     this.type = SearchFieldType.CHECKBOX;
+    this._checked = false;
   }
 
   set checked(checked: boolean) {

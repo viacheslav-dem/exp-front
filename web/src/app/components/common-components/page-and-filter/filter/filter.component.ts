@@ -1,4 +1,5 @@
-import {ChangeDetectionStrategy, Component, computed, effect, input, signal, output} from "@angular/core";
+import {ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, input, OnDestroy, signal, output} from "@angular/core";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {
   CheckboxField,
   MultiCheck,
@@ -79,10 +80,10 @@ import {environment} from "../../../../../environments/environment";
       ? ChangeDetectionStrategy.OnPush
       : ChangeDetectionStrategy.Default
 })
-export class FilterComponent {
+export class FilterComponent implements OnDestroy {
 
   SearchFieldType = SearchFieldType;
-  searcherTimer: any;
+  searcherTimer: ReturnType<typeof setTimeout> | null = null;
   _fields: SearchField[] = [];
   readonly maxTitleLength = 400;
   
@@ -95,6 +96,8 @@ export class FilterComponent {
   readonly fieldClass = input<string>('');
   readonly filterClass = input<string>('');
   readonly onFilterChanged = output<Filter<any>[]>();
+
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private dataService: DataService
@@ -157,17 +160,20 @@ export class FilterComponent {
     this._fieldsSignal.set([...fields]);
     
     this._fields.forEach(field => {
-      if ((field.type == SearchFieldType.MULTI_SELECT) && field.catalog != null)
-        this.dataService.getCatalog(field.catalog).subscribe(items => {
-          const multiSelectField = <MultiSelectField>field;
-          multiSelectField.setItems(items);
-          // Если поле уже имеет значение (из кэша), обновляем selectedItems
-          if (multiSelectField.value && Array.isArray(multiSelectField.value) && multiSelectField.value.length > 0) {
-            multiSelectField.setSelectedValues(multiSelectField.value);
-          }
-          // Обновляем сигнал после загрузки каталога для реактивного обновления
-          this._fieldsSignal.set([...this._fields]);
-        });
+      if ((field.type == SearchFieldType.MULTI_SELECT) && field.catalog != null) {
+        this.dataService.getCatalog(field.catalog)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(items => {
+            const multiSelectField = <MultiSelectField>field;
+            multiSelectField.setItems(items);
+            // Если поле уже имеет значение (из кэша), обновляем selectedItems
+            if (multiSelectField.value && Array.isArray(multiSelectField.value) && multiSelectField.value.length > 0) {
+              multiSelectField.setSelectedValues(multiSelectField.value);
+            }
+            // Обновляем сигнал после загрузки каталога для реактивного обновления
+            this._fieldsSignal.set([...this._fields]);
+          });
+      }
     });
   });
 
@@ -182,7 +188,7 @@ export class FilterComponent {
     // Обновляем сигнал для реактивного обновления UI
     this._fieldsSignal.set([...this._fields]);
     clearTimeout(this.searcherTimer);
-    this.searcherTimer = setTimeout(() => this.filterChanged(), 6000);
+    this.searcherTimer = setTimeout(() => this.filterChanged(), 600);
   }
 
   // Старый метод оставлен для обратной совместимости, если где-то используется
@@ -197,7 +203,7 @@ export class FilterComponent {
     // Обновляем сигнал для реактивного обновления UI
     this._fieldsSignal.set([...this._fields]);
     clearTimeout(this.searcherTimer);
-    this.searcherTimer = setTimeout(() => this.filterChanged(), 6000);
+    this.searcherTimer = setTimeout(() => this.filterChanged(), 600);
   }
 
   changeMultiCheck(field: MultiCheckField, multiCheck: MultiCheck) {
@@ -243,5 +249,12 @@ export class FilterComponent {
   sortIconClass(field: SearchField) {
     return field.sortDirection == Direction.ASC ? 'sort-amount-up' :
       field.sortDirection == Direction.DESC ? 'sort-amount-down' : 'sort';
+  }
+
+  ngOnDestroy() {
+    if (this.searcherTimer != null) {
+      clearTimeout(this.searcherTimer);
+      this.searcherTimer = null;
+    }
   }
 }
