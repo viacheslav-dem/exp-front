@@ -10,7 +10,7 @@ import {Text} from "@app/components/document-form/form-model/Text";
       </label>
       @for (opt of scientificLevelItems; track opt) {
         <div>
-          <app-checkbox [ngModel]="opt.isChecked" (onChecked)="onChecked()"> {{opt.text}}</app-checkbox>
+          <app-checkbox [ngModel]="opt.isChecked" (onChecked)="onChecked($event, opt)"> {{opt.text}}</app-checkbox>
         </div>
       }
       @if (full()) {
@@ -57,12 +57,12 @@ export class ScientificLevelItemsBlockComponent {
     this.scientificLevelItems.forEach(item => item.isChecked = items.some(checked => checked.text == item.text));
   });
 
-  onChecked() {
+  onChecked(checked: boolean, opt: Text) {
+    opt.isChecked = checked;
     const scientificLevelItems = this.scientificLevelItems
       .filter(item => item.isChecked)
       .map(item => new Text(item.text));
-    this.formPatch.emit({ scientificLevelItems });
-    this.onConditionsChanged.emit(true);
+    this.emitPatch({ scientificLevelItems });
   }
 }
 

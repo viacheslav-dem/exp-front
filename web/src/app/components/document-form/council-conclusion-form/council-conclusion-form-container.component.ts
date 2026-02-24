@@ -252,12 +252,4 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   markForCheck() {
     this.cdr.markForCheck();
   }
-
-  /**
-   * Обработчик изменений условий в дочерних блоках.
-   * Вызывается блоками через onConditionsChanged output для уведомления о мутации формы.
-   */
-  onConditionsChanged() {
-    this.markFormChanged();
-  }
 }

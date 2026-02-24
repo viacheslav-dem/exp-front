@@ -20,7 +20,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
           @for (direction of _allDirections; track direction.id) {
             <div>
               <app-checkbox [ngModel]="direction.isChecked"
-                (ngModelChange)="onDirectionChanged()">{{ direction.name }}
+                (ngModelChange)="onDirectionChanged($event, direction)">{{ direction.name }}
               </app-checkbox>
             </div>
           }
@@ -34,7 +34,7 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
           </label>
           @for (item of _allGoals; track item.id) {
             <div>
-              <app-checkbox [ngModel]="item.isChecked" (ngModelChange)="onGoalChanged()">{{ item.name }}
+              <app-checkbox [ngModel]="item.isChecked" (ngModelChange)="onGoalChanged($event, item)">{{ item.name }}
               </app-checkbox>
             </div>
           }
@@ -130,12 +130,14 @@ export class SelectDirectionsAndGoalsBlock2025Component {
       selectedGoals.some(selectedItem => selectedItem.id == item.id));
   }
 
-  onDirectionChanged() {
+  onDirectionChanged(isChecked: boolean, direction: IdNameDto) {
+    direction.isChecked = isChecked;
     const selected = this._allDirections.filter(d => d.isChecked).map(d => new IdNameDto(d.id, d.name));
     this.emitPatch({ selectedDirections: selected });
   }
 
-  onGoalChanged() {
+  onGoalChanged(isChecked: boolean, goal: IdNameDto) {
+    goal.isChecked = isChecked;
     const selected = this._allGoals.filter(d => d.isChecked).map(d => new IdNameDto(d.id, d.name));
     this.emitPatch({ selectedSocialEconomicGoals: selected });
   }
