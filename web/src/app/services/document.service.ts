@@ -54,27 +54,28 @@ export class DocumentService {
       responseType: 'blob',
       observe: 'response',
       headers: {hash: hash ? hash : ''}
-    }).pipe(map(response => {
-
-        let contentDisposition: string = response.headers.get('content-disposition');
-        let filename = contentDisposition.slice(contentDisposition.indexOf('=') + 1);
-        filename = decodeURIComponent(filename);
-          let a:HTMLAnchorElement = <HTMLAnchorElement>document.createElement('a');
-          a.href = window.URL.createObjectURL(response.body);
-          a.target = '_parent';
-          // Use a.download if available. This increases the likelihood that
-          // the file is downloaded instead of opened by another PDF plugin.
-          if ('download' in a) {
-            a.download = filename;
-          }
-          // <a> must be in the document for IE and recent Firefox versions.
-          // (otherwise .click() is ignored)
-          (document.body || document.documentElement).appendChild(a);
-          a.click();
-          a.parentNode.removeChild(a);
-
-
-    }));
+    }).pipe(
+      map(response => {
+        const contentDisposition = response.headers.get('content-disposition');
+        const filename = decodeURIComponent(contentDisposition.slice(contentDisposition.indexOf('=') + 1));
+        const blobUrl = window.URL.createObjectURL(response.body);
+        const a = document.createElement('a') as HTMLAnchorElement;
+        a.href = blobUrl;
+        a.target = '_parent';
+        if ('download' in a) {
+          a.download = filename;
+        }
+        (document.body || document.documentElement).appendChild(a);
+        a.click();
+        a.parentNode.removeChild(a);
+        window.URL.revokeObjectURL(blobUrl);
+      }),
+      catchError((err: HttpErrorResponse) => {
+        const msg = typeof err.error === 'string' ? err.error : (err.error?.message ?? 'Не удалось скачать файл.');
+        this._toasty.err(err.status ?? 0, msg);
+        return EMPTY;
+      })
+    );
   }
 
   saveTemplate(template: TemplateDocumentDto): Observable<TemplateDocumentDto> {

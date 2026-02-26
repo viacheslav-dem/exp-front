@@ -1,5 +1,5 @@
 <div class="file-input-wrapper custom-file-sm" [ngClass]="controlClass()">
   <input type="file" class="form-control file-input" #fileInput
-         [accept]="typesAccept()" (change)="chooseFiles($event)">
-  <label class="file-input-label">Выбрать файл ({{ sizeHint() }})...</label>
+         [accept]="typesAccept()" [multiple]="allowMultiple()" (change)="chooseFiles($event)">
+  <label class="file-input-label">Выбрать {{ allowMultiple() ? 'файл(ы)' : 'файл' }} ({{ sizeHint() }})...</label>
 </div>

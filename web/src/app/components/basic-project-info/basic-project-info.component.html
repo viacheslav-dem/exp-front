@@ -335,8 +335,16 @@
         <div class="mt-2 mb-1 text-sm text-muted">
           Материалы объекта экспертизы
           @if (project.documents.length>0) {
-            <a class="italic link" (click)="downloadAllDocuments(project)">(скачать
-            все)</a>
+            <span class="download-all-wrap">
+              <button type="button" class="download-all-btn" (click)="downloadAllDocuments(project)" title="Скачать все документы архивом" [disabled]="downloadAllInProgress()">
+                @if (downloadAllInProgress()) {
+                  <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                } @else {
+                  <fa-icon icon="arrow-down" aria-hidden="true"></fa-icon>
+                }
+                {{ downloadAllInProgress() ? 'Загрузка…' : 'Скачать все' }}
+              </button>
+            </span>
           }
         </div>
         @if (canEditProjectDocuments()) {

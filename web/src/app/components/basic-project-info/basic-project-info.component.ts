@@ -32,10 +32,12 @@ import {LifecycleGroupDto} from "@app/dto/LifecycleGroupDto";
 import {LifecycleGroupState} from "@app/pipes/lifecycle-group-state.pipe";
 import {DirectionDto} from "@app/dto/DirectionDto";
 import {environment} from "../../../environments/environment";
+import { finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'app-basic-project-info',
     templateUrl: './basic-project-info.component.html',
+    styleUrls: ['./basic-project-info.component.scss'],
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
 })
@@ -286,6 +288,7 @@ export class BasicProjectInfoComponent {
   }
 
   readonly decisionDocumentLoading = signal(false);
+  readonly downloadAllInProgress = signal(false);
 
   generateDecisionDocument(form: any) {
     this.decisionDocumentLoading.set(true);
@@ -312,8 +315,12 @@ export class BasicProjectInfoComponent {
   }
 
   downloadAllDocuments(project: ProjectDto) {
+    this.downloadAllInProgress.set(true);
     this._documentService.downloadAllDocuments(project)
-      .pipe(takeUntilDestroyed(this._destroyRef))
+      .pipe(
+        finalize(() => this.downloadAllInProgress.set(false)),
+        takeUntilDestroyed(this._destroyRef)
+      )
       .subscribe();
   }
 

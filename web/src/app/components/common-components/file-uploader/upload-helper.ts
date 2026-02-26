@@ -22,9 +22,9 @@ export abstract class UploadHelper implements OnInit {
   ngOnInit(): void {
   }
 
-  onSuccess: any = () => {};
-  onError: any = () => {};
-  onProgress: any = (fileItem: any, progress: any) => {
+  onSuccess: (item: unknown, response: string) => void = () => {};
+  onError: (item: unknown, response: string, status: number) => void = () => {};
+  onProgress: (fileItem: unknown, progress: number) => void = (_fileItem: unknown, progress: number) => {
     this.progressValue = progress;
   };
 
@@ -76,8 +76,14 @@ export abstract class UploadHelper implements OnInit {
         },
         error: (err) => {
           const status = err.status;
-          const response =
-            typeof err.error === "string" ? err.error : err.message || "";
+          let response: string;
+          if (typeof err.error === "string") {
+            response = err.error;
+          } else if (err.error && typeof err.error === "object" && typeof (err.error as { message?: string }).message === "string") {
+            response = (err.error as { message: string }).message;
+          } else {
+            response = err.message || "";
+          }
           this.onError(null, response, status);
         },
       });

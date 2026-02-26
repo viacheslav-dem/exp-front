@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, ElementRef, input, output, viewChild} from "@angular/core";
+import {ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, output, viewChild} from "@angular/core";
 import {DocType} from "@app/components/common-components/file-uploader/doc-type";
 import {environment} from "../../../../../environments/environment";
 import {validateFilesForUpload} from "@app/components/common-components/file-uploader/file-upload-validator";
@@ -20,7 +20,11 @@ export class ChooseFilesComponent {
     DocType.DOCX.extension, DocType.DOC.extension,
     DocType.PDF.extension, DocType.TIFF.extension
 ].join(','));
+  /** Разрешить выбор нескольких файлов (при false — только один). */
+  readonly allowMultiple = input<boolean>(false);
   readonly fileInput = viewChild<ElementRef>('fileInput');
+
+  private readonly _toasty = inject(GlobalToastyService);
 
   /** Подсказка по размеру (computed — не пересчитывается лишний раз при CD). */
   readonly sizeHint = computed(() => {
@@ -31,10 +35,8 @@ export class ChooseFilesComponent {
     return hasZip ? 'Документ до 10 МБ или zip архив до 50 МБ' : 'Не более 10 МБ';
   });
 
-  constructor(private _toasty: GlobalToastyService) {}
-
-  chooseFiles(event: any) {
-    const files = event.target.files;
+  chooseFiles(event: Event) {
+    const files = (event.target as HTMLInputElement).files;
     if (files?.length > 0) {
       const result = validateFilesForUpload(Array.from(files), this.typesAccept());
       if (!result.valid) {

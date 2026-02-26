@@ -1,0 +1,28 @@
+.document-uploader-queue {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.document-uploader-queue-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.uploading {
+    background: rgba(var(--bs-primary-rgb), 0.06);
+    border-radius: 4px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.document-uploader-queue-item-header {
+  font-size: 0.8125rem;
+}
