@@ -20,6 +20,11 @@ import {environment} from "../../../../environments/environment";
                 style="width: 100%; height: 80vh; display: block;"
                 class="pdf-viewer-container">
             </pdf-viewer>
+        } @else if (isArchivePlaceholder()) {
+            <div class="pdf-viewer-placeholder text-muted text-center py-5 px-3">
+                <p class="mb-0">Просмотр архива в браузере недоступен.</p>
+                <p class="mb-0 small">Скачайте файл по кнопке «Скачать» в списке документов.</p>
+            </div>
         }
         `,
     standalone: false,
@@ -36,6 +41,12 @@ import {environment} from "../../../../environments/environment";
         ::ng-deep .pdf-viewer-container canvas {
             width: 100% !important;
             height: auto !important;
+        }
+        .pdf-viewer-placeholder {
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
     `]
 })
@@ -65,16 +76,28 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
     // Worker для PDF.js настроен глобально в main.ts
   }
 
+  /** Показывать блок «просмотр архива недоступен» (ZIP не конвертируется в PDF). */
+  isArchivePlaceholder(): boolean {
+    return !!this.doc()?.archive && !this.pdfSrc;
+  }
+
   private loadPdf(doc: DocumentDto): void {
     this.cleanup();
-    
+
     if (!doc || !doc.id) {
       console.error('Invalid document data:', doc);
       this.pdfSrc = null;
       this.cdr.markForCheck();
       return;
     }
-    
+
+    // Архив (ZIP) конвертировать в PDF на бэкенде нельзя — не дергаем API, не показываем ошибку
+    if (doc.archive) {
+      this.pdfSrc = null;
+      this.cdr.markForCheck();
+      return;
+    }
+
     // Сбрасываем pdfSrc перед загрузкой нового
     this.pdfSrc = null;
     this.cdr.markForCheck();
@@ -110,6 +133,11 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
         reader.readAsArrayBuffer(blob);
       },
       error: (error) => {
+        if (error?.status === 400) {
+          this.pdfSrc = null;
+          this.cdr.markForCheck();
+          return;
+        }
         console.error('Error loading PDF:', error);
         this.pdfSrc = null;
         this.cdr.markForCheck();

@@ -343,14 +343,14 @@
           <app-document-uploader
             (saved)="addProjectDocument($event)"
             [url]="SERVER_URL + '/project/add/' + project.id + '/document'" [idDto]="project"
-            [typesAccept]="[DocType.DOCX.extension, DocType.DOC.extension, DocType.PDF.extension]">
+            [typesAccept]="[DocType.DOCX.extension, DocType.DOC.extension, DocType.PDF.extension, DocType.ZIP.extension]">
           </app-document-uploader>
         }
         @if ((project.canAddDocumentsForCustomerForSection || project.canAddDocumentsForCustomerForBureau) && role()==Role.CUSTOMER) {
           <app-document-uploader
             (saved)="addProjectDocument($event)"
             [url]="SERVER_URL + '/project/add/' + project.id + '/document'" [idDto]="project"
-            [typesAccept]="[DocType.DOCX.extension, DocType.DOC.extension, DocType.PDF.extension]">
+            [typesAccept]="[DocType.DOCX.extension, DocType.DOC.extension, DocType.PDF.extension, DocType.ZIP.extension]">
           </app-document-uploader>
         }
         <div class="mt-2 mb-1 text-sm text-muted">

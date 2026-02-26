@@ -1,6 +1,8 @@
-import {ChangeDetectionStrategy, Component, ElementRef, OnInit, input, output, viewChild} from "@angular/core";
+import {ChangeDetectionStrategy, Component, computed, ElementRef, input, output, viewChild} from "@angular/core";
 import {DocType} from "@app/components/common-components/file-uploader/doc-type";
 import {environment} from "../../../../../environments/environment";
+import {validateFilesForUpload} from "@app/components/common-components/file-uploader/file-upload-validator";
+import {GlobalToastyService} from "@app/services/global-toasty.service";
 
 @Component({
     selector: 'app-choose-files',
@@ -10,40 +12,40 @@ import {environment} from "../../../../../environments/environment";
       ? ChangeDetectionStrategy.OnPush
       : ChangeDetectionStrategy.Default
 })
-export class ChooseFilesComponent implements OnInit {
+export class ChooseFilesComponent {
 
   readonly onFilesChosen = output<FileList>();
   readonly controlClass = input<any>(undefined);
-  readonly typesAccept = input<string>([
+  readonly typesAccept = input<string | string[]>([
     DocType.DOCX.extension, DocType.DOC.extension,
     DocType.PDF.extension, DocType.TIFF.extension
 ].join(','));
   readonly fileInput = viewChild<ElementRef>('fileInput');
 
-  constructor() {
-  }
+  /** Подсказка по размеру (computed — не пересчитывается лишний раз при CD). */
+  readonly sizeHint = computed(() => {
+    const accept = this.typesAccept();
+    const hasZip = Array.isArray(accept)
+      ? accept.includes(DocType.ZIP.extension)
+      : (accept || '').includes('application/zip');
+    return hasZip ? 'Документ до 10 МБ или zip архив до 50 МБ' : 'Не более 10 МБ';
+  });
 
-  ngOnInit() {
-  }
+  constructor(private _toasty: GlobalToastyService) {}
 
   chooseFiles(event: any) {
-    if (event.target.files.length > 0) {
-      this.validateTypes(event.target.files);
-      this.onFilesChosen.emit(event.target.files);
+    const files = event.target.files;
+    if (files?.length > 0) {
+      const result = validateFilesForUpload(Array.from(files), this.typesAccept());
+      if (!result.valid) {
+        this._toasty.err(400, result.message);
+        const el = this.fileInput()?.nativeElement;
+        if (el) el.value = '';
+        return;
+      }
+      this.onFilesChosen.emit(files);
     }
     const el = this.fileInput()?.nativeElement;
-    if (el) el.value = "";
-  }
-
-  private validateTypes(files: any) {
-    // note that files is not array instance, so we can't use .forEach or .some
-    for (let i = 0; i < files.length; ++i) {
-      if (this.typesAccept().indexOf(files[i].type) == -1) {
-        throw "Выбран файл недопустимого типа: " + files[i].name;
-      }
-      if (files[i].size > 10485760) {
-        throw "Ваш файл превышает разрешённый размер в 10 Мб";
-      }
-    }
+    if (el) el.value = '';
   }
 }

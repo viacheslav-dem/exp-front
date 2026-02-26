@@ -1,4 +1,5 @@
-import {OnInit, Directive} from "@angular/core";
+import {DestroyRef, Directive, OnInit} from "@angular/core";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {AuthService} from "@app/services/auth.service";
 import { HttpClient, HttpEvent, HttpEventType, HttpHeaders, HttpRequest, HttpBackend } from "@angular/common/http";
 
@@ -8,11 +9,13 @@ export abstract class UploadHelper implements OnInit {
   progressValue: number = 0;
   file: File;
 
-  // HttpClient без интерсепторов
   protected _httpRaw: HttpClient;
 
-  constructor(protected _authService: AuthService,
-              httpBackend: HttpBackend) {
+  constructor(
+    protected _authService: AuthService,
+    httpBackend: HttpBackend,
+    protected destroyRef: DestroyRef
+  ) {
     this._httpRaw = new HttpClient(httpBackend);
   }
 
@@ -54,26 +57,29 @@ export abstract class UploadHelper implements OnInit {
       headers
     });
 
-    this._httpRaw.request(req).subscribe({
-      next: (event: HttpEvent<any>) => {
-        if (event.type === HttpEventType.UploadProgress && event.total) {
-          const progress = Math.round((100 * event.loaded) / event.total);
-          this.onProgress(null, progress);
-        }
-        if (event.type === HttpEventType.Response) {
-          const body =
-            typeof event.body === "string"
-              ? event.body
-              : JSON.stringify(event.body);
-          this.onSuccess(null, body);
-        }
-      },
-      error: (err) => {
-        const status = err.status;
-        const response =
-          typeof err.error === "string" ? err.error : err.message || "";
-        this.onError(null, response, status);
-      }
-    });
+    this._httpRaw
+      .request(req)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (event: HttpEvent<any>) => {
+          if (event.type === HttpEventType.UploadProgress && event.total) {
+            const progress = Math.round((100 * event.loaded) / event.total);
+            this.onProgress(null, progress);
+          }
+          if (event.type === HttpEventType.Response) {
+            const body =
+              typeof event.body === "string"
+                ? event.body
+                : JSON.stringify(event.body);
+            this.onSuccess(null, body);
+          }
+        },
+        error: (err) => {
+          const status = err.status;
+          const response =
+            typeof err.error === "string" ? err.error : err.message || "";
+          this.onError(null, response, status);
+        },
+      });
   }
 }

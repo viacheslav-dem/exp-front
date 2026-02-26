@@ -83,6 +83,13 @@ export function firstCharToUpperCase(str: string) {
   return str[0].toUpperCase() + str.slice(1, str.length);
 }
 
+/** Имя файла без пути (защита от path traversal в имени). */
+export function getBasename(fileName: string): string {
+  if (!fileName) return '';
+  const lastSlash = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+  return lastSlash === -1 ? fileName : fileName.slice(lastSlash + 1);
+}
+
 export function removeFileSuffix(fileName: string): string {
   let charIndex = fileName.lastIndexOf('.');
   if (charIndex != -1) {

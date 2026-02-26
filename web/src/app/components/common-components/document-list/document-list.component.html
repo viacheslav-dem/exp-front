@@ -13,7 +13,12 @@
       <table style="width: 100%">
         <tr>
           <td (click)="viewDocument(doc)" style="width: 100%">
-            <div class="text-sm">{{doc?.name}}</div>
+            <div class="text-sm d-flex align-items-center gap-1 flex-wrap">
+              <span>{{doc?.name}}</span>
+              @if (doc?.archive) {
+                <span class="badge document-archive-badge" aria-label="Документ — архив">Архив</span>
+              }
+            </div>
             <div class="text-sm text-muted">{{doc?.description}}</div>
           </td>
           <td class="actions">

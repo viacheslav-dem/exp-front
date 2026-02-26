@@ -2,7 +2,7 @@
      (dragover)="onDragOver($event)"
      (dragleave)="onDragLeave($event)"
      (drop)="onDrop($event)"
-     [class.drag-over]="isDragOver">
+     [class.drag-over]="isDragOver()">
   <div class="flex-shrink-0">
     <app-choose-files
       [typesAccept]="typesAccept()"

@@ -11,6 +11,7 @@ import {environment} from "../../../../environments/environment";
 @Component({
     selector: 'app-document-list',
     templateUrl: './document-list.component.html',
+    styleUrls: ['./document-list.component.scss'],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.fileAndPdf)
