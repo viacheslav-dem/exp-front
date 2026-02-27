@@ -1,20 +1,21 @@
-import {Injectable} from '@angular/core';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from "@angular/router";
-import {Observable} from "rxjs";
+import {Injectable, inject} from '@angular/core';
 import {AuthService} from "./auth.service";
 import {Role} from "@app/pipes/role.pipe";
+import {Router} from "@angular/router";
+import {CanActivateFn} from "@angular/router";
 
 @Injectable()
 export class DefineRole  {
+  private readonly _authService = inject(AuthService);
 
-  constructor(private router: Router,
-              private _authService: AuthService) {
-  }
-
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
-    this.router.navigateByUrl(this.defineRedirectUrl());
-    return false;
-  }
+  /**
+   * Функциональный guard: всегда редиректит на целевой маршрут по роли/состоянию авторизации.
+   */
+  static guard: CanActivateFn = () => {
+    const router = inject(Router);
+    const defineRole = inject(DefineRole);
+    return router.parseUrl(defineRole.defineRedirectUrl());
+  };
 
   defineRedirectUrl(): string {
     // Если access-токен валиден, но роль ещё не выбрана (curr_role отсутствует),
@@ -24,7 +25,7 @@ export class DefineRole  {
       return '/select-role';
     }
 
-    let role = this._authService.getCurrRole();
+    const role = this._authService.getCurrRole();
     switch (role) {
       case Role.SUB_CUSTOMER:
       case Role.CUSTOMER:
