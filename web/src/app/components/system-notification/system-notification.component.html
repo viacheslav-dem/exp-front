@@ -8,35 +8,45 @@
         <app-dropdown
           [options]="notificationNames"
           [notSelected]="'Оповещение не выбрано'"
-          [(ngModel)]="selectedNotificationName"
-          (ngModelChange)="changeNotification(selectedNotificationName)">
+          [ngModel]="selectedNotificationName()"
+          (ngModelChange)="changeNotification($event)">
         </app-dropdown>
       </div>
 
-      @if (selectedNotificationName!='Оповещение не выбрано') {
+      @if (hasNotificationSelected()) {
         <div>
           <div class="form-sub-group">
             <label>Отображение оповещения: </label>
-            <app-boolean-button [(ngModel)]="notification.enabled" [falseLabel]="'отключено'"
-            [trueLabel]="'включено'" class="space-between-button"></app-boolean-button>
+            <app-boolean-button
+              [ngModel]="notification().enabled"
+              (ngModelChange)="onEnabledChange($event)"
+              [falseLabel]="'отключено'"
+              [trueLabel]="'включено'"
+              class="space-between-button">
+            </app-boolean-button>
           </div>
           <div class="form-sub-group">
             <label>Выберите тип оповещения:</label>
             <app-dropdown
               [options]="notificationTypes"
               [notSelected]="'Обычное сообщение (белый фон)'"
-              [(ngModel)]="selectedNotificationType"
-              (ngModelChange)="changeNotificationType(selectedNotificationType)">
+              [ngModel]="selectedNotificationType()"
+              (ngModelChange)="changeNotificationType($event)">
             </app-dropdown>
           </div>
           <div class="form-sub-group">
             <label>Текст оповещения (RAW HTML):</label>
-            <textarea [(ngModel)]="notification.message" rows="3" class="form-control mt-05" placeholder="Введите текст оповещения">
+            <textarea
+              [ngModel]="notification().message"
+              (ngModelChange)="onMessageChange($event)"
+              rows="3"
+              class="form-control mt-05"
+              placeholder="Введите текст оповещения">
             </textarea>
           </div>
           <div class="mt-1">
             <button class="btn btn-secondary" (click)="deleteNotification()">Очистить текст оповещения</button>
-            <button class="btn btn-primary btn-right" [disabled]="isSaving" (click)="postNotification(notification.message)">Сохранить</button>
+            <button class="btn btn-primary btn-right" [disabled]="isSaving()" (click)="postNotification(notification().message)">Сохранить</button>
           </div>
         </div>
       }
@@ -45,13 +55,13 @@
 </div>
 <br>
 
-  @if (selectedNotificationName!='Оповещение не выбрано' && notification.message != '') {
-    <div>
-      <p>Отображаемое сообщение:</p>
-      <div class="card-notification-block">
-        <div id="displayed-notification" class="card py-3" [ngClass]= "[notification.type, displayedNotificationStyleClass]">
-          <div [innerHTML]="notificationToSafeHtml(notification.message)"> </div>
-        </div>
+@if (hasNotificationSelected() && hasMessage()) {
+  <div>
+    <p>Отображаемое сообщение:</p>
+    <div class="card-notification-block">
+      <div id="displayed-notification" class="card py-3" [ngClass]="[notification().type, displayedNotificationStyleClass()]">
+        <div [innerHTML]="notification().message | safeHtml"></div>
       </div>
     </div>
-  }
+  </div>
+}

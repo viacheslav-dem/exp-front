@@ -602,13 +602,21 @@ span.badge.bg-primary,
   margin-left: 10px;
 }
 
-.INFORMATION_BACKGROUND {
+// Фон по типу оповещения: специфичность выше .card и .alert, чтобы перекрывать их background
+.card.INFORMATION_BACKGROUND,
+.alert.INFORMATION_BACKGROUND {
   background-color: #a3d9ff;
 }
-.WARNING_BACKGROUND {
+.card.EMPTY_BACKGROUND,
+.alert.EMPTY_BACKGROUND {
+  background-color: #fff;
+}
+.card.WARNING_BACKGROUND,
+.alert.WARNING_BACKGROUND {
   background-color: #ffef98;
 }
-.IMPORTANT_BACKGROUND {
+.card.IMPORTANT_BACKGROUND,
+.alert.IMPORTANT_BACKGROUND {
   background-color: #f8d7da;
 }
 
