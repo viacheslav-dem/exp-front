@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, viewChild, signal, computed, effect, DestroyRef, inject, untracked} from '@angular/core';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {toSignal, takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {timer} from 'rxjs';
 import {DialogService} from "@app/components/dialogs/dialog.service";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {DialogResult} from "@app/components/dialogs/dialog-result";
@@ -71,12 +71,12 @@ export class DialogComponent {
         if (seq !== this._openSeq) return;
         untracked(() => this.dlg.set(newDlg));
 
-        setTimeout(() => {
+        timer(0).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
           if (seq !== this._openSeq) return;
           if (untracked(() => this.dlg()) === newDlg) {
             untracked(() => this.modalComponent()?.show());
           }
-        }, 0);
+        });
       });
     });
   }

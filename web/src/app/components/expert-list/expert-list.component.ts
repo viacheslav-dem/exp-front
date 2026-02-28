@@ -1,5 +1,6 @@
 import {Component, ChangeDetectionStrategy, signal, ChangeDetectorRef, AfterViewInit, OnDestroy, ElementRef, effect, viewChild, viewChildren} from '@angular/core';
-import {Subscription} from 'rxjs';
+import {Subscription, timer} from 'rxjs';
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {PersonService} from "@app/services/person.service";
 import {DialogService} from "@app/components/dialogs/dialog.service";
@@ -101,14 +102,14 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
     
     // Initial load - update будет вызван автоматически в enableFilterCache если есть сохраненное состояние
     // Если нет сохраненного состояния, вызываем update после небольшой задержки
-    setTimeout(() => {
+    timer(150).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       // Проверяем, был ли уже вызван update через enableFilterCache
       // Используем флаг _initialLoadDone вместо _loading, так как setLoading использует setTimeout
       if (!(this as any)._initialLoadDone) {
         (this as any)._initialLoadDone = true;
         this.update();
       }
-    }, 150);
+    });
   }
 
   loadPage() {
@@ -139,7 +140,7 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
     this.setupIntersectionObserver();
     // effect может сработать до ngAfterViewInit (observer ещё undefined). Гарантируем
     // первичную подписку на контейнеры после инициализации observer.
-    setTimeout(() => this.observeChartContainers(), 0);
+    timer(0).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.observeChartContainers());
   }
 
   ngOnDestroy() {

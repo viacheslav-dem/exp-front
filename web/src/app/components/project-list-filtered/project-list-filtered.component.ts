@@ -1,4 +1,4 @@
-import {Component, ChangeDetectionStrategy, signal, ChangeDetectorRef, OnInit, OnDestroy, inject, DestroyRef} from '@angular/core';
+import {Component, ChangeDetectionStrategy, signal, ChangeDetectorRef, OnInit, OnDestroy} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {Direction, SortOrder} from "@app/components/common-components/page-and-filter/model/SortOrder";
@@ -6,6 +6,7 @@ import {ProjectLiDto} from "@app/dto/ProjectLiDto";
 import {ProjectService} from "@app/services/project.service";
 import {Router, NavigationEnd} from "@angular/router";
 import {filter} from "rxjs/operators";
+import {timer} from 'rxjs';
 
 @Component({
     selector: 'app-project-list-filtered',
@@ -17,7 +18,6 @@ export class ProjectListFilteredComponent extends FilterAndPages<ProjectLiDto> i
 
   projects = signal<ProjectLiDto[]>([]);
   filterName = signal<string | undefined>(undefined);
-  private readonly destroyRef = inject(DestroyRef);
   private isInitializing = false;
 
   constructor(private _projectService: ProjectService,
@@ -73,9 +73,9 @@ export class ProjectListFilteredComponent extends FilterAndPages<ProjectLiDto> i
       this.update();
     } finally {
       // Сбрасываем флаг после небольшой задержки, чтобы избежать множественных вызовов
-      setTimeout(() => {
+      timer(100).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
         this.isInitializing = false;
-      }, 100);
+      });
     }
   }
 

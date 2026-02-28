@@ -1,4 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentFactoryResolver, ViewContainerRef, AfterViewInit, viewChild} from '@angular/core';
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {timer} from 'rxjs';
 import {GlobalToastyService} from "app/services/global-toasty.service";
 import {DataService} from "@app/services/data.service";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
@@ -46,12 +48,12 @@ export class SettingsComponent extends FilterAndPages<PropertyDto> implements Af
     ];
     this.enableFilterCache("properties");
     // Если нет сохранённого состояния фильтров, загружаем данные явно
-    setTimeout(() => {
+    timer(100).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       const hasCachedFilters = localStorage.getItem('filter_cache_properties');
       if (!hasCachedFilters) {
         this.update();
       }
-    }, 100);
+    });
   }
 
   ngAfterViewInit() {

@@ -1,6 +1,8 @@
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {CatalogDto} from "@app/dto/CatalogDto";
 import { ChangeDetectorRef, computed, Directive, effect, inject, input } from "@angular/core";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {timer} from 'rxjs';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {Catalog, DataService} from "@app/services/data.service";
 import * as _ from "lodash";
@@ -66,12 +68,12 @@ export abstract class CatalogTemplate<T extends CatalogDto> extends FilterAndPag
         this._cdr?.markForCheck();
       }
       // Очищаем selectedItem после обновления представления
-      setTimeout(() => {
+      timer(0).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
         this.selectedItem = null;
         if (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin) {
           this._cdr?.markForCheck();
         }
-      }, 0);
+      });
     }
   }
 

@@ -12,7 +12,7 @@ import {ProjectService} from "@app/services/project.service";
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {PersonPlainDto} from "@app/dto/PersonPlainDto";
 import {switchMap, tap, catchError} from 'rxjs/operators';
-import {of} from 'rxjs';
+import {of, timer} from 'rxjs';
 import {SearchModule} from "@app/components/search/search.module";
 import {CommonComponentsModule} from "@app/components/common-components/components.module";
 import {ExpertReviewModule} from "@app/components/expert-review/expert-review.module";
@@ -187,9 +187,8 @@ export class ExpertReviewListComponent {
 
     if (hasExpiredConfirmation) {
       // Небольшая задержка перед автоматическим выбором, чтобы пользователь увидел изменение
-      setTimeout(() => {
-        // Оригинальная логика: просто добавляем результат к списку
-        this._projectService.automaticExpertSelection(project.id).pipe(
+      timer(1000).pipe(
+        switchMap(() => this._projectService.automaticExpertSelection(project.id).pipe(
           tap((res: ExpertReviewDto[]) => {
             const currentReviews = this.expertReviews();
             const updatedReviews = [...currentReviews, ...res];
@@ -199,10 +198,10 @@ export class ExpertReviewListComponent {
             // Логируем ошибку, но не показываем пользователю, так как это автоматический процесс
             console.error("Ошибка при автоматическом выборе нового эксперта:", error);
             return of([]);
-          }),
-          takeUntilDestroyed(this._destroyRef)
-        ).subscribe();
-      }, 1000);
+          })
+        )),
+        takeUntilDestroyed(this._destroyRef)
+      ).subscribe();
     }
   }
 

@@ -15,8 +15,9 @@ import {
 } from '@angular/core';
 import {ModalDirective, ModalOptions} from "ngx-bootstrap/modal";
 import {environment} from "../../../../environments/environment";
-import {fromEvent} from "rxjs";
+import {fromEvent, timer} from "rxjs";
 import {auditTime, distinctUntilChanged, map, startWith} from "rxjs/operators";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 @Component({
     selector: 'app-modal',
@@ -141,11 +142,11 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
     // поэтому явно помечаем компонент (и его ng-content) на отрисовку.
     this.cdr.markForCheck();
     // Удобство: открываем модалку всегда сверху.
-    setTimeout(() => {
+    timer(0).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.scrollModalToTop(false);
       // Проверяем состояние скролла после загрузки контента
       this.checkScrollState();
-    }, 0);
+    });
   }
 
   private checkScrollState(): void {

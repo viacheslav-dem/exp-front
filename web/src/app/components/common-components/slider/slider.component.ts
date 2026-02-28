@@ -1,6 +1,8 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnChanges, SimpleChanges, input, output} from "@angular/core";
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, OnChanges, SimpleChanges, input, output} from "@angular/core";
 import {Options} from '@angular-slider/ngx-slider';
 import {environment} from "../../../../environments/environment";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Subject, debounceTime} from 'rxjs';
 
 @Component({
     selector: 'app-slider',
@@ -24,9 +26,20 @@ export class SliderComponent implements OnInit, OnChanges {
     step: 1
   };
 
-  private timer: any;
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly changeEnd$ = new Subject<void>();
 
   constructor() {
+    this.changeEnd$.pipe(
+      debounceTime(500),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      const result = {
+        from: this.value === this.options.floor ? null : this.value,
+        to: this.highValue === this.options.ceil ? null : this.highValue
+      };
+      this.onChange.emit(result);
+    });
   }
 
   ngOnInit() {
@@ -55,16 +68,7 @@ export class SliderComponent implements OnInit, OnChanges {
   }
 
   onUserChangeEnd(changeContext: any) {
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
-    this.timer = setTimeout(() => {
-      const result = {
-        from: this.value === this.options.floor ? null : this.value,
-        to: this.highValue === this.options.ceil ? null : this.highValue
-      };
-      this.onChange.emit(result);
-    }, 500);
+    this.changeEnd$.next();
   }
 
   onValueChange(value: number) {

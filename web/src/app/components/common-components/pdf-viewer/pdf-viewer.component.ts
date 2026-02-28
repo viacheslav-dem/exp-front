@@ -1,4 +1,6 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, effect, input} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, effect, inject, input} from "@angular/core";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {timer} from 'rxjs';
 import {StorageService} from "app/services/storage.service";
 import {SERVER_URL} from "app/config";
 import {DocumentDto} from "@app/dto/DocumentDto";
@@ -52,6 +54,7 @@ import {environment} from "../../../../environments/environment";
 })
 export class PdfViewerComponent implements OnInit, OnDestroy {
 
+  private readonly destroyRef = inject(DestroyRef);
   pdfSrc: string | Uint8Array | ArrayBuffer;
   readonly url = input<string>('document');
   readonly doc = input<DocumentDto | undefined>(undefined);
@@ -66,6 +69,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   });
   private subscription: Subscription;
+  private timerSub: Subscription | null = null;
 
   constructor(private _storage: StorageService,
               private _http: HttpClientSecure,
@@ -118,12 +122,13 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
           const pdfData = new Uint8Array(arrayBuffer);
           
           // Даём время Angular полностью обработать предыдущее состояние
-          // В zoneless режиме setTimeout не триггерит change detection автоматически,
+          // В zoneless режиме timer не триггерит change detection автоматически,
           // поэтому явно вызываем detectChanges() после обновления данных
-          setTimeout(() => {
+          this.timerSub = timer(100).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+            this.timerSub = null;
             this.pdfSrc = pdfData;
             this.cdr.detectChanges();  // Явная детекция изменений для zoneless режима
-          }, 100);
+          });
         };
         reader.onerror = () => {
           console.error('Error reading PDF blob');
@@ -149,6 +154,10 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
     if (this.subscription) {
       this.subscription.unsubscribe();
       this.subscription = null;
+    }
+    if (this.timerSub) {
+      this.timerSub.unsubscribe();
+      this.timerSub = null;
     }
     this.pdfSrc = null;
   }

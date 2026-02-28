@@ -1,4 +1,5 @@
 import {Injectable, Output, EventEmitter} from '@angular/core';
+import {timer} from 'rxjs';
 
 @Injectable()
 export class GlobalToastyService {
@@ -73,9 +74,9 @@ export class GlobalToastyService {
       onRemove: () => {
         // Очищаем флаг через небольшую задержку после удаления toast,
         // чтобы предотвратить повторное появление при быстрых последовательных ошибках
-        setTimeout(() => {
+        timer(500).subscribe(() => {
           this.active[key] = false;
-        }, 500);
+        });
       }
     };
     this.error(toastOptions);

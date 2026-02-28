@@ -16,7 +16,8 @@ import {FilterAndPages} from "@app/components/common-components/page-and-filter/
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {RolePipe} from "@app/pipes/role.pipe";
 import {DegreeTypePipe, getAllDegreeTypes} from "@app/pipes/degree.pipe";
-import {Observable, Subscription} from "rxjs";
+import {Observable, Subscription, timer, switchMap} from "rxjs";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {AcademicTitleTypePipe, getAllAcademicTitleTypes} from "@app/pipes/academic-title.pipe";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {LastSignEnumPipe} from "@app/pipes/last-sign.pipe";
@@ -116,11 +117,11 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
         this.enableFilterCache("notification");
         // enableFilterCache вызывает update() если есть сохраненное состояние
         // Если кэша нет, загружаем данные без фильтров после завершения enableFilterCache
-        setTimeout(() => {
+        timer(300).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
           if (!localStorage.getItem('filter_cache_notification')) {
             this.update();
           }
-        }, 300);
+        });
       }
     };
     
@@ -231,24 +232,25 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
 
   postMessage(message: string){
     this._progress.show();
-    setTimeout(() => {
-      this.getIsSendingCheck().subscribe(res => {
-        this._progress.show();
-        if (res == false) {
-          var messageRequest = {
-            message:  message,
-            searchRequest:    this._searchRequest
-          };
-          this._progress.hide();
-          return this._http.post(`${this.url}/persons/notification/send`, messageRequest).subscribe(() => {
-            this.cdr?.markForCheck?.();
-          });
-        } else {
-          this.toasty.error("Идёт формирование писем")
-          return this._progress.hide();
-        }
-      });
-    }, 720);
+    timer(720).pipe(
+      switchMap(() => this.getIsSendingCheck()),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(res => {
+      this._progress.show();
+      if (res == false) {
+        const messageRequest = {
+          message:  message,
+          searchRequest:    this._searchRequest
+        };
+        this._progress.hide();
+        this._http.post(`${this.url}/persons/notification/send`, messageRequest).subscribe(() => {
+          this.cdr?.markForCheck?.();
+        });
+      } else {
+        this.toasty.error("Идёт формирование писем");
+        this._progress.hide();
+      }
+    });
     this.isSending = true;
     this.setDisabled();
     this.cdr?.markForCheck?.();
@@ -265,10 +267,10 @@ export class NotificationComponent extends FilterAndPages<PersonDto> implements 
   setDisabled() {
     this.disabled = true;
     console.log(this.disabled)
-    setTimeout(() => {
+    timer(10000).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.disabled = false;
       console.log(this.disabled)
       this.cdr?.markForCheck?.();
-    }, 10000);
+    });
   }
 }

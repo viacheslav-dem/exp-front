@@ -1,4 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, viewChild} from '@angular/core';
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {timer} from 'rxjs';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {DataService} from "@app/services/data.service";
 import {OrgDto} from "@app/dto/OrgDto";
@@ -50,12 +52,12 @@ export class OrgsComponent extends FilterAndPages<OrgDto> {
     ];
     this.enableFilterCache("orgs");
     // Если нет сохранённого состояния фильтров, загружаем данные явно
-    setTimeout(() => {
+    timer(100).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       const hasCachedFilters = localStorage.getItem('filter_cache_orgs');
       if (!hasCachedFilters) {
         this.update();
       }
-    }, 100);
+    });
   }
 
   loadPage() {
