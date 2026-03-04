@@ -4,7 +4,6 @@ import {appRoutes} from "./app.routing";
 import {AppComponent} from "./app.component";
 import {HttpClientSecure} from "./services/http.client";
 import {GlobalToastyService} from "./services/global-toasty.service";
-import {AuthGuardService} from "./services/auth-guard.service";
 import {AuthService} from "./services/auth.service";
 import {DefineRole} from "./services/define-role";
 import {LoginComponent} from "./base/login/login.component";
@@ -188,7 +187,6 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         HttpClientSecure,
         AuthService,
         GlobalToastyService,
-        AuthGuardService,
         DefineRole,
         ProgressService,
         PersonService,

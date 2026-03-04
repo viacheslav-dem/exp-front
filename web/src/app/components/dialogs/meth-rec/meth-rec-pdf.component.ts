@@ -1,9 +1,10 @@
-import {Component, input, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, output} from "@angular/core";
+import {Component, input, OnDestroy, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef, NgZone, inject, output} from "@angular/core";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {StorageService} from "@app/services/storage.service";
 import {SERVER_URL} from "@app/config";
 import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/ConfirmDialogField";
 import {HttpClientSecure} from "@app/services/http.client";
-import {Subscription} from "rxjs";
+import {Subscription, timer} from "rxjs";
 import {environment} from "../../../../environments/environment";
 
 @Component({
@@ -72,6 +73,7 @@ export class MethRecPdfComponent implements OnInit, OnDestroy {
     readonly onSave = output<any>();
     readonly canceled = output<void>();
 
+    private readonly destroyRef = inject(DestroyRef);
     pdfSrc: string | Uint8Array | ArrayBuffer;
     private subscription: Subscription;
     isLoading = false;
@@ -151,12 +153,12 @@ export class MethRecPdfComponent implements OnInit, OnDestroy {
                         const pdfData = new Uint8Array(arrayBuffer);
                         
                         // Даём время Angular полностью удалить старый pdf-viewer из DOM
-                        setTimeout(() => {
+                        timer(100).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
                             this.pdfSrc = pdfData;
                             this.isLoading = false;
                             this.showPdfViewer = true;
                             this.cdr.detectChanges();
-                        }, 100);
+                        });
                     });
                 };
                 reader.onerror = () => {

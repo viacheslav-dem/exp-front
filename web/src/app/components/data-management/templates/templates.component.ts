@@ -1,4 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, AfterViewInit, effect, viewChildren} from '@angular/core';
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {timer} from 'rxjs';
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
@@ -83,12 +85,12 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> impl
     ];
     this.enableFilterCache("templates");
     // Если нет сохранённого состояния фильтров, загружаем данные явно
-    setTimeout(() => {
+    timer(100).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       const hasCachedFilters = localStorage.getItem('filter_cache_templates');
       if (!hasCachedFilters) {
         this.update();
       }
-    }, 100);
+    });
   }
 
   loadPage() {
@@ -97,10 +99,10 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> impl
       this._page = res;
       this.templates = this._page.content;
       // Обновляем карту загрузчиков после загрузки данных
-      setTimeout(() => {
+      timer(0).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
         this.updateUploaderMap();
         this.cdr?.markForCheck?.();
-      }, 0);
+      });
       // show tooltips
     }, () => {
       this.setLoading(false);
@@ -116,13 +118,13 @@ export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> impl
     this.editedTemplate = TemplatesComponent.copyTemplate(this.selectedTemplate);
     this.selectedTemplate.isEdit = true;
     // Обновляем карту загрузчиков после изменения состояния редактирования
-    setTimeout(() => this.updateUploaderMap(), 0);
+    timer(0).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.updateUploaderMap());
   }
 
   cancelEditTemplate() {
     this.selectedTemplate.isEdit = false;
     // Обновляем карту загрузчиков после отмены редактирования
-    setTimeout(() => this.updateUploaderMap(), 0);
+    timer(0).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.updateUploaderMap());
   }
 
   saveEditedTemplate() {

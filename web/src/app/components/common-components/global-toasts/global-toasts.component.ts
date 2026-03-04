@@ -1,5 +1,6 @@
 import {Component, ChangeDetectionStrategy, inject, signal, computed} from "@angular/core";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {timer, mergeMap, map} from 'rxjs';
 import {CommonModule} from "@angular/common";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 
@@ -47,27 +48,28 @@ export class GlobalToastsComponent {
 
   constructor() {
     this.globalToasty.globalToastyHandled.pipe(
+      mergeMap((value: ToastPayload) => {
+        const data = value?.data ?? {};
+        const toastType: 'success' | 'error' | 'warn' | 'info' = (value?.type || 'info') as 'success' | 'error' | 'warn' | 'info';
+
+        const t: ToastItem = {
+          id: ++this.idCounter,
+          type: toastType,
+          title: data.title,
+          msg: data.msg
+        };
+
+        this._toasts.update(toasts => [...toasts, t]);
+
+        // Разное время жизни для разных типов сообщений
+        // Ошибки показываются дольше, чтобы пользователь успел их прочитать
+        const timeout = t.type === 'error' ? 10000 :  // 10 секунд для ошибок
+                        t.type === 'warn' ? 7000 :     // 7 секунд для предупреждений
+                        5000;                          // 5 секунд для остальных
+        return timer(timeout).pipe(map(() => t.id));
+      }),
       takeUntilDestroyed()
-    ).subscribe((value: ToastPayload) => {
-      const data = value?.data ?? {};
-      const toastType: 'success' | 'error' | 'warn' | 'info' = (value?.type || 'info') as 'success' | 'error' | 'warn' | 'info';
-      
-      const t: ToastItem = {
-        id: ++this.idCounter,
-        type: toastType,
-        title: data.title,
-        msg: data.msg
-      };
-      
-      this._toasts.update(toasts => [...toasts, t]);
-      
-      // Разное время жизни для разных типов сообщений
-      // Ошибки показываются дольше, чтобы пользователь успел их прочитать
-      const timeout = t.type === 'error' ? 10000 :  // 10 секунд для ошибок
-                      t.type === 'warn' ? 7000 :     // 7 секунд для предупреждений
-                      5000;                          // 5 секунд для остальных
-      setTimeout(() => this.remove(t.id), timeout);
-    });
+    ).subscribe(id => this.remove(id));
   }
 
   remove(id: number) {

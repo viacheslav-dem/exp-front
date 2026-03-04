@@ -4,7 +4,7 @@ import { HttpErrorResponse, HttpHandler, HttpInterceptor, HttpRequest } from '@a
 import {StorageService} from "@app/services/storage.service";
 import {ROLE_HEADER, TOKEN_HEADER} from "@app/config";
 import {catchError, filter, switchMap, take} from "rxjs/operators";
-import {BehaviorSubject, throwError, EMPTY, race} from "rxjs";
+import {BehaviorSubject, throwError, EMPTY, race, timer} from "rxjs";
 import {AuthService} from "@app/services/auth.service";
 import {UserCredentials} from "@app/dto/UserCredentials";
 import {Router} from "@angular/router";
@@ -387,11 +387,11 @@ export class AuthErrorInterceptor implements HttpInterceptor {
   private redirectToLoginIfNeeded(): void {
     const currentUrl = this.router.url;
     if (!currentUrl.includes('/login')) {
-      // Используем setTimeout для асинхронной навигации, чтобы избежать проблем
+      // Используем timer для асинхронной навигации, чтобы избежать проблем
       // с обработкой ошибок в текущем цикле обработки событий
-      setTimeout(() => {
+      timer(100).subscribe(() => {
         this.router.navigateByUrl('/login');
-      }, 100);
+      });
     }
   }
 

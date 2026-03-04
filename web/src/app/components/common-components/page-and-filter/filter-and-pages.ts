@@ -1,4 +1,6 @@
-import { Directive, OnInit, signal } from "@angular/core";
+import { DestroyRef, Directive, inject, OnInit, signal } from "@angular/core";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {timer, switchMap, EMPTY} from 'rxjs';
 import {SearchField, SearchFieldType, MultiSelectField} from "app/components/common-components/page-and-filter/model/SearchField";
 import {Page} from "app/components/common-components/page-and-filter/model/Page";
 import {Filter} from "app/components/common-components/page-and-filter/model/Filter";
@@ -26,6 +28,7 @@ export abstract class FilterAndPages<T> implements OnInit {
 
   _searchRequest: SearchPageRequest;
 
+  protected readonly destroyRef = inject(DestroyRef);
   protected _filterCachePageName: string | null = null;
   protected _initialLoadDone: boolean = false;
 
@@ -83,23 +86,24 @@ export abstract class FilterAndPages<T> implements OnInit {
 
   enableFilterCache(pageName: string) {
     this._filterCachePageName = pageName;
-    
+
     // Загружаем состояние только один раз при инициализации
-    setTimeout(() => {
-      const hadSavedState = this.loadFilterState(pageName);
-      if (hadSavedState) {
+    timer(50).pipe(
+      switchMap(() => {
+        const hadSavedState = this.loadFilterState(pageName);
         this._initialLoadDone = true;
-        // Создаем новый массив полей для immutable обновления
-        // Это триггерит input() fields в FilterComponent, который обновит сигнал
-        this._searchFields = [...this._searchFields];
-        // Вызываем update() после загрузки значений из кэша
-        setTimeout(() => this.update(), 0);
-      } else {
-        // Если кэша нет, помечаем что начальная загрузка завершена и запускаем первую загрузку
-        this._initialLoadDone = true;
-        setTimeout(() => this.update(), 0);
-      }
-    }, 50);
+        if (hadSavedState) {
+          // Создаем новый массив полей для immutable обновления
+          // Это триггерит input() fields в FilterComponent, который обновит сигнал
+          this._searchFields = [...this._searchFields];
+          // Вызываем update() только после загрузки значений из кэша
+          return timer(0);
+        }
+        // Нет сохранённого состояния — update() вызовет сам компонент
+        return EMPTY;
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => this.update());
   }
 
   private saveFilterState(pageName: string) {

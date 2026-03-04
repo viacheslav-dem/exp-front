@@ -16,7 +16,8 @@ import {FilterAndPages} from "@app/components/common-components/page-and-filter/
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {RolePipe} from "@app/pipes/role.pipe";
 import {DegreeTypePipe, getAllDegreeTypes} from "@app/pipes/degree.pipe";
-import {Subscription} from "rxjs";
+import {Subscription, timer} from "rxjs";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {AcademicTitleTypePipe, getAllAcademicTitleTypes} from "@app/pipes/academic-title.pipe";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {LastSignEnumPipe} from "@app/pipes/last-sign.pipe";
@@ -97,11 +98,11 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
         this.enableFilterCache("users");
         // enableFilterCache вызывает update() если есть сохраненное состояние
         // Если кэша нет, загружаем данные без фильтров после завершения enableFilterCache
-        setTimeout(() => {
+        timer(300).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
           if (!localStorage.getItem('filter_cache_users')) {
             this.update();
           }
-        }, 300);
+        });
       }
     };
     

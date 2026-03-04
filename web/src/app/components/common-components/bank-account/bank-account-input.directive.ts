@@ -14,7 +14,10 @@ export const NI_CONTROL_VALUE_ACCESSOR: any = {
     standalone: false
 })
 export class BankAccountInputDirective extends ControlComponent<string> {
-  private regex: RegExp = new RegExp(/^BY[0-9]{0,2}$|^BY[0-9]{0,2}AKBB(([0-9]{0,4}){0,4})[0-9]{0,4}$/g);
+  /** BY + 2 цифры + AKBB + 12 цифр + 4 символа (цифры/буквы, предпоследняя группа) + 4 цифры */
+  private regex: RegExp = new RegExp(
+    /^BY[0-9]{0,2}$|^BY[0-9]{2}AKBB[0-9]{0,12}$|^BY[0-9]{2}AKBB[0-9]{12}[A-Za-z0-9]{0,4}$|^BY[0-9]{2}AKBB[0-9]{12}[A-Za-z0-9]{4}[0-9]{0,4}$/
+  );
   private elem: HTMLInputElement;
 
 
@@ -30,7 +33,7 @@ export class BankAccountInputDirective extends ControlComponent<string> {
   @HostListener('input', ['$event'])
   onInput(event: any) {
     let current: string = this.elem.value.replace(/\s/g, "");
-    if (!current || !String(current).match(this.regex)) {
+    if (!current || !this.regex.test(current)) {
       if (this.value == null || current == 'B') {
         this.value = 'BY';
       }

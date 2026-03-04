@@ -1,5 +1,6 @@
-import {ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, input, OnDestroy, signal, output} from "@angular/core";
+import {ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, input, signal, output} from "@angular/core";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Subject, timer, switchMap} from 'rxjs';
 import {
   CheckboxField,
   MultiCheck,
@@ -80,10 +81,10 @@ import {environment} from "../../../../../environments/environment";
       ? ChangeDetectionStrategy.OnPush
       : ChangeDetectionStrategy.Default
 })
-export class FilterComponent implements OnDestroy {
+export class FilterComponent {
 
   SearchFieldType = SearchFieldType;
-  searcherTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly filterTrigger$ = new Subject<number>();
   _fields: SearchField[] = [];
   readonly maxTitleLength = 400;
   
@@ -102,6 +103,10 @@ export class FilterComponent implements OnDestroy {
   constructor(
     private dataService: DataService
   ) {
+    this.filterTrigger$.pipe(
+      switchMap(ms => timer(ms)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => this.onFilterChanged.emit(this._fields));
   }
 
   /**
@@ -178,17 +183,14 @@ export class FilterComponent implements OnDestroy {
   });
 
   filterChanged() {
-    // Очищаем таймер, чтобы избежать повторного вызова после нажатия Enter
-    clearTimeout(this.searcherTimer);
-    this.onFilterChanged.emit(this._fields);
+    this.filterTrigger$.next(0);
   }
 
   // Обработчик изменения текстового поля через ngModel
   onTextValueChange(field: SearchField) {
     // Обновляем сигнал для реактивного обновления UI
     this._fieldsSignal.set([...this._fields]);
-    clearTimeout(this.searcherTimer);
-    this.searcherTimer = setTimeout(() => this.filterChanged(), 600);
+    this.filterTrigger$.next(600);
   }
 
   // Старый метод оставлен для обратной совместимости, если где-то используется
@@ -202,8 +204,7 @@ export class FilterComponent implements OnDestroy {
     field.value[type] = Number.parseInt($event.srcElement.value);
     // Обновляем сигнал для реактивного обновления UI
     this._fieldsSignal.set([...this._fields]);
-    clearTimeout(this.searcherTimer);
-    this.searcherTimer = setTimeout(() => this.filterChanged(), 600);
+    this.filterTrigger$.next(600);
   }
 
   changeMultiCheck(field: MultiCheckField, multiCheck: MultiCheck) {
@@ -251,10 +252,4 @@ export class FilterComponent implements OnDestroy {
       field.sortDirection == Direction.DESC ? 'sort-amount-down' : 'sort';
   }
 
-  ngOnDestroy() {
-    if (this.searcherTimer != null) {
-      clearTimeout(this.searcherTimer);
-      this.searcherTimer = null;
-    }
-  }
 }

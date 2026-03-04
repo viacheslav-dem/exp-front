@@ -7,6 +7,8 @@ import {
   signal,
   viewChild
 } from '@angular/core';
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {timer} from 'rxjs';
 import { Catalog, DataService } from 'app/services/data.service';
 import { CatalogTemplate } from '@app/components/data-management/catalog/CatalogTemplate';
 import { DirectionDto } from '@app/dto/DirectionDto';
@@ -51,12 +53,12 @@ export class DirectionsComponent<T extends DirectionDto> extends CatalogTemplate
       SearchField.checkbox('disabled', 'Показывать неактивные'),
     ];
     this.enableFilterCache('directions');
-    setTimeout(() => {
+    timer(100).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       const hasCachedFilters = localStorage.getItem('filter_cache_directions');
       if (!hasCachedFilters) {
         this.update();
       }
-    }, 100);
+    });
   }
 
   // saveEditedItem() {

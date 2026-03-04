@@ -415,7 +415,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
     }
     if (this._user.personInfo.bankAccount.account &&
       !this._user.personInfo.bankAccount.account.replace(/ /g, "")
-        .match(/^BY\d{2}AKBB\d{20}$/)) {
+        .match(/^BY\d{2}AKBB\d{12}[A-Za-z0-9]{4}\d{4}$/)) {
       throw 'Поле "Номер счёта" (IBAN) имеет неверный формат.';
     }
     if (this._user.phones.length > 0) {
