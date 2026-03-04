@@ -1,44 +1,40 @@
 <!--HEADER-->
 <div class="mb-2">
-  <div class="d-inline-block text-muted">Экспертные оценки:</div>
-  @if (canChooseExperts()) {
-    @if (isAutomaticSelectionMode()) {
-      <!-- <button class="btn btn-sm btn-primary btn-right ms-2"
-              [disabled]="isAutomaticSelectionDisabled() || isAutomaticSelectionLoading()"
-              (click)="automaticExpertSelection()">
-        @if (isAutomaticSelectionLoading()) {
-          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-          Выбор эксперта...
+    <div class="d-inline-block text-muted">Экспертные оценки:</div>
+    @if (canChooseExperts()) {
+        @if (isAutomaticSelectionMode()) {
+            <button class="btn btn-sm btn-primary btn-right ms-2"
+                    [disabled]="isAutomaticSelectionDisabled() || isAutomaticSelectionLoading()"
+                    (click)="automaticExpertSelection()">
+                @if (isAutomaticSelectionLoading()) {
+                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                    Выбор эксперта...
+                } @else {
+                    Автоматический выбор эксперта
+                }
+            </button>
         } @else {
-          Автоматический выбор эксперта
+            <button class="btn btn-sm btn-primary btn-right"
+                    (click)="searchExpertComponent().show()">
+                Ручной выбор эксперта
+            </button>
         }
-      </button> -->
-      <button class="btn btn-sm btn-outline-primary btn-right ms-2"
-              (click)="searchExpertComponent().show()">
-        Добавить <!-- вручную -->
-      </button>
-    } @else {
-      <button class="btn btn-sm btn-primary btn-right"
-              (click)="searchExpertComponent().show()">
-        Добавить эксперта
-      </button>
     }
-  }
 </div>
 
 <!--BODY-->
 @if (expertReviews().length == 0) {
-  <div class="list-group-item text-muted text-sm italic">
-    Экспертные оценки отсутствуют
-  </div>
+    <div class="list-group-item text-muted text-sm italic">
+        Экспертные оценки отсутствуют
+    </div>
 }
 @for (expertReview of expertReviews(); track expertReview.id) {
-  <div class="review">
-    <app-expert-review [role]="role()" [project]="project()" [review]="expertReview"></app-expert-review>
-  </div>
+    <div class="review">
+        <app-expert-review [role]="role()" [project]="project()" [review]="expertReview"></app-expert-review>
+    </div>
 }
 
 <!--SEARCH EXPERT MODAL-->
 @if (canChooseExperts()) {
-  <app-search-expert (selected)="onSelectedExpert($event)"></app-search-expert>
+    <app-search-expert (selected)="onSelectedExpert($event)"></app-search-expert>
 }

@@ -29,7 +29,6 @@ import {ExpertReviewState} from "@app/pipes/review-state.pipe";
 export class ExpertReviewListComponent {
 
   Role = Role;
-  ExpertReviewState = ExpertReviewState;
 
   readonly expertReviews = input<ExpertReviewDto[]>([]);
   readonly role = input<string | undefined>(undefined);
@@ -48,6 +47,8 @@ export class ExpertReviewListComponent {
   // Состояние загрузки для автоматического выбора эксперта
   isAutomaticSelectionLoading = signal(false);
 
+  isAutomaticSelectionMode = signal(true);
+
   // Предыдущее состояние списка для отслеживания изменений
   // Убрали _previousRejectedIds, так как отклонение обрабатывается бэкендом
   private _previousExpiredIds = new Set<number>();
@@ -65,6 +66,11 @@ export class ExpertReviewListComponent {
       // Автоматически выбираем нового эксперта только при истечении срока подтверждения
       // Отклонение обрабатывается бэкендом через reAssignExpert в rejectProject
       if (currentRole === Role.BUREAU_CHAIRMAN && reviews.length > 0) {
+        if (reviews.length < 2 ||
+            reviews.filter(item => item.state === ExpertReviewState.REJECTED).length > this.expertReviews().length - 2
+        ) {
+          this.isAutomaticSelectionMode.set(false);
+        }
         const currentExpiredIds = new Set(
           reviews
             .filter(r => r.state === ExpertReviewState.ON_EXPERT_CONFIRMATION && r.red)
@@ -83,7 +89,6 @@ export class ExpertReviewListComponent {
             this.checkAndAutoSelectExpert(reviews);
           });
         }
-        
         this._previousExpiredIds = currentExpiredIds;
       }
     });
@@ -117,11 +122,6 @@ export class ExpertReviewListComponent {
     ).subscribe();
   }
 
-  // Проверяет, нужно ли показывать автоматический выбор для BUREAU_CHAIRMAN
-  isAutomaticSelectionMode(): boolean {
-    return this.role() === Role.BUREAU_CHAIRMAN && this.canChooseExperts();
-  }
-
   // Проверяет, заблокирована ли кнопка автоматического выбора
   // Блокируется, если уже есть эксперты (как в оригинальной реализации от 12.12.2025)
   isAutomaticSelectionDisabled(): boolean {
@@ -142,6 +142,10 @@ export class ExpertReviewListComponent {
         this.isAutomaticSelectionLoading.set(false);
         const currentReviews = this.expertReviews();
         const updatedReviews = [...currentReviews, ...res];
+        if (updatedReviews.length < 2) {
+          this.isAutomaticSelectionMode.set(false);
+          this._toasty.warn("Нет доступных экспертов для автоматического выбора. Пожалуйста, выберите эксперта вручную.")
+        }
         this.onChanged.emit(updatedReviews);
       }),
       catchError((error) => {
@@ -164,7 +168,7 @@ export class ExpertReviewListComponent {
             errorMessage.includes('недоступен') || error?.status === 404) {
           errorMessage = "Нет доступных экспертов для автоматического выбора. Пожалуйста, выберите эксперта вручную.";
         }
-        
+        this.isAutomaticSelectionMode.set(false);
         this._toasty.error(errorMessage);
         return of([]);
       }),
