@@ -42,7 +42,6 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   private readonly _sectionTypePipe = inject(SectionTypePipe);
   private readonly _councilPipe = inject(CouncilPipe);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly destroyRef = inject(DestroyRef);
 
   // Signals для реактивного состояния
   readonly councils = signal<CouncilDto[]>([]);

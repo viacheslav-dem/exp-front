@@ -57,7 +57,6 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
     selectedGroup = signal<string | null>(null);
     availableSections = signal<SectionPlainDto[]>([]);
     
-    private readonly destroyRef = inject(DestroyRef);
     private readonly councilsChange$ = new Subject<any[]>();
     protected readonly ProjectState = ProjectState;
     /** Мутабельный набор выбранных id (источник истины для projectsList и API). */

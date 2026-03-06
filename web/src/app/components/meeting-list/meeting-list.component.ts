@@ -41,8 +41,6 @@ export class MeetingListComponent extends FilterAndPages<MeetingDto> {
 
   createMeetingModal = viewChild<MeetingFormComponent>(MeetingFormComponent);
 
-  private readonly destroyRef = inject(DestroyRef);
-
   constructor(private _toasty: GlobalToastyService,
               private _authService: AuthService,
               private _meetingService: MeetingService,

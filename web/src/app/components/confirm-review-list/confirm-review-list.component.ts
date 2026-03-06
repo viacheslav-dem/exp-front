@@ -71,9 +71,6 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
   private _loadToken = 0;
   private _prefetchToken = 0;
   
-  // Inject DestroyRef для автоматической отписки
-  private readonly destroyRef = inject(DestroyRef);
-  
   // Inject Injector для afterNextRender
   private readonly injector = inject(Injector);
   

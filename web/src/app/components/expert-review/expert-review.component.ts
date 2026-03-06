@@ -354,7 +354,7 @@ export class ExpertReviewComponent implements OnInit {
 
     canBelisaFinishExamination() {
         return this.role() == Role.BELISA_EDIT && this.expertReview().state == ExpertReviewState.ON_EXAMINATION
-            && this.expertReview().documents.length > 0 && this.expertReview().reviewScan;
+            && (this.expertReview().documents?.length ?? 0) > 0 && this.expertReview().reviewScan;
     }
     canRollbackExpertReview() {
         return this.role() == Role.BELISA_EDIT;
