@@ -30,7 +30,7 @@
         
         <!-- Заголовок проекта -->
         <div class="mb-1">
-          <h6 [ngClass]="project.viewed ? 'fw-normal':'fw-bold'" class="mb-0 lh-base text-dark">
+          <h6 [ngClass]="project.viewed ? 'fw-normal':'fw-bold'" class="mb-0 lh-base">
             {{project.title}}
           </h6>
         </div>
@@ -75,7 +75,7 @@
       <div class="text-end text-body-secondary small flex-shrink-0 project-numbers">
         <div class="mb-1">
           <div class="d-flex align-items-center gap-1 justify-content-end">
-            <div class="fw-bold text-dark">№</div>
+            <div class="fw-bold">№</div>
           <div class="user-select-all fw-semibold fs-6" (click)="onNumberClick($event); $event.stopPropagation();">
             {{project.id}}
             </div>
@@ -85,7 +85,7 @@
           @if (number!=null) {
             <div class="mb-1">
               <div class="d-flex align-items-center gap-1">
-                <div class="fw-bold text-dark">№</div>
+                <div class="fw-bold">№</div>
                 <div class="user-select-all fw-semibold" (click)="onNumberClick($event); $event.stopPropagation();">
                   {{number.number}}
                 </div>

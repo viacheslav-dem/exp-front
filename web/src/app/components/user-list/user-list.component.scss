@@ -405,3 +405,80 @@ tbody td:nth-child(3) {
   height: 0.875rem;
 }
 
+// --- Dark theme overrides ---
+:host-context([data-bs-theme="dark"]) {
+  table {
+    background-color: var(--dark-bg-surface);
+  }
+
+  table.table {
+    --bs-table-bg: var(--dark-bg-surface);
+    --bs-table-hover-bg: var(--dark-bg-card);
+  }
+
+  thead th {
+    border-bottom-color: var(--dark-border);
+    color: var(--dark-text);
+  }
+
+  tbody td, tbody th {
+    border-bottom-color: var(--dark-bg-elevated);
+    color: var(--dark-text);
+  }
+
+  .user-table-row:not(.alert-danger):not(.alert-dark):hover {
+    background-color: var(--dark-bg-card);
+
+    > th, > td {
+      background-color: var(--dark-bg-card) !important;
+    }
+  }
+
+  .user-table-row.alert-danger {
+    background-color: var(--dark-danger-bg);
+    border-left-color: #dc3545;
+    --bs-table-hover-bg: var(--dark-danger-bg-hover);
+
+    > th, > td { background-color: var(--dark-danger-bg) !important; }
+  }
+
+  .user-table-row.alert-danger:hover {
+    background-color: var(--dark-danger-bg-hover) !important;
+    > th, > td { background-color: var(--dark-danger-bg-hover) !important; }
+  }
+
+  .user-table-row.alert-dark {
+    background-color: var(--dark-bg-elevated);
+    opacity: 0.65;
+    --bs-table-hover-bg: var(--dark-bg-hover);
+    > th, > td { background-color: var(--dark-bg-elevated) !important; }
+  }
+
+  .user-table-row.alert-dark:hover {
+    background-color: var(--dark-bg-hover) !important;
+    opacity: 0.85;
+    > th, > td { background-color: var(--dark-bg-hover) !important; }
+  }
+
+  .card.user-card {
+    background-color: var(--dark-bg-card);
+    border-color: var(--dark-border-subtle);
+    color: var(--dark-text);
+  }
+
+  .card.user-card.alert-danger {
+    background-color: var(--dark-danger-bg);
+    border-left-color: #dc3545;
+  }
+
+  .card.user-card.alert-dark {
+    background-color: var(--dark-bg-elevated);
+    opacity: 0.65;
+  }
+
+  .filter-toggle-btn {
+    color: var(--dark-text);
+    &:hover { color: var(--dark-accent); }
+  }
+}
+

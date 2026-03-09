@@ -197,7 +197,16 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
 
   getForm(): CouncilConclusionFormContent {
     const form = super.getForm();
-    if (this.formComponent) form.projectProtocol = this.formComponent.getForm();
+    if (this.formComponent) {
+      const componentForm = this.formComponent.getForm();
+      // selectedDirections и selectedSocialEconomicGoals управляются контейнером
+      // (app-select-directions-and-goals-block), а не дочерним formComponent.
+      // Без merge они теряются при перезаписи projectProtocol.
+      componentForm.selectedDirections = form.projectProtocol?.selectedDirections || [];
+      componentForm.selectedSocialEconomicGoals = form.projectProtocol?.selectedSocialEconomicGoals || [];
+      componentForm.directionsAndGoalsText = form.projectProtocol?.directionsAndGoalsText || componentForm.directionsAndGoalsText;
+      form.projectProtocol = componentForm;
+    }
     form.documents = this.documents.map(obj => obj.text).filter(document => !isEmptyOrNull(document));
     return form;
   }
@@ -231,6 +240,13 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
   selectPerson(person: PersonPlainDto) {
     this.patchForm({ chairman: person } as Partial<CouncilConclusionFormContent>);
     this.searchPersonModal()?.hide();
+  }
+
+  patchProjectProtocol(patch: Partial<AgendaNewFormContent>) {
+    this.updateForm(f => ({
+      ...f,
+      projectProtocol: { ...f.projectProtocol, ...patch }
+    } as CouncilConclusionFormContent));
   }
 
   needSelectDirections() {

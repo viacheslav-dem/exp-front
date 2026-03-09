@@ -152,6 +152,28 @@ import {PageRequest} from "@app/components/common-components/page-and-filter/mod
       .list-group-item:hover {
         background-color: #f8f9fa;
       }
+
+      :host-context([data-bs-theme="dark"]) table {
+        background-color: var(--dark-bg-surface);
+        color: var(--dark-text);
+      }
+
+      :host-context([data-bs-theme="dark"]) table.table {
+        --bs-table-bg: var(--dark-bg-surface);
+        --bs-table-hover-bg: var(--dark-bg-card);
+      }
+
+      :host-context([data-bs-theme="dark"]) .user-session-row:hover {
+        background-color: var(--dark-bg-card);
+      }
+
+      :host-context([data-bs-theme="dark"]) .user-session-row:hover > td {
+        background-color: var(--dark-bg-card) !important;
+      }
+
+      :host-context([data-bs-theme="dark"]) .list-group-item:hover {
+        background-color: var(--dark-bg-elevated);
+      }
     `],
     standalone: false,
     changeDetection: ChangeDetectionStrategy.OnPush

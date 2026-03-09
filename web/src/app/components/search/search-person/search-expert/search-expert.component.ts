@@ -1,4 +1,5 @@
-import {Component, ChangeDetectorRef, output, viewChild} from '@angular/core';
+import {Component, ChangeDetectorRef, output, viewChild, OnDestroy} from '@angular/core';
+import {Subscription} from 'rxjs';
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {PersonService} from "@app/services/person.service";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
@@ -18,13 +19,16 @@ import {PersonExpertDto} from "@app/dto/PersonExpertDto";
     templateUrl: 'search-expert.component.html',
     standalone: false
 })
-export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
+export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> implements OnDestroy {
 
   SortClass = SortClass;
   experts: PersonExpertDto[] = [];
   sortDirection = Direction.ASC;
   readonly selected = output<PersonExpertDto>();
   readonly searchPersonModal = viewChild<ModalComponent>('searchModal');
+
+  private _isModalVisible = false;
+  private _searchSub?: Subscription;
 
   constructor(protected _service: PersonService, private _cdr: ChangeDetectorRef) {
     super();
@@ -47,7 +51,15 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
   }
 
   loadPage() {
-    this._service.searchExperts(this._searchRequest).subscribe({
+    // Не загружаем данные, пока модалка не открыта (enableFilterCache вызывает update() при ngOnInit)
+    if (!this._isModalVisible) {
+      this.setLoading(false);
+      return;
+    }
+    // Отменяем предыдущий запрос — предотвращает race condition,
+    // когда ответ на устаревший запрос перезаписывает актуальные результаты
+    this._searchSub?.unsubscribe();
+    this._searchSub = this._service.searchExperts(this._searchRequest).subscribe({
       next: (res) => {
         this._page = res;
         this.experts = res.content;
@@ -71,6 +83,9 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
   }
 
   show() {
+    this._isModalVisible = true;
+    // Гарантируем, что update() не заблокируется из-за незавершённого enableFilterCache
+    this._initialLoadDone = true;
     // Очищаем результаты предыдущего поиска при открытии модального окна
     this.experts = [];
     // Zoneless/Signals: иммутабельное обновление _page
@@ -81,21 +96,26 @@ export class SearchExpertComponent extends FilterAndPages<PersonExpertDto> {
     nextPagination.page = 1;
     this._pagination = nextPagination;
     this._searchRequest.paging.page = 0;
-    
+
     // Помечаем компонент для проверки изменений (важно для OnPush стратегии)
     this._cdr.markForCheck();
-    
+
     this.searchPersonModal()?.show();
-    // Загружаем первую страницу при открытии (убраны ненужные задержки для ускорения)
+    // Загружаем первую страницу при открытии
     this.setLoading(true);
     this.update();
   }
 
   hide() {
+    this._isModalVisible = false;
     // Поисковые поля НЕ очищаем - они сохраняются через кэш фильтров
     // Помечаем компонент для проверки изменений
     this._cdr.markForCheck();
-    
+
     this.searchPersonModal()?.hide();
+  }
+
+  ngOnDestroy() {
+    this._searchSub?.unsubscribe();
   }
 }

@@ -1,5 +1,13 @@
 <!doctype html>
 <html>
+<script>
+  // Apply saved theme immediately to prevent flash of wrong theme (FOUC)
+  (function() {
+    var t = localStorage.getItem('app-theme');
+    if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-bs-theme', t);
+  })();
+</script>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <meta charset="utf-8">
@@ -19,7 +27,13 @@
       background-color: var(--bs-body-bg);
       font-size: 1.1rem;
       line-height: 1.4;
+    }
 
+    /* Dark theme body background (applied before Bootstrap CSS loads) */
+    [data-bs-theme="dark"] body {
+      --bs-body-bg: #1a1d21;
+      background-color: #1a1d21;
+      color: #dee2e6;
     }
     
     /* Typography - SAFE: Base styles, no Bootstrap dependency */

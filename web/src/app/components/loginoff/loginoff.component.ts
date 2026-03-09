@@ -8,6 +8,7 @@ import {PersonDto} from "@app/dto/PersonDto";
 import {Subscription} from "rxjs";
 import {StorageService} from "@app/services/storage.service";
 import {RoleInfoDto} from "@app/dto/RoleInfoDto";
+import {ThemeService} from "@app/services/theme.service";
 import {environment} from "../../../environments/environment";
 
 @Component({
@@ -33,6 +34,7 @@ export class LoginoffComponent implements OnInit, OnDestroy {
               private toasty: GlobalToastyService,
               private dialogService: DialogService,
               private _storageService: StorageService,
+              public themeService: ThemeService,
               private cdr: ChangeDetectorRef) {
   }
 

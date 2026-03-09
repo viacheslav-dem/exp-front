@@ -1,7 +1,7 @@
 <div class="container-fluid d-flex justify-content-center align-items-center min-vh-100 py-4 px-3">
   <div class="card border-0 shadow-lg rounded-4" [style.max-width]="roles.length >= 6 ? '700px' : '550px'" style="width: 100%;">
     <div class="card-body p-4">
-      <h4 class="card-title fw-bold mb-3 text-center text-dark">Выберите роль</h4>
+      <h4 class="card-title fw-bold mb-3 text-center">Выберите роль</h4>
         @if (roles.length == 0) {
         <div class="text-center text-body-secondary py-4">
           <i class="fas fa-info-circle me-2"></i>Вам не назначена ни одна роль
@@ -21,7 +21,7 @@
                     tabindex="0"
                     (keyup.enter)="enterHow(r)">
                 <div class="d-flex justify-content-between align-items-center">
-                      <span class="flex-grow-1 fw-semibold text-dark small">{{r | role}}</span>
+                      <span class="flex-grow-1 fw-semibold small">{{r | role}}</span>
                   @if (mapInfoRole[r]?.count != 0) {
                         <span class="badge bg-info rounded-pill ms-2 px-2 py-1 fw-semibold shadow-sm">{{mapInfoRole[r].count}}</span>
                   }

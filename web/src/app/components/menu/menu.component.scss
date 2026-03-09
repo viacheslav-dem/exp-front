@@ -111,6 +111,61 @@
   box-shadow: 0 0 0 0.1rem rgba(13, 110, 253, 0.2);
 }
 
+// Dark theme overrides (ViewEncapsulation-safe)
+:host-context([data-bs-theme="dark"]) {
+  .main-menu-wrapper {
+    background-color: var(--dark-bg-surface);
+    border-bottom-color: var(--dark-border-subtle);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  .nav-link {
+    color: var(--dark-text-muted);
+
+    &:hover {
+      background-color: var(--dark-accent-bg);
+      color: var(--dark-accent);
+    }
+
+    &.active {
+      background-color: #0d6efd;
+      color: #fff;
+    }
+  }
+
+  .dropdown-menu {
+    background-color: var(--dark-bg-card);
+    border-color: var(--dark-border-subtle);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  .dropdown-item {
+    color: var(--dark-text);
+
+    &:hover {
+      background-color: var(--dark-accent-bg);
+      color: var(--dark-accent);
+    }
+
+    &.active {
+      background-color: #0d6efd;
+      color: #fff;
+    }
+  }
+
+  .navbar-toggler {
+    border-color: var(--dark-border);
+  }
+
+  .navbar-toggler-icon {
+    filter: invert(1) grayscale(100%) brightness(150%);
+  }
+}
+
 // Мобильная версия
 @media (max-width: 991.98px) {
   .main-menu-wrapper {
@@ -162,6 +217,18 @@
     padding-left: 0.5rem;
     min-width: unset;
     max-width: unset;
+  }
+
+  // Dark mobile overrides
+  :host-context([data-bs-theme="dark"]) {
+    .navbar-collapse {
+      background-color: var(--dark-bg-card);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .dropdown-menu {
+      border-left-color: var(--dark-border);
+    }
   }
 
   .dropdown-item {

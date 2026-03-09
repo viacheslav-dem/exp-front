@@ -30,6 +30,10 @@
         <a class="not-link" target="_blank" href="https://www.youtube.com/channel/UCoBl4G26Um6JuSbkX3HeJVw/videos">
         Видеоинструкции</a>
       </li>
+      <li class="dropdown-item selectable" (click)="themeService.toggle(); $event.stopPropagation()">
+        <fa-icon [icon]="themeService.isDark() ? 'sun' : 'moon'" [fixedWidth]="true"></fa-icon>
+        {{ themeService.isDark() ? 'Светлая тема' : 'Тёмная тема' }}
+      </li>
       <li class="dropdown-divider"></li>
       <li class="dropdown-item selectable" (click)="toLogout()">
         <fa-icon icon="power-off" [fixedWidth]="true"></fa-icon>

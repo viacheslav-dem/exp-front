@@ -1,59 +1,91 @@
-@if (expertInfoDtos().length>0) {
-  <table class="border">
-    <tr>
-      <th class="border " style="width: 35%">
-        <div class="m-2">Наименование объекта экспертизы</div>
-      </th>
-      <th class="border " style="width: 13%">
-        <div class="m-2">ГЭС</div>
-      </th>
-      <th class="border " style="width: 13%">
-        <div class="m-2">Дата заключения договора</div>
-      </th>
-      <th class="border " style="width: 13%">
-        <div class="m-2">Дата окончания договора</div>
-      </th>
-      <th class="border " style="width: 13%">
-        <div class="m-2">Дата передачи договора на оплату</div>
-      </th>
-      <th class="border " style="width: 13%">
-        <div class="m-2">Дата оплаты</div>
-      </th>
-    </tr>
+@if (_loading) {
+  <div class="d-flex justify-content-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Загрузка...</span>
+    </div>
+  </div>
+}
+
+@if (!_loading && expertInfoDtos().length > 0) {
+  <div class="pay-info-list">
     @for (project of expertInfoDtos(); track project) {
-      <tr>
-        <td class="border" style="width: 35%">
-          <a target="_blank"
-            [routerLink]="['/projects/',project.project.id]">
-            <div class="m-2">{{project.project.title}} ({{project.project.code.code}})</div>
+      <div class="pay-info-card">
+        <div class="pay-info-card__header">
+          <a class="pay-info-card__title" target="_blank"
+             [routerLink]="['/projects/', project.project.id]">
+            {{project.project.title}}
           </a>
-        </td>
-        <td class="border" style="width: 13%">
-          @for (council of project.councils; track council) {
-            <div class="m-2">
-              ГЭС №{{council.code}}
+          <span class="pay-info-card__code">{{project.project.code.code}}</span>
+        </div>
+
+        <div class="pay-info-card__body">
+          @if (project.councils.length > 0) {
+            <div class="pay-info-card__field">
+              <div class="pay-info-card__label">
+                <i class="fas fa-users fa-fw"></i>ГЭС
+              </div>
+              <div class="pay-info-card__value">
+                @for (council of project.councils; track council) {
+                  <span class="pay-info-card__badge">
+                    ГЭС №{{council.code}}
+                  </span>
+                }
+              </div>
             </div>
           }
-        </td>
-        <td class="border" style="width: 13%">
-          <div class="m-2">{{project.contractDate | date:'dd.MM.yyyy'}}</div>
-        </td>
-        <td class="border" style="width: 13%">
-          <div class="m-2">{{project.contractEnd | date:'dd.MM.yyyy'}}</div>
-        </td>
-        <td class="border" style="width: 13%">
-          <div class="m-2">{{project.actDate | date:'dd.MM.yyyy'}}</div>
-        </td>
-        <td class="border" style="width: 13%">
-          <div class="m-2">{{project.payDate | date:'dd.MM.yyyy'}}</div>
-        </td>
-      </tr>
-    }
-  </table>
-}
-@if (_page.totalElements != null && _page.totalElements === 0 && expertInfoDtos().length == 0) {
-  <div>Информация об эксперте отсутствует</div>
-}
-<app-pagination [page]="_page" [pagination]="_pagination"
-(onPageChanged)="onPageChanged($event)"></app-pagination>
 
+          <div class="pay-info-card__dates">
+            <div class="pay-info-card__date-item">
+              <div class="pay-info-card__label">
+                <i class="fas fa-file-signature fa-fw"></i>Заключение
+              </div>
+              <div class="pay-info-card__date-value">
+                {{project.contractDate ? (project.contractDate | date:'dd.MM.yyyy') : '—'}}
+              </div>
+            </div>
+            <div class="pay-info-card__date-item">
+              <div class="pay-info-card__label">
+                <i class="fas fa-calendar-check fa-fw"></i>Окончание
+              </div>
+              <div class="pay-info-card__date-value">
+                {{project.contractEnd ? (project.contractEnd | date:'dd.MM.yyyy') : '—'}}
+              </div>
+            </div>
+            <div class="pay-info-card__date-item">
+              <div class="pay-info-card__label">
+                <i class="fas fa-paper-plane fa-fw"></i>На оплату
+              </div>
+              <div class="pay-info-card__date-value">
+                {{project.actDate ? (project.actDate | date:'dd.MM.yyyy') : '—'}}
+              </div>
+            </div>
+            <div class="pay-info-card__date-item">
+              <div class="pay-info-card__label">
+                <i class="fas fa-check-circle fa-fw"></i>Оплата
+              </div>
+              <div class="pay-info-card__date-value"
+                   [class.pay-info-card__date-value--success]="project.payDate"
+                   [class.pay-info-card__date-value--pending]="!project.payDate && project.actDate">
+                {{project.payDate ? (project.payDate | date:'dd.MM.yyyy') : '—'}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@if (!_loading && _page.totalElements != null && _page.totalElements === 0 && expertInfoDtos().length === 0) {
+  <div class="pay-info-empty">
+    <i class="fas fa-inbox pay-info-empty__icon"></i>
+    <div class="pay-info-empty__text">Информация об эксперте отсутствует</div>
+  </div>
+}
+
+@if (_page.totalElements > 0) {
+  <div class="mt-3">
+    <app-pagination [page]="_page" [pagination]="_pagination"
+                    (onPageChanged)="onPageChanged($event)"></app-pagination>
+  </div>
+}

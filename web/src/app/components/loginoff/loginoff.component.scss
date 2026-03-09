@@ -5,6 +5,7 @@
   border-radius: 0.5rem;
   margin-top: 0.5rem;
   padding: 0.5rem 0;
+  overflow: hidden;
 }
 
 .user-info {
@@ -68,6 +69,45 @@
 .not-link {
   color: #212529;
   text-decoration: none;
+}
+
+// Dark theme overrides (ViewEncapsulation-safe)
+:host-context([data-bs-theme="dark"]) {
+  .dropdown-menu {
+    background-color: var(--dark-bg-card);
+    border: 1px solid var(--dark-border-subtle);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+  }
+
+  .user-info:hover {
+    background-color: var(--dark-bg-elevated);
+    border-color: var(--dark-border);
+  }
+
+  .user-name {
+    color: var(--dark-text-bright);
+  }
+
+  .user-role {
+    color: var(--dark-text-muted);
+  }
+
+  .dropdown-item {
+    color: var(--dark-text);
+
+    &:hover {
+      background-color: var(--dark-accent-bg);
+      color: var(--dark-accent);
+    }
+  }
+
+  .not-link {
+    color: var(--dark-text);
+  }
+
+  .dropdown-divider {
+    border-color: var(--dark-border-subtle);
+  }
 }
 
 @media (max-width: 991.98px) {

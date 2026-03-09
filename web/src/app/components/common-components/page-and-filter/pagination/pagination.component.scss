@@ -263,3 +263,48 @@
   transform: translateY(0);
   box-shadow: 0 2px 6px rgba(13, 110, 253, 0.3);
 }
+
+// --- Dark theme overrides ---
+:host-context([data-bs-theme="dark"]) {
+  .pagination-modern .page-link {
+    color: var(--dark-text-muted);
+    background-color: var(--dark-bg-card);
+    border-color: var(--dark-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .pagination-modern .page-link:hover:not(.disabled):not(.active) {
+    background-color: var(--dark-bg-elevated);
+    border-color: var(--dark-accent);
+    color: var(--dark-accent);
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.25);
+  }
+
+  .pagination-modern .page-item.active .page-link {
+    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    border-color: #0d6efd;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.4);
+  }
+
+  .pagination-modern .page-item.active .page-link:hover {
+    background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+    border-color: #0a58ca;
+  }
+
+  .pagination-modern .page-item.disabled .page-link {
+    background-color: var(--dark-bg-surface);
+    border-color: var(--dark-bg-elevated);
+    color: var(--dark-border);
+  }
+
+  .pagination-modern .page-item.disabled .page-link:hover {
+    background-color: var(--dark-bg-surface);
+    border-color: var(--dark-bg-elevated);
+    color: var(--dark-border);
+  }
+
+  .pagination-modern .page-link:active:not(.disabled):not(.active) {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+}

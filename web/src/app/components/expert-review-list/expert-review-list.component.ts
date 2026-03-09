@@ -66,9 +66,19 @@ export class ExpertReviewListComponent {
       // Автоматически выбираем нового эксперта только при истечении срока подтверждения
       // Отклонение обрабатывается бэкендом через reAssignExpert в rejectProject
       if (currentRole === Role.BUREAU_CHAIRMAN && reviews.length > 0) {
-        if (reviews.length < 2 ||
-            reviews.filter(item => item.state === ExpertReviewState.REJECTED).length > this.expertReviews().length - 2
-        ) {
+        const rejected = reviews.filter(item => item.state === ExpertReviewState.REJECTED).length;
+        const accepted = reviews.filter(item => item.state === ExpertReviewState.PROJECT_ACCEPTED).length;
+        const projectRejected = reviews.filter(item => item.state === ExpertReviewState.PROJECT_REJECTED).length;
+        const inProgress = reviews.filter(item =>
+          item.state === ExpertReviewState.ON_EXAMINATION ||
+          item.state === ExpertReviewState.ON_EXPERT_CONFIRMATION ||
+          item.state === ExpertReviewState.ON_GKNT_CONFIRMATION
+        ).length;
+        // Переключаем на ручной выбор если:
+        // - мало экспертов или большинство отклонили назначение (REJECTED)
+        // - ситуация 50/50: одинаковое кол-во положительных и отрицательных заключений, нет экспертов в процессе
+        const isFiftyFifty = accepted > 0 && accepted === projectRejected && inProgress === 0;
+        if (reviews.length < 2 || rejected > reviews.length - 2 || isFiftyFifty) {
           this.isAutomaticSelectionMode.set(false);
         }
         const currentExpiredIds = new Set(

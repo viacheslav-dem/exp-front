@@ -110,6 +110,7 @@
       [project]="project"
       [group]="lifecycleGroup"
       [council]="lifecycleGroup.council"
+      [loading]="returnLoading()"
       (onSave)="returnFromCouncil($event)"
       (onClose)="returnFromCouncilWithoutExpertiseModal.hide()">
     </app-return-from-council-without-expertise-form>

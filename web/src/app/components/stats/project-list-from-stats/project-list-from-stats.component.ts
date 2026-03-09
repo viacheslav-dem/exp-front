@@ -65,11 +65,12 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
         }
     }
 
-    private loadExpiredPage() {
-        if (this.isDisplayPage) {
-            this.period.set(dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY'));
-            this.setLoading(true);
-            
+    private loadExpiredPage(): Promise<void> {
+        if (!this.isDisplayPage) return Promise.resolve();
+        this.period.set(dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY'));
+        this.setLoading(true);
+
+        return new Promise<void>((resolve) => {
             this.service.getExpiredProjectList(
                 this.councilId, this.startOfMonth, this.endOfMonth, this._searchRequest
             ).subscribe({
@@ -79,19 +80,22 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
                     this.countProjects.set(res.totalElements);
                     this.setLoading(false);
                     this.searchProjectModal()?.show();
+                    resolve();
                 },
                 error: () => {
                     this.setLoading(false);
+                    resolve();
                 }
             });
-        }
+        });
     }
 
-    private loadOnExaminationPage() {
-        if (this.isDisplayPage) {
-            this.period.set(dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY'));
-            this.setLoading(true);
-            
+    private loadOnExaminationPage(): Promise<void> {
+        if (!this.isDisplayPage) return Promise.resolve();
+        this.period.set(dayjs(this.startOfMonth).startOf('month').locale('ru').format('MMMM YYYY'));
+        this.setLoading(true);
+
+        return new Promise<void>((resolve) => {
             this.service.getOnExaminationProjectList(
                 this.councilId, this.startOfMonth, this.endOfMonth, this._searchRequest
             ).subscribe({
@@ -101,12 +105,14 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
                     this.countProjects.set(res.totalElements);
                     this.setLoading(false);
                     this.searchProjectModal()?.show();
+                    resolve();
                 },
                 error: () => {
                     this.setLoading(false);
+                    resolve();
                 }
             });
-        }
+        });
     }
 
     getSortOrders() {
@@ -118,19 +124,19 @@ export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
         this.update();
     }
 
-    show(type, councilId, startOfMonth, endOfMonth) {
+    show(type, councilId, startOfMonth, endOfMonth): Promise<void> {
         this.type = type;
         this.councilId = councilId;
         this.startOfMonth = startOfMonth;
         this.endOfMonth = endOfMonth;
         this.isDisplayPage = true;
-        
-        // Вызываем соответствующий метод загрузки
+
         if (type === "expired") {
-            this.loadExpiredPage();
+            return this.loadExpiredPage();
         } else if (type === "on_examination") {
-            this.loadOnExaminationPage();
+            return this.loadOnExaminationPage();
         }
+        return Promise.resolve();
     }
 
     hide() {

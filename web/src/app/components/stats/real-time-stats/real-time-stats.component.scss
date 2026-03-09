@@ -53,3 +53,24 @@
 .no-violation {
   color: #a2c2cc !important;
 }
+
+// --- Dark theme overrides ---
+:host-context([data-bs-theme="dark"]) {
+  .stats-pane {
+    background-color: var(--dark-bg-elevated);
+    border-color: var(--dark-border);
+  }
+
+  .stats-label {
+    color: var(--dark-text-muted) !important;
+  }
+
+  .stats-number,
+  .stats-number-sm {
+    color: var(--dark-text-bright);
+  }
+
+  .legend-text {
+    color: var(--dark-text);
+  }
+}

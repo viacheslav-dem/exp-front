@@ -413,3 +413,20 @@
     }
   }
 }
+
+// --- Dark theme overrides ---
+:host-context([data-bs-theme="dark"]) {
+  .form-label {
+    color: var(--dark-text-muted);
+
+    &.fw-semibold { color: var(--dark-text); }
+  }
+
+  .speciality-item-wrapper,
+  .specialization-item-wrapper,
+  .area-item-wrapper {
+    .input-group ng-select.form-control {
+      border-color: var(--dark-border);
+    }
+  }
+}

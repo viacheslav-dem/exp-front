@@ -70,6 +70,7 @@ export class ProjectInfoComponent implements OnInit {
 
   readonly sameProjectsLoading = signal<boolean>(false);
   readonly acceptProjectLoading = signal<boolean>(false);
+  readonly returnLoading = signal<boolean>(false);
 
   // Геттеры для обратной совместимости (используются в шаблоне и методах)
   get role(): string | undefined {
@@ -445,9 +446,13 @@ export class ProjectInfoComponent implements OnInit {
     const project = this._projectSignal();
     const role = this._roleSignal();
     const lifecycle = this._lifecycleSignal();
+    const lifecycleGroup = this._lifecycleGroupSignal();
     return project != null && (
       (project.state == ProjectState.ON_EXPERT_EXAMINATION &&
-        anyMatch(role, Role.GKNT_DEPARTMENT_CHAIRMAN, Role.BUREAU_CHAIRMAN)) ||
+        role == Role.GKNT_DEPARTMENT_CHAIRMAN) ||
+      (project.state == ProjectState.ON_EXPERT_EXAMINATION &&
+        role == Role.BUREAU_CHAIRMAN &&
+        lifecycleGroup != null && lifecycleGroup.state == LifecycleGroupState.ON_CHECKING) ||
       (lifecycle && lifecycle.state == ProjectLifecycleState.ON_EXPERT_EXAMINATION &&
         role == Role.SECTION_CHAIRMAN)
     );
@@ -511,24 +516,35 @@ export class ProjectInfoComponent implements OnInit {
         buttons.push(new ActionButtonMetadata('Завершить экспертизу', () => this.finishLifecycleGroup(), 'btn-primary'));
       }
       if (project.state == ProjectState.ON_EXPERT_EXAMINATION && project.expertReviews.length == 0) {
-        buttons.push(new ActionButtonMetadata('Вернуть в ГКНТ', () => this.showReturnFromCouncilModal(), 'btn-secondary'));
+        buttons.push(new ActionButtonMetadata('Вернуть в ГКНТ', () => this.showReturnFromCouncilModal(), 'btn-secondary', {
+          isDisabled: () => this.returnLoading()
+        }));
       }
       if (this.checkPossibleToReturnToGKNT(lifecycleGroup, project, role)) {
-        buttons.push(new ActionButtonMetadata('Вернуть в ГКНТ без рассмотрения', () => this.returnFromBureauToGKNTWithoutExamination(), 'btn-secondary'));
+        buttons.push(new ActionButtonMetadata('Вернуть в ГКНТ без рассмотрения', () => this.returnFromBureauToGKNTWithoutExamination(), 'btn-secondary', {
+          isLoading: () => this.returnLoading(),
+          isDisabled: () => this.returnLoading()
+        }));
       }
     }
 
     // SECTION_CHAIRMAN
     if (role == Role.SECTION_CHAIRMAN && lifecycle && lifecycle.state == ProjectLifecycleState.ON_EXPERT_EXAMINATION) {
       buttons.push(new ActionButtonMetadata('Перейти к рассмотрению в секции', () => this.finishChoosingExperts(), 'btn-primary'));
-      buttons.push(new ActionButtonMetadata('Вернуть в бюро ГЭС', () => this.returnFromSectionToCouncil(), 'btn-secondary'));
+      buttons.push(new ActionButtonMetadata('Вернуть в бюро ГЭС', () => this.returnFromSectionToCouncil(), 'btn-secondary', {
+        isLoading: () => this.returnLoading(),
+        isDisabled: () => this.returnLoading()
+      }));
     }
 
     if (role == Role.SECTION_CHAIRMAN && lifecycle
       && lifecycle.state == ProjectLifecycleState.ON_WAITING_RESPONSE
       && !lifecycle.isAnswerReceived && project.isRescheduleSection
       && project.isSectionRemarksExpired) {
-      buttons.push(new ActionButtonMetadata('Вернуть в бюро ГЭС без рассмотрения', () => this.returnFromSectionToCouncilWithoutExamination(), 'btn-secondary'));
+      buttons.push(new ActionButtonMetadata('Вернуть в бюро ГЭС без рассмотрения', () => this.returnFromSectionToCouncilWithoutExamination(), 'btn-secondary', {
+        isLoading: () => this.returnLoading(),
+        isDisabled: () => this.returnLoading()
+      }));
     }
 
     // EXPERT
@@ -691,9 +707,13 @@ export class ProjectInfoComponent implements OnInit {
         'Это действие будет необратимо')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        this.returnLoading.set(true);
         let reason = "";
         this._lifecycleService.returnFromSectionToCouncil(lifecycle, reason)
-          .pipe(takeUntilDestroyed(this.destroyRef))
+          .pipe(
+            finalize(() => this.returnLoading.set(false)),
+            takeUntilDestroyed(this.destroyRef)
+          )
           .subscribe((res) => {
             this._toasty.success("Вы вернули объект экспертизы.");
             this.updateLifecycleSignal(res);
@@ -713,8 +733,12 @@ export class ProjectInfoComponent implements OnInit {
       `Вернуть объект экспертизы "${project.title}" в бюро ГЭС?`)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        this.returnLoading.set(true);
         this._lifecycleService.returnFromSectionToCouncilWithoutExamination(lifecycle)
-          .pipe(takeUntilDestroyed(this.destroyRef))
+          .pipe(
+            finalize(() => this.returnLoading.set(false)),
+            takeUntilDestroyed(this.destroyRef)
+          )
           .subscribe((res) => {
             this._toasty.success('Вы вернули объект экспертизы');
             this.updateLifecycleSignal(res);
@@ -734,8 +758,12 @@ export class ProjectInfoComponent implements OnInit {
       `Вернуть объект экспертизы "${project.title}" в ГКНТ ?`)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        this.returnLoading.set(true);
         this._groupService.returnFromBureauToGKNTlWithoutExamination(group)
-          .pipe(takeUntilDestroyed(this.destroyRef))
+          .pipe(
+            finalize(() => this.returnLoading.set(false)),
+            takeUntilDestroyed(this.destroyRef)
+          )
           .subscribe((res) => {
             this._toasty.success('Вы вернули объект экспертизы');
             this.updateLifecycleGroupSignal(res);
@@ -1294,8 +1322,12 @@ export class ProjectInfoComponent implements OnInit {
       const group = this.requireLifecycleGroup();
       if (!project || !group) return;
 
+      this.returnLoading.set(true);
       this._groupService.returnToGknt(group, formContent)
-        .pipe(takeUntilDestroyed(this.destroyRef))
+        .pipe(
+          finalize(() => this.returnLoading.set(false)),
+          takeUntilDestroyed(this.destroyRef)
+        )
         .subscribe(res => {
           this.updateLifecycleGroupSignal(res);
           this.returnFromCouncilWithoutExpertiseModal?.hide();

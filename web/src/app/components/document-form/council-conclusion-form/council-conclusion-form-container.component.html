@@ -52,7 +52,7 @@
     <app-select-directions-and-goals-block
       [form]="formValue().projectProtocol"
       [project]="project()"
-      (formPatch)="patchForm({ projectProtocol: $event })"></app-select-directions-and-goals-block>
+      (formPatch)="patchProjectProtocol($event)"></app-select-directions-and-goals-block>
   }
 
   <ng-template #form></ng-template>

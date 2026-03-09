@@ -43,6 +43,7 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
   chartsLoaded = signal<Set<number>>(new Set());
   private observer?: IntersectionObserver;
   private subscriptions: Subscription[] = [];
+  private searchSub?: Subscription;
 
   private readonly chartContainersEffect = effect(() => {
     this.chartContainers();
@@ -113,27 +114,26 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
   }
 
   loadPage() {
-    // Очищаем список экспертов при начале новой загрузки
+    // Отменяем предыдущий поисковый запрос — предотвращает race condition,
+    // когда ответ на устаревший запрос (напр. по первой букве из debounce)
+    // перезаписывает результаты актуального запроса (по Enter).
+    this.searchSub?.unsubscribe();
     this.experts.set([]);
-    this.subscriptions.push(
-      this._personService.searchExperts(this._searchRequest).subscribe({
-        next: (res) => {
-          this._page = res;
-          this.experts.set(res.content);
-          this.setLoading(false);
-          this.cdr.markForCheck();
-          // После обновления списка экспертов, обновляем observer
-          // Используем requestAnimationFrame для гарантии, что DOM обновлен
-          requestAnimationFrame(() => {
-            this.observeChartContainers();
-          });
-        },
-        error: () => {
-          this.setLoading(false);
-          this.cdr.markForCheck();
-        }
-      })
-    );
+    this.searchSub = this._personService.searchExperts(this._searchRequest).subscribe({
+      next: (res) => {
+        this._page = res;
+        this.experts.set(res.content);
+        this.setLoading(false);
+        this.cdr.markForCheck();
+        requestAnimationFrame(() => {
+          this.observeChartContainers();
+        });
+      },
+      error: () => {
+        this.setLoading(false);
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   ngAfterViewInit() {
@@ -144,6 +144,7 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
   }
 
   ngOnDestroy() {
+    this.searchSub?.unsubscribe();
     this.subscriptions.forEach(sub => sub.unsubscribe());
     this.subscriptions = [];
     if (this.observer) {

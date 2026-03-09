@@ -74,6 +74,10 @@ import {environment} from "../../../../../environments/environment";
         transform: translateY(-1px);
         box-shadow: 0 0.25rem 0.5rem rgba(108, 117, 125, 0.2);
       }
+
+      :host-context([data-bs-theme="dark"]) .input-group-text:hover {
+        background-color: var(--dark-bg-hover);
+      }
     `],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)

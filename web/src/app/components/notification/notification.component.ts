@@ -39,6 +39,21 @@ import {environment} from "../../../environments/environment";
       td, th {
           padding: 0.75rem 0.5rem;
       }
+
+      :host-context([data-bs-theme="dark"]) table {
+          background-color: var(--dark-bg-surface);
+          color: var(--dark-text);
+      }
+
+      :host-context([data-bs-theme="dark"]) td,
+      :host-context([data-bs-theme="dark"]) th {
+          border-color: var(--dark-border);
+          color: var(--dark-text);
+      }
+
+      :host-context([data-bs-theme="dark"]) thead th {
+          background-color: var(--dark-bg-card);
+      }
   `],
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default

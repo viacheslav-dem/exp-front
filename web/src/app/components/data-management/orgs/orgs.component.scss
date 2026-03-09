@@ -501,3 +501,66 @@
     border-top: 2px solid #f0f0f0;
   }
 }
+
+// --- Dark theme overrides ---
+:host-context([data-bs-theme="dark"]) ::ng-deep .simple-catalog {
+  background: var(--dark-bg-surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  .catalog-header {
+    border-bottom-color: var(--dark-border);
+    .catalog-title { color: var(--dark-text); }
+  }
+
+  .catalog-item {
+    background: var(--dark-bg-card);
+    border-color: var(--dark-border);
+
+    &:not(.item-editing):hover {
+      border-color: var(--dark-accent);
+      box-shadow: 0 4px 16px rgba(13, 110, 253, 0.2);
+    }
+    &.item-disabled { background: var(--dark-bg-elevated); }
+    &.item-editing {
+      border-color: var(--dark-accent);
+      box-shadow: 0 4px 20px rgba(13, 110, 253, 0.2);
+    }
+  }
+
+  .item-name { color: var(--dark-text); }
+  .item-label { color: var(--dark-text-muted); }
+
+  .item-details {
+    border-top-color: var(--dark-border);
+    .detail-item { color: var(--dark-text-muted); }
+    .detail-label { color: var(--dark-text-tertiary); }
+    .detail-value { color: var(--dark-text); }
+    .detail-value.link { color: var(--dark-accent); &:hover { color: #93c5fd; } }
+  }
+
+  .btn-edit { background: var(--dark-bg-elevated); border-color: var(--dark-border); }
+
+  .item-edit-form { border-top-color: var(--dark-border); }
+
+  .form-label { color: var(--dark-text-muted); }
+  .form-input, .form-textarea, .form-control {
+    color: var(--dark-text);
+    background: var(--dark-bg-card);
+    border-color: var(--dark-border);
+    &:focus { border-color: var(--dark-accent); box-shadow: 0 0 0 4px var(--dark-accent-bg); }
+  }
+
+  .form-field-with-action .form-field-value { color: var(--dark-text); }
+  .form-field-with-action .btn-icon-sm { background: var(--dark-bg-elevated); border-color: var(--dark-border); }
+
+  .form-actions { border-top-color: var(--dark-border); }
+  .btn.btn-cancel { background: var(--dark-bg-elevated); color: var(--dark-text-muted); border-color: var(--dark-border); }
+  .btn.btn-delete, .btn.btn-danger { background: var(--dark-danger-bg); color: var(--dark-danger-text); border-color: var(--dark-danger-border); }
+
+  .form-list li { background: var(--dark-bg-elevated); border-color: var(--dark-border); span { color: var(--dark-text); } }
+
+  .badge.badge-warning { background: var(--dark-warning-bg); color: #ffc107; }
+  .badge.badge-secondary { background: var(--dark-bg-elevated); color: var(--dark-text-muted); }
+
+  .catalog-pagination { border-top-color: var(--dark-border); }
+}

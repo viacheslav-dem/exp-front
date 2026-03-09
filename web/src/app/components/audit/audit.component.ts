@@ -103,6 +103,34 @@ import {environment} from "../../../environments/environment";
       thead th:nth-child(2) {
           text-align: center;
       }
+
+      :host-context([data-bs-theme="dark"]) table {
+          background-color: var(--dark-bg-surface);
+          color: var(--dark-text);
+      }
+
+      :host-context([data-bs-theme="dark"]) table.table {
+          --bs-table-bg: var(--dark-bg-surface);
+          --bs-table-hover-bg: var(--dark-bg-card);
+      }
+
+      :host-context([data-bs-theme="dark"]) thead th {
+          border-bottom-color: var(--dark-border);
+          color: var(--dark-text);
+      }
+
+      :host-context([data-bs-theme="dark"]) tbody td {
+          border-bottom-color: var(--dark-bg-elevated);
+          color: var(--dark-text);
+      }
+
+      :host-context([data-bs-theme="dark"]) .audit-table-row:hover {
+          background-color: var(--dark-bg-card);
+      }
+
+      :host-context([data-bs-theme="dark"]) .audit-table-row:hover > td {
+          background-color: var(--dark-bg-card) !important;
+      }
   `],
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default

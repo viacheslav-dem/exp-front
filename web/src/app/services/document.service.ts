@@ -83,7 +83,7 @@ export class DocumentService {
   }
 
   getTemplatesPage(request: SearchPageRequest): Observable<PageDto<TemplateDocumentDto>> {
-    return this._http.post(`${SERVER_URL}/document/template/`, request)
+    return this._http.post(`${SERVER_URL}/document/template`, request)
   }
 
   getMethRec() {

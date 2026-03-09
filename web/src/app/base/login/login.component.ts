@@ -55,10 +55,6 @@ export class LoginComponent implements OnInit {
 
   toggleVisibility() {
       this.showPassword = !this.showPassword;
-      const inputPass = document.getElementById("input-password") as HTMLInputElement;
-      if (inputPass) {
-        inputPass.type = this.showPassword ? 'text' : 'password';
-      }
   }
 
   getSystemNotificationForLoginPage() {

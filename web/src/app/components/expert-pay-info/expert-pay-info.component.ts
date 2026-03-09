@@ -1,4 +1,4 @@
-import {Component, ChangeDetectionStrategy, signal, ChangeDetectorRef, effect, input} from "@angular/core";
+import {Component, ChangeDetectionStrategy, signal, ChangeDetectorRef, effect, input, untracked} from "@angular/core";
 import {ExpertReviewService} from "@app/services/expert-review.service";
 import {ExpertPayInfoDto} from "@app/dto/ExpertPayInfoDto";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
@@ -9,6 +9,7 @@ import {Page} from "@app/components/common-components/page-and-filter/model/Page
 @Component({
     selector: 'app-expert-pay-info',
     templateUrl: './expert-pay-info.component.html',
+    styleUrls: ['./expert-pay-info.component.scss'],
     standalone: false,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -27,25 +28,25 @@ export class ExpertPayInfoComponent extends FilterAndPages<ExpertPayInfoDto> {
     private readonly _expertEffect = effect(() => {
         const expert = this.expert();
         if (expert == null) {
-            this._expertId.set(undefined);
+            untracked(() => this._expertId.set(undefined));
             return;
         }
-        this.expertInfoDtos.set([]);
+        // untracked: эффект должен отслеживать ТОЛЬКО input-сигнал expert().
+        // Без untracked чтение _pagination/_expertId и запись _page/_pagination
+        // (новые объекты каждый раз) создают бесконечный цикл перезапуска эффекта.
+        untracked(() => {
+            this.expertInfoDtos.set([]);
+            this._page = new Page<ExpertPayInfoDto>();
 
-        // Zoneless/Signals: избегаем мутаций вложенных полей (_page.* / _pagination.page),
-        // чтобы корректно триггерить обновление.
-        this._page = new Page<ExpertPayInfoDto>();
+            const nextPagination = new Pagination(this._pagination?.itemsPerPage);
+            nextPagination.page = 1;
+            this._pagination = nextPagination;
 
-        // Сбрасываем пагинацию на первую страницу (pagination.page — 1-based)
-        const nextPagination = new Pagination(this._pagination?.itemsPerPage);
-        nextPagination.page = 1;
-        this._pagination = nextPagination;
-
-        // Пересоздаём SearchPageRequest с новой пагинацией
-        this._searchRequest = new SearchPageRequest(nextPagination);
-        this._expertId.set(expert);
-        this.setLoading(true);
-        this.loadPage();
+            this._searchRequest = new SearchPageRequest(nextPagination);
+            this._expertId.set(expert);
+            this.setLoading(true);
+            this.loadPage();
+        });
     });
 
     get expertId(): number | undefined {

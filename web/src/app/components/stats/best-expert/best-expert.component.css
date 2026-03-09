@@ -107,7 +107,36 @@ button:hover {
 }
 
 .button-container button {
-    width: 100%; /* Ensures that all buttons take the full width of the container */
+    width: 100%;
 }
 
+/* Dark theme overrides */
+:host-context([data-bs-theme="dark"]) .form-container {
+    background-color: var(--dark-bg-card);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
 
+:host-context([data-bs-theme="dark"]) label {
+    color: var(--dark-text);
+}
+
+:host-context([data-bs-theme="dark"]) input[type="date"] {
+    background-color: var(--dark-bg-card);
+    border-color: var(--dark-border);
+    color: var(--dark-text);
+}
+
+:host-context([data-bs-theme="dark"]) .experts-table th,
+:host-context([data-bs-theme="dark"]) .experts-table td {
+    border-bottom-color: var(--dark-border);
+    color: var(--dark-text);
+}
+
+:host-context([data-bs-theme="dark"]) .experts-table .text-muted {
+    color: var(--dark-text-muted) !important;
+}
+
+:host-context([data-bs-theme="dark"]) .spinner {
+    border-color: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--dark-accent);
+}

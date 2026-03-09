@@ -298,6 +298,90 @@ a:hover {
 }
 
 // ============================================================================
+// ТЕМНАЯ ТЕМА (ViewEncapsulation-safe)
+// ============================================================================
+
+:host-context([data-bs-theme="dark"]) {
+  .project-list-item {
+    background-color: var(--dark-bg-card);
+    border-color: var(--dark-border-subtle);
+  }
+
+  .project-list-item:hover {
+    background-color: var(--dark-bg-elevated);
+    border-color: rgba(13, 110, 253, 0.4) !important;
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .project-list-item.active {
+    background-color: var(--dark-primary-bg);
+    border-color: #0d6efd !important;
+  }
+
+  .project-list-item.alert-danger {
+    background-color: var(--dark-danger-bg) !important;
+    border-color: var(--dark-danger-border);
+    color: var(--dark-text) !important;
+  }
+
+  .project-list-item.alert-danger:hover {
+    background-color: var(--dark-danger-bg-hover) !important;
+    border-color: rgba(220, 53, 69, 0.5);
+  }
+
+  .project-list-item.alert-warning {
+    background-color: var(--dark-warning-bg) !important;
+    border-color: var(--dark-warning-border);
+    color: var(--dark-text) !important;
+  }
+
+  .project-list-item.alert-warning:hover {
+    background-color: var(--dark-warning-bg-hover) !important;
+    border-color: rgba(255, 193, 7, 0.5);
+  }
+
+  .project-list-item.alert-primary {
+    background-color: var(--dark-primary-bg) !important;
+    border-color: var(--dark-primary-border);
+    color: var(--dark-text) !important;
+  }
+
+  .project-list-item.alert-primary:hover {
+    background-color: var(--dark-primary-bg-hover) !important;
+    border-color: rgba(13, 110, 253, 0.5);
+  }
+
+  // Цвета текста внутри карточек
+  .project-list-item .text-body-secondary {
+    color: var(--dark-text-muted) !important;
+  }
+
+  .project-list-item .text-dark {
+    color: var(--dark-text-bright) !important;
+  }
+
+  .project-list-item h6 {
+    color: var(--dark-text-bright);
+  }
+
+  .project-list-item.project-card-has-remarks {
+    border-left-color: #fd7e14;
+    background-color: #33291e;
+  }
+
+  .project-list-item.project-card-has-remarks:hover {
+    background-color: #3d3020;
+    border-left-color: #e8590c;
+  }
+
+  .project-list-item .project-remarks-badge {
+    background-color: #3d3020;
+    color: #ffb74d;
+    border-color: #805a20;
+  }
+}
+
+// ============================================================================
 // АДАПТИВНЫЕ СТИЛИ - ПЛАНШЕТЫ И СРЕДНИЕ МОНИТОРЫ
 // ============================================================================
 // Оптимизация для экранов 992px - 1600px (старые мониторы, не Full HD)

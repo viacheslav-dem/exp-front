@@ -31,6 +31,7 @@ export class ReturnFromCouncilWithoutExpertiseFormComponent extends DocumentForm
   readonly project = input<ProjectDto>(undefined);
   readonly group = input<LifecycleGroupDto>(undefined);
   readonly council = input<CouncilPlainDto>(undefined);
+  readonly loading = input<boolean>(false);
 
   public readonly searchPersonModal = viewChild(SearchPersonByRolesComponent);
 

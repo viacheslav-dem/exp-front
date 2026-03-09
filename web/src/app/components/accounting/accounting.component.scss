@@ -8,3 +8,24 @@ td, th {
   padding: 0.75rem 0.5rem;
 }
 
+// --- Dark theme overrides ---
+:host-context([data-bs-theme="dark"]) {
+  table {
+    background-color: var(--dark-bg-surface);
+    color: var(--dark-text);
+  }
+
+  td, th {
+    border-color: var(--dark-border);
+    color: var(--dark-text);
+  }
+
+  thead th {
+    background-color: var(--dark-bg-card);
+  }
+
+  tbody tr:hover {
+    background-color: var(--dark-bg-card);
+  }
+}
+

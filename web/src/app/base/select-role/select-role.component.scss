@@ -104,3 +104,63 @@
   }
 }
 
+// --- Dark theme overrides ---
+:host-context([data-bs-theme="dark"]) {
+  .role-item {
+    background-color: var(--dark-bg-card);
+    border-color: var(--dark-border-subtle);
+    color: var(--dark-text);
+  }
+
+  .role-item:hover:not(.active) {
+    background-color: var(--dark-bg-elevated);
+    border-color: rgba(13, 110, 253, 0.4);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.3);
+  }
+
+  .role-item.alert-danger {
+    background-color: var(--dark-danger-bg);
+    border-color: rgba(220, 53, 69, 0.35);
+  }
+
+  .role-item.alert-danger:hover {
+    background-color: var(--dark-danger-bg-hover);
+    border-color: rgba(220, 53, 69, 0.5);
+    box-shadow: 0 0.25rem 0.5rem rgba(220, 53, 69, 0.25);
+  }
+
+  .role-item.alert-warning {
+    background-color: var(--dark-warning-bg);
+    border-color: rgba(255, 193, 7, 0.35);
+  }
+
+  .role-item.alert-warning:hover {
+    background-color: var(--dark-warning-bg-hover);
+    border-color: rgba(255, 193, 7, 0.5);
+    box-shadow: 0 0.25rem 0.5rem rgba(255, 193, 7, 0.25);
+  }
+
+  .role-item.alert-primary {
+    background-color: var(--dark-primary-bg);
+    border-color: rgba(13, 110, 253, 0.35);
+  }
+
+  .role-item.alert-primary:hover {
+    background-color: var(--dark-primary-bg-hover);
+    border-color: rgba(13, 110, 253, 0.5);
+    box-shadow: 0 0.25rem 0.5rem rgba(13, 110, 253, 0.25);
+  }
+
+  .roles-container::-webkit-scrollbar-track {
+    background: var(--dark-bg-body);
+  }
+
+  .roles-container::-webkit-scrollbar-thumb {
+    background: var(--dark-border);
+  }
+
+  .roles-container::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-text-tertiary);
+  }
+}
+

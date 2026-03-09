@@ -54,3 +54,60 @@
     opacity: 0.75;
   }
 }
+
+// ============================================================================
+// ТЕМНАЯ ТЕМА (ViewEncapsulation-safe)
+// ============================================================================
+
+:host-context([data-bs-theme="dark"]) {
+  .card.card-block {
+    background-color: var(--dark-bg-card);
+    border-color: var(--dark-border-subtle);
+    color: var(--dark-text);
+  }
+
+  .card.card-block.alert-danger {
+    background-color: var(--dark-danger-bg) !important;
+    border-color: var(--dark-danger-border);
+    color: var(--dark-text) !important;
+  }
+
+  .card.card-block.alert-warning {
+    background-color: var(--dark-warning-bg) !important;
+    border-color: var(--dark-warning-border);
+    color: var(--dark-text) !important;
+  }
+
+  .card.card-block.alert-primary {
+    background-color: var(--dark-primary-bg) !important;
+    border-color: var(--dark-primary-border);
+    color: var(--dark-text) !important;
+  }
+
+  .text-muted {
+    color: var(--dark-text-muted) !important;
+  }
+
+  .text-sm {
+    color: var(--dark-text);
+  }
+
+  .italic, .text-sm .italic {
+    color: var(--dark-text-bright);
+  }
+
+  h5 {
+    color: var(--dark-text-bright);
+  }
+
+  .download-all-btn {
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+
+    &:hover {
+      color: var(--dark-accent);
+      border-color: rgba(13, 110, 253, 0.4);
+      background: rgba(13, 110, 253, 0.15);
+    }
+  }
+}

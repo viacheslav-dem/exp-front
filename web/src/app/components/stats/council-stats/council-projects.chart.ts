@@ -50,6 +50,9 @@ export class CouncilProjectsChart implements OnInit {
             .series(Chart.lineOptions('На экспертизе')
                 .color(returnedClr)
                 .data(stats.map(stats => stats.projectsNotFinished))
+                .cursorPointer()
+                .tooltip(Chart.tooltip()
+                    .pointFormat('<span style="color:{point.color}">\u25CF</span> На экспертизе: <b>{point.y}</b><br/><span style="font-size:10px;color:#666">Нажмите для просмотра списка</span>'))
                 .onClick(
                     (event) => {
                         this.councilStatsComponent.showListProjectsFromStats("on_examination", event.point.category);
@@ -58,6 +61,9 @@ export class CouncilProjectsChart implements OnInit {
             .series(Chart.lineOptions('Просроченные')
                 .color(rejectedClr)
                 .data(stats.map(stats => stats.projectsOverdue))
+                .cursorPointer()
+                .tooltip(Chart.tooltip()
+                    .pointFormat('<span style="color:{point.color}">\u25CF</span> Просроченные: <b>{point.y}</b><br/><span style="font-size:10px;color:#666">Нажмите для просмотра списка</span>'))
                 .onClick(
                     (event) => {
                         this.councilStatsComponent.showListProjectsFromStats("expired", event.point.category);

@@ -7,9 +7,39 @@
   --bs-table-bg: #ffffff !important;
   --bs-table-hover-bg: #f8f9fa !important;
   background-color: #ffffff !important;
-  
+
   tbody tr:hover {
     background-color: #f8f9fa !important;
+  }
+}
+
+// --- Dark theme overrides ---
+:host-context([data-bs-theme="dark"]) {
+  .table.table-responsive {
+    --bs-table-bg: var(--dark-bg-surface) !important;
+    --bs-table-hover-bg: var(--dark-bg-card) !important;
+    background-color: var(--dark-bg-surface) !important;
+
+    tbody tr:hover {
+      background-color: var(--dark-bg-card) !important;
+    }
+
+    thead th {
+      background-color: var(--dark-bg-card) !important;
+      border-color: var(--dark-border) !important;
+      color: var(--dark-text) !important;
+    }
+
+    td {
+      border-color: var(--dark-border) !important;
+      color: var(--dark-text) !important;
+    }
+  }
+
+  .card.card-block {
+    background-color: var(--dark-bg-card);
+    border-color: var(--dark-border-subtle);
+    color: var(--dark-text);
   }
 }
 

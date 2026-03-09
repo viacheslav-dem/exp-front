@@ -24,13 +24,13 @@
         <div class="mb-4">
           <label for="input-password" class="form-label fw-semibold small text-dark">Пароль</label>
           <div class="position-relative">
-            <input 
-              type="password" 
-              id="input-password" 
-              class="form-control form-control-lg rounded-3 pe-5" 
-              placeholder="Введите пароль" 
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="input-password"
+              class="form-control form-control-lg rounded-3 pe-5"
+              placeholder="Введите пароль"
               required
-              [(ngModel)]="user.password" 
+              [(ngModel)]="user.password"
               name="password"
               >
             <button 

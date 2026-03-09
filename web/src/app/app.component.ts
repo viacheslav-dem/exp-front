@@ -42,7 +42,9 @@ import {
   faUsers,
   faPlayCircle,
   faFile,
-  faSitemap
+  faSitemap,
+  faSun,
+  faMoon
 } from '@fortawesome/free-solid-svg-icons';
 
 defineLocale('ru', ruLocale);
@@ -63,7 +65,8 @@ export class AppComponent {
       faCheck, faPlus, faMinus, faCalendar, faCircle, faUser, faUsers, faKey, faList, faInfoCircle, faPowerOff,
       faSortAlphaDown, faSortAlphaUp, faSortAmountDown, faSortAmountUp, faSort, faChevronUp, faChevronDown,
       faAngleDown, faAngleUp, faAngleLeft, faAngleRight, faAngleDoubleLeft, faAngleDoubleRight,
-      faExclamationTriangle, faFileWord, faPlayCircle, faFile, faSitemap
+      faExclamationTriangle, faFileWord, faPlayCircle, faFile, faSitemap,
+      faSun, faMoon
     );
     //this.initCrypto();
   }
