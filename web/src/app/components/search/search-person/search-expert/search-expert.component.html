@@ -32,7 +32,7 @@
                 }
                 @if (expert.personInfo.specializations) {
                   <div>
-                    Специализация:&nbsp;
+                    Код ГРНТИ:&nbsp;
                     @for (spec of expert.personInfo.specializations; track spec?.id || $index) {
                       <div
                         class="italic">{{spec.name}}

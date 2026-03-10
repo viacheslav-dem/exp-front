@@ -58,7 +58,7 @@ export class RootPageComponent implements OnInit {
       {link: '/data-management/science', title: 'Отрасли наук'},
       {link: '/data-management/funding', title: 'Источники финансирования'},
       {link: '/data-management/speciality', title: 'Специальности'},
-      {link: '/data-management/specialization', title: 'Специализации'},
+      {link: '/data-management/specialization', title: 'Коды ГРНТИ'},
       {link: '/data-management/industrial-property', title: 'Объекты промышленной собственности'},
       {link: '/data-management/tariff', title: 'Тарифы'},
       {link: '/data-management/meth-rec', title: 'Методические рекомендации'},

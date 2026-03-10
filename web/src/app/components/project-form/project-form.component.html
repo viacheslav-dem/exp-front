@@ -40,7 +40,7 @@
     </div>
 
     <div class="form-group">
-        <label class="form-group-label">Коды специализации</label>
+        <label class="form-group-label">Коды ГРНТИ</label>
         @for (specialization of _project.projectSpecialization; track trackBySpecialization(i, specialization); let i = $index) {
             <div class="specialization-item-wrapper mb-2">
                 <div class="input-group">
@@ -51,7 +51,7 @@
                         [(ngModel)]="_project.projectSpecialization[i]"
                         [compareWith]="compareSpecialization"
                         [appendTo]="'body'"
-                        placeholder="Выберите специализацию"
+                        placeholder="Выберите Код ГРНТИ"
                         [searchable]="true"
                         [clearable]="true"
                         [loading]="isSpecializationLoading(i)"
@@ -62,24 +62,34 @@
                         (open)="onSpecializationOpen(i)"
                         (scrollToEnd)="loadMoreSpecializations(i)"
                         class="form-control p-0 border-0">
+                        <ng-template ng-label-tmp let-item="item" >
+                            <!-- Display the item using multiple fields in the selected area -->
+                            <span> {{ item.code + " - " + item.name }} </span>
+                        </ng-template>
+
+                        <ng-template ng-option-tmp let-item="item">
+                            <!-- Display the options in the dropdown list -->
+                            <span> {{ item.code + " - " + item.name }} </span>
+                        </ng-template>
                     </ng-select>
-                    <button type="button" class="btn btn-outline-danger" 
-                        (click)="removeSpecialization(i)"
-                        title="Удалить специализацию">&times;</button>
+                    <button type="button" class="btn btn-outline-danger"
+                            (click)="removeSpecialization(i)"
+                            title="Удалить код ГРНТИ">&times;
+                    </button>
                 </div>
             </div>
         }
         <div>
-            <button type="button" class="btn btn-primary btn-sm" 
+            <button type="button" class="btn btn-primary btn-sm"
                 (click)="addSpecialization()"
                 [disabled]="_project.projectSpecialization && _project.projectSpecialization.length >= 10">
-                Добавить специализацию
+                Добавить код ГРНТИ
             </button>
         </div>
         <div class="hint">
             <p class="font-italic">
                 <b>Подсказка.</b>
-                Выберите коды специализации проекта (не более 10). Специализация используется для автоматического подбора экспертов.
+                Выберите коды ГРНТИ проекта (не более 10). Код ГРНТИ используется для автоматического подбора экспертов.
             </p>
         </div>
     </div>

@@ -19,6 +19,7 @@ import {SortOrder, Direction} from "@app/components/common-components/page-and-f
 import {environment} from "../../../environments/environment";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {FormValidationScrollService} from "@app/services/form-validation-scroll.service";
+import {SpecializationDto} from "@app/dto/SpecializationDto";
 
 
 @Component({
@@ -70,7 +71,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     selectedCommercializationMethod: CatalogDto;
 
     // Специализация проекта - lazy loading
-    specializationItemsMap: Map<number, CatalogDto[]> = new Map();
+    specializationItemsMap: Map<number, SpecializationDto[]> = new Map();
     specializationLoadingMap: Map<number, boolean> = new Map();
     specializationSearchInputMap: Map<number, Subject<string>> = new Map();
     specializationPageMap: Map<number, number> = new Map();
@@ -140,7 +141,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         if (this._project.projectSpecialization) {
             this._project.projectSpecialization.forEach((specialization, index) => {
                 if (specialization != null) {
-                    this.specializationItemsMap.set(index, [specialization] as CatalogDto[]);
+                    this.specializationItemsMap.set(index, [specialization] as SpecializationDto[]);
                 } else {
                     this.specializationItemsMap.set(index, []);
                 }
@@ -369,7 +370,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         }
         const validSpecializations = this._project.projectSpecialization?.filter(s => s != null) || [];
         if (validSpecializations.length === 0) {
-            throw 'Пожалуйста, выберите хотя бы один код специализации.';
+            throw 'Пожалуйста, выберите хотя бы один код ГРНТИ.';
         }
         // Удаляем пустые специализации перед сохранением
         this._project.projectSpecialization = validSpecializations;
@@ -639,7 +640,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         this.specializationLoadingMap.clear();
     }
 
-    getSpecializationItems(index: number): CatalogDto[] {
+    getSpecializationItems(index: number): SpecializationDto[] {
         if (!this.specializationItemsMap.has(index)) {
             this.specializationItemsMap.set(index, []);
         }
@@ -659,7 +660,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                     
                     if (trimmedTerm.length > 0 && trimmedTerm.length < 2) {
                         const existingSelected = this._project?.projectSpecialization?.[index] 
-                            ? [this._project.projectSpecialization[index]].filter(s => s != null) as CatalogDto[] 
+                            ? [this._project.projectSpecialization[index]].filter(s => s != null) as SpecializationDto[]
                             : [];
                         this.specializationItemsMap.set(index, [...existingSelected]);
                         this.specializationHasMoreMap.set(index, true);
@@ -669,7 +670,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
                     
                     this.specializationPageMap.set(index, 0);
                     const existingSelected = this._project?.projectSpecialization?.[index] 
-                        ? [this._project.projectSpecialization[index]].filter(s => s != null) as CatalogDto[] 
+                        ? [this._project.projectSpecialization[index]].filter(s => s != null) as SpecializationDto[]
                         : [];
                     this.specializationItemsMap.set(index, [...existingSelected]);
                     this.specializationHasMoreMap.set(index, true);
@@ -683,7 +684,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     }
 
     onSpecializationOpen(index: number) {
-        const items = this.getSpecializationItems(index);
+        const items = this.getSpecializationItems(index).filter(specialization => !specialization.disabled);
         const page = this.specializationPageMap.get(index) || 0;
         const loading = this.specializationLoadingMap.get(index) || false;
         
@@ -717,21 +718,24 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         let filter = null;
         const currentSearch = this.specializationCurrentSearchMap.get(index) || '';
         if (currentSearch && currentSearch.trim().length > 0) {
-            filter = FilterBuilder.contains('name', currentSearch.trim());
+            filter = FilterBuilder.or('', [
+                FilterBuilder.contains('name', currentSearch.trim()),
+                FilterBuilder.contains('code', currentSearch.trim())
+            ])
         }
 
         const request = new SearchPageRequest(pagination, filter, [new SortOrder('name', Direction.ASC)]);
         
         // Используем публичный пагинируемый endpoint: CUSTOMER не имеет доступа к /admin/page
-        return this._dataService.getCatalogPage<CatalogDto>(Catalog.SPECIALIZATION, request).pipe(
+        return this._dataService.getCatalogPage<SpecializationDto>(Catalog.SPECIALIZATION, request).pipe(
             switchMap((page) => {
                 const items = this.getSpecializationItems(index);
                 if (reset) {
                     const existingIds = new Set(items.map(item => item.id));
-                    const newItems = page.content.filter(item => !existingIds.has(item.id));
+                    const newItems = page.content.filter(item => !existingIds.has(item.id) && !item.disabled);
                     this.specializationItemsMap.set(index, [...items, ...newItems]);
                 } else {
-                    this.specializationItemsMap.set(index, [...items, ...page.content]);
+                    this.specializationItemsMap.set(index, [...items, ...page.content.filter(item => !item.disabled)]);
                 }
                 this.specializationHasMoreMap.set(index, page.page < page.totalPages);
                 this.specializationPageMap.set(index, currentPage + 1);
@@ -772,7 +776,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
             this._project.projectSpecialization = [];
         }
         if (this._project.projectSpecialization.length >= 10) {
-            throw 'Количество выбранных кодов специализации не может быть больше 10';
+            throw 'Количество выбранных кодов ГРНТИ не может быть больше 10';
         }
         this._project.projectSpecialization.push(null);
         const newIndex = this._project.projectSpecialization.length - 1;
@@ -800,7 +804,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         const errorMappings: { [key: string]: string } = {
             'приоритетное направление': '.form-group-label',
             'код объекта экспертизы': '.form-group-label',
-            'код специализации': '.form-group-label',
+            'код ГРНТИ': '.form-group-label',
             'исполнитель': '.form-group-label',
             'сроки реализации': '.form-group-label',
             'ожидаемый результат': '.form-group-label',
@@ -869,7 +873,7 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         const errorMappings: { [key: string]: string } = {
             'приоритетное направление': 'приоритетное направление',
             'код объекта экспертизы': 'код объекта экспертизы',
-            'код специализации': 'код специализации',
+            'код ГРНТИ': 'код ГРНТИ',
             'исполнитель': 'исполнитель',
             'сроки реализации': 'сроки',
             'ожидаемый результат': 'ожидаемый результат',

@@ -8,11 +8,9 @@ import {CatalogDto} from "@app/dto/CatalogDto";
 import {ProjectCodePlainDto} from "@app/dto/ProjectCodePlainDto";
 import {HasState} from "@app/dto/HasState";
 import {FundingDto} from "@app/dto/FundingDto";
-import {DirectionDto} from "@app/dto/DirectionDto";
 import {SubDirectionDto} from "@app/dto/SubDirectionDto";
-import {PeriodNIOKTRDto} from "@app/dto/PeriodNIOKTRDto";
-import {PeriodInnovationDto} from "@app/dto/PeriodInnovationDto";
 import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
+import {SpecializationDto} from "@app/dto/SpecializationDto";
 
 export class ProjectDto extends HasState {
   title: string;
@@ -75,5 +73,5 @@ export class ProjectDto extends HasState {
   technologicalOrder: string;
   otherTechnologicalOrder: string;
 
-  projectSpecialization: CatalogDto[] = [];
+  projectSpecialization: SpecializationDto[] = [];
 }

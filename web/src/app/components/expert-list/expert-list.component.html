@@ -73,7 +73,7 @@
               }
               @if (expert.personInfo.specializations) {
                       <div class="mb-3">
-                        <div class="fw-semibold small text-dark mb-1">Специализация:</div>
+                        <div class="fw-semibold small text-dark mb-1">Код ГРНТИ:</div>
                   @for (spec of expert.personInfo.specializations; track (spec?.id ?? spec?.code ?? spec?.name ?? $index)) {
                           <div class="text-body-secondary small mt-1 text-break">{{spec.name}}</div>
                   }

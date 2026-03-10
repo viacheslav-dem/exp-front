@@ -64,7 +64,7 @@
                       }
                       @if (review.expert.personInfo.specialization) {
                         <div>
-                          Специализация:&nbsp;<span class="italic">{{review.expert.personInfo.specialization}}</span>
+                          Код ГРНТИ:&nbsp;<span class="italic">{{review.expert.personInfo.specialization}}</span>
                         </div>
                       }
                       @if (review.expert.personInfo.specialty) {
@@ -192,7 +192,7 @@
           }
           @if (currentExpert?.personInfo?.specializations?.length) {
             <div>
-              Специализация:&nbsp;
+              Код ГРНТИ:&nbsp;
               @for (spec of currentExpert.personInfo.specializations; track spec) {
                 <div
                   class="italic">

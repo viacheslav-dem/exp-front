@@ -77,7 +77,7 @@ export class ExpertListComponent extends FilterAndPages<PersonExpertDto> impleme
       SearchField.multiSelect('personInfo.academicTitleType', getAllAcademicTitleTypes(), value => this._academicTitleTypePipe.transform(value))
         .setSelectText("учёное звание"),
       SearchField.multiSelect('personInfo.specialities', Catalog.SPECIALITY).setSelectText('Специальность').setSearchFilterEnabled(true),
-      SearchField.multiSelect('personInfo.specializations', Catalog.SPECIALIZATION).setSelectText('Специализация').setSearchFilterEnabled(true),
+      SearchField.multiSelect('personInfo.specializations', Catalog.SPECIALIZATION, value => value.code + ' - ' + value.name).setSelectText('Код ГРНТИ').setSearchFilterEnabled(true),
       SearchField.multiSelect('org', []).setSelectText('Организация').setSearchFilterEnabled(true),
       SearchField.contains('org.unp').setPlaceholder('Поиск по УНП...'),
       SearchField.contains('org.orgAddress').setPlaceholder('Поиск по адресу...'),

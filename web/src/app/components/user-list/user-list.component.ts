@@ -70,8 +70,8 @@ export class UserListComponent extends FilterAndPages<PersonDto> implements OnDe
         .setSelectText("Выбрать учёное звание").setTitle('Учёное звание'),
       SearchField.multiSelect('personInfo.specialities', []).setSelectText('Выбрать специальности')
         .setSearchFilterEnabled(true).setTitle('Специальность'),
-      SearchField.multiSelect('personInfo.specializations', []).setSelectText('Выбрать специализации')
-        .setSearchFilterEnabled(true).setTitle('Специализация'),
+      SearchField.multiSelect('personInfo.specializations', []).setSelectText('Выбрать коды ГРНТИ')
+        .setSearchFilterEnabled(true).setTitle('Код ГРНТИ'),
       SearchField.multiSelect('personInfo.lastSignState', this._lastSignPipe.getAllSignTypes(), value => this._lastSignPipe.transform(value))
           .setSelectText('Выбрать роль').setCheckAllEnabled(true).setTitle('Последний вход'),
     ];
