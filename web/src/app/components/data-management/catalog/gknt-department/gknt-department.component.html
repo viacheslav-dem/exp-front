@@ -1,4 +1,4 @@
-<h5 class="mb-3">Справочник подразделений ГКНТ</h5>
+<h5 class="mb-3">Справочник подразделений БелИСА</h5>
 <div class="list-group">
 
   <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
@@ -17,7 +17,7 @@
       <div>
         <!--DEPARTMENT HEADER-->
         <div class="list-group-item list-group-item-action selectable"
-          [class.border-bottom-none]="department.isExpanded" [class.disabled]="department.disabled"
+          [class.border-bottom-none]="department.isExpanded" [class.item-disabled]="department.disabled"
           (click)="department.isExpanded=!department.isExpanded">
           <div class="text-mini font-weight-bold">
             подразделение
@@ -38,13 +38,13 @@
                 <a class="btn btn-icon btn-right" (click)="editItem(department)">
                   <fa-icon icon="cog"></fa-icon>
                 </a>
-                <div>Начальник подразделения:
+                <div>Заведующий отделом:
                   <span class="italic">{{department.chairman | fullName}}</span>
                 </div>
-                <div>Заместитель начальника:
+                <div>Заведующий сектором:
                   <span class="italic">{{department.deputyChairman | fullName}}</span>
                 </div>
-                <div>Курирующий зам. Председателя:
+                <div>Курирующий зам. Директора:
                   <span class="italic">{{department.gkntChairman | fullName}}</span>
                 </div>
                 <div>Краткое наименование:
@@ -155,7 +155,7 @@
           @if (!items || items.length == 0) {
             <div>
               <div class="italic list-group-item background-light-blue">
-                Подразделения ГКНТ отсутствуют
+                Подразделения БелИСА отсутствуют
               </div>
             </div>
           }

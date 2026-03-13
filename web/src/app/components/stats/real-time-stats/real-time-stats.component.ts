@@ -40,7 +40,7 @@ export class RealTimeStatsComponent {
   }
 
   showGkntProjects() {
-    this._projectService.filterName = 'Объекты экспертизы на рассмотрении в ГКНТ';
+    this._projectService.filterName = 'Объекты экспертизы на рассмотрении в БелИСА';
     this._projectService.filter = FilterBuilder.in('state', [
       ProjectState.NEW, ProjectState.ON_CHECKING, ProjectState.ON_DEPARTMENT_SIGNING, ProjectState.ON_SIGNING,
       ProjectState.ON_DEPARTMENT_FINAL_SIGNING, ProjectState.ON_FINAL_SIGNING

@@ -15,9 +15,9 @@ export class RolePipe extends AbstractEnumPipe<Role> {
     this.map[Role.BUREAU_ASSESSOR] = 'Член бюро';
     this.map[Role.SECTION_CHAIRMAN] = 'Аппарат секции ГЭС';
     this.map[Role.BUREAU_CHAIRMAN] = 'Аппарат бюро ГЭС';
-    this.map[Role.GKNT_CHAIRMAN] = 'Зам. Председателя ГКНТ';
-    this.map[Role.GKNT_DEPARTMENT_CHAIRMAN] = 'Начальник подразделения ГКНТ';
-    this.map[Role.GKNT_WORKER] = 'Ответственный сотрудник ГКНТ';
+    this.map[Role.GKNT_CHAIRMAN] = 'Зам. Директора БелИСА';
+    this.map[Role.GKNT_DEPARTMENT_CHAIRMAN] = 'Заведующий отделом БелИСА';
+    this.map[Role.GKNT_WORKER] = 'Ответственный сотрудник БелИСА';
     this.map[Role.ADMIN] = 'Администратор';
     this.map[Role.BELISA_READ] = 'Сотрудник ГУ «БелИСА»';
     this.map[Role.BELISA_EDIT] = 'Сотрудник ГУ «БелИСА» (курирующий ГЭС)';

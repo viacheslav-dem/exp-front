@@ -261,7 +261,7 @@ export class ExpertReviewComponent implements OnInit {
         this._dialogService.showConfirmDialog(
             'Подтверждение согласия эксперта на проект',
             `Эксперт ${this._personPipe.transform(this.expertReview().expert)} согласился провести экспертизу объекта "${this.project().title}"?`,
-            'Он сможет приступить к работе после согласования зам. Председателя ГКНТ ' +
+            'Он сможет приступить к работе после согласования зам. Директора БелИСА ' +
             'и обязан будет завершить экспертизу в течение установленного нормативными актами срока.'
         ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
             this._reviewService.acceptProject(this.expertReview())
