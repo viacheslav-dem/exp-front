@@ -1,0 +1,8 @@
+.item-disabled {
+  opacity: 0.5;
+  background: #b2c1c1;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}

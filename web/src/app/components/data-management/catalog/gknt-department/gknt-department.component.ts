@@ -16,6 +16,7 @@ import {environment} from "../../../../../environments/environment";
 @Component({
     selector: 'app-gknt-department',
     templateUrl: './gknt-department.component.html',
+    styleUrls: ['gknt-department.component.scss'],
     standalone: false,
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
@@ -38,7 +39,9 @@ export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> 
   }
 
   ngOnInit() {
-    this._dataService.getGknt().subscribe(res => {
+    // При возврате функции в ГКНТ, заменить назад на этот метод (какие менять названия смотри в комите "Change specialization to GRNTI" от 13.03.2026)
+    // this._dataService.getGknt().subscribe(res => {
+    this._dataService.getBelisa().subscribe(res => {
       this.searchPersonFilter = FilterBuilder.equals('org', res);
       this.gknt = res;
       this.cdr.markForCheck();
