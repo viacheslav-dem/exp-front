@@ -50,6 +50,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   
   isCreatingReferral = false;
   isCreatingConclusion = false;
+  isCreatingDecision = false;
 
   readonly role = input(undefined);
   readonly project = input<ProjectDto>(new ProjectDto());
@@ -437,11 +438,21 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   }
 
   generateLifecycleGroupDecisionDocument(form: any) {
-    this.groupDecisionFormModal()?.hide();
+    this.isCreatingDecision = true;
     this.subscriptions.push(
-      this._lifecycleGroupService.generateLifecycleGroupDecisionDocument(this._group, form).subscribe(res => {
-        this._group.decisionDocument = res;
-        this.changed();
+      this._lifecycleGroupService.generateLifecycleGroupDecisionDocument(this._group, form).subscribe({
+        next: (res) => {
+          this.isCreatingDecision = false;
+          this.groupDecisionFormModal()?.hide();
+          this._group.decisionDocument = res;
+          this.changed();
+          this.cdr?.markForCheck?.();
+        },
+        error: (err) => {
+          this.isCreatingDecision = false;
+          this._toasty.error('Ошибка при создании документа');
+          this.cdr?.markForCheck?.();
+        }
       })
     );
   }

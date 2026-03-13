@@ -47,7 +47,12 @@
           <div class="d-inline-block text-muted text-sm">Направление в ГЭС</div>
           @if (canEditReferral()) {
             <div class="btn-right-sm">
-              <button class="btn btn-sm btn-primary" (click)="showReferralForm()">Создать</button>
+              <button class="btn btn-sm btn-primary" (click)="showReferralForm()" [disabled]="isCreatingReferral">
+                @if (isCreatingReferral) {
+                  <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                }
+                Создать
+              </button>
             </div>
           }
         </div>
@@ -97,7 +102,10 @@
           <div class="d-inline-block text-muted text-sm">Направление результатов заказчику</div>
           @if (canEditLifecycleGroupDecision()) {
             <div class="btn-right-sm">
-              <button class="btn btn-sm btn-primary" (click)="showGroupDecisionForm()">
+              <button class="btn btn-sm btn-primary" (click)="showGroupDecisionForm()" [disabled]="isCreatingDecision">
+                @if (isCreatingDecision) {
+                  <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                }
                 Создать
               </button>
             </div>
@@ -207,6 +215,7 @@
   <app-modal #groupDecisionFormModal
              [title]="'Направление результатов экспертизы'">
   <app-decision-document-form [project]="projectValue" [council]="_group?.council" [needCauses]="false"
+                              [loading]="isCreatingDecision"
                               (onSave)="generateLifecycleGroupDecisionDocument($event)"
                               (onClose)="groupDecisionFormModal.hide()">
   </app-decision-document-form>
