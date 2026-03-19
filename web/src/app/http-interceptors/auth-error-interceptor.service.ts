@@ -47,7 +47,9 @@ export class AuthErrorInterceptor implements HttpInterceptor {
     
     if (url.includes('/refresh-token') || 
         url.includes('/public/logout') || 
-        url.includes('/system-notification/get')) {
+        url.includes('/system-notification/get') ||
+        url.includes('/select_auth')
+    ) {
       return next.handle(req);
     }
 

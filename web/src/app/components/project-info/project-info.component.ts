@@ -39,6 +39,7 @@ import {DocumentDto} from "@app/dto/DocumentDto";
 import {DocumentService} from "@app/services/document.service";
 import {ActionButtonMetadata} from "./action-button-metadata";
 import {environment} from "../../../environments/environment";
+import {EsifulService} from "@app/services/esiful.service";
 
 @Component({
     selector: 'app-project-info',
@@ -230,6 +231,7 @@ export class ProjectInfoComponent implements OnInit {
 
   constructor(private route: ActivatedRoute,
               private _toasty: GlobalToastyService,
+              private esifulService: EsifulService,
               private _projectService: ProjectService,
               private router: Router,
               private _authService: AuthService,
@@ -289,6 +291,7 @@ export class ProjectInfoComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log("Project info: ngOnInit");
     this.role = this._authService.getCurrRole();
     this._personService.getCurrentPerson()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -495,6 +498,7 @@ export class ProjectInfoComponent implements OnInit {
       buttons.push(new ActionButtonMetadata('Редактировать', () => this.editProject(), 'btn-primary'));
       if (project.documents.length != 0 && role == Role.CUSTOMER) {
         buttons.push(new ActionButtonMetadata('На экспертизу', () => this.sendOnExamination(), 'btn-primary'));
+        buttons.push(new ActionButtonMetadata('Подписать и отправить на экспертизу', () => this.sendForSignatureCustomer(), 'btn-primary'));
       }
       if (project.documents.length != 0 && role == Role.SUB_CUSTOMER) {
         buttons.push(new ActionButtonMetadata('На утверждение', () => this.sendToHeadOrg(), 'btn-primary'));
@@ -570,7 +574,7 @@ export class ProjectInfoComponent implements OnInit {
           buttons.push(new ActionButtonMetadata('Отправить письмо заказчику без ЭЦП', () => this.returnProjectWithoutSign(), 'btn-warning'));
         }
         if (this.hasReferralsForAllActiveGroups(lifecycleGroups)) {
-          buttons.push(new ActionButtonMetadata('Подписать и отправить в ГЭС', () => this.sendOnExaminationToCouncilsWithSign(), 'btn-primary'));
+          buttons.push(new ActionButtonMetadata('Подписать и отправить в ГЭС', () => this.sendForSignatureGkntChairman(), 'btn-primary'));
           buttons.push(new ActionButtonMetadata('Отправить в ГЭС без ЭЦП', () => this.sendOnExaminationToCouncilsWithoutSign(), 'btn-warning'));
         }
       }
@@ -590,7 +594,7 @@ export class ProjectInfoComponent implements OnInit {
         buttons.push(new ActionButtonMetadata('Вернуть назначенному сотруднику', () => this.returnOnChecking(), 'btn-primary'));
 
         if (this.hasReferralsForAllActiveGroups(lifecycleGroups)) {
-          buttons.push(new ActionButtonMetadata('Подписать направления в ГЭС', () => this.sendOnSigningWithSignReferrals(), 'btn-primary'));
+          buttons.push(new ActionButtonMetadata('Подписать направления в ГЭС', () => this.sendForSignatureGkntDepartmentChairman(), 'btn-primary'));
           buttons.push(new ActionButtonMetadata('Отправить направления в ГЭС без ЭЦП', () => this.sendOnSigningWithoutSign(), 'btn-warning'));
         }
         if (project.decisionDocument) {
@@ -1098,11 +1102,7 @@ export class ProjectInfoComponent implements OnInit {
       '');
   }
 
-  sendOnSigningWithoutSign() {
-    this.sendOnSigningConfirmDialog()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.sendOnSigning());
-  }
+
 
   sendOnSigningWithSignDecision() {
     this.sendOnSigningConfirmDialog()
@@ -1140,6 +1140,18 @@ export class ProjectInfoComponent implements OnInit {
             this._progress.hide();
           }, () => this._progress.hide());
       });
+  }
+
+
+  sendOnSigningWithoutSign() {
+    this.sendOnSigningConfirmDialog()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.sendOnSigning());
+  }
+  sendForSignatureGkntDepartmentChairman() {
+    this.sendOnSigningConfirmDialog()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.sendForSignatureGkntDepartmentChairmanInEsiful());
   }
 
   private sendOnFinalSigning() {
@@ -1503,7 +1515,53 @@ export class ProjectInfoComponent implements OnInit {
         }
       });
   }
+
+  sendForSignatureGkntDepartmentChairmanInEsiful() {
+    this.esifulService.sendForSignatureGkntDepartmentChairmanInEsiful(this.project)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(res => {
+          this.updateProjectSignal(res);
+          this._toasty.success("Вы отправили документы зам. Председателя ГКНТ.");
+        });
+  }
+
+  private sendForSignatureGkntChairman() {
+    this.sendOnExaminationToCouncilsConfirmDialog()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.sendForSignatureGkntChairmanInEsiful());
+  }
+
+  private sendForSignatureGkntChairmanInEsiful() {
+    this.esifulService.sendForSignatureGkntChairmanInEsiful(this.project)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((res) => {
+          this.updateProjectSignal(res);
+          this.loadLifecycleGroups();
+          this._toasty.success("Отправлен на экспертизу в ГЭС.");
+        })
+  }
+
+  private sendForSignatureCustomer() {
+    const project = this.requireProject();
+    if (!project) return;
+
+    this._dialogService.showConfirmDialog(
+        null,
+        `Отправить на экспертизу объект "${project.title}"?`,
+        'После выполнения операции редактировать данные станет невозможно.'
+    )
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.esifulService.sendForSignatureCustomerInEsiful(project)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe((res) => {
+                this.updateProjectSignal(res);
+                this._toasty.success("Отправлен на экспертизу.");
+              });
+        });
+  }
 }
+
 
 // Re-export for backward compatibility
 export {ActionButtonMetadata} from './action-button-metadata';

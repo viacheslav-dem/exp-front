@@ -22,7 +22,6 @@ import {ProjectReviewsExpertsDto} from "@app/dto/ProjectReviewsExpertsDto";
 import {ProjectCopyDto} from "@app/dto/ProjectCopyDto";
 import {PersonDto} from "@app/dto/PersonDto";
 import {GroupStateDto} from "@app/dto/GroupStateDto";
-import {RemarkDto} from "@app/dto/RemarkDto";
 import {Role} from "@app/pipes/role.pipe";
 import {ExpertReviewTermsMessages} from "@app/pipes/review-state.pipe";
 import {LifecycleGroupTermsMessages} from "@app/pipes/lifecycle-group-state.pipe";
@@ -173,11 +172,6 @@ export class ProjectService extends HasStateService {
 
   getAnonymousReviews(idDto: IdDto): Observable<DocumentDto[]> {
     return this._http.getBlock(`${this.url}/get-anonymous-reviews/${idDto.id}`);
-  }
-
-  /** Обезличенные замечания экспертов по проекту (для аппарата бюро/секции на этапе работы с экспертами). */
-  getExpertRemarksByProject(projectId: number): Observable<RemarkDto[]> {
-    return this._http.getBlock(`${this.url}/${projectId}/expert-remarks`);
   }
 
   getProjectsForMeeting(): Observable<ProjectPlainDto[]> {

@@ -2,8 +2,11 @@ import {Component, OnInit, viewChild} from '@angular/core';
 import {AuthService} from "@app/services/auth.service";
 import {StorageService} from "@app/services/storage.service";
 import {RoleInfoDto} from "@app/dto/RoleInfoDto";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {ProjectListComponent} from "@app/components/project-list/project-list.component";
+import {DataIseful} from "@app/dto/DataIseful";
+import {UserEsiful} from "@app/dto/UserEsiful";
+import {EsifulService} from "@app/services/esiful.service";
 
 @Component({
     selector: 'app-select-role',
@@ -15,6 +18,7 @@ export class SelectRoleComponent implements OnInit {
 
   roles: string[] = [];
   currRole: string;
+  userEsiful: UserEsiful;
   rolesInfo: RoleInfoDto[] = [];
   mapInfoRole: { [key: string]: RoleInfoDto } = {};
   user: any = {};
@@ -23,18 +27,35 @@ export class SelectRoleComponent implements OnInit {
 
   constructor(private _storageService: StorageService,
               private _authService: AuthService,
-              private route: ActivatedRoute,) {
+              private esifulService: EsifulService,
+              private route: ActivatedRoute,
+              private router: Router) {
   }
 
   ngOnInit() {
-    this.roles = this._storageService.getRoles();
-    this.currRole = this._storageService.getCurrRole();
-    this.route.params.subscribe(() => {
-      this.getRolesInfo();
-      const comp = this.projectListComponent();
-      if (comp != null) {
-        comp.loadPage();
+    this.route.queryParams.subscribe(params => {
+      const dataParam = params['data'];
+      if (dataParam) {
+        const data = new DataIseful();
+        data.dataParam = dataParam;
+       this.esifulService.dataParams(data).subscribe({
+          next: (response: UserEsiful) => {
+              console.log(response);
+          },
+          error: (err) => {
+            console.error('Ошибка при обработке callback', err);
+          }
+        });
       }
+        this.roles = this._storageService.getRoles();
+        this.currRole = this._storageService.getCurrRole();
+        this.route.params.subscribe(() => {
+          this.getRolesInfo();
+          const comp = this.projectListComponent();
+          if (comp != null) {
+            comp.loadPage();
+          }
+        });
     });
   }
 

@@ -85,4 +85,5 @@ export class LoginoffComponent implements OnInit, OnDestroy {
   getUserManual() {
     this._authService.getManual().subscribe(doc => this.dialogService.showPDFViewer("document", doc).subscribe());
   }
+
 }

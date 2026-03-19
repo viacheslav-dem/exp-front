@@ -366,7 +366,7 @@
         </div>
         <app-document-list #customerDocumentsComponent [documents]="customerDocuments()"
           [canDelete]="canEditProjectDocuments()" [canUpdate]="canEditProjectDocuments()"
-          (onDelete)="deleteProjectDocument($event)" (onUpdate)="updateProjectDocument($event)">
+          (onDelete)="deleteProjectDocument($event)" (onUpdate)="updateProjectDocument($event)" [canCheck]="true">
         </app-document-list>
         <div class="mt-2 mb-1 text-sm text-muted">
           Остальные документы

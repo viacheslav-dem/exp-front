@@ -41,6 +41,11 @@
                 <fa-icon icon="trash-alt"></fa-icon>
               </a>
             }
+            @if (canCheck()) {
+            <a class="btn btn-icon" (click)="checkSignature(doc)">
+                <fa-icon icon="check"></fa-icon>
+            </a>
+            }
           </td>
         </tr>
       </table>

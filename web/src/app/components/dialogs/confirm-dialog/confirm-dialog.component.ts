@@ -6,7 +6,7 @@ import {environment} from "../../../../environments/environment";
     selector: 'app-confirm-dialog',
     template: `
     <div>
-      <div class="mb-2">{{message()}}</div>
+        <div class="mb-2" [innerHTML]="message()"></div>
       @for (field of (fields() ?? []); track field) {
         <div class="form-sub-group">
           <label>{{field.label}}</label>

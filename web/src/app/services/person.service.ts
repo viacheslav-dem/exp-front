@@ -11,6 +11,7 @@ import {PersonExpertDto} from "@app/dto/PersonExpertDto";
 import {PersonPlainDto} from "@app/dto/PersonPlainDto";
 import {StorageService} from "@app/services/storage.service";
 import {IdDto} from "@app/dto/IdDto";
+import {UserEsiful} from "@app/dto/UserEsiful";
 
 @Injectable()
 export class PersonService {
@@ -62,4 +63,5 @@ export class PersonService {
     getCurrentPerson(): Observable<PersonDto> {
         return this._http.get<PersonDto>(`${this.url}/current-person`);
     }
+
 }

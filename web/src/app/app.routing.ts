@@ -25,6 +25,9 @@ import {RootPageComponent} from "@app/components/root-page/root-page.component";
 import {SubOrgListComponent} from "@app/components/sub-org-list/sub-org-list.component";
 import {NotificationComponent} from "@app/components/notification/notification.component";
 import {SystemNotificationComponent} from "@app/components/system-notification/system-notification.component";
+import {InfoComponent} from "@app/base/info/info.component";
+import {LogoComponent} from "@app/base/logo/logo.component";
+import {CallbackComponent} from "@app/components/callback/callback.component";
 
 export const appRoutes: Routes = [
   {
@@ -36,6 +39,8 @@ export const appRoutes: Routes = [
   {path: 'login', component: LoginComponent, canActivate: [loginPageGuard]},
   {path: 'error', component: ErrorPageComponent},
   {path: 'select-role', component: SelectRoleComponent},
+  {path: 'info', component: InfoComponent},
+  {path: 'logo', component: LogoComponent},
   {
     path: '',
     component: RootPageComponent,
@@ -53,6 +58,7 @@ export const appRoutes: Routes = [
       {path: 'audit', component: AuditComponent},
       {path: 'sessions', component: SessionsComponent},
       {path: 'experts', component: ExpertListComponent},
+      {path: 'callback', component: CallbackComponent},
       {
         path: '',
         loadChildren: () => import('./components/stats/stats.module').then(m => m.StatsModule)
