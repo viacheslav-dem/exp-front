@@ -4,6 +4,9 @@ import {StorageService} from "@app/services/storage.service";
 import {RoleInfoDto} from "@app/dto/RoleInfoDto";
 import {ActivatedRoute, Router} from "@angular/router";
 import {ProjectListComponent} from "@app/components/project-list/project-list.component";
+import {DataIseful} from "@app/dto/DataIseful";
+import {UserEsiful} from "@app/dto/UserEsiful";
+import {EsifulService} from "@app/services/esiful.service";
 
 @Component({
     selector: 'app-select-role',
@@ -15,6 +18,7 @@ export class SelectRoleComponent implements OnInit {
 
   roles: string[] = [];
   currRole: string;
+  userEsiful: UserEsiful;
   rolesInfo: RoleInfoDto[] = [];
   mapInfoRole: { [key: string]: RoleInfoDto } = {};
   user: any = {};
@@ -23,49 +27,36 @@ export class SelectRoleComponent implements OnInit {
 
   constructor(private _storageService: StorageService,
               private _authService: AuthService,
+              private esifulService: EsifulService,
               private route: ActivatedRoute,
               private router: Router) {
   }
 
   ngOnInit() {
-
-    // Получаем параметр "data" из query-строки
     this.route.queryParams.subscribe(params => {
       const dataParam = params['data'];
-      console.log(dataParam);
       if (dataParam) {
-        // Отправляем GET-запрос на бэкенд с этим параметром
-       this._authService.dataParams(dataParam).subscribe({
-          next: (response: any) => {
-            // Здесь обрабатываем ответ от бэкенда (сохраняем токены, перенаправляем в приложение)
-            console.log('Успешный вход', response);
-            // Например, сохраняем токены и редиректим на главную
-            localStorage.setItem('access_token', response.access_token);
-            this.router.navigate(['/dashboard']);
+        const data = new DataIseful();
+        data.dataParam = dataParam;
+       this.esifulService.dataParams(data).subscribe({
+          next: (response: UserEsiful) => {
+              console.log(response);
           },
           error: (err) => {
             console.error('Ошибка при обработке callback', err);
-            // Перенаправляем на страницу ошибки или показываем сообщение
           }
         });
-      } else {
-        // Нет параметра data — что-то пошло не так
-        console.error('Отсутствует параметр data');
-        this.router.navigate(['/error']);
       }
+        this.roles = this._storageService.getRoles();
+        this.currRole = this._storageService.getCurrRole();
+        this.route.params.subscribe(() => {
+          this.getRolesInfo();
+          const comp = this.projectListComponent();
+          if (comp != null) {
+            comp.loadPage();
+          }
+        });
     });
-
-    this.roles = this._storageService.getRoles();
-    this.currRole = this._storageService.getCurrRole();
-    this.route.params.subscribe(() => {
-      this.getRolesInfo();
-      const comp = this.projectListComponent();
-      if (comp != null) {
-        comp.loadPage();
-      }
-    });
-
-
   }
 
   enterHow(currRole: string) {

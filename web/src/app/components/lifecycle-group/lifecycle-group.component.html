@@ -46,6 +46,7 @@
         <app-document-list
             [documents]="_group.referral"
             [canDelete]="canEditReferral()"
+            [canCheck]="true"
             (onDelete)="deleteReferral(_group)">
         </app-document-list>
       }

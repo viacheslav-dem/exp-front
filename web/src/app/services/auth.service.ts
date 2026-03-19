@@ -1,7 +1,7 @@
 import {map} from 'rxjs/operators';
 import {Injectable, OnInit} from "@angular/core";
 import {HttpClientSecure} from "./http.client";
-import {SERVER_URL} from "../config";
+import {SERVER_URL, TOKEN_HEADER} from "../config";
 import {Router} from "@angular/router";
 import {StorageService} from "./storage.service";
 import {Observable, Observer, of, defer, Subject} from "rxjs";
@@ -15,13 +15,16 @@ import {DocumentDto} from "@app/dto/DocumentDto";
 import {TokenDto} from "@app/dto/TokenDto";
 import {catchError, finalize, map as rxMap, shareReplay} from "rxjs/operators";
 import {TokenRefreshCoordinatorService} from "@app/services/token-refresh-coordinator.service";
-import {Data} from "@app/dto/Data";
+import {ProtectedAuthorizationParameters} from "@app/dto/ProtectedAuthorizationParameters";
 import {HttpHeaders, HttpResponse} from "@angular/common/http";
+import {DataIseful} from "@app/dto/DataIseful";
+import {OIDCTicketResponse} from "@app/dto/OIDCTicketResponse";
+import {UserEsiful} from "@app/dto/UserEsiful";
 
 @Injectable()
 export class AuthService implements OnInit {
 
-  private apiUrl = 'http://127.0.0.1:8084/select_auth';
+  private apiUrl = 'http://127.0.0.1:8084';
 
   private restoreSessionInFlight$?: Observable<boolean>;
   
@@ -239,25 +242,4 @@ export class AuthService implements OnInit {
     );
   }
 
-    inputISEFUL(): Observable<Data> {
-      return this.http.getBlock(`${SERVER_URL}/data/log-in`);
-    }
-
-
-  inputCP(signed_data_to_check_in_cp: string): Observable<String> {
-    return this.http.postBlock(this.apiUrl, {data: signed_data_to_check_in_cp});
-  }
-
-  redirectToEsiful(): Observable<HttpResponse<any>> {
-    return this.http.get(`${SERVER_URL}/data/redirect-to-esiful`, {
-      observe: 'response',
-      withCredentials: true
-    });
-  }
-
-  dataParams(dataParam: string) {
-   return this.http.get(`${SERVER_URL}/data/login-callback`, {
-     params: { data: dataParam }
-   });
-  }
 }

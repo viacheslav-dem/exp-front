@@ -1,0 +1,26 @@
+<div class="dropdown">
+    <div class="user-info dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+        @if(userEsiful != null){
+        <div class="user-name">{{userEsiful.name}} {{userEsiful.surname}}</div>
+        }
+        @if(userEsiful == null){
+        <div class="user-name">Не подключена</div>
+        }
+        <div class="user-role">Электронная цифровая подпись</div>
+    </div>
+
+    <ul class="dropdown-menu dropdown-menu-end shadow-sm" #dropdownMenu>
+        <!-- Одна кнопка с условным текстом и действием -->
+        <li class="dropdown-item selectable" (click)="userEsiful == null ? inputISEFUL() : toLogout()">
+            @if(userEsiful == null){
+            <fa-icon icon="key" [fixedWidth]="true"></fa-icon>
+            Войти в ЭС ИФЮЛ
+            }
+            @if(userEsiful != null){
+            <fa-icon icon="power-off" [fixedWidth]="true"></fa-icon>
+            Выйти из ЭС ИФЮЛ
+            }
+        </li>
+    </ul>
+</div>
+

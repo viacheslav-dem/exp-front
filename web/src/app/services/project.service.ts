@@ -323,4 +323,9 @@ export class ProjectService extends HasStateService {
   automaticExpertSelection(projectId: number): Observable<ExpertReviewDto[]> {
     return this._http.post(`${this.url}/automatic-expert-selection`, projectId)
   }
+
+
+  sendForSignatureCustomerInEsiful(project: ProjectDto) {
+
+  }
 }

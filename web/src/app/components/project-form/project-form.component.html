@@ -63,14 +63,14 @@
                         (scrollToEnd)="loadMoreSpecializations(i)"
                         class="form-control p-0 border-0">
                     </ng-select>
-                    <button type="button" class="btn btn-outline-danger" 
+                    <button type="button" class="btn btn-outline-danger"
                         (click)="removeSpecialization(i)"
                         title="Удалить специализацию">&times;</button>
                 </div>
             </div>
         }
         <div>
-            <button type="button" class="btn btn-primary btn-sm" 
+            <button type="button" class="btn btn-primary btn-sm"
                 (click)="addSpecialization()"
                 [disabled]="_project.projectSpecialization && _project.projectSpecialization.length >= 10">
                 Добавить специализацию

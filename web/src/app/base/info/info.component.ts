@@ -17,29 +17,14 @@ export class InfoComponent implements OnInit {
     }
 
     ngOnInit(): void {
+
     }
 
 
     input() {
-        this._authService.inputISEFUL().subscribe(res =>{
-            console.log("Запрос выполнен");
-            this._authService.inputCP(res.signed_data_to_check_in_cp).subscribe(res =>{
-                console.log("Запрос выполнен");
-                console.log(res);
-                if(res['step 0'] === 'OK'){
-                    // Создаём скрытую форму для GET-запроса на бэкенд
-                    const form = document.createElement('form');
-                    form.method = 'GET';
-                    form.action = '/examination-api/data/redirect-to-esiful'; // убедитесь, что путь правильный
-                    form.style.display = 'none';
-                    document.body.appendChild(form);
-                    form.submit();
-                    // form.submit() сразу отправляет запрос, и браузер покидает текущую страницу.
-                    // Дальнейший код после submit() может не выполниться, но это нормально.
-                }
-            })
-        })
+
     }
+
 
 
 }

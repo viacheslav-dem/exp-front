@@ -7,6 +7,8 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {DialogService} from "@app/components/dialogs/dialog.service";
 import {Subscription} from "rxjs";
 import {environment} from "../../../../environments/environment";
+import {EsifulService} from "@app/services/esiful.service";
+import {DatePipe} from "@angular/common";
 
 @Component({
     selector: 'app-document-list',
@@ -22,6 +24,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   public selectedDocument: any = null;
   readonly canDelete = input<boolean>(false);
   readonly canUpdate = input<boolean>(false);
+  readonly canCheck = input<boolean>(false);
   readonly url = input<string>('document');
   readonly onUpdate = output<DocumentDto>();
   readonly onDelete = output<any>();
@@ -33,6 +36,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
               private _toasty: GlobalToastyService,
               private _dialogService: DialogService,
               private cdr: ChangeDetectorRef,
+              private esifulService: EsifulService,
+              private datePipe: DatePipe
               ) {
   }
 
@@ -68,6 +73,27 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       })
     );
   }
+
+  checkSignature(doc) {
+    console.log(doc);
+    this.esifulService.checkSignature(doc).subscribe(res => {
+      console.log(res.holistic);
+      if(res.holistic){
+        let message = "";
+        res.signingUserinfoDtos.forEach(r => {
+          const formattedDate = this.datePipe.transform(r.signingDate, 'dd.MM.yyyy HH:mm');
+
+          message = message.concat(`${r.userinfoDto.surname} ${r.userinfoDto.name} ${formattedDate}<br>`);
+        });
+        this._dialogService.showConfirmDialog('Подтверждение ЭЦП',
+            `${res.message} <br> Подписал: <br> ${message}`, null, "ОК", "Отмена");
+      } else {
+        this._dialogService.showConfirmDialog('Подтверждение ЭЦП',
+            `${res.message}`, null, "ОК", "Отмена");
+      }
+    });
+  }
+
 
   editDocument(doc) {
     this.selectedDocument = doc;
