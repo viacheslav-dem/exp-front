@@ -26,6 +26,7 @@ import {Role} from "@app/pipes/role.pipe";
 import {ExpertReviewTermsMessages} from "@app/pipes/review-state.pipe";
 import {LifecycleGroupTermsMessages} from "@app/pipes/lifecycle-group-state.pipe";
 import {Page} from "@app/components/common-components/page-and-filter/model/Page";
+import {RemarkDto} from "@app/dto/RemarkDto";
 
 @Injectable()
 export class ProjectService extends HasStateService {
@@ -332,4 +333,9 @@ export class ProjectService extends HasStateService {
   sendAllFinished(idList: number[]): Observable<any> {
     return this._http.post(`${this.url}/send-all/finished`, idList);
   }
+
+  getExpertRemarksByProject(projectId: number): Observable<RemarkDto[]> {
+    return this._http.getBlock(`${this.url}/${projectId}/expert-remarks`);
+  }
+
 }
