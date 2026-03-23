@@ -12,6 +12,7 @@ export class StorageService {
   private userIdPlace: string = 'user_id';
   private usernamePlace: string = 'username';
   private redirectUrlPlace: string = 'redirectUrl';
+  private codeVerifier: string = 'code_verifier';
   private rolesInfo: string = 'roles_info';
 
   constructor(private _rolePipe: RolePipe) {
@@ -139,4 +140,13 @@ export class StorageService {
       return null;
     }
   }
+
+    setCodeVerifier(code_verifier: string) {
+      localStorage.setItem(this.codeVerifier, code_verifier);
+    }
+
+    getCodeVerifier() {
+      return localStorage.getItem(this.codeVerifier);
+    }
+
 }

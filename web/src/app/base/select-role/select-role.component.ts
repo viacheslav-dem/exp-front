@@ -38,6 +38,7 @@ export class SelectRoleComponent implements OnInit {
       if (dataParam) {
         const data = new DataIseful();
         data.dataParam = dataParam;
+        data.codeVerifier = this._storageService.getCodeVerifier();
        this.esifulService.dataParams(data).subscribe({
           next: (response: UserEsiful) => {
               console.log(response);

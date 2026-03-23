@@ -60,14 +60,24 @@ export class LoginesifulComponent implements OnInit, OnDestroy {
   inputISEFUL() {
     this.esifulService.inputISEFUL().subscribe(res => {
       console.log("Запрос выполнен");
-      this.esifulService.inputCP(res.signed_data_to_check_in_cp).subscribe(res => {
+      console.log(res.codeVerifier);
+      console.log(res.signedDataToCheckInCp);
+      this._storageService.setCodeVerifier(res.codeVerifier);
+      this.esifulService.inputCP(res.signedDataToCheckInCp).subscribe(res => {
         console.log("Запрос выполнен");
         console.log(res);
         if (res['step 0'] === 'OK') {
+          const codeVerifier = this._storageService.getCodeVerifier();
           const form = document.createElement('form');
           form.method = 'GET';
           form.action = '/examination-api/esiful/redirect-to-esiful';
           form.style.display = 'none';
+
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'data';
+          input.value = codeVerifier;
+          form.appendChild(input);
           document.body.appendChild(form);
           form.submit();
         }
