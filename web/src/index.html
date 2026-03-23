@@ -1,14 +1,13 @@
 <!doctype html>
 <html>
-<script>
-  // Apply saved theme immediately to prevent flash of wrong theme (FOUC)
-  (function() {
-    var t = localStorage.getItem('app-theme');
-    if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-bs-theme', t);
-  })();
-</script>
 <head>
+  <script>
+    // Apply saved theme immediately to prevent flash of wrong theme (FOUC)
+    (function() {
+      var t = localStorage.getItem('app-theme');
+      document.documentElement.setAttribute('data-bs-theme', t === 'dark' ? 'dark' : 'light');
+    })();
+  </script>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <meta charset="utf-8">
   <base href="/">
