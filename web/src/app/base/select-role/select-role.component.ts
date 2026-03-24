@@ -42,6 +42,12 @@ export class SelectRoleComponent implements OnInit {
        this.esifulService.dataParams(data).subscribe({
           next: (response: UserEsiful) => {
               console.log(response);
+              // fix: убираем ?data= из URL, чтобы F5 не повторял callback
+              this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: {},
+                replaceUrl: true
+              });
           },
           error: (err) => {
             console.error('Ошибка при обработке callback', err);

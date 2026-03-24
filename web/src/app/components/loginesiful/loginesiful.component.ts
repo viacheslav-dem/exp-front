@@ -9,6 +9,8 @@ import {StorageService} from "@app/services/storage.service";
 import {environment} from "../../../environments/environment";
 import {UserEsiful} from "@app/dto/UserEsiful";
 import {EsifulService} from "@app/services/esiful.service";
+import {Subject} from "rxjs";
+import {switchMap, takeUntil} from "rxjs/operators";
 
 @Component({
   selector: 'app-loginesiful',
@@ -26,6 +28,8 @@ export class LoginesifulComponent implements OnInit, OnDestroy {
   public user: PersonDto;
   public userEsiful: UserEsiful;
 
+  // fix: отписка при уничтожении компонента
+  private destroy$ = new Subject<void>();
   constructor(private router: Router,
               private esifulService: EsifulService,
               private _personService: PersonService,
@@ -36,36 +40,54 @@ export class LoginesifulComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.esifulService.getCurrentUserEsiful().subscribe(res => {
-      console.log(res);
-      if(res.name == null && res.surname == null){
-        this.userEsiful = null;
-      } else {
-        this.userEsiful = this.update(res);
-      }
-      // Явно сообщаем Angular об изменениях
-      this.cdr.markForCheck();
-    });
+    this.esifulService.getCurrentUserEsiful()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          if (res.name == null && res.surname == null) {
+            this.userEsiful = null;
+          } else {
+            this.userEsiful = res;
+          }
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          console.error('Ошибка получения статуса ЭЦП', err);
+        }
+      });
   }
 
   ngOnDestroy(): void {
-
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
+  // fix: ожидаем ответ сервера перед обнулением UI
   toLogout() {
-    this.esifulService.logoutUserEsiful().subscribe();
-    this.userEsiful = null;
+    this.esifulService.logoutUserEsiful()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.userEsiful = null;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.toasty.error('Ошибка при отключении ЭЦП');
+          console.error('Ошибка logout ESIFUL', err);
+        }
+      });
   }
 
+  // fix: switchMap вместо вложенных subscribe + обработка ошибок
   inputISEFUL() {
-    this.esifulService.inputISEFUL().subscribe(res => {
-      console.log("Запрос выполнен");
-      console.log(res.codeVerifier);
-      console.log(res.signedDataToCheckInCp);
-      this._storageService.setCodeVerifier(res.codeVerifier);
-      this.esifulService.inputCP(res.signedDataToCheckInCp).subscribe(res => {
-        console.log("Запрос выполнен");
-        console.log(res);
+    this.esifulService.inputISEFUL().pipe(
+      switchMap(res => {
+        this._storageService.setCodeVerifier(res.codeVerifier);
+        return this.esifulService.inputCP(res.signedDataToCheckInCp);
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res) => {
         if (res['step 0'] === 'OK') {
           const codeVerifier = this._storageService.getCodeVerifier();
           const form = document.createElement('form');
@@ -80,12 +102,14 @@ export class LoginesifulComponent implements OnInit, OnDestroy {
           form.appendChild(input);
           document.body.appendChild(form);
           form.submit();
+        } else {
+          this.toasty.error('Криптопровайдер не подтвердил запрос');
         }
-      });
+      },
+      error: (err) => {
+        this.toasty.error('Ошибка подключения к ЭС ИФЮЛ');
+        console.error('Ошибка inputISEFUL', err);
+      }
     });
-  }
-
-  private update(res: UserEsiful) {
-    return this.userEsiful = res;
   }
 }
