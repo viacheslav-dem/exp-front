@@ -103,6 +103,12 @@ export class ExpertReviewFormContainerComponent<Form extends ExpertReviewFormCon
       form.date = c.date;
       const h = c.hours != null ? (typeof c.hours === 'string' ? Number(c.hours) : c.hours) : undefined;
       form.hours = h != null && !isNaN(h) ? h : undefined;
+      // selectedDirections и selectedSocialEconomicGoals управляются контейнером
+      // (app-select-directions-and-goals-block), а не дочерним formComponent.
+      // Без merge они теряются при чтении формы из дочернего компонента.
+      form.selectedDirections = c.selectedDirections || [];
+      form.selectedSocialEconomicGoals = c.selectedSocialEconomicGoals || [];
+      form.directionsAndGoalsText = c.directionsAndGoalsText || form.directionsAndGoalsText;
     }
     return form;
   }
