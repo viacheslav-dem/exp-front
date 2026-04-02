@@ -43,6 +43,7 @@ import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
 import {NgSelectModule} from "@ng-select/ng-select";
 import {NgxSliderModule} from "@angular-slider/ngx-slider";
 import {NumberInputDirective} from "@app/components/common-components/number-input/number-input.directive";
+import {DigitsOnlyDirective} from "@app/components/common-components/number-input/digits-only.directive";
 import {BankAccountInputDirective} from "@app/components/common-components/bank-account/bank-account-input.directive";
 import {BooleanButtonV2Component} from "@app/components/common-components/boolean-button/boolean-button-v2.component";
 import {MethRecPdfComponent} from "@app/components/dialogs/meth-rec/meth-rec-pdf.component";
@@ -116,6 +117,7 @@ import {PdfViewerModule} from "ng2-pdf-viewer";
     DateInputComponent,
     TimeInputComponent,
     NumberInputDirective,
+    DigitsOnlyDirective,
     BankAccountInputDirective,
     BooleanButtonV2Component,
     MethRecPdfComponent,
@@ -154,6 +156,7 @@ import {PdfViewerModule} from "ng2-pdf-viewer";
     DateInputComponent,
     TimeInputComponent,
     NumberInputDirective,
+    DigitsOnlyDirective,
     BankAccountInputDirective,
     MethRecPdfComponent,
     HighchartComponent

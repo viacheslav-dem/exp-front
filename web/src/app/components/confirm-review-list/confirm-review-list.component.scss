@@ -1,8 +1,127 @@
+// =============================================
+// Sidebar + Content layout
+// =============================================
+.confirm-layout {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.filter-sidebar {
+  flex: 0 0 300px;
+  position: sticky;
+  top: 1rem;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: visible;
+
+  &__header {
+    padding: 0.625rem 1rem;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    border-bottom: 1px solid #dee2e6;
+    color: #495057;
+    background: #f8f9fa;
+    border-radius: 0.5rem 0.5rem 0 0;
+    display: flex;
+    align-items: center;
+  }
+
+  &__icon {
+    font-size: 0.6875rem;
+    color: #6c757d;
+    margin-right: 0.5rem;
+  }
+
+  &__count {
+    margin-left: auto;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    background: #0d6efd;
+    color: #fff;
+    border-radius: 10px;
+    padding: 0.125rem 0.5rem;
+    line-height: 1.4;
+    min-width: 1.5rem;
+    text-align: center;
+  }
+
+  &__body {
+    padding: 1rem;
+
+    // Уменьшаем отступы между полями внутри app-filter
+    ::ng-deep .mb-3 {
+      margin-bottom: 0.75rem !important;
+
+      &:last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+
+    // Labels внутри фильтров — компактнее
+    ::ng-deep .form-label {
+      margin-bottom: 0.25rem !important;
+      font-size: 0.8125rem;
+      color: #495057;
+    }
+  }
+}
+
+.confirm-content {
+  flex: 1;
+  min-width: 0;
+}
+
+// Мобильная кнопка — скрыта на десктопе
+.filter-toggle {
+  width: 100%;
+}
+
+// На десктопе (lg+) сайдбар виден, мобильная кнопка скрыта
+@media (min-width: 992px) {
+  .filter-toggle,
+  .filter-mobile {
+    display: none !important;
+  }
+}
+
+// На мобильных (<lg) сайдбар скрыт
+@media (max-width: 991.98px) {
+  .confirm-layout {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .filter-sidebar {
+    display: none;
+  }
+
+  .filter-mobile {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .confirm-content {
+    width: 100%;
+  }
+}
+
+// =============================================
+// Таблица
+// =============================================
 .chart {
   margin: 0;
 }
 
-// Белый фон для таблицы экспертов
 .table.table-responsive {
   --bs-table-bg: #ffffff !important;
   --bs-table-hover-bg: #f8f9fa !important;
@@ -13,8 +132,39 @@
   }
 }
 
-// --- Dark theme overrides ---
+// =============================================
+// Dark theme
+// =============================================
 :host-context([data-bs-theme="dark"]) {
+  .filter-sidebar {
+    background: var(--dark-bg-card);
+    border-color: var(--dark-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+    &__header {
+      background: var(--dark-bg-elevated, var(--dark-bg-surface));
+      border-color: var(--dark-border);
+      color: var(--dark-text);
+    }
+
+    &__icon {
+      color: var(--dark-text-muted, #adb5bd);
+    }
+
+    &__count {
+      background: var(--dark-accent, #4dabf7);
+    }
+
+    &__body ::ng-deep .form-label {
+      color: var(--dark-text-muted, #adb5bd);
+    }
+  }
+
+  .filter-mobile {
+    background: var(--dark-bg-card);
+    border-color: var(--dark-border);
+  }
+
   .table.table-responsive {
     --bs-table-bg: var(--dark-bg-surface) !important;
     --bs-table-hover-bg: var(--dark-bg-card) !important;
@@ -43,14 +193,14 @@
   }
 }
 
-// Стили для очень маленьких экранов (360px и меньше, до 575.98px)
+// =============================================
+// Мобильная адаптация (<=575.98px)
+// =============================================
 @media (max-width: 575.98px) {
-  // Стили для карточек объектов экспертизы на маленьких экранах
   .card.card-block {
     padding: 0.5rem 0.75rem 0.75rem !important;
   }
 
-  // Исправляем растягивание заголовка
   .card.card-block .h5 {
     font-size: 1rem;
     line-height: 1.3;
@@ -65,7 +215,6 @@
     hyphens: auto;
   }
 
-  // Исправляем ссылку с заголовком и номером
   .card.card-block .h5.bold {
     word-break: break-word;
     overflow-wrap: break-word;
@@ -74,7 +223,6 @@
     display: block;
   }
 
-  // Исправляем отображение текста
   .card.card-block .text-sm {
     font-size: 0.75rem;
     line-height: 1.4;
@@ -83,7 +231,6 @@
     margin-bottom: 0.25rem;
   }
 
-  // Исправляем таблицу экспертов
   .card.card-block .table {
     font-size: 0.75rem;
     margin-top: 0.75rem !important;
@@ -102,19 +249,16 @@
     word-break: break-word;
   }
 
-  // Вертикальный layout для таблицы на очень маленьких экранах
   .card.card-block .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  // Исправляем кнопки в таблице
   .card.card-block .table .btn-icon {
     padding: 0.25rem;
     margin: 0.125rem;
   }
 
-  // Исправляем badge в таблице
   .card.card-block .table .badge {
     font-size: 0.65rem;
     padding: 0.25rem 0.5rem;
@@ -122,13 +266,11 @@
     margin-bottom: 0.25rem;
   }
 
-  // Исправляем текст в ячейках таблицы
   .card.card-block .table td .text-sm {
     font-size: 0.7rem;
     line-height: 1.3;
   }
 
-  // Исправляем курсор pointer
   .card.card-block .table .cursor-pointer {
     word-break: break-word;
     white-space: normal;

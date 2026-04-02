@@ -20,11 +20,14 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {ExpertReviewAndExpertDto} from "@app/dto/ExpertReviewAndExpertDto";
 import {Direction, SortOrder} from "@app/components/common-components/page-and-filter/model/SortOrder";
+import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {DialogService} from "@app/components/dialogs/dialog.service";
 import {PersonFullNamePipe} from "@app/pipes/person-full-name.pipe";
+import {CouncilPipe} from "@app/pipes/council.pipe";
 import {ExpertReviewState} from "@app/pipes/review-state.pipe";
 import {ExpertReviewService} from "@app/services/expert-review.service";
 import {ProjectService} from "@app/services/project.service";
+import {DataService} from "@app/services/data.service";
 import {ProjectReviewsExpertsDto} from "@app/dto/ProjectReviewsExpertsDto";
 import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/ConfirmDialogField";
 import {DialogResult} from "@app/components/dialogs/dialog-result";
@@ -47,7 +50,8 @@ import {environment} from "../../../environments/environment";
 export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExpertsDto> implements OnInit, OnDestroy {
 
   ExpertReviewState = ExpertReviewState;
-  
+  showMobileFilters = false;
+
   // Signals для реактивного состояния
   readonly projects = signal<ProjectReviewsExpertsDto[]>([]);
   readonly expert = signal<PersonExpertDto | null>(null);
@@ -55,6 +59,7 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
   // Computed signals для производных значений
   readonly hasProjects = computed(() => this.projects().length > 0);
   readonly projectsCount = computed(() => this.projects().length);
+  readonly filterResultText = signal<string | null>(null);
   
   readonly expertInfoModal = viewChild.required<ModalComponent>('expertInfo');
   
@@ -83,7 +88,9 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
     private _projectService: ProjectService,
     private _dialogService: DialogService,
     private _personPipe: PersonFullNamePipe,
+    private _councilPipe: CouncilPipe,
     private _chartService: ChartService,
+    private _dataService: DataService,
     private _route: ActivatedRoute,
     private _router: Router
   ) {
@@ -136,7 +143,30 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
   }
 
   ngOnInit() {
-    // Инициализация уже выполнена в конструкторе через effect
+    this._searchFields = [
+      SearchField.startsWith('id').setTitle('Рег. номер')
+        .setPlaceholder('Поиск по номеру...').setNumericOnly(),
+      SearchField.contains('title').setTitle('Наименование')
+        .setPlaceholder('Поиск по наименованию...'),
+      SearchField.multiSelect('groups.council', [], council => this._councilPipe.transform(council))
+        .setSelectText('Выбрать ГЭС').setSearchFilterEnabled(true)
+        .setTitle('ГЭС'),
+      SearchField.multiSelect('customer.org', [])
+        .setSelectText('Выбрать организацию').setSearchFilterEnabled(true)
+        .setTitle('Заказчик экспертизы'),
+    ];
+
+    this._dataService.getCouncils()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(councils => {
+        this.getSearchField('groups.council').setItems(councils);
+      });
+
+    this._dataService.getOrgs()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(orgs => {
+        this.getSearchField('customer.org').setItems(orgs);
+      });
   }
   
   ngOnDestroy() {
@@ -181,7 +211,9 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
           this._page = res;
           // Обновляем signal вместо прямого присваивания
           this.projects.set(res.content);
-          // markForCheck больше не нужен - signals автоматически триггерят change detection
+          // Обновляем текст счётчика: показываем только при активных фильтрах
+          const hasFilters = this._searchFields.some(f => !f.isEmpty());
+          this.filterResultText.set(hasFilters ? `Найдено: ${res.totalElements}` : null);
           this.setLoading(false);
           
           // Используем afterNextRender для прокрутки после обновления DOM

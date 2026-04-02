@@ -27,6 +27,8 @@ export class SearchField {
    * не затрагивая остальные страницы.
    */
   fieldClass?: string;
+  inputMode?: string;
+  pattern?: string;
   sortable: boolean = false;
   sortDirection: string;
   sortProperty: string;
@@ -52,6 +54,12 @@ export class SearchField {
 
   setFieldClass(fieldClass: string): SearchField {
     this.fieldClass = fieldClass;
+    return this;
+  }
+
+  setNumericOnly(): SearchField {
+    this.inputMode = 'numeric';
+    this.pattern = '[0-9]*';
     return this;
   }
 

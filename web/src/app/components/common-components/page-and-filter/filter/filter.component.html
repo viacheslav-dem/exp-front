@@ -23,10 +23,11 @@
         }
         <!--SEARCH FIELD-->
         @if (field.type == SearchFieldType.TEXT) {
-          <input type="text" title="Текст для поиска" 
+          <input type="text" title="Текст для поиска"
             [class.rounded-end]="!field.sortable && !field.resetEnabled"
             [class.rounded-0]="field.sortable || field.resetEnabled"
             class="form-control"
+            [digitsOnly]="field.inputMode === 'numeric'"
             [(ngModel)]="field.value"
             (ngModelChange)="onTextValueChange(field)"
             (keyup.enter)="$event.preventDefault(); filterChanged()"
