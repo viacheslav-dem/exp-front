@@ -7,7 +7,6 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Соответствие приоритетности направления инвестиций в технологии:
       </label>
-      <input type="hidden" [ngModel]="_form()?.priorityAccordance" name="priorityAccordance" required>
       <app-boolean-button
         name="priorityAccordance"
         required

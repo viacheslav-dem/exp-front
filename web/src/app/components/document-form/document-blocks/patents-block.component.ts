@@ -9,7 +9,6 @@ import {Component, input, output} from '@angular/core';
         (изобретений, полезных моделей, промышленных образцов, топологий интегральных микросхем, сортов растений,
         на которые в установленном порядке получены патенты (свидетельства) либо приняты решения патентного органа об их выдаче):
       </label>
-      <input type="hidden" [ngModel]="_form()?.patents" name="patents" required>
       <app-boolean-button name="patents" required [ngModel]="_form()?.patents" [trueLabel]="'да'"
         [falseLabel]="'нет'"
       (ngModelChange)="emitPatch({ patents: $event })"></app-boolean-button>

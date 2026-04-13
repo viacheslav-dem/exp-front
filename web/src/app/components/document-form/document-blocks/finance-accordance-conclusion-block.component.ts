@@ -9,7 +9,6 @@ import {ProjectPlainDto} from "@app/dto/ProjectPlainDto";
       <label>
         {{num()}}. Соответствие заявленного финансирования планируемому объему выполняемых работ:
       </label>
-      <input type="hidden" [ngModel]="_form()?.financeAccordance" name="financeAccordance" required>
       <app-boolean-button name="financeAccordance" required [ngModel]="_form()?.financeAccordance" [trueLabel]="'соответствует'"
                           [falseLabel]="'не соответствует'"
                           (ngModelChange)="emitPatch({ financeAccordance: $event })"></app-boolean-button>

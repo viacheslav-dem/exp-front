@@ -9,7 +9,6 @@ import {Component, input, output} from '@angular/core';
         включая работы (услуги) по технической поддержке и сопровождению программно-технических средств,
         информационных ресурсов, информационных систем и информационных сетей, заявленным объемам финансирования:
       </label>
-      <input type="hidden" [ngModel]="_form()?.workAccordance" name="workAccordance" required>
       <app-boolean-button name="workAccordance" required [ngModel]="_form()?.workAccordance"
         [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"

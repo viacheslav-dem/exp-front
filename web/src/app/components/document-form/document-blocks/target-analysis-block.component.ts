@@ -7,7 +7,6 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Анализ целевых показателей:
       </label>
-      <input type="hidden" [ngModel]="_form()?.targetAnalysis" name="targetAnalysis" required>
       <app-boolean-button name="targetAnalysis" required [ngModel]="_form()?.targetAnalysis" [trueLabel]="'достаточны'"
         [falseLabel]="'недостаточны'"
       (ngModelChange)="emitPatch({ targetAnalysis: $event })"></app-boolean-button>

@@ -8,7 +8,6 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Обладание товаром более высокими технико-экономическими показателями по сравнению с другими товарами,
         представленными на определенном сегменте рынка:
       </label>
-      <input type="hidden" [ngModel]="_form()?.advantage" name="advantage" required>
       <app-boolean-button name="advantage" required [ngModel]="_form()?.advantage" [trueLabel]="'да'"
         [falseLabel]="'нет'"
       (ngModelChange)="emitPatch({ advantage: $event })"></app-boolean-button>

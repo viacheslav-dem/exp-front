@@ -7,7 +7,6 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Конкурентоспособность товара:
       </label>
-      <input type="hidden" [ngModel]="_form()?.competitiveness" name="competitiveness" required>
       <app-boolean-button name="competitiveness" required [ngModel]="_form()?.competitiveness" [trueLabel]="'да'"
         [falseLabel]="'нет'"
       (ngModelChange)="emitPatch({ competitiveness: $event })"></app-boolean-button>

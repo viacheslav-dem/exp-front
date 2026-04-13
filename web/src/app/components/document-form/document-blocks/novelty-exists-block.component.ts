@@ -8,7 +8,6 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Создание и внедрение новых технологий и (или) производство новой для Республики Беларусь
         и (или) мировой экономики продукции:
       </label>
-      <input type="hidden" [ngModel]="_form()?.noveltyExists" name="noveltyExists" required>
       <app-boolean-button name="noveltyExists" required [ngModel]="_form()?.noveltyExists" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="emitPatch({ noveltyExists: $event })"></app-boolean-button>

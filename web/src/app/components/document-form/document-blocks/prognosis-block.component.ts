@@ -8,7 +8,6 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Оценка анализа текущего состояния и прогноза
         научно-технического развития соответствующей сферы планирования:
       </label>
-      <input type="hidden" [ngModel]="_form()?.prognosis" name="prognosis" required>
       <app-boolean-button name="prognosis" required [ngModel]="_form()?.prognosis" [trueLabel]="'достаточна'"
         [falseLabel]="'недостаточна'"
       (ngModelChange)="emitPatch({ prognosis: $event })"></app-boolean-button>

@@ -8,7 +8,6 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Научно-технический уровень внедряемых технологий
       </label>
       <br/>
-      <input type="hidden" [ngModel]="_form()?.scientificLevelOfInjectedTech" name="scientificLevelOfInjectedTech" required>
       <app-boolean-button name="scientificLevelOfInjectedTech" required [ngModel]="_form()?.scientificLevelOfInjectedTech" [trueLabel]="'подтверждается'"
         [falseLabel]="'не подтверждается'"
       (ngModelChange)="emitPatch({ scientificLevelOfInjectedTech: $event })"></app-boolean-button>

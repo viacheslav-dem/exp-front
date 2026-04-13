@@ -7,7 +7,6 @@ import {Component, input, output} from '@angular/core';
         <label>
           {{ num() }}. Соответствие требованиям, указанным в Положении о порядке реализации государственных программ:
         </label>
-        <input type="hidden" [ngModel]="_form()?.programRequirements" name="programRequirements" required>
         <app-boolean-button name="programRequirements" required [ngModel]="_form()?.programRequirements" [trueLabel]="'соответствует'"
           [falseLabel]="'не соответствует'"
         (ngModelChange)="emitPatch({ programRequirements: $event })"></app-boolean-button>

@@ -7,7 +7,6 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Оптимальность выбранной технологии и ее инновационность для Республики Беларусь:
       </label>
-      <input type="hidden" [ngModel]="_form()?.technology" name="technology" required>
       <app-boolean-button name="technology" required [ngModel]="_form()?.technology" [trueLabel]="'подтверждается'"
         [falseLabel]="'не подтверждается'"
       (ngModelChange)="emitPatch({ technology: $event })"></app-boolean-button>

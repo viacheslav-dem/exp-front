@@ -10,7 +10,6 @@ import {Component, input, output} from '@angular/core';
             государственной научно-технической программы для достижения запланированных программой целевых
             показателей:
           </label>
-          <input type="hidden" [ngModel]="_form()?.programSufficiency" name="programSufficiency" required>
           <app-boolean-button name="programSufficiency" required [ngModel]="_form()?.programSufficiency" [trueLabel]="'достаточен'"
             [falseLabel]="'недостаточен'"
           (ngModelChange)="emitPatch({ programSufficiency: $event })"></app-boolean-button>

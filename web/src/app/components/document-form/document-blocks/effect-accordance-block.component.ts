@@ -10,7 +10,6 @@ import {Component, input, output} from '@angular/core';
         }
         Соответствие экономического и (или) социального эффекта установленным условиям коммерциализации:
       </label>
-      <input type="hidden" [ngModel]="_form()?.effectAccordance" name="effectAccordance" required>
       <app-boolean-button name="effectAccordance" required [ngModel]="_form()?.effectAccordance" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="emitPatch({ effectAccordance: $event })"></app-boolean-button>

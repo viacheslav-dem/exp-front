@@ -9,7 +9,6 @@ import {Component, input, output} from '@angular/core';
         привлекаемых для выполнения работ (оказания услуг), а также к уровню производственной, научной,
         конструкторско-технологической базы, необходимой для реализации мероприятия:
       </label>
-      <input type="hidden" [ngModel]="_form()?.requirements" name="requirements" required>
       <app-boolean-button name="requirements" required [ngModel]="_form()?.requirements" [trueLabel]="'достаточны'"
         [falseLabel]="'недостаточны'"
       (ngModelChange)="emitPatch({ requirements: $event })"></app-boolean-button>

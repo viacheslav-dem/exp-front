@@ -7,7 +7,6 @@ import {Component, input, output} from '@angular/core';
       <label>
         {{num()}}. Соответствие объекта государственной экспертизы заявленным целям:
       </label>
-      <input type="hidden" [ngModel]="_form()?.targetAccordance" name="targetAccordance" required>
       <app-boolean-button name="targetAccordance" required [ngModel]="_form()?.targetAccordance" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="emitPatch({ targetAccordance: $event })"></app-boolean-button>

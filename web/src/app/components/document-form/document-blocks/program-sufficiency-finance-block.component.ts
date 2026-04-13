@@ -8,7 +8,6 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Достаточность перечня мероприятий по научному обеспечению проекта государственной программы
         в части объемов их финансирования для достижения запланированных государственной программой показателей:
       </label>
-      <input type="hidden" [ngModel]="_form()?.programSufficiency" name="programSufficiency" required>
       <app-boolean-button name="programSufficiency" required [ngModel]="_form()?.programSufficiency"
         [trueLabel]="'достаточно'"
         [falseLabel]="'недостаточно'"

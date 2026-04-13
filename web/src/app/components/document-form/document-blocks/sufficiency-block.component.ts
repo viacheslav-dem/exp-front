@@ -13,7 +13,6 @@ import {Component, input, output} from '@angular/core';
         либо перечня научных исследований и разработок по развитию государственной системы научно-технической
         информации Республики Беларусь:
       </label>
-      <input type="hidden" [ngModel]="_form()?.sufficiency" name="sufficiency" required>
       <app-boolean-button name="sufficiency" required [ngModel]="_form()?.sufficiency" [trueLabel]="'достаточно'"
         [falseLabel]="'недостаточно'"
       (ngModelChange)="emitPatch({ sufficiency: $event })"></app-boolean-button>

@@ -10,7 +10,6 @@ import {Component, input, output} from '@angular/core';
         }
         Соответствие достигнутого результата запланированному:
       </label>
-      <input type="hidden" [ngModel]="_form()?.accordance" name="accordance" required>
       <app-boolean-button name="accordance" required [ngModel]="_form()?.accordance" [trueLabel]="'соответствует'"
         [falseLabel]="'не соответствует'"
       (ngModelChange)="emitPatch({ accordance: $event })"></app-boolean-button>

@@ -9,6 +9,7 @@
 <app-patents-accordance-block
   [_form]="formValue()"
   [num]="'1'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-patents-accordance-block>
 
@@ -17,6 +18,7 @@
 <app-advantage-accordance-block
   [_form]="formValue()"
   [num]="'2'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-advantage-accordance-block>
 
@@ -25,6 +27,7 @@
 <app-competitiveness-accordance-block
   [_form]="formValue()"
   [num]="'3'"
+  (formPatch)="patchForm($event)"
   (onConditionsChanged)="onConditionsChanged()"
 ></app-competitiveness-accordance-block>
 

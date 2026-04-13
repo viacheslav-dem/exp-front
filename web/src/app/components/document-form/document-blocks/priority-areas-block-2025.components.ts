@@ -77,8 +77,6 @@ export class PriorityAreasBlock2025Components implements OnInit{
     }
 
     ngOnInit(): void {
-        // Инициализация через emitPatch вместо прямой мутации
-        this.emitPatch({ priorityAreas: false });
     }
 }
 

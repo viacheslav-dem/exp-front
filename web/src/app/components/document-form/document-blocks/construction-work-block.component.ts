@@ -8,7 +8,6 @@ import {Component, input, output} from '@angular/core';
         {{num()}}. Необходимость осуществления работ в сфере строительной деятельности. Возведение, реконструкция,
         реставрация, капитальный ремонт, техническая модернизация зданий и сооружений, их благоустройство:
       </label>
-      <input type="hidden" [ngModel]="_form()?.constructionWorks" name="constructionWorks" required>
       <app-boolean-button name="constructionWorks" required [ngModel]="_form()?.constructionWorks" [trueLabel]="'требуется'"
         [falseLabel]="'не требуется'"
       (ngModelChange)="emitPatch({ constructionWorks: $event })"></app-boolean-button>
