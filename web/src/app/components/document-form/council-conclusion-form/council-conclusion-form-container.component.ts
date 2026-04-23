@@ -253,12 +253,6 @@ export class CouncilConclusionFormContainerComponent extends DocumentForm<Counci
     return !ProjectCodePlainDto.isCodeIn(this.project()?.code?.code, 9, 10, 13);
   }
 
-  patchProjectProtocol(patch: Partial<AgendaNewFormContent>) {
-    if (this.formComponent) {
-      this.formComponent.patchForm(patch);
-    }
-  }
-
   is_8_9() {
     return ProjectCodePlainDto.isCode(this.project()?.code?.code, 9);
   }
