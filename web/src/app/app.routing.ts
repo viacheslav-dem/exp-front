@@ -28,6 +28,7 @@ import {SystemNotificationComponent} from "@app/components/system-notification/s
 import {InfoComponent} from "@app/base/info/info.component";
 import {LogoComponent} from "@app/base/logo/logo.component";
 import {CallbackComponent} from "@app/components/callback/callback.component";
+import {ConfirmManualSelectionComponent} from "@app/components/manual-expert-selection-request/confirm-manual-expert-selection/confirm-manual-selection.component";
 
 export const appRoutes: Routes = [
   {
@@ -69,6 +70,7 @@ export const appRoutes: Routes = [
       {path: 'sub-org', component: SubOrgListComponent},
       {path: 'notification', component: NotificationComponent},
       {path: 'system-notification', component: SystemNotificationComponent},
+      {path: 'confirm-manual', component: ConfirmManualSelectionComponent},
       DataManagementRoutes,
     ]
   }

@@ -1,3 +1,47 @@
+<div class="mb-2">
+    @if (canChooseExperts()) {
+        <div class="mb-2">
+            @if (isAutomaticSelectionMode()) {
+                <button class="btn btn-sm btn-primary"
+                        [disabled]="isRequestForManualSelectionDisabled()"
+                        (click)="manualSelectionRequest()"> Заявка на ручной выбор эксперта
+                </button>
+            }
+        </div>
+        @if (_manualSelectionRequests().length != 0) {
+            <div class="d-inline-block text-muted">Заявки на ручной выбор эксперта:</div>
+            @for (manualSelectionRequest of _manualSelectionRequests(); track manualSelectionRequest.id) {
+                <div class="card card-block" style="padding: 0.75rem 1rem 1rem;">
+                    @if (!manualSelectionRequest.isConfirmed && !manualSelectionRequest.onConfirmation) {
+                        <span class="badge badge-danger">
+                            Отклонена
+                        </span>
+                    }
+                    @if (manualSelectionRequest.onConfirmation) {
+                        <span class="badge badge-info">
+                            На рассмотрении
+                        </span>
+                    }
+                    @if (manualSelectionRequest.isConfirmed) {
+                        <span class="badge badge-success">
+                            Одобрена
+                        </span>
+                    }
+                    <div class="italic text-sm">
+                        <b>Причина отправки
+                            заявки:</b> {{ manualSelectionRequest.requestReason | orElse: 'не указана' }}
+                    </div>
+                    @if (!manualSelectionRequest.isConfirmed && !manualSelectionRequest.onConfirmation) {
+                        <div class="italic text-sm">
+                            <b>Причина отказа:</b> {{ manualSelectionRequest.rejectionReason | orElse: 'не указана' }}
+                        </div>
+                    }
+                </div>
+            }
+        }
+    }
+
+</div>
 <!--HEADER-->
 <div class="mb-2">
     <div class="d-inline-block text-muted">Экспертные оценки:</div>

@@ -4,7 +4,6 @@ import {CommonModule} from '@angular/common';
 import {Role} from "app/pipes/role.pipe";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {SearchExpertComponent} from "@app/components/search/search-person/search-expert/search-expert.component";
-import {ExpertReviewComponent} from "@app/components/expert-review/expert-review.component";
 import {ExpertReviewDto} from "@app/dto/ExpertReviewDto";
 import {DialogService} from "@app/components/dialogs/dialog.service";
 import {PersonFullNamePipe} from "@app/pipes/person-full-name.pipe";
@@ -17,6 +16,9 @@ import {SearchModule} from "@app/components/search/search.module";
 import {CommonComponentsModule} from "@app/components/common-components/components.module";
 import {ExpertReviewModule} from "@app/components/expert-review/expert-review.module";
 import {ExpertReviewState} from "@app/pipes/review-state.pipe";
+import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/ConfirmDialogField";
+import {DialogResult} from "@app/components/dialogs/dialog-result";
+import {ManualSelectionRequestDto} from "@app/dto/ManualSelectionRequestDto";
 
 @Component({
     selector: 'app-expert-review-list',
@@ -24,7 +26,7 @@ import {ExpertReviewState} from "@app/pipes/review-state.pipe";
     styleUrls: ['expert-review-list.component.scss'],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, SearchModule, CommonComponentsModule, ExpertReviewModule]
+  imports: [CommonModule, SearchModule, CommonComponentsModule, ExpertReviewModule]
 })
 export class ExpertReviewListComponent {
 
@@ -55,13 +57,24 @@ export class ExpertReviewListComponent {
 
   private _autoSelectScheduled = false;
 
+  private _isAutomaticSelectionDisabled = false;
+
+  _manualSelectionRequests  = signal<ManualSelectionRequestDto[]>([]);
+
   constructor() {
     // Отслеживаем изменения списка экспертных оценок для автоматического выбора при истечении срока
     // НЕ отслеживаем отклонение через rejectProject, так как бэкенд сам обрабатывает это через reAssignExpert
     effect(() => {
       const reviews = this.expertReviews();
       const currentRole = this.role();
-      
+      if (this.project().manualSelectionRequests.length != 0) {
+        if (this._manualSelectionRequests().length < this.project().manualSelectionRequests.length) {
+          this._manualSelectionRequests.set(this.project().manualSelectionRequests);
+        }
+        if (this.project().manualSelectionRequests.at(-1).isConfirmed) {
+          this.isAutomaticSelectionMode.set(false);
+        }
+      }
       // Для BUREAU_CHAIRMAN проверяем необходимость автоматического выбора
       // Автоматически выбираем нового эксперта только при истечении срока подтверждения
       // Отклонение обрабатывается бэкендом через reAssignExpert в rejectProject
@@ -135,7 +148,23 @@ export class ExpertReviewListComponent {
   // Проверяет, заблокирована ли кнопка автоматического выбора
   // Блокируется, если уже есть эксперты (как в оригинальной реализации от 12.12.2025)
   isAutomaticSelectionDisabled(): boolean {
-    return this.expertReviews().length !== 0;
+
+    if (this._manualSelectionRequests().length != 0) {
+      this._isAutomaticSelectionDisabled = this._manualSelectionRequests().at(-1).onConfirmation
+          || this._manualSelectionRequests().at(-1).isConfirmed
+    }
+    return this.expertReviews().length !== 0 || this._isAutomaticSelectionDisabled;
+  }
+
+  isRequestForManualSelectionDisabled(){
+    let isDisabled = false;
+
+    if (this._manualSelectionRequests().length != 0) {
+      isDisabled = this._manualSelectionRequests().at(-1).onConfirmation
+          || this._manualSelectionRequests().at(-1).isConfirmed
+    }
+
+    return isDisabled;
   }
 
   automaticExpertSelection() {
@@ -219,5 +248,21 @@ export class ExpertReviewListComponent {
     }
   }
 
+  manualSelectionRequest() {
+    this._dialogService.showConfirmDialogWithFields(
+        [new ConfirmDialogField<string>('reason', 'Причина заявки')],
+        'Отправление заявки',
+        `Отправить заявку на ручной выбор эксперта на объект экспертизы "${this.project().title}"?`,
+        'Пожалуйста, проверьте данные об эксперте, поскольку отменить действие будет невозможно.')
+        .pipe(takeUntilDestroyed(this._destroyRef)).subscribe((dlgResult: DialogResult<any>) => {
+      const reason: string = dlgResult?.value?.reason || "";
+      this._projectService.createRequestForManualSelection(this.project().id, reason).pipe(tap((res) => {
+            this._isAutomaticSelectionDisabled = true;
+            this._manualSelectionRequests.set(res);
+            this._toasty.success("Заявка добавлена");
+          }),
+          takeUntilDestroyed(this._destroyRef)).subscribe()
+    })
+  }
 }
 

@@ -101,6 +101,7 @@ import { LOCALE_ID } from '@angular/core';
 import { BackToTopComponent } from './components/common-components/back-to-top/back-to-top.component';
 import {LoginesifulComponent} from "@app/components/loginesiful/loginesiful.component";
 import {EsifulService} from "@app/services/esiful.service";
+import {ConfirmManualSelectionComponent} from "@app/components/manual-expert-selection-request/confirm-manual-expert-selection/confirm-manual-selection.component";
 
 // Регистрация русской локали для Angular
 registerLocaleData(localeRu, 'ru', localeRuExtra);
@@ -134,6 +135,7 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         SearchCouncilComponent,
         MenuComponent,
         ConfirmReviewListComponent,
+        ConfirmManualSelectionComponent,
         LifecycleGroupListComponent,
         ProjectFormComponent,
         ProjectNewComponent,

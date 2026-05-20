@@ -1,0 +1,120 @@
+<div class="confirm-layout">
+    <!-- Основной контент -->
+    <main class="confirm-content">
+        <!-- Мобильная кнопка открытия фильтров -->
+        <button class="filter-toggle d-lg-none btn btn-outline-primary btn-sm mb-3"
+                (click)="showMobileFilters = !showMobileFilters">
+            <i class="fas fa-filter me-1"></i>
+            {{ showMobileFilters ? 'Скрыть фильтры' : 'Фильтры' }}
+        </button>
+        <!-- Мобильные фильтры -->
+        @if (showMobileFilters) {
+            <div class="filter-mobile d-lg-none mb-3">
+                <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
+            </div>
+        }
+        <div class="list-group">
+            <div [loadingData]="_loading">
+                @for (project of projects(); track project.id) {
+                    <div class="card card-block mb-3">
+                        <a class="h5 bold" target="_blank" [routerLink]="['/projects/',project.id]">{{
+                                project |
+                                    titleAndCode
+                            }}</a>
+                        <div class="text-sm">
+                            <span>Регистрационный номер: </span>
+                            <span class="italic">{{ project.id }}</span>
+                        </div>
+                        <div class="text-sm">
+                            <span>Дата регистрации: </span>
+                            <span class="italic">{{ project.registerDate | date:'dd.MM.yyyy' }} г.</span>
+                        </div>
+                        <div class="text-sm">
+                            <span>Заказчик экспертизы: </span>
+                            <span class="italic">{{project.customer?.org?.name | orElse : 'организация не указана' }}</span>
+                        </div>
+                        @if (project.executor) {
+                            <div class="text-sm">
+                                <span>Организация-исполнитель: </span>
+                                <span class="italic">{{project.executor | orElse: 'не указан'}}</span>
+                            </div>
+                        }
+
+                        <table class="table table-responsive mb-0 mt-3">
+                            <thead>
+                            <tr>
+                                <th class="align-top" style="width: 100%">Причина заявки</th>
+                                <th class="align-top" style="min-width: 300px">Статус заявки</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @for (request of project.manualSelectionRequests; track request.id) {
+                                    <tr class="list-group-item-action">
+                                        <td>
+                                            {{ request.requestReason }}
+                                        </td>
+                                        <td class="text-sm">
+                                            @if (request.onConfirmation) {
+                                                <div class="mb-1">
+                                                    <span class="badge badge-info">
+                                                        На рассмотрении
+                                                    </span>
+                                                </div>
+                                                <button class="btn btn-icon"
+                                                        (click)="confirmRequest(project, request)">
+                                                    <fa-icon icon="check" size="lg"></fa-icon>
+                                                </button>
+                                                <button class="btn btn-icon"
+                                                        (click)="rejectRequest(project, request)">
+                                                    <fa-icon icon="times" size="lg"></fa-icon>
+                                                </button>
+
+
+                                            } @else {
+                                                <div>
+                                                    @if (!request.isConfirmed && !request.onConfirmation) {
+                                                        <span class="badge badge-danger">
+                                                        Отклонена
+                                                      </span>
+                                                        <div>
+                                                            <span class="italic">{{ request.rejectionReason }}</span>
+                                                        </div>
+                                                    }
+                                                    @if (request.isConfirmed) {
+                                                        <span class="badge badge-success">
+                                                            Одобрена
+                                                        </span>
+                                                    }
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                @if (!hasProjects()) {
+                    <div class="alert alert-info italic mb-0 card card-block">
+                        Не требуется
+                    </div>
+                }
+                <app-pagination [page]="_page" [pagination]="_pagination"
+                                (onPageChanged)="onPageChanged($event)"></app-pagination>
+            </div>
+        </div>
+    </main>
+    <!-- Сайдбар с фильтрами (правый) -->
+    <aside class="filter-sidebar">
+        <div class="filter-sidebar__header">
+            <i class="fas fa-filter filter-sidebar__icon"></i>
+            <span>Фильтры</span>
+            @if (filterResultText()) {
+                <span class="filter-sidebar__count">{{ filterResultText() }}</span>
+            }
+        </div>
+        <div class="filter-sidebar__body">
+            <app-filter [fields]="_searchFields" (onFilterChanged)="onFilterChanged()"></app-filter>
+        </div>
+    </aside>
+</div>

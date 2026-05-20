@@ -2,9 +2,6 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/co
 import {Catalog, DataService} from "@app/services/data.service";
 import {environment} from "../../../../../environments/environment";
 import {CatalogTemplate} from "@app/components/data-management/catalog/CatalogTemplate";
-import {ProjectCodeDto} from "@app/dto/ProjectCodeDto";
-import {IdNameDto} from "@app/dto/IdNameDto";
-import {TariffRateDto} from "@app/dto/TariffRateDto";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
 import {Direction} from "@app/components/common-components/page-and-filter/model/SortOrder";
@@ -34,11 +31,6 @@ export class SpecializationComponent extends CatalogTemplate<SpecializationDto> 
         super.ngOnInit();
         this._dataService.getCatalog(Catalog.SPECIALIZATION).subscribe(res => {
             this.specializations = <SpecializationDto[]>res;
-            console.log('---------------------------------')
-            console.log(res)
-            console.log(this.specializations)
-
-            console.log('---------------------------------')
             this.cdr.markForCheck();
         });
         this._searchFields = [

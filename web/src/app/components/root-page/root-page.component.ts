@@ -153,8 +153,13 @@ export class RootPageComponent implements OnInit {
       case Role.GKNT_CHAIRMAN:
         this.menu = [
           {link: '/projects', title: 'Объекты экспертизы'},
-          {link: '/confirm-reports', title: 'Согласование экспертов'},
-          {link: '/experts', title: 'Эксперты'},
+          {
+            link: '', title: 'Работа с экспертами', children: [
+              {link: '/experts', title: 'Эксперты'},
+              {link: '/confirm-reports', title: 'Согласование экспертов'},
+              {link: '/confirm-manual', title: 'Согласование ручного выбора экспертов'}
+            ]
+          },
           {link: '', title: 'Статистика', children: statsMenu},
         ];
         break;

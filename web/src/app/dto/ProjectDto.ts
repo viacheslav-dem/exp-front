@@ -11,6 +11,7 @@ import {FundingDto} from "@app/dto/FundingDto";
 import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
 import {SpecializationDto} from "@app/dto/SpecializationDto";
+import {ManualSelectionRequestDto} from "@app/dto/ManualSelectionRequestDto";
 
 export class ProjectDto extends HasState {
   title: string;
@@ -74,4 +75,6 @@ export class ProjectDto extends HasState {
   otherTechnologicalOrder: string;
 
   projectSpecialization: SpecializationDto[] = [];
+
+  manualSelectionRequests: ManualSelectionRequestDto[] = [];
 }

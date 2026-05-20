@@ -27,6 +27,7 @@ import {ExpertReviewTermsMessages} from "@app/pipes/review-state.pipe";
 import {LifecycleGroupTermsMessages} from "@app/pipes/lifecycle-group-state.pipe";
 import {Page} from "@app/components/common-components/page-and-filter/model/Page";
 import {RemarkDto} from "@app/dto/RemarkDto";
+import {ManualSelectionRequestDto} from "@app/dto/ManualSelectionRequestDto";
 
 @Injectable()
 export class ProjectService extends HasStateService {
@@ -336,6 +337,18 @@ export class ProjectService extends HasStateService {
 
   getExpertRemarksByProject(projectId: number): Observable<RemarkDto[]> {
     return this._http.getBlock(`${this.url}/${projectId}/expert-remarks`);
+  }
+
+  createRequestForManualSelection(projectId: number, requestReason: string): Observable<ManualSelectionRequestDto[]> {
+    return this._http.post(`${this.url}/request-for-manual-selection/${projectId}`, {value: requestReason})
+  }
+
+  getAllRequestsForManualSelectionPage(request: SearchPageRequest): Observable<PageDto<ProjectDto>> {
+    return this._http.post(`${this.url}/get/all-requests-for-manual-selection`, request);
+  }
+
+  updateRequestForManualSelection(request: ManualSelectionRequestDto): Observable<any> {
+    return this._http.post(`${this.url}/update-request-for-manual-selection`, request)
   }
 
 }
