@@ -3,7 +3,7 @@
         <div class="mb-2">
             @if (isAutomaticSelectionMode()) {
                 <button class="btn btn-sm btn-primary"
-                        [disabled]="isRequestForManualSelectionDisabled()"
+                        [disabled]="_isManualRequestDisabled"
                         (click)="manualSelectionRequest()"> Заявка на ручной выбор эксперта
                 </button>
             }

@@ -1,4 +1,13 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, signal, computed, inject, DestroyRef, viewChild} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  signal,
+  computed,
+  inject,
+  viewChild,
+  input
+} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {GlobalToastyService} from "app/services/global-toasty.service";
@@ -21,6 +30,7 @@ import {FilterBuilder} from "@app/components/common-components/page-and-filter/m
 import {SearchPersonComponent} from "@app/components/search/search-person/search-person.component";
 import {environment} from "../../../../environments/environment";
 import {catchError, of} from "rxjs";
+import {PersonFullNamePipe} from "@app/pipes/person-full-name.pipe";
 
 @Component({
     selector: 'app-councils',
@@ -42,13 +52,15 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   private readonly _sectionTypePipe = inject(SectionTypePipe);
   private readonly _councilPipe = inject(CouncilPipe);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly _personPipe = inject(PersonFullNamePipe);
 
   // Signals для реактивного состояния
   readonly councils = signal<CouncilDto[]>([]);
   readonly selectedCouncil = signal<CouncilDto | null>(null);
   readonly selectedBureau = signal<BureauDto | null>(null);
   readonly selectedSection = signal<SectionDto | null>(null);
-  
+
+  readonly notSelected = input<string>('Ничего не выбрано');
   // Состояние для редактирования
   editedCouncil: CouncilDto | null = null;
   editedBureau: BureauDto | null = null;
@@ -60,6 +72,7 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   
   // Другие свойства
   readonly sectionTypeToString = (value: string) => this._sectionTypePipe.transform(value);
+  readonly mainBelisaWorkerToString = (value: PersonPlainDto) => this._personPipe.transform(value);
   newDirection: CatalogDto | null = null;
   
   // Signal для belisa (загружается асинхронно)

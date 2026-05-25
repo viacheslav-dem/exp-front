@@ -10,6 +10,7 @@ export class CouncilDto extends IdNameDto {
   bureau: BureauDto;
   sections: SectionDto[] = [];
   belisaWorkers: PersonPlainDto[] = [];
+  mainBelisaWorker: PersonPlainDto;
   directions: CatalogDto[] = [];
   // for ui
   isEdit: boolean;

@@ -59,6 +59,8 @@ export class ExpertReviewListComponent {
 
   private _isAutomaticSelectionDisabled = false;
 
+  _isManualRequestDisabled = false;
+
   _manualSelectionRequests  = signal<ManualSelectionRequestDto[]>([]);
 
   constructor() {
@@ -78,7 +80,7 @@ export class ExpertReviewListComponent {
       // Для BUREAU_CHAIRMAN проверяем необходимость автоматического выбора
       // Автоматически выбираем нового эксперта только при истечении срока подтверждения
       // Отклонение обрабатывается бэкендом через reAssignExpert в rejectProject
-      if (currentRole === Role.BUREAU_CHAIRMAN && reviews.length > 0) {
+      if ((currentRole === Role.BUREAU_CHAIRMAN || currentRole === Role.SECTION_CHAIRMAN) && reviews.length > 0) {
         const rejected = reviews.filter(item => item.state === ExpertReviewState.REJECTED).length;
         const accepted = reviews.filter(item => item.state === ExpertReviewState.PROJECT_ACCEPTED).length;
         const projectRejected = reviews.filter(item => item.state === ExpertReviewState.PROJECT_REJECTED).length;
@@ -94,6 +96,16 @@ export class ExpertReviewListComponent {
         if (reviews.length < 2 || rejected > reviews.length - 2 || isFiftyFifty) {
           this.isAutomaticSelectionMode.set(false);
         }
+
+        if (accepted >= 2) {
+          this._isManualRequestDisabled = true;
+        }
+
+        if (this._manualSelectionRequests().length != 0) {
+          this._isManualRequestDisabled = this._manualSelectionRequests().at(-1).onConfirmation
+              || this._manualSelectionRequests().at(-1).isConfirmed
+        }
+
         const currentExpiredIds = new Set(
           reviews
             .filter(r => r.state === ExpertReviewState.ON_EXPERT_CONFIRMATION && r.red)
@@ -154,17 +166,6 @@ export class ExpertReviewListComponent {
           || this._manualSelectionRequests().at(-1).isConfirmed
     }
     return this.expertReviews().length !== 0 || this._isAutomaticSelectionDisabled;
-  }
-
-  isRequestForManualSelectionDisabled(){
-    let isDisabled = false;
-
-    if (this._manualSelectionRequests().length != 0) {
-      isDisabled = this._manualSelectionRequests().at(-1).onConfirmation
-          || this._manualSelectionRequests().at(-1).isConfirmed
-    }
-
-    return isDisabled;
   }
 
   automaticExpertSelection() {

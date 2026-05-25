@@ -143,6 +143,17 @@
                         <li>{{person | fullName}}</li>
                       }
                     </ul>
+
+                      <div>
+                          <span class="info-label">Основной курирующий сотрудник: </span>
+                          @if (council.mainBelisaWorker) {
+
+                              <span class="info-value">{{ council.mainBelisaWorker | fullName }}</span>
+
+                          } @else {
+                              <span class="info-value">не указан</span>
+                          }
+                      </div>
                   } @else {
                     <span class="info-value">не указаны</span>
                   }
@@ -205,6 +216,14 @@
                       <button type="button" class="btn-icon-sm" (click)="showSearchBelisaWorkerModal()" title="Добавить">
                         <fa-icon icon="plus"></fa-icon>
                       </button>
+                        <div>
+                            <span class="form-label">Выберите основного курирующего сотрудника:</span>
+                            <app-dropdown
+                                    [(ngModel)]="editedCouncil.mainBelisaWorker" [notSelected]="notSelected()"
+                                    [options]="editedCouncil.belisaWorkers"
+                                    [optionToString]="mainBelisaWorkerToString"
+                            ></app-dropdown>
+                        </div>
                     }
                   </div>
                   <div class="form-group">
