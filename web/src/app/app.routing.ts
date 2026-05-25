@@ -29,6 +29,9 @@ import {InfoComponent} from "@app/base/info/info.component";
 import {LogoComponent} from "@app/base/logo/logo.component";
 import {CallbackComponent} from "@app/components/callback/callback.component";
 import {ConfirmManualSelectionComponent} from "@app/components/manual-expert-selection-request/confirm-manual-expert-selection/confirm-manual-selection.component";
+import {
+  MethodicalRecommendationsComponent
+} from "@app/components/methodical-recommendations/methodical-recommendations.component";
 
 export const appRoutes: Routes = [
   {
@@ -71,6 +74,7 @@ export const appRoutes: Routes = [
       {path: 'notification', component: NotificationComponent},
       {path: 'system-notification', component: SystemNotificationComponent},
       {path: 'confirm-manual', component: ConfirmManualSelectionComponent},
+      {path: 'methodical-recommendations', component: MethodicalRecommendationsComponent},
       DataManagementRoutes,
     ]
   }

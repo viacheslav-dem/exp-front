@@ -76,6 +76,10 @@ export class ExpertReviewListComponent {
         if (this.project().manualSelectionRequests.at(-1).isConfirmed) {
           this.isAutomaticSelectionMode.set(false);
         }
+        if (this._manualSelectionRequests().length != 0) {
+          this._isManualRequestDisabled = this._manualSelectionRequests().at(-1).onConfirmation
+              || this._manualSelectionRequests().at(-1).isConfirmed
+        }
       }
       // Для BUREAU_CHAIRMAN проверяем необходимость автоматического выбора
       // Автоматически выбираем нового эксперта только при истечении срока подтверждения
@@ -99,11 +103,6 @@ export class ExpertReviewListComponent {
 
         if (accepted >= 2) {
           this._isManualRequestDisabled = true;
-        }
-
-        if (this._manualSelectionRequests().length != 0) {
-          this._isManualRequestDisabled = this._manualSelectionRequests().at(-1).onConfirmation
-              || this._manualSelectionRequests().at(-1).isConfirmed
         }
 
         const currentExpiredIds = new Set(
@@ -256,6 +255,10 @@ export class ExpertReviewListComponent {
         `Отправить заявку на ручной выбор эксперта на объект экспертизы "${this.project().title}"?`,
         'Пожалуйста, проверьте данные об эксперте, поскольку отменить действие будет невозможно.')
         .pipe(takeUntilDestroyed(this._destroyRef)).subscribe((dlgResult: DialogResult<any>) => {
+      if (dlgResult.value.reason == null || dlgResult.value.reason == '') {
+        this._toasty.error('Пожалуйста, укажите причину отклонения эксперта.');
+        return;
+      }
       const reason: string = dlgResult?.value?.reason || "";
       this._projectService.createRequestForManualSelection(this.project().id, reason).pipe(tap((res) => {
             this._isAutomaticSelectionDisabled = true;

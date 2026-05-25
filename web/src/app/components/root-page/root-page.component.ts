@@ -109,6 +109,8 @@ export class RootPageComponent implements OnInit {
       case Role.SUB_CUSTOMER:
         this.menu = [
           {link: '/projects', title: 'Объекты экспертизы'},
+          {link: '/methodical-recommendations', title: 'Методические рекомендации'},
+
         ];
         break;
       case Role.CUSTOMER:
