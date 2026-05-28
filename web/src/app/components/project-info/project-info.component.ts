@@ -291,7 +291,6 @@ export class ProjectInfoComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log("Project info: ngOnInit");
     this.role = this._authService.getCurrRole();
     this._personService.getCurrentPerson()
       .pipe(takeUntilDestroyed(this.destroyRef))

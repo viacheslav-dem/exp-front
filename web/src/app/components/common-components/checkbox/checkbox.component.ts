@@ -13,7 +13,7 @@ export const CHECKBOX_VALUE_ACCESSOR: any = {
     selector: 'app-checkbox',
     template: `
     <div class="form-check" (click)="check()">
-      <input type="checkbox" class="form-check-input" [checked]="value" (click)="$event.stopPropagation()">
+      <input type="checkbox" class="form-check-input" [checked]="value" style="pointer-events: none">
       <label class="form-check-label">
         <ng-content></ng-content>
       </label>

@@ -246,20 +246,16 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
 
     // Если текущая страница неполная и есть следующая страница, загружаем её
     const isPageIncomplete = currentProjectsCount < this._page.size;
-    const hasNextPage = this._currentPage + 1 < this._page.totalPages;
+    const hasNextElement = this._page.size <= this._page.totalElements;
 
-    if (isPageIncomplete && hasNextPage) {
+    if (isPageIncomplete && hasNextElement) {
       const token = ++this._prefetchToken;
       const anchorPage = this._currentPage;
-      const nextPage = this._currentPage + 1;
-      
-      // Вычисляем, сколько проектов нужно добавить для заполнения текущей страницы
-      const projectsNeeded = this._page.size - currentProjectsCount;
       
       // Важно: не мутируем общий `_searchRequest`, чтобы не «перебить» основную загрузку страницы
       const nextRequest = {
         ...this._searchRequest,
-        paging: { ...this._searchRequest.paging, page: nextPage }
+        paging: { ...this._searchRequest.paging, page: anchorPage }
       };
 
       this._projectService.getConfirmReviewPage(nextRequest as any)
@@ -270,24 +266,12 @@ export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExp
             if (token !== this._prefetchToken || anchorPage !== this._currentPage) {
               return;
             }
-            
-            // Берем только необходимое количество проектов для заполнения текущей страницы
-            const projectsToAdd = res.content.slice(0, projectsNeeded);
-            
-            // Добавляем новые проекты к текущему списку
-            const current = this.projects();
-            const existingIds = new Set(current.map(p => p.id));
-            const dedupedToAdd = projectsToAdd.filter(p => !existingIds.has(p.id));
-            if (dedupedToAdd.length === 0) {
-              return;
-            }
 
-            const newProjects = [...current, ...dedupedToAdd];
-            this.projects.set(newProjects);
+            this.projects.set(res.content);
 
             // Обновляем `_page` иммутабельно, чтобы `app-pagination` корректно реагировал на input()
             if (this._page) {
-              this._page = Object.assign(new Page<ProjectReviewsExpertsDto>(), this._page, { content: newProjects });
+              this._page = Object.assign(new Page<ProjectReviewsExpertsDto>(), this._page, { content: res.content });
             }
           },
           error: (error) => {
