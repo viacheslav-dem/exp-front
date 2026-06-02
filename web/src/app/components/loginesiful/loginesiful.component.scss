@@ -88,3 +88,53 @@
   }
 }
 
+
+// Dark theme overrides (ViewEncapsulation-safe)
+:host-context([data-bs-theme="dark"]) {
+  .dropdown-menu {
+    background-color: var(--dark-bg-card);
+    border: 1px solid var(--dark-border-subtle);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+  }
+
+  .user-info:hover {
+    background-color: var(--dark-bg-elevated);
+    border-color: var(--dark-border);
+  }
+
+  .user-name {
+    color: var(--dark-text-bright);
+  }
+
+  .user-role {
+    color: var(--dark-text-muted);
+  }
+
+  .dropdown-item {
+    color: var(--dark-text);
+
+    &:hover {
+      background-color: var(--dark-accent-bg);
+      color: var(--dark-accent);
+    }
+  }
+}
+
+@media (max-width: 991.98px) {
+  .user-info {
+    min-width: auto;
+    padding: 0.375rem 0.5rem;
+    text-align: left;
+  }
+
+  .user-name {
+    font-size: 0.875rem;
+    max-width: 150px;
+  }
+
+  .user-role {
+    font-size: 0.75rem;
+    max-width: 150px;
+  }
+}
+
