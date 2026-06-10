@@ -27,6 +27,7 @@ import {MethRecComponent} from "@app/components/data-management/catalog/meth-rec
 import {
   CommercializationMethodsComponent
 } from "@app/components/data-management/catalog/commercialization-methods/commercialization-methods.component";
+import {RecordKeepingComponent} from "@app/components/data-management/catalog/record_keeping/record-keeping.component";
 
 export const DataManagementRoutes: Route = {
   path: 'data-management',
@@ -48,6 +49,7 @@ export const DataManagementRoutes: Route = {
     {path: 'manual', component: UserManualComponent},
     {path: 'speciality', component: SpecialityComponent},
     {path: 'specialization', component: SpecializationComponent},
+    {path: 'record-keeping', component: RecordKeepingComponent},
     {path: 'industrial-property', component: IndustrialPropertyComponent},
     {path: 'tariff', component: TariffComponent},
     {path: 'meth-rec', component: MethRecComponent},
@@ -63,6 +65,7 @@ export const DataManagementRoutes: Route = {
     DirectionsComponent,
   ],
   declarations: [
+      RecordKeepingComponent,
     FundingComponent,
     ScienceAreaComponent,
     SimpleCatalogComponent,
@@ -85,6 +88,7 @@ export const DataManagementRoutes: Route = {
     CommercializationMethodsComponent
   ],
   exports: [
+      RecordKeepingComponent,
     FundingComponent,
     ScienceAreaComponent,
     SimpleCatalogComponent,

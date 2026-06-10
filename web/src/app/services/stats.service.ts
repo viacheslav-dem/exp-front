@@ -9,6 +9,9 @@ import {CouncilStatsDto} from "@app/dto/CouncilStatsDto";
 import {CouncilStatsResponseDTO} from "@app/dto/response/CouncilStatsResponseDTO";
 import { HttpErrorResponse } from "@angular/common/http";
 import {CouncilStatsV2ResponseDTO} from "@app/dto/response/CouncilStatsV2ResponseDTO";
+import {SearchPageRequest} from "@app/components/common-components/page-and-filter/model/SearchPageRequest";
+import {PageRequest} from "@app/components/common-components/page-and-filter/model/PageRequest";
+import {SigningUserinfoDto} from "@app/dto/SigningUserinfoDto";
 
 @Injectable()
 export class StatsService {
@@ -57,6 +60,39 @@ export class StatsService {
 
   getResFunYear(dateFrom: number, dateTo: number): Observable<Array<CouncilStatsResponseDTO>> {
     return this._http.getBlock(`${this.searchUrl}/council/result-fun-year`, {params: {dateFrom: dateFrom, dateTo: dateTo}});
+  }
+
+  getCaseProduction(dateFrom: string | null, dateTo: string | null, lastName: string | null, orgName: string | null, pageRequest: PageRequest) {
+    let params: any = {
+      page: pageRequest.page - 1,
+      size: pageRequest.size
+    };
+
+    if (dateFrom) {
+      params.dateFrom = dateFrom;
+    }
+    if (dateTo) {
+      params.dateTo = dateTo;
+    }
+    if (lastName) {
+      params.lastName = lastName;
+    }
+    if (orgName) {
+      params.orgName = orgName;
+    }
+
+    if (pageRequest.orders && pageRequest.orders.length > 0) {
+      params.sort = pageRequest.orders.map(order => `${order.property},${order.direction}`).join(',');
+    }
+
+    return this._http.get(`${this.searchUrl}/case-production`, {params});
+  }
+
+  updateCaseProductionRecordKeeping(caseProdId: number, recordKeepingId: number | null): Observable<SigningUserinfoDto> {
+    const body = {
+      recordKeepingId: recordKeepingId
+    };
+    return this._http.put<SigningUserinfoDto>(`${this.searchUrl}/case-production/${caseProdId}/record-keeping`, body);
   }
 
 }

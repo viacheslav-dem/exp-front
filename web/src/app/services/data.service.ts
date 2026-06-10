@@ -20,6 +20,7 @@ import {PropertyPlainDto} from "@app/dto/PropertyPlainDto";
 import {DirectionDto} from "@app/dto/DirectionDto";
 import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
 import {AuthService} from "@app/services/auth.service";
+import {SigningUserinfoDto} from "@app/dto/SigningUserinfoDto";
 
 @Injectable()
 export class DataService {
@@ -222,5 +223,6 @@ export enum Catalog {
   SPECIALIZATION = 'specialization',
   INDUSTRIAL_PROPERTY = 'industrial-property',
   TARIFF = 'tariff',
-  COMMERCIALIZATION_METHODS = 'commercialization-methods'
+  COMMERCIALIZATION_METHODS = 'commercialization-methods',
+  RECORD_KEEPING = 'record_keeping'
 }

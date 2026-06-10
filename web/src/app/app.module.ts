@@ -101,6 +101,7 @@ import { LOCALE_ID } from '@angular/core';
 import { BackToTopComponent } from './components/common-components/back-to-top/back-to-top.component';
 import {LoginesifulComponent} from "@app/components/loginesiful/loginesiful.component";
 import {EsifulService} from "@app/services/esiful.service";
+import {CaseProductionComponent} from "@app/components/stats/case-production/case-production.component";
 
 // Регистрация русской локали для Angular
 registerLocaleData(localeRu, 'ru', localeRuExtra);
@@ -111,6 +112,7 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         DialogModule,
     ],
     declarations: [
+        CaseProductionComponent,
         AppComponent,
         LoginesifulComponent,
         LoginComponent,

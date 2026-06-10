@@ -170,6 +170,7 @@ export class CouncilsComponent extends FilterAndPages<CouncilDto> {
       this.setLoading(false);
       this._page = res;
       const councils = res.content;
+      console.log(councils);
       // Инициализируем UI-поля для всех элементов
       councils.forEach(council => {
         this.initializeCouncilUI(council);

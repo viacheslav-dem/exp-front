@@ -59,6 +59,7 @@ export class RootPageComponent implements OnInit {
       {link: '/data-management/funding', title: 'Источники финансирования'},
       {link: '/data-management/speciality', title: 'Специальности'},
       {link: '/data-management/specialization', title: 'Коды ГРНТИ'},
+      {link: '/data-management/record-keeping', title: 'Делопроизводство'},
       {link: '/data-management/industrial-property', title: 'Объекты промышленной собственности'},
       {link: '/data-management/tariff', title: 'Тарифы'},
       {link: '/data-management/meth-rec', title: 'Методические рекомендации'},
@@ -70,6 +71,7 @@ export class RootPageComponent implements OnInit {
       {link: '/council-stats', title: 'Статистика по ГЭС'},
       {link: '/result-fun', title: 'Результаты функционирования'},
       {link: '/best-expert', title: 'Эксперт года'},
+      {link: '/case-production', title: 'Дело производство'}
     ];
     let notificationMenu = [
       {link: '/notification', title: 'Уведомление на почту'},
