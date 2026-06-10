@@ -102,6 +102,7 @@ import { BackToTopComponent } from './components/common-components/back-to-top/b
 import {LoginesifulComponent} from "@app/components/loginesiful/loginesiful.component";
 import {EsifulService} from "@app/services/esiful.service";
 import {ConfirmManualSelectionComponent} from "@app/components/manual-expert-selection-request/confirm-manual-expert-selection/confirm-manual-selection.component";
+import {CaseProductionComponent} from "@app/components/stats/case-production/case-production.component";
 
 // Регистрация русской локали для Angular
 registerLocaleData(localeRu, 'ru', localeRuExtra);
@@ -112,6 +113,7 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         DialogModule,
     ],
     declarations: [
+        CaseProductionComponent,
         AppComponent,
         LoginesifulComponent,
         LoginComponent,

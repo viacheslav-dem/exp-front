@@ -1,0 +1,234 @@
+table {
+  font-size: 0.9375rem;
+  background-color: white;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+/* Горизонтальная прокрутка */
+.table-responsive {
+  overflow-x: auto;
+  overflow-y: visible;
+  border-radius: 0.5rem;
+
+  /* Плавная прокрутка */
+  scroll-behavior: smooth;
+
+  /* Для Webkit браузеров (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    height: 8px;
+    background-color: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: #555;
+    }
+  }
+}
+
+table.table {
+  --bs-table-bg: #ffffff;
+  --bs-table-hover-bg: rgba(0, 0, 0, 0.03);
+  min-width: 1300px; /* Общая минимальная ширина таблицы для горизонтальной прокрутки */
+  table-layout: auto;
+}
+
+/* Обновленные ширины колонок для новых полей */
+thead th:nth-child(1) { min-width: 160px; width: 10%; }  /* Дата */
+thead th:nth-child(2) { min-width: 180px; width: 12%; }  /* Пользователь */
+thead th:nth-child(3) { min-width: 150px; width: 8%; }   /* Тип */
+thead th:nth-child(4) { min-width: 150px; width: 10%; }  /* Источник */
+thead th:nth-child(5) { min-width: 130px; width: 8%; }   /* IP источника */
+thead th:nth-child(6) { min-width: 120px; width: 8%; }   /* IP хоста */
+thead th:nth-child(7) { min-width: 200px; width: 12%; }  /* Время операции */
+thead th:nth-child(8) { min-width: 300px; width: 32%; }  /* Сообщение */
+
+thead th {
+  padding: 0.75rem 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+  border-bottom: 2px solid #dee2e6;
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 0.75rem 0.5rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #f0f0f0;
+  word-wrap: break-word;
+}
+
+.audit-table-row {
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.audit-table-row:hover {
+  background-color: #f8f9fa;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-pointer:hover {
+  color: #0d6efd !important;
+}
+
+.badge {
+  font-size: 0.7rem;
+  padding: 0.3rem 0.6rem;
+  white-space: normal;
+  word-break: break-word;
+  max-width: 100%;
+  display: inline-block;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.code-ip {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.75rem;
+  color: #6c757d;
+  white-space: nowrap;
+}
+
+.operation-time {
+  font-size: 0.7rem;
+  color: #6c757d;
+  white-space: nowrap;
+}
+
+.duration-high {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+/* Выравнивание колонок по центру */
+tbody td:nth-child(1),
+tbody td:nth-child(2),
+tbody td:nth-child(3) {
+  text-align: center;
+}
+
+thead th:nth-child(1),
+thead th:nth-child(2),
+thead th:nth-child(3) {
+  text-align: center;
+}
+
+/* Индикатор прокрутки (опционально) */
+.table-responsive {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.05));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  &:not(:hover)::after {
+    opacity: 1;
+  }
+}
+
+/* Скрыть индикатор при скролле до конца */
+@media (hover: none) {
+  .table-responsive::after {
+    display: none;
+  }
+}
+
+/* Темная тема */
+:host-context([data-bs-theme="dark"]) table {
+  background-color: var(--dark-bg-surface);
+  color: var(--dark-text);
+}
+
+:host-context([data-bs-theme="dark"]) table.table {
+  --bs-table-bg: var(--dark-bg-surface);
+  --bs-table-hover-bg: var(--dark-bg-card);
+}
+
+:host-context([data-bs-theme="dark"]) thead th {
+  border-bottom-color: var(--dark-border);
+  color: var(--dark-text);
+}
+
+:host-context([data-bs-theme="dark"]) tbody td {
+  border-bottom-color: var(--dark-bg-elevated);
+  color: var(--dark-text);
+}
+
+:host-context([data-bs-theme="dark"]) .audit-table-row:hover {
+  background-color: var(--dark-bg-card);
+}
+
+:host-context([data-bs-theme="dark"]) .audit-table-row:hover > td {
+  background-color: var(--dark-bg-card) !important;
+}
+
+:host-context([data-bs-theme="dark"]) .code-ip {
+  color: #adb5bd;
+}
+
+/* Стили для полосы прокрутки в темной теме */
+:host-context([data-bs-theme="dark"]) .table-responsive {
+  &::-webkit-scrollbar-track {
+    background-color: #2d2d2d;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #555;
+
+    &:hover {
+      background-color: #777;
+    }
+  }
+}
+
+/* Для мобильных устройств - уменьшаем отступы */
+@media (max-width: 768px) {
+  thead th {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.65rem;
+  }
+
+  tbody td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .badge {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .code-ip {
+    font-size: 0.65rem;
+  }
+
+  .operation-time {
+    font-size: 0.6rem;
+  }
+}
+

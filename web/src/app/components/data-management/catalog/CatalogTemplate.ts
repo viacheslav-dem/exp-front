@@ -46,30 +46,74 @@ export abstract class CatalogTemplate<T extends CatalogDto> extends FilterAndPag
     }, () => this.setLoading(false));
   }
 
+  // editItem(item: T) {
+  //   if (this.selectedItem) {
+  //     this.selectedItem.isEdit = false;
+  //   }
+  //
+  //   this.selectedItem = item;
+  //   this.editedItem = (item.id == 0 ?
+  //     this.selectedItem : _.cloneDeep(this.selectedItem));
+  //   this.selectedItem.isEdit = true;
+  //   if (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin) {
+  //     this._cdr?.markForCheck();
+  //   }
+  // }
+
   editItem(item: T) {
+    console.log('=== editItem START ===');
+    console.log('1. item.isEdit BEFORE:', item.isEdit);
+    console.log('2. item.id:', item.id);
+
     if (this.selectedItem) {
+      console.log('3. Closing previous selected item');
       this.selectedItem.isEdit = false;
     }
 
     this.selectedItem = item;
     this.editedItem = (item.id == 0 ?
-      this.selectedItem : _.cloneDeep(this.selectedItem));
+        this.selectedItem : _.cloneDeep(this.selectedItem));
     this.selectedItem.isEdit = true;
+
+    console.log('4. item.isEdit AFTER:', this.selectedItem.isEdit);
+    console.log('5. selectedItem:', this.selectedItem);
+    console.log('=== editItem END ===');
+
     if (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin) {
       this._cdr?.markForCheck();
     }
   }
 
+  // cancelEditItem() {
+  //   if (this.selectedItem) {
+  //     const item = this.selectedItem;
+  //     item.isEdit = false;
+  //     if (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin) {
+  //       this._cdr?.markForCheck();
+  //     }
+  //     // Очищаем selectedItem после обновления представления
+  //     timer(0).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+  //       this.selectedItem = null;
+  //       if (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin) {
+  //         this._cdr?.markForCheck();
+  //       }
+  //     });
+  //   }
+  // }
+
   cancelEditItem() {
+    console.log('!!! CANCEL EDIT CALLED !!!');
+    console.trace(); // Покажет стек вызовов
+
     if (this.selectedItem) {
       const item = this.selectedItem;
       item.isEdit = false;
       if (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin) {
         this._cdr?.markForCheck();
       }
-      // Очищаем selectedItem после обновления представления
       timer(0).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
         this.selectedItem = null;
+        console.log('selectedItem cleared by timer');
         if (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin) {
           this._cdr?.markForCheck();
         }
@@ -91,13 +135,29 @@ export abstract class CatalogTemplate<T extends CatalogDto> extends FilterAndPag
     }
   }
 
+  // addItem() {
+  //   let newItem = this.create();
+  //   console.log('Created new item:', newItem);
+  //   this.items.unshift(newItem);
+  //   this.editItem(newItem);
+  //   if (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin) {
+  //     this._cdr?.markForCheck();
+  //   }
+  // }
+
   addItem() {
+    console.log('=== addItem START ===');
     let newItem = this.create();
+    console.log('1. Created item:', newItem);
+    console.log('2. Item isEdit value:', newItem.isEdit);
+    console.log('3. Item id:', newItem.id);
+
     this.items.unshift(newItem);
+    console.log('4. After unshift, items length:', this.items.length);
+    console.log('5. First item in array:', this.items[0]);
+
     this.editItem(newItem);
-    if (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin) {
-      this._cdr?.markForCheck();
-    }
+    console.log('=== addItem END ===');
   }
 
   abstract create():T;

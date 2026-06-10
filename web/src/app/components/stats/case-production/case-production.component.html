@@ -1,0 +1,164 @@
+<div class="container-fluid px-4 py-4">
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-4 fw-bold text-dark">
+                        Дело производство
+                        <small class="text-muted fs-6 ms-2">Список подписантов</small>
+                    </h4>
+
+                    <!-- Блок фильтрации в одну строку -->
+                    <div class="mb-4">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <app-filter [fields]="[_searchFields[0]]" (onFilterChanged)="onFilterChanged()">
+                                </app-filter>
+                            </div>
+                            <div class="col-md-4">
+                                <app-filter [fields]="[_searchFields[1]]" (onFilterChanged)="onFilterChanged()">
+                                </app-filter>
+                            </div>
+                            <div class="col-md-4">
+                                <app-filter [fields]="[_searchFields[2]]" (onFilterChanged)="onFilterChanged()">
+                                </app-filter>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div [loadingData]="_loading">
+                        @if (caseProds.length > 0) {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="selectable border-0 fw-semibold small text-muted cursor-pointer"
+                                            (click)="sortBy('id')">
+                                            <span>№ регистрации</span>
+                                            @if (sort.property == 'id') {
+                        <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[sort.direction]"></fa-icon>
+                        } @else {
+                        <fa-icon [icon]="faSort" class="ms-1 text-muted opacity-50"></fa-icon>
+                        }
+                        </th>
+                        <th class="selectable border-0 fw-semibold small text-muted cursor-pointer"
+                            (click)="sortBy('signingDate')">
+                            <span>Дата подписи</span>
+                            @if (sort.property == 'signingDate') {
+                        <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[sort.direction]"></fa-icon>
+                        } @else {
+                        <fa-icon [icon]="faSort" class="ms-1 text-muted opacity-50"></fa-icon>
+                        }
+                        </th>
+                        <th class="selectable border-0 fw-semibold small text-muted cursor-pointer"
+                            (click)="sortBy('userinfoDto.orgName')">
+                            <span>Организация</span>
+                            @if (sort.property == 'userinfoDto.orgName') {
+                        <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[sort.direction]"></fa-icon>
+                        } @else {
+                        <fa-icon [icon]="faSort" class="ms-1 text-muted opacity-50"></fa-icon>
+                        }
+                        </th>
+                        <th class="selectable border-0 fw-semibold small text-muted cursor-pointer"
+                            (click)="sortBy('userinfoDto.surname')">
+                            <span>ФИО</span>
+                            @if (sort.property == 'userinfoDto.surname') {
+                        <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[sort.direction]"></fa-icon>
+                        } @else {
+                        <fa-icon [icon]="faSort" class="ms-1 text-muted opacity-50"></fa-icon>
+                        }
+                        </th>
+                        <th class="border-0 fw-semibold small text-muted">
+                            <span>Дело</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (cp of caseProds; track cp.id) {
+                        <tr class="case-prod-table-row">
+                            <td class="text-nowrap text-body-secondary small">
+                                {{cp.id}}/{{cp.signingDate | date: 'yyyy'}}/{{cp.recordKeepingDto?.code || '—'}}
+                            </td>
+                            <td class="fw-medium">
+                                {{ cp.signingDate | date:'dd.MM.yyyy HH:mm:ss' }}
+                            </td>
+                            <td class="text-body-secondary small">
+                                {{ cp.userinfoDto?.orgName || '-' }}
+                            </td>
+                            <td class="text-body-secondary small">
+                                {{ cp.userinfoDto?.surname }} {{ cp.userinfoDto?.name || '' }}
+                            </td>
+                            <td class="position-relative" style="min-width: 250px;">
+                                @if (!editingIds.has(cp.id)) {
+                                <!-- Отображение выбранного дела -->
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-body-secondary small">
+                                        @if (cp.recordKeepingDto) {
+                                <span class="badge bg-light text-dark">
+                                                                    {{ cp.recordKeepingDto.code }} - {{ cp.recordKeepingDto.name }}
+                                                                </span>
+                                } @else {
+                                <span class="text-muted fst-italic">Не выбрано</span>
+                                }
+                                </span>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-secondary"
+                                        (click)="startEditing(cp)"
+                                        [disabled]="savingIds.has(cp.id)">
+                                    <fa-icon icon="pencil-alt"></fa-icon>
+                                </button>
+                            </div>
+                                } @else {
+                                <!-- Режим редактирования - выпадающий список -->
+                                <div class="d-flex align-items-center gap-2">
+                                    <select class="form-select form-select-sm"
+                                            [(ngModel)]="cp.selectedRecordKeepingId"
+                                            (change)="onRecordKeepingChange(cp, cp.id)"
+                                            [disabled]="savingIds.has(cp.id)"
+                                            style="flex: 1;">
+                                        <option [ngValue]="null">-- Выберите дело --</option>
+                                        @for (record of recordKeepingList; track record.id) {
+                                <option [ngValue]="record.id"
+                                        [disabled]="record.disabled">
+                                    {{ record.code }} - {{ record.name }}
+                                </option>
+                                }
+                                </select>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-secondary"
+                                        (click)="cancelEditing(cp)"
+                                        [disabled]="savingIds.has(cp.id)">
+                                    <fa-icon icon="times"></fa-icon>
+                                </button>
+                            </div>
+                                }
+                                @if (savingIds.has(cp.id)) {
+                                <div class="spinner-border spinner-border-sm ms-2 text-primary" role="status">
+                                    <span class="visually-hidden">Сохранение...</span>
+                                </div>
+                                }
+                            </td>
+                        </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                        }
+
+                        @if (caseProds.length == 0 && !_loading) {
+                        <div class="alert alert-info fst-italic mb-0 rounded-4 shadow-sm border-0 p-3">
+                            <i class="fas fa-info-circle me-2"></i>Записи отсутствуют
+                        </div>
+                        }
+
+                        <div class="mt-4">
+                            <app-pagination [page]="_page" [pagination]="_pagination"
+                                            (onPageChanged)="onPageChanged($event)">
+                            </app-pagination>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,225 @@
+table {
+  font-size: 0.9375rem;
+  background-color: white;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+/* Горизонтальная прокрутка */
+.table-responsive {
+  overflow-x: auto;
+  overflow-y: visible;
+  border-radius: 0.5rem;
+
+  /* Плавная прокрутка */
+  scroll-behavior: smooth;
+
+  /* Для Webkit браузеров (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    height: 8px;
+    background-color: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: #555;
+    }
+  }
+}
+
+table.table {
+  --bs-table-bg: #ffffff;
+  --bs-table-hover-bg: rgba(0, 0, 0, 0.03);
+  min-width: 800px; /* Уменьшаем для 4 колонок */
+  table-layout: auto;
+}
+
+/* Ширины колонок для 4 столбцов */
+thead th:nth-child(1) { min-width: 80px; width: 10%; }   /* ID */
+thead th:nth-child(2) { min-width: 180px; width: 25%; }  /* Дата подписи */
+thead th:nth-child(3) { min-width: 200px; width: 30%; }  /* Организация */
+thead th:nth-child(4) { min-width: 250px; width: 35%; }  /* ФИО */
+
+thead th {
+  padding: 0.75rem 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+  border-bottom: 2px solid #dee2e6;
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 0.75rem 0.5rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #f0f0f0;
+  word-wrap: break-word;
+}
+
+.case-prod-table-row {
+  transition: background-color 0.2s ease;
+}
+
+.case-prod-table-row:hover {
+  background-color: #f8f9fa;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-pointer:hover {
+  color: #0d6efd !important;
+}
+
+.selectable {
+  user-select: none;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+}
+
+.fa-active {
+  font-size: 0.8rem;
+}
+
+.code-ip {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.85rem;
+}
+
+/* Выравнивание колонок */
+thead th:nth-child(1),
+tbody td:nth-child(1) {
+  text-align: center;
+}
+
+/* Индикатор прокрутки (опционально) */
+.table-responsive {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.05));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  &:not(:hover)::after {
+    opacity: 1;
+  }
+}
+
+/* Скрыть индикатор при скролле до конца */
+@media (hover: none) {
+  .table-responsive::after {
+    display: none;
+  }
+}
+
+/* Для мобильных устройств - уменьшаем отступы */
+@media (max-width: 768px) {
+  thead th {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.65rem;
+  }
+
+  tbody td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Темная тема */
+:host-context([data-bs-theme="dark"]) table {
+  background-color: var(--dark-bg-surface);
+  color: var(--dark-text);
+}
+
+:host-context([data-bs-theme="dark"]) table.table {
+  --bs-table-bg: var(--dark-bg-surface);
+  --bs-table-hover-bg: var(--dark-bg-card);
+}
+
+:host-context([data-bs-theme="dark"]) thead th {
+  border-bottom-color: var(--dark-border);
+  color: var(--dark-text);
+}
+
+:host-context([data-bs-theme="dark"]) tbody td {
+  border-bottom-color: var(--dark-bg-elevated);
+  color: var(--dark-text);
+}
+
+:host-context([data-bs-theme="dark"]) .case-prod-table-row:hover {
+  background-color: var(--dark-bg-card);
+}
+
+:host-context([data-bs-theme="dark"]) .code-ip {
+  color: #adb5bd;
+}
+
+/* Стили для полосы прокрутки в темной теме */
+:host-context([data-bs-theme="dark"]) .table-responsive {
+  &::-webkit-scrollbar-track {
+    background-color: #2d2d2d;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #555;
+
+    &:hover {
+      background-color: #777;
+    }
+  }
+}
+
+.table-responsive {
+  max-height: 70vh;
+  overflow: auto;
+  position: relative;
+
+  /* Фиксируем заголовок */
+  thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 10;
+    box-shadow: 0 1px 0 0 #dee2e6;
+  }
+
+  /* Показываем тень при прокрутке */
+  &::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1), transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  &.scrolled::after {
+    opacity: 1;
+  }
+}
