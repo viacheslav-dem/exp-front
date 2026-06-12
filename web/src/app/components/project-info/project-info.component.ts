@@ -519,12 +519,12 @@ export class ProjectInfoComponent implements OnInit {
         buttons.push(new ActionButtonMetadata('Завершить экспертизу', () => this.finishLifecycleGroup(), 'btn-primary'));
       }
       if (project.state == ProjectState.ON_EXPERT_EXAMINATION && project.expertReviews.length == 0) {
-        buttons.push(new ActionButtonMetadata('Вернуть в БелИСА', () => this.showReturnFromCouncilModal(), 'btn-secondary', {
+        buttons.push(new ActionButtonMetadata('Вернуть в ГКНТ', () => this.showReturnFromCouncilModal(), 'btn-secondary', {
           isDisabled: () => this.returnLoading()
         }));
       }
       if (this.checkPossibleToReturnToGKNT(lifecycleGroup, project, role)) {
-        buttons.push(new ActionButtonMetadata('Вернуть в БелИСА без рассмотрения', () => this.returnFromBureauToGKNTWithoutExamination(), 'btn-secondary', {
+        buttons.push(new ActionButtonMetadata('Вернуть в ГКНТ без рассмотрения', () => this.returnFromBureauToGKNTWithoutExamination(), 'btn-secondary', {
           isLoading: () => this.returnLoading(),
           isDisabled: () => this.returnLoading()
         }));
@@ -758,7 +758,7 @@ export class ProjectInfoComponent implements OnInit {
 
     this._dialogService.showConfirmDialog(
       'Возврат объекта экспертизы',
-      `Вернуть объект экспертизы "${project.title}" в БелИСА ?`)
+      `Вернуть объект экспертизы "${project.title}" в ГКНТ ?`)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.returnLoading.set(true);
@@ -950,7 +950,7 @@ export class ProjectInfoComponent implements OnInit {
     this._dialogService.showConfirmDialog(
       null,
       `Вернуть объект экспертизы "${project.title}" назначенному ответственному сотруднику подразделения 
-      БелИСА для дополнительного рассмотрения?`,
+      ГКНТ для дополнительного рассмотрения?`,
       ''
     )
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -999,7 +999,7 @@ export class ProjectInfoComponent implements OnInit {
   private returnOnDepartmentSigningConfirmDialog() {
     return this._dialogService.showConfirmDialog(
       null,
-      `Вернуть объект экспертизы "${this.project.title}" в подразделение БелИСА для дополнительного рассмотрения?`,
+      `Вернуть объект экспертизы "${this.project.title}" в подразделение ГКНТ для дополнительного рассмотрения?`,
       ''
     )
   }
@@ -1087,7 +1087,7 @@ export class ProjectInfoComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(res => {
         this.updateProjectSignal(res);
-        this._toasty.success("Вы отправили документы зам. Директора БелИСА.");
+        this._toasty.success("Вы отправили документы зам. Председателя ГКНТ.");
       });
   }
 
@@ -1097,7 +1097,7 @@ export class ProjectInfoComponent implements OnInit {
     }
     return this._dialogService.showConfirmDialog(
       null,
-      `Отправить документы по объекту экспертизы "${this.project.title}" на подпись зам. Директор БелИСА?`,
+      `Отправить документы по объекту экспертизы "${this.project.title}" на подпись зам. Председателя ГКНТ?`,
       '');
   }
 
@@ -1158,7 +1158,7 @@ export class ProjectInfoComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((dto) => {
         this.updateProjectSignal(dto);
-        this._toasty.success("Вы отправили документы зам. Директора БелИСА.");
+        this._toasty.success("Вы отправили документы зам. Председателя ГКНТ.");
       });
   }
 

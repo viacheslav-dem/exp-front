@@ -19,7 +19,7 @@ export class ReviewStatePipe extends AbstractEnumPipe<ExpertReviewState> {
 
 export enum ExpertReviewState {
   ON_EXPERT_CONFIRMATION = 'ON_EXPERT_CONFIRMATION', // ожидается согласие эксперта на проведение экспертизы
-  ON_GKNT_CONFIRMATION = 'ON_GKNT_CONFIRMATION', // ожидается согласие БелИСА на назначение эксперта
+  ON_GKNT_CONFIRMATION = 'ON_GKNT_CONFIRMATION', // ожидается согласие ГКНТ на назначение эксперта
   ON_EXAMINATION = 'ON_EXAMINATION', // эксперт проводит экспертизу проекта
   PROJECT_ACCEPTED = 'PROJECT_ACCEPTED', // эксперт рекомендовал проект
   PROJECT_REJECTED = 'PROJECT_REJECTED', // эксперт не рекомендовал проект
@@ -28,7 +28,7 @@ export enum ExpertReviewState {
 
 export enum ExpertReviewStateBadge {
   ON_EXPERT_CONFIRMATION = 'badge-info', // ожидается согласие эксперта на проведение экспертизы
-  ON_GKNT_CONFIRMATION = 'badge-info', // ожидается согласие БелИСА на назначение эксперта
+  ON_GKNT_CONFIRMATION = 'badge-info', // ожидается согласие ГКНТ на назначение эксперта
   ON_EXAMINATION = 'badge-info', // эксперт проводит экспертизу проекта
   PROJECT_ACCEPTED = 'badge-success', // эксперт рекомендовал проект
   PROJECT_REJECTED = 'badge-danger', // эксперт не рекомендовал проект

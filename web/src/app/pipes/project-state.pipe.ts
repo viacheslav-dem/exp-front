@@ -11,12 +11,12 @@ export class ProjectStatePipe extends AbstractEnumPipe<ProjectState> {
     this.map[ProjectState.ROUGH] = 'Черновик';
     this.map[ProjectState.FOR_APPROVAL] = 'На утверждении';
     this.map[ProjectState.NEW] = 'Новый';
-    this.map[ProjectState.ON_CHECKING] = 'В подразделении БелИСА';
-    this.map[ProjectState.ON_DEPARTMENT_SIGNING] = 'На подписи в подразделении БелИСА';
+    this.map[ProjectState.ON_CHECKING] = 'В подразделении ГКНТ';
+    this.map[ProjectState.ON_DEPARTMENT_SIGNING] = 'На подписи в подразделении ГКНТ';
     this.map[ProjectState.ON_SIGNING] = 'На визировании';
     this.map[ProjectState.ON_EXPERT_EXAMINATION] = 'На экспертной оценке';
     this.map[ProjectState.ON_EXAMINATION] = 'На экспертизе';
-    this.map[ProjectState.ON_DEPARTMENT_FINAL_SIGNING] = 'На подписи в подразделении БелИСА';
+    this.map[ProjectState.ON_DEPARTMENT_FINAL_SIGNING] = 'На подписи в подразделении ГКНТ';
     this.map[ProjectState.ON_FINAL_SIGNING] = 'На визировании';
     this.map[ProjectState.ACCEPTED] = 'Рассмотрен';
     this.map[ProjectState.REJECTED] = 'Рассмотрен';
@@ -27,8 +27,8 @@ export class ProjectStatePipe extends AbstractEnumPipe<ProjectState> {
 export enum ProjectState {
   ROUGH = 'ROUGH',//черновик
   FOR_APPROVAL = 'FOR_APPROVAL', //проект на утверждении головной организацией
-  NEW = 'NEW',//новый проект не расписанный по БелИСА
-  ON_CHECKING = 'ON_CHECKING',//первичная проверка в БелИСА
+  NEW = 'NEW',//новый проект не расписанный по ГКНТ
+  ON_CHECKING = 'ON_CHECKING',//первичная проверка в ГКНТ
   ON_DEPARTMENT_SIGNING = 'ON_DEPARTMENT_SIGNING',//подпись начальника структ. подр.
   ON_SIGNING = 'ON_SIGNING',//подпись зам. пред.
   ON_EXPERT_EXAMINATION = 'ON_EXPERT_EXAMINATION',//формирование экспертных заключений
@@ -46,9 +46,9 @@ export function getAllProjectStates() {
 
 export enum ProjectStateBadge {
   ROUGH = 'badge-info',//черновик
-  NEW = 'badge-info',//новый проект не расписанный по БелИСА
+  NEW = 'badge-info',//новый проект не расписанный по ГКНТ
   FOR_APPROVAL = 'badge-info', //проект на утверждении головной организацией
-  ON_CHECKING = 'badge-info',//первичная проверка в БелИСА
+  ON_CHECKING = 'badge-info',//первичная проверка в ГКНТ
   ON_DEPARTMENT_SIGNING = 'badge-info',//подпись начальника структ. подр.
   ON_SIGNING = 'badge-info',//подпись зам. пред.
   ON_EXPERT_EXAMINATION = 'badge-info',//формирование экспертных заключений

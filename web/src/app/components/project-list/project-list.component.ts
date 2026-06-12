@@ -228,9 +228,9 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
         const states = [
             {name: 'Черновик', value: [ProjectState.ROUGH]},
             {name: 'Новый', value: [ProjectState.NEW]},
-            {name: 'В подразделении БелИСА', value: [ProjectState.ON_CHECKING]},
+            {name: 'В подразделении ГКНТ', value: [ProjectState.ON_CHECKING]},
             {
-                name: 'На подписи в подразделении БелИСА',
+                name: 'На подписи в подразделении ГКНТ',
                 value: [
                     ProjectState.ON_DEPARTMENT_SIGNING,
                     ProjectState.ON_DEPARTMENT_FINAL_SIGNING
@@ -268,7 +268,7 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
             SearchField.datePeriod('stateStartDate').setTitle('Дата последнего изменения')
                 .setPlaceholder('Выбрать период...')
                 .setSortable(true).setSortDirection(Direction.DESC),
-            SearchField.datePeriod('registerDate').setTitle('Дата регистрации в БелИСА')
+            SearchField.datePeriod('registerDate').setTitle('Дата регистрации в ГКНТ')
                 .setPlaceholder('Выбрать период...')
                 .setSortable(true).setSortDirection(Direction.DESC),
             SearchField.checkbox(this.getStateField(), 'С подходящим или нарушенным сроком', new DateRange(null, dayjs().valueOf()), null)

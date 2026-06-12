@@ -39,9 +39,7 @@ export class GkntDepartmentComponent extends CatalogTemplate<GkntDepartmentDto> 
   }
 
   ngOnInit() {
-    // При возврате функции в ГКНТ, заменить назад на этот метод (какие менять названия смотри в комите "Change specialization to GRNTI" от 13.03.2026)
-    // this._dataService.getGknt().subscribe(res => {
-    this._dataService.getBelisa().subscribe(res => {
+    this._dataService.getGknt().subscribe(res => {
       this.searchPersonFilter = FilterBuilder.equals('org', res);
       this.gknt = res;
       this.cdr.markForCheck();

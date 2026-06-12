@@ -171,28 +171,28 @@
 
   @if (project.gkntChairman) {
     <div class="text-sm mb-2">
-      <span>Зам. Директора БелИСА: </span>
+      <span>Зам. Председателя ГКНТ: </span>
       <span class="italic">{{project.gkntChairman | fullName}}</span>
     </div>
   }
 
   @if (project.gkntDepartment) {
     <div class="text-sm mb-2">
-      <span>Подразделение БелИСА: </span>
+      <span>Подразделение ГКНТ: </span>
       <span class="italic">{{project.gkntDepartment.name}}</span>
     </div>
   }
 
   @if (project.gkntDepartmentChairman) {
     <div class="text-sm mb-2">
-      <span>Заведующий отделом БелИСА: </span>
+      <span>Начальник подразделения ГКНТ: </span>
       <span class="italic">{{project.gkntDepartmentChairman | fullName}}</span>
     </div>
   }
 
   @if (project.gkntWorker) {
     <div class="text-sm mb-2">
-      <span>Ответственный сотрудник БелИСА: </span>
+      <span>Ответственный сотрудник ГКНТ: </span>
       <span class="italic">{{project.gkntWorker | fullName}}</span>
     </div>
   }

@@ -33,7 +33,7 @@ export class GkntConsiderationViolationChart implements OnInit {
 
   private render(stats: StatsDto[]) {
     let numberFormat = this.numberPipe;
-    this.chart = Chart.chart('Контроль времени рассмотрения в БелИСА')
+    this.chart = Chart.chart('Контроль времени рассмотрения в ГКНТ')
       .xAxis(Chart.axis().categories(stats.map(stats => this.monthYear.transform(stats.startDate))))
       .yAxis(Chart.axis()
         .title(Chart.title('Процент нарушений, %').color(redClr))
@@ -44,7 +44,7 @@ export class GkntConsiderationViolationChart implements OnInit {
         .title(Chart.title('Среднее время, сут').color(blueClr))
         .labels(Chart.labels().color(blueClr)))
       .exporting(Chart.exporting()
-        .filename('Контроль времени рассмотрения в БелИСА')
+        .filename('Контроль времени рассмотрения в ГКНТ')
         .size(625, 350))
       .tooltip(Chart.tooltip().shared())
       .series(Chart.columnOptions('Процент нарушений сроков')

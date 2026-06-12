@@ -23,7 +23,7 @@ export class LifecycleGroupStatePipe extends AbstractEnumPipe<LifecycleGroupStat
 }
 
 export enum LifecycleGroupState {
-  READY = 'READY', // для проекта назначен ГЭС, но он пока в БелИСА; выбираются секции
+  READY = 'READY', // для проекта назначен ГЭС, но он пока в ГКНТ; выбираются секции
   ON_CHECKING = 'ON_CHECKING', // проект поступил в ГЭСы, выбираются эксперты (и секции?)
   IN_PROCESSING = 'IN_PROCESSING', // проект отправлен в секции
   ON_CHOOSING_MEETING = 'ON_CHOOSING_MEETING', // проект ожидает назначения даты заседания бюро
@@ -37,7 +37,7 @@ export enum LifecycleGroupState {
 }
 
 export enum LifecycleGroupStateBadge {
-  READY = 'badge-info', // для проекта назначен ГЭС, но он пока в БелИСА; выбираются секции
+  READY = 'badge-info', // для проекта назначен ГЭС, но он пока в ГКНТ; выбираются секции
   ON_CHECKING = 'badge-info', // проект поступил в ГЭСы, выбираются эксперты (и секции?)
   IN_PROCESSING = 'badge-info', // проект отправлен в секции
   ON_CHOOSING_MEETING = 'badge-info', // проект ожидает назначения даты заседания бюро
