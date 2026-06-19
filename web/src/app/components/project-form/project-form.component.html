@@ -10,24 +10,35 @@
     <div class="form-group">
         <label class="form-group-label">Код объекта экспертизы</label>
         <div class="dropdown">
-            <button type="button" class="btn btn-block btn-outline-primary dropdown-toggle"
-                    data-toggle="dropdown">{{ _project.code ? _project.code.code : "Выберите код" }}
-            </button>
-            <ul class="dropdown-menu scrollable-menu">
-                @for (code of codes; track (code?.id ?? code?.code ?? $index)) {
-                    <li class="dropdown-item" (click)="selectCode(code)">
-                        <span class="font-weight-bold">{{ code.code }}</span>{{
-                            !code.name || code.name == '' ? '' : ' - ' +
-                                code.name
-                        }}
-                    </li>
-                }
-                @if (codes.length == 0) {
-                    <li disabled class="dropdown-item disabled">
-                        Нет данных
-                    </li>
-                }
-            </ul>
+            <div class="input-group">
+                <ng-select
+                        [items]="codes"
+                        bindLabel="name"
+                        [(ngModel)]="_project.code"
+                        [compareWith]="compareSpecialization"
+                        [appendTo]="'body'"
+                        [clearable]="false"
+                        placeholder="Выберите код"
+                        [searchable]="true"
+                        [typeToSearchText]="'Введите минимум 2 символа для поиска...'"
+                        [notFoundText]="'Нет данных'"
+                        [minTermLength]="2"
+                        [virtualScroll]="true"
+                        (change)="selectCode($event)"
+                        [searchFn]="customSearchFn"
+                        class="form-control p-0 border-0">
+                    <ng-template ng-label-tmp let-item="item" >
+                        <!-- Display the item using multiple fields in the selected area -->
+                        <span> {{ item.code + " - " + item.name }} </span>
+                    </ng-template>
+
+                    <ng-template ng-option-tmp let-item="item">
+                        <!-- Display the options in the dropdown list -->
+                        <span style="white-space: normal; word-break: break-word;"> {{ item.code + " - " + item.name }} </span>
+                    </ng-template>
+                </ng-select>
+            </div>
+
         </div>
         @if (this._project.code && this._project.code.description) {
             <div class="hint">
@@ -69,10 +80,10 @@
 
                         <ng-template ng-option-tmp let-item="item">
                             <!-- Display the options in the dropdown list -->
-                            <span> {{ item.code + " - " + item.name }} </span>
+                            <span style="white-space: normal; word-break: break-word;"> {{ item.code + " - " + item.name }} </span>
                         </ng-template>
                     </ng-select>
-                    <button type="button" class="btn btn-outline-danger"
+                    <button type="button" class="btn btn-outline-danger" style="height: 45px"
                             (click)="removeSpecialization(i)"
                             title="Удалить код ГРНТИ">&times;
                     </button>

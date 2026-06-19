@@ -12,6 +12,7 @@ import {SubDirectionDto} from "@app/dto/SubDirectionDto";
 import {ExpectedResultDto} from "@app/dto/ExpectedResultDto";
 import {SpecializationDto} from "@app/dto/SpecializationDto";
 import {ManualSelectionRequestDto} from "@app/dto/ManualSelectionRequestDto";
+import {ExpertReviewStatsDto} from "@app/dto/ExpertReviewStatsDto";
 
 export class ProjectDto extends HasState {
   title: string;
@@ -77,4 +78,6 @@ export class ProjectDto extends HasState {
   projectSpecialization: SpecializationDto[] = [];
 
   manualSelectionRequests: ManualSelectionRequestDto[] = [];
+
+  reviewStats: ExpertReviewStatsDto[] = [];
 }

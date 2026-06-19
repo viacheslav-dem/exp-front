@@ -262,6 +262,7 @@ export class ExpertReviewListComponent {
       const reason: string = dlgResult?.value?.reason || "";
       this._projectService.createRequestForManualSelection(this.project().id, reason).pipe(tap((res) => {
             this._isAutomaticSelectionDisabled = true;
+            this._isManualRequestDisabled = true;
             this._manualSelectionRequests.set(res);
             this._toasty.success("Заявка добавлена");
           }),

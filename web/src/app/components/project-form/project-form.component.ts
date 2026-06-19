@@ -186,6 +186,16 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         });
     }
 
+    customSearchFn(term: string, item: any) {
+        term = term.toLowerCase();
+
+        // Поиск по названию ИЛИ по коду
+        const nameMatch = item.name.toLowerCase().includes(term);
+        const codeMatch = item.code.toLowerCase().includes(term);
+
+        return nameMatch || codeMatch;
+    }
+
     selectCode(code) {
         this._project.code = code;
         if (
