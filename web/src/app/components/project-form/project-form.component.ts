@@ -20,6 +20,7 @@ import {environment} from "../../../environments/environment";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {FormValidationScrollService} from "@app/services/form-validation-scroll.service";
 import {SpecializationDto} from "@app/dto/SpecializationDto";
+import {SelectItem} from "@app/components/common-components/page-and-filter/model/SearchField";
 
 
 @Component({
@@ -70,6 +71,9 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     commercializationMethods: CatalogDto[] = [];
     selectedCommercializationMethod: CatalogDto;
 
+    allOrgs: SelectItem[] = [];
+    _userSelectedOrg: SelectItem = null;
+
     // Специализация проекта - lazy loading
     specializationItemsMap: Map<number, SpecializationDto[]> = new Map();
     specializationLoadingMap: Map<number, boolean> = new Map();
@@ -104,6 +108,10 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
             this.commercializationMethods = res;
             this.cdr?.markForCheck?.();
         }))
+        this._dataService.getOrgs().subscribe((res => {
+            this.allOrgs = res.map((item, ind) => new SelectItem(item, item.name, item.id));
+            this.cdr?.markForCheck?.();
+        }))
     }
 
     readonly project = input<ProjectDto>(undefined);
@@ -113,7 +121,8 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         if (!project) project = new ProjectDto();
         if (!project.period) project.period = new PeriodDto();
         if (!project.projectSpecialization) project.projectSpecialization = [];
-        
+        if (!project.executor) this._userSelectedOrg = null;
+
         // Если специализации пустые, добавляем один пустой элемент по умолчанию
         if (project.projectSpecialization.length === 0) {
             project.projectSpecialization.push(null);
@@ -932,6 +941,11 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     private scrollToElement(element: HTMLElement): void {
         this.validationScrollService.scrollToElement(element);
     }
+
+    selectOrg(org: SelectItem) {
+        this._project.executor = org ? org.value.name : null;
+    }
+
 }
 
 export const choiceOfResultCharacterApplied: string[] = [

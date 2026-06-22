@@ -156,9 +156,26 @@
 
     <div class="form-group">
         <label class="form-group-label">Потенциальный(-е) исполнитель(-и) объекта государственной экспертизы</label>
-        <textarea rows="2" class="form-control" placeholder="Организация-исполнитель проекта"
-                  name="executor" required
-                  [(ngModel)]="_project.executor" title="Наименование организации"></textarea>
+        <div>
+            <ng-select
+                    [items]="allOrgs"
+                    bindLabel="value.name"
+                    [(ngModel)]="_project.executor"
+                    [searchable]="true"
+                    [clearable]="true"
+                    placeholder="Выберите организацию-исполнитель проекта"
+                    (ngModelChange)="selectOrg($event)">
+                <ng-template ng-label-tmp let-item="item">
+                    <!-- Display the item using multiple fields in the selected area -->
+                    <span style="white-space: normal; word-break: break-word;"> {{ item.value.name }} </span>
+                </ng-template>
+
+                <ng-template ng-option-tmp let-item="item">
+                    <!-- Display the options in the dropdown list -->
+                    <span style="white-space: normal; word-break: break-word;"> {{ item.value.name }} </span>
+                </ng-template>
+            </ng-select>
+        </div>
         <div class="hint">
             <p class="font-italic">
                 <b>Подсказка.</b>
