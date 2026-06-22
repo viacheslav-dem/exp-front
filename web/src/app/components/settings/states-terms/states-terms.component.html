@@ -7,7 +7,8 @@
         <fa-icon icon="cog" size="lg"></fa-icon>
       </a>
       <div class="form-sub-group">
-        Срок рассмотрения объекта экспертизы в ГКНТ:
+<!--        Срок рассмотрения объекта экспертизы в ГКНТ:-->
+          Срок рассмотрения объекта экспертизы в БелИСА:
         <i><b>{{value.gkntCheckingAndSigningTerms}}</b>&nbsp;(рабочих дней)</i>
       </div>
       <div class="form-sub-group">
@@ -41,9 +42,12 @@
   @if (isEdit) {
     <div>
       <div class="form-group">
-        <label>Срок рассмотрения объекта экспертизы в ГКНТ, рабочих дней</label>
-        <input numberInput type="text" [(ngModel)]="editedValue.gkntCheckingAndSigningTerms" placeholder="Количество рабочих дней"
-          class="form-control" title="Срок рассмотрения объекта экспертизы в ГКНТ, рабочих дней">
+<!--        <label>Срок рассмотрения объекта экспертизы в ГКНТ, рабочих дней</label>-->
+        <label>Срок рассмотрения объекта экспертизы в БелИСА, рабочих дней</label>
+<!--        <input numberInput type="text" [(ngModel)]="editedValue.gkntCheckingAndSigningTerms" placeholder="Количество рабочих дней"-->
+<!--          class="form-control" title="Срок рассмотрения объекта экспертизы в ГКНТ, рабочих дней">-->
+          <input numberInput type="text" [(ngModel)]="editedValue.gkntCheckingAndSigningTerms" placeholder="Количество рабочих дней"
+          class="form-control" title="Срок рассмотрения объекта экспертизы в БелИСА, рабочих дней">
         </div>
         <div class="form-group">
           <label>Срок принятия объекта на экспертизу (или отказа) экспертом, рабочих дней</label>
