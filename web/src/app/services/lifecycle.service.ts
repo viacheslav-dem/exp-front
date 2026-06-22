@@ -37,4 +37,5 @@ export class LifecycleService {
   returnFromSectionToCouncilWithoutExamination(idDto: IdDto){
     return this._http.postBlock(`${this.url}/return-section-to-council-without-exp/${idDto.id}`, null);
   }
+
 }

@@ -366,14 +366,14 @@
         </div>
         <app-document-list #customerDocumentsComponent [documents]="customerDocuments()"
           [canDelete]="canEditProjectDocuments()" [canUpdate]="canEditProjectDocuments()"
-          (onDelete)="deleteProjectDocument($event)" (onUpdate)="updateProjectDocument($event)" [canCheck]="true">
+          (onDelete)="deleteProjectDocument($event)" (onUpdate)="updateProjectDocument($event)" [canCheck]="canCheckProjectDocument()">
         </app-document-list>
         <div class="mt-2 mb-1 text-sm text-muted">
           Остальные документы
         </div>
         <app-document-list #notCustomerDocumentsComponent [documents]="notCustomerDocuments()"
           [canDelete]="canEditProjectDocuments()" [canUpdate]="canEditProjectDocuments()"
-          (onDelete)="deleteProjectDocument($event)" (onUpdate)="updateProjectDocument($event)">
+          (onDelete)="deleteProjectDocument($event)" (onUpdate)="updateProjectDocument($event)" [canCheck]="canCheckProjectDocument()">
         </app-document-list>
       }
 
