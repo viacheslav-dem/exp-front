@@ -377,6 +377,9 @@ export class ProjectInfoComponent implements OnInit {
             Role.GKNT_WORKER, Role.GKNT_CHAIRMAN, Role.GKNT_DEPARTMENT_CHAIRMAN,
             Role.BELISA_READ, Role.BELISA_EDIT, Role.CUSTOMER)
           ) {
+            if (this.role == Role.BELISA_EDIT) {
+              this.loadLifecycleGroup()
+            }
             this.loadLifecycleGroups();
             if (this.role == Role.CUSTOMER) {
               this.loadAnonymousExpertReviews();
@@ -518,17 +521,21 @@ export class ProjectInfoComponent implements OnInit {
       if (lifecycleGroup.state == 'ON_CONCLUSION') {
         buttons.push(new ActionButtonMetadata('Завершить экспертизу', () => this.finishLifecycleGroup(), 'btn-primary'));
       }
-      if (project.state == ProjectState.ON_EXPERT_EXAMINATION && project.expertReviews.length == 0) {
-        buttons.push(new ActionButtonMetadata('Вернуть в ГКНТ', () => this.showReturnFromCouncilModal(), 'btn-secondary', {
-          isDisabled: () => this.returnLoading()
-        }));
-      }
+      // if (project.state == ProjectState.ON_EXPERT_EXAMINATION && project.expertReviews.length == 0) {
+      //   buttons.push(new ActionButtonMetadata('Вернуть в ГКНТ', () => this.showReturnFromCouncilModal(), 'btn-secondary', {
+      //     isDisabled: () => this.returnLoading()
+      //   }));
+      // }
       if (this.checkPossibleToReturnToGKNT(lifecycleGroup, project, role)) {
         buttons.push(new ActionButtonMetadata('Вернуть в ГКНТ без рассмотрения', () => this.returnFromBureauToGKNTWithoutExamination(), 'btn-secondary', {
           isLoading: () => this.returnLoading(),
           isDisabled: () => this.returnLoading()
         }));
       }
+    }
+
+    if (lifecycleGroup && role == Role.BELISA_EDIT && project.state == ProjectState.ON_EXPERT_EXAMINATION && project.expertReviews.length == 0) {
+      buttons.push(new ActionButtonMetadata('Вернуть в ГКНТ', () => this.showReturnFromCouncilModal(), 'btn-secondary'));
     }
 
     // SECTION_CHAIRMAN

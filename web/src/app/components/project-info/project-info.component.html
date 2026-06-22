@@ -104,7 +104,7 @@
 </app-modal>
 
 <!--RETURN FROM COUNCIL WITHOUT EXPERTISE MODAL-->
-<app-modal #returnFromCouncilWithoutExpertiseModal *ifRole="[Role.BUREAU_CHAIRMAN]" [title]="'Возврат объекта экспертизы'">
+<app-modal #returnFromCouncilWithoutExpertiseModal *ifRole="[Role.BELISA_EDIT]" [title]="'Возврат объекта экспертизы'">
   @if (project && lifecycleGroup) {
     <app-return-from-council-without-expertise-form
       [project]="project"
