@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit, signal, viewChild, ChangeDetectionStrategy, ChangeDetectorRef, effect, input, output} from '@angular/core';
-import {Subscription} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 import {ProjectLifecycleState, ProjectLifecycleStateBadge} from "@app/pipes/lifecycle-state.pipe";
 import {Router} from "@angular/router";
 import {SearchSectionComponent} from "@app/components/search/search-section/search-section.component";
@@ -23,6 +23,8 @@ import {CouncilConclusionFormContainerComponent} from "@app/components/document-
 import {ProjectDto} from "@app/dto/ProjectDto";
 import {ProjectService} from "@app/services/project.service";
 import {environment} from "../../../environments/environment";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {takeUntil} from "rxjs/operators";
 
 @Component({
     selector: 'app-lifecycle-group',
@@ -80,6 +82,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   readonly expertRemarksLoading = signal(false);
   readonly expertRemarksLoadError = signal(false);
   private expertRemarksSubscription: Subscription | null = null;
+  readonly canCheckSignReferralSignal = signal<boolean>(false);
 
   constructor(private _router: Router,
               public _lifecycleGroupService: LifecycleGroupService,
@@ -396,6 +399,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
           this.isCreatingReferral = false;
           this.referralFormModal()?.hide();
           this._group.referral = res;
+          this.checkReferralSignatures();
           this.changed();
           this.cdr?.markForCheck?.();
         },
@@ -411,6 +415,7 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   deleteReferral(_group: LifecycleGroupDto) {
     this._lifecycleGroupService.deleteReferral(_group.referral, _group, () => {
       _group.referral = null;
+      this.canCheckSignReferralSignal.set(false);
       this.changed();
       this.cdr?.markForCheck?.();
     });
@@ -480,5 +485,32 @@ export class LifecycleGroupComponent implements OnInit, OnDestroy {
   private applyGroup(group: LifecycleGroupDto) {
     this._lifecycleGroupService.prepareGroup(group);
     this._group = group;
+    this.checkReferralSignatures();
   }
+
+  private checkReferralSignatures(): void {
+    const group = this._group;
+    if (group?.referral?.id) {
+      const sub = this._lifecycleGroupService.checkReferralSignatures(group.id)
+          .subscribe({
+            next: (hasSignature) => {
+              this.canCheckSignReferralSignal.set(hasSignature === true);
+              this.cdr?.markForCheck?.();
+            },
+            error: (error) => {
+              console.error('Error checking referral signatures:', error);
+              this.canCheckSignReferralSignal.set(false);
+              this.cdr?.markForCheck?.();
+            }
+          });
+      this.subscriptions.push(sub);
+    } else {
+      this.canCheckSignReferralSignal.set(false);
+    }
+  }
+
+  canCheckSignReferral(): boolean {
+    return this.canCheckSignReferralSignal();
+  }
+
 }

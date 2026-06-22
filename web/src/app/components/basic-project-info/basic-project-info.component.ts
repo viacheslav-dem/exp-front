@@ -33,6 +33,7 @@ import {LifecycleGroupState} from "@app/pipes/lifecycle-group-state.pipe";
 import {DirectionDto} from "@app/dto/DirectionDto";
 import {environment} from "../../../environments/environment";
 import { finalize } from 'rxjs/operators';
+import {EsifulService} from "@app/services/esiful.service";
 
 @Component({
     selector: 'app-basic-project-info',
@@ -119,6 +120,7 @@ export class BasicProjectInfoComponent {
   readonly lifecycleGroup = input<LifecycleGroupDto>(undefined);
   readonly visibleDocsForExpert = input<boolean>(undefined);
   readonly onChanged = output<ProjectDto>();
+  readonly canCheckDocuments = signal<boolean>(false);
 
   decisionFormModal = viewChild<ModalComponent>('decisionFormModal');
   transitionHistoryModal = viewChild<ModalComponent>('transitionHistoryModal');
@@ -182,10 +184,31 @@ export class BasicProjectInfoComponent {
 
       // Присваиваем напрямую - в effect() запись в state разрешена; signal гарантирует обновление view и в zoneless.
       this._project.set(normalized);
+
+      this.checkDocumentSignatures();
     } finally {
       this._processingProject = false;
     }
   });
+
+  private checkDocumentSignatures(): void {
+    const project = this._project();
+    if (project?.id) {
+      this._projectService.checkSignDocument(project.id)
+          .pipe(takeUntilDestroyed(this._destroyRef))
+          .subscribe({
+            next: (hasSignature) => {
+              this.canCheckDocuments.set(hasSignature === true);
+            },
+            error: (error) => {
+              console.error('Error checking signatures:', error);
+              this.canCheckDocuments.set(false);
+            }
+          });
+    } else {
+      this.canCheckDocuments.set(false);
+    }
+  }
 
   changed(): void {
     this.onChanged.emit(this._project());
@@ -199,12 +222,17 @@ export class BasicProjectInfoComponent {
     this._transitionHistoryService.getProjectHistory(this.project)
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(res => {
+        console.log(res);
         this.transitionHistory.set(res);
       });
   }
 
   canEditProjectDocuments(): boolean {
     return this.project.state == ProjectState.ROUGH || this.role() == Role.BELISA_EDIT;
+  }
+
+  canCheckProjectDocument(): boolean {
+    return this.canCheckDocuments();
   }
 
   addProjectDocument(doc: DocumentDto): void {

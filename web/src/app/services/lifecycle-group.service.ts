@@ -98,4 +98,9 @@ export class LifecycleGroupService extends HasStateService implements DraftServi
   saveDraft(draftOwner: IdDto, draft: CouncilConclusionFormContent): Observable<any> {
     return this._http.post(`${this.url}/save-conclusion-draft/${draftOwner.id}`, draft);
   }
+
+  checkReferralSignatures(id: number): Observable<boolean> {
+    return this._http.get<boolean>(`${this.url}/check/referral/${id}`);
+  }
+
 }

@@ -351,4 +351,8 @@ export class ProjectService extends HasStateService {
     return this._http.post(`${this.url}/update-request-for-manual-selection`, request)
   }
 
+  checkSignDocument(id: number): Observable<boolean> {
+    return this._http.get<boolean>(`${this.url}/check/document/${id}`);
+  }
+
 }
