@@ -499,7 +499,6 @@ export class ProjectInfoComponent implements OnInit {
     if ((role == Role.CUSTOMER || role == Role.SUB_CUSTOMER) && project.state == ProjectState.ROUGH) {
       buttons.push(new ActionButtonMetadata('Редактировать', () => this.editProject(), 'btn-primary'));
       if (project.documents.length != 0 && role == Role.CUSTOMER) {
-        buttons.push(new ActionButtonMetadata('На экспертизу без ЭЦП', () => this.sendOnExamination(), 'btn-warning'));
         buttons.push(new ActionButtonMetadata('Отправить на экспертизу без ЭЦП', () => this.sendOnExamination(), 'btn-warning'));
         buttons.push(new ActionButtonMetadata('Подписать и отправить на экспертизу', () => this.sendForSignatureCustomer(), 'btn-primary'));
       }

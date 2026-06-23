@@ -58,7 +58,13 @@
   align-items: stretch;
   width: 100%;
   position: relative;
-  
+
+  // Поднимаем строку с открытым dropdown над последующими,
+  // иначе z-index:1070 меню «заперт» в контексте наложения строки.
+  &:has(.dropdown-menu.show) {
+    z-index: 1071;
+  }
+
   .form-control {
     flex: 1 1 auto;
     min-width: 0;
@@ -376,10 +382,10 @@
   position: relative;
   overflow: visible;
   
-  // Увеличиваем z-index для wrapper, когда внутри открыт ng-select
-  // Это гарантирует, что открытый dropdown не будет перекрыт следующими элементами
+  // Поднимаем обёртку с открытым select над последующим содержимым,
+  // иначе z-index:1070 панели «заперт» в контексте наложения обёртки.
   &:has(.ng-select.ng-select-opened) {
-    z-index: 2;
+    z-index: 1071;
   }
   
   ::ng-deep ng-select {
