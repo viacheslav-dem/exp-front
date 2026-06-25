@@ -1,0 +1,248 @@
+// ============================================================================
+// Модальное окно «Подтверждение ЭЦП»
+// ----------------------------------------------------------------------------
+// Файл подключается глобально в style.scss
+// ============================================================================
+
+.eds {
+  --eds-ok: #1f9d57;
+  --eds-ok-dark: #14532d;
+  --eds-ok-soft: #f1faf4;
+  --eds-ok-border: #cdebd8;
+  --eds-error: #dc3545;
+  --eds-error-dark: #842029;
+  --eds-error-soft: #fdf3f3;
+  --eds-error-border: #f3d6d6;
+  --eds-ink: #1f2937;
+  --eds-muted: #6b7280;
+  --eds-card-border: #e6e8eb;
+
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--eds-ink);
+}
+
+// ── Шапка-баннер с итогом проверки ──────────────────────────────────────────
+.eds__banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+
+  &--ok {
+    background: var(--eds-ok-soft);
+    border-color: var(--eds-ok-border);
+  }
+
+  &--error {
+    background: var(--eds-error-soft);
+    border-color: var(--eds-error-border);
+  }
+}
+
+.eds__banner-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+
+  .eds__banner--ok & {
+    color: var(--eds-ok-dark);
+  }
+
+  .eds__banner--error & {
+    color: var(--eds-error-dark);
+  }
+}
+
+.eds__banner-subtitle {
+  margin-top: 2px;
+  font-size: 0.88rem;
+
+  .eds__banner--ok & {
+    color: #4b8a64;
+  }
+
+  .eds__banner--error & {
+    color: #a14d4d;
+  }
+}
+
+// ── Иконки (рисуются на CSS, без SVG) ───────────────────────────────────────
+.eds__icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  position: relative;
+
+  &--sm {
+    width: 34px;
+    height: 34px;
+  }
+
+  &--check {
+    background: var(--eds-ok);
+
+    &::after {
+      content: "";
+      width: 0.42em;
+      height: 0.78em;
+      margin-top: -0.18em;
+      border: solid #fff;
+      border-width: 0 0.16em 0.16em 0;
+      transform: rotate(45deg);
+      font-size: 24px;
+    }
+
+    &.eds__icon--sm::after {
+      font-size: 18px;
+    }
+  }
+
+  // Мягкая иконка-галочка для карточек подписантов
+  &--check-soft {
+    background: var(--eds-ok-soft);
+    border: 1px solid var(--eds-ok-border);
+
+    &::after {
+      content: "";
+      width: 0.42em;
+      height: 0.78em;
+      margin-top: -0.18em;
+      border: solid var(--eds-ok);
+      border-width: 0 0.16em 0.16em 0;
+      transform: rotate(45deg);
+      font-size: 18px;
+    }
+  }
+
+  &--warn {
+    background: var(--eds-error);
+
+    &::after {
+      content: "!";
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+  }
+}
+
+// ── Список подписантов ──────────────────────────────────────────────────────
+.eds__section-label {
+  margin: 18px 0 10px;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #374151;
+}
+
+.eds__signers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.eds__signer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--eds-card-border);
+  border-radius: 10px;
+}
+
+.eds__signer-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--eds-ink);
+}
+
+.eds__signer-date {
+  margin-top: 2px;
+  font-size: 0.82rem;
+  color: var(--eds-muted);
+}
+
+// ── Сноска внизу окна ───────────────────────────────────────────────────────
+.eds__note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 0.85rem;
+  color: var(--eds-muted);
+
+  &::before {
+    content: "i";
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1.5px solid #9ca3af;
+    font-size: 0.7rem;
+    font-style: italic;
+    font-weight: 700;
+    font-family: Georgia, "Times New Roman", serif;
+    color: #9ca3af;
+  }
+}
+
+// ── Тёмная тема ──────────────────────────────────────────────────────────────
+// Переопределяем токены .eds на палитру тёмной темы (см. _dark-theme.scss),
+// плюс единичные захардкоженные светлые цвета.
+[data-bs-theme="dark"] {
+  .eds {
+    --eds-ok-soft: var(--dark-success-bg);
+    --eds-ok-border: var(--dark-success-border);
+    --eds-error-soft: var(--dark-danger-bg);
+    --eds-error-border: var(--dark-danger-border);
+    --eds-ink: var(--dark-text-bright);
+    --eds-muted: var(--dark-text-muted);
+    --eds-card-border: var(--dark-border);
+    // Заголовки баннеров: на тёмном фоне тёмно-зелёный/бордовый нечитаем
+    --eds-ok-dark: var(--dark-text-bright);
+    --eds-error-dark: var(--dark-text-bright);
+  }
+
+  .eds__banner-subtitle {
+    .eds__banner--ok & {
+      color: var(--dark-success-text);
+    }
+
+    .eds__banner--error & {
+      color: var(--dark-danger-text);
+    }
+  }
+
+  .eds__section-label {
+    color: var(--dark-text-muted);
+  }
+
+  // Карточки подписантов: белый фон → приподнятая тёмная поверхность
+  .eds__signer {
+    background: var(--dark-bg-elevated);
+  }
+
+  // Мягкая галочка читаемее со светло-зелёной обводкой
+  .eds__icon--check-soft::after {
+    border-color: var(--dark-success-text);
+  }
+
+  .eds__note::before {
+    border-color: var(--dark-text-tertiary);
+    color: var(--dark-text-tertiary);
+  }
+}

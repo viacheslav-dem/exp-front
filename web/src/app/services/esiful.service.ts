@@ -1,4 +1,4 @@
-import {Injectable, OnInit} from "@angular/core";
+import {Injectable} from "@angular/core";
 import {HttpClientSecure} from "@app/services/http.client";
 import {Observable} from "rxjs";
 import {ProtectedAuthorizationParameters} from "@app/dto/ProtectedAuthorizationParameters";
@@ -11,16 +11,12 @@ import {DocumentDto} from "@app/dto/DocumentDto";
 import {VerifiedDocumentDto} from "@app/dto/VerifiedDocumentDto";
 
 @Injectable()
-export class EsifulService implements OnInit {
+export class EsifulService {
 
     private apiUrl = 'http://127.0.0.1:8084';
 
     constructor(private http: HttpClientSecure) {
     }
-
-    ngOnInit(): void {
-    }
-
 
     inputISEFUL(): Observable<ProtectedAuthorizationParameters> {
         return this.http.getBlock(`${SERVER_URL}/esiful/log-in`);

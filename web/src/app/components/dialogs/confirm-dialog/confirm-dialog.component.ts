@@ -16,7 +16,9 @@ import {environment} from "../../../../environments/environment";
       <div class="text-sm">{{description()}}</div>
       <div class="mt-3">
         <button class="btn btn-primary me-1" (click)="confirm()">{{okBtnMessage()}}</button>
-        <button class="btn btn-dark" (click)="cancel()">{{cancelBtnMessage()}}</button>
+        @if (cancelBtnMessage()) {
+          <button class="btn btn-dark" (click)="cancel()">{{cancelBtnMessage()}}</button>
+        }
       </div>
     </div>
     `,

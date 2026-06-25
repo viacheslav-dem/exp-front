@@ -42,7 +42,9 @@
               </a>
             }
             @if (canCheck()) {
-            <a class="btn btn-icon" (click)="checkSignature(doc)">
+            <a class="btn btn-icon check-signature" (click)="checkSignature(doc)"
+               tooltip="Проверить электронную цифровую подпись"
+               placement="top" container="body">
                 <fa-icon icon="check"></fa-icon>
             </a>
             }

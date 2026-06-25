@@ -1,13 +1,16 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, computed, input, output, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, computed, inject, input, output, viewChild} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FileEditorComponent} from "../file-editor/file-editor.component";
 import {DocumentService} from "@app/services/document.service";
 import {DocumentDto} from "@app/dto/DocumentDto";
 import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {GlobalToastyService} from "@app/services/global-toasty.service";
 import {DialogService} from "@app/components/dialogs/dialog.service";
-import {Subscription} from "rxjs";
+import {filter, switchMap, tap} from "rxjs";
 import {environment} from "../../../../environments/environment";
 import {EsifulService} from "@app/services/esiful.service";
+import {VerifiedDocumentDto} from "@app/dto/VerifiedDocumentDto";
+import {SigningUserinfoDto} from "@app/dto/SigningUserinfoDto";
 import {DatePipe} from "@angular/common";
 
 @Component({
@@ -20,18 +23,19 @@ import {DatePipe} from "@angular/common";
       ? ChangeDetectionStrategy.OnPush
       : ChangeDetectionStrategy.Default
 })
-export class DocumentListComponent implements OnInit, OnDestroy {
+export class DocumentListComponent {
 
-  public selectedDocument: any = null;
+  public selectedDocument: DocumentDto | null = null;
   readonly canDelete = input<boolean>(false);
   readonly canUpdate = input<boolean>(false);
   readonly canCheck = input<boolean>(false);
   readonly url = input<string>('document');
   readonly onUpdate = output<DocumentDto>();
-  readonly onDelete = output<any>();
+  readonly onDelete = output<DocumentDto>();
   readonly fileEditor = viewChild(FileEditorComponent);
   readonly fileViewerModal = viewChild<ModalComponent>("fileViewerModal");
-  private subscriptions: Subscription[] = [];
+
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(private _documentService: DocumentService,
               private _toasty: GlobalToastyService,
@@ -42,12 +46,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
               ) {
   }
 
-  ngOnInit() {
-  }
+  readonly documents = input<DocumentDto[] | DocumentDto | undefined>(undefined);
 
-  readonly documents = input<any[] | any>(undefined);
-
-  readonly documentsForTemplate = computed(() => {
+  readonly documentsForTemplate = computed<DocumentDto[]>(() => {
     const documents = this.documents();
     if (documents == null) {
       return [];
@@ -58,138 +59,118 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     return [documents];
   });
 
-  viewDocument(doc) {
-    this.subscriptions.push(
-      this._documentService.checkPdfView(doc).subscribe(res => {
+  viewDocument(doc: DocumentDto) {
+    this._documentService.checkPdfView(doc).pipe(
+      tap(res => {
         if (!res) {
           this._toasty.warn("Формат файла не поддерживается для предпросмотра. " +
             "Вместо этого, пожалуйста, скачайте его и откройте у себя на компьютере предустановленной программой");
-        } else {
-          this.subscriptions.push(
-            this._dialogService.showPDFViewer("document", doc).subscribe()
-          );
         }
         // Для OnPush/zoneless: обновления/модалки инициируются из async-подписки
         this.cdr.markForCheck();
-      })
-    );
+      }),
+      filter(res => !!res),
+      switchMap(() => this._dialogService.showPDFViewer("document", doc)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe();
   }
 
-  checkSignature(doc) {
-    console.log('📄 Проверка подписи для документа:', doc);
+  /** Экранирование динамических данных перед вставкой в innerHTML. */
+  private escapeHtml(value: unknown): string {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
 
-    this.esifulService.checkSignature(doc).subscribe({
-      next: (res) => {
-        console.log('✅ Результат проверки:', res);
-
-        if (res.holistic) {
-          // Подпись найдена - показываем красивую информацию
-          this.showSignatureInfoDialog(res);
-        } else {
-          // Подпись не найдена
-          this.showNoSignatureDialog(res);
+  checkSignature(doc: DocumentDto) {
+    this.esifulService.checkSignature(doc)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res: VerifiedDocumentDto) => {
+          if (res.holistic) {
+            this.showSignatureInfoDialog(res);
+          } else {
+            this.showNoSignatureDialog(res);
+          }
+        },
+        error: (error) => {
+          console.error('Ошибка при проверке подписи:', error);
+          this._toasty.error('Произошла ошибка при проверке электронной подписи');
         }
-      },
-      error: (error) => {
-        console.error('❌ Ошибка при проверке подписи:', error);
-        this._toasty.error('Произошла ошибка при проверке электронной подписи');
-      }
-    });
+      });
   }
 
-  private showSignatureInfoDialog(res: any): void {
-    // Формируем список подписантов с красивым форматированием
-    let signersHtml = '';
-    let signerCount = 0;
+  private showSignatureInfoDialog(res: VerifiedDocumentDto): void {
+    const signers: SigningUserinfoDto[] = res.signingUserinfoDtos ?? [];
 
-    res.signingUserinfoDtos.forEach((r, index) => {
-      const formattedDate = this.datePipe.transform(r.signingDate, 'dd.MM.yyyy HH:mm');
-      const fullName = `${r.userinfoDto.surname} ${r.userinfoDto.name} ${r.userinfoDto.patronymic || ''}`.trim();
+    const signersHtml = signers.map((r) => {
+      const formattedDate = this.escapeHtml(this.datePipe.transform(r.signingDate, 'dd.MM.yyyy HH:mm'));
+      const fullName = this.escapeHtml(`${r.userinfoDto.surname} ${r.userinfoDto.name} ${r.userinfoDto.patronymic || ''}`.trim());
+      return `
+        <div class="eds__signer">
+          <span class="eds__icon eds__icon--check-soft eds__icon--sm"></span>
+          <div>
+            <div class="eds__signer-name">${fullName}</div>
+            <div class="eds__signer-date">Подписано ${formattedDate}</div>
+          </div>
+        </div>`;
+    }).join('');
 
-      // Иконка для каждого подписанта
-      const icon = '✅';
-      signerCount++;
-
-      signersHtml += `
-            <div style="padding: 8px 12px; margin: 4px 0; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #28a745;">
-                <strong>${icon} ${fullName}</strong>
-                <span style="color: #6c757d; font-size: 0.9rem; margin-left: 8px;">
-                    📅 ${formattedDate}
-                </span>
-            </div>
-        `;
-    });
-
-    // Создаем HTML для отображения
     const messageHtml = `
-        <div style="font-size: 1rem; line-height: 1.6;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding: 12px; background: #d4edda; border-radius: 8px; border: 1px solid #c3e6cb;">
-                <span style="font-size: 2rem;">✅</span>
-                <div>
-                    <strong style="color: #155724; font-size: 1.1rem;">${res.message}</strong>
-                    <div style="color: #155724; font-size: 0.9rem; margin-top: 4px;">
-                        Документ подписан электронной цифровой подписью
-                    </div>
-                </div>
-            </div>
-            
-            <div style="margin: 16px 0 8px 0; font-weight: 600; color: #495057; font-size: 1rem;">
-                📝 Подписанты (${signerCount}):
-            </div>
-            <div style="margin: 8px 0 0 0; max-height: 300px; overflow-y: auto;">
-                ${signersHtml}
-            </div>
-            
-            ${res.signingUserinfoDtos.length > 0 ? `
-                <div style="margin-top: 12px; padding: 8px 12px; background: #e7f3ff; border-radius: 6px; font-size: 0.9rem; color: #004085; border: 1px solid #b8daff;">
-                    ℹ️ Все подписи действительны и соответствуют требованиям
-                </div>
-            ` : ''}
+      <div class="eds">
+        <div class="eds__banner eds__banner--ok">
+          <span class="eds__icon eds__icon--check"></span>
+          <div>
+            <div class="eds__banner-title">${this.escapeHtml(res.message)}</div>
+            <div class="eds__banner-subtitle">Документ подписан электронной цифровой подписью</div>
+          </div>
         </div>
-    `;
+
+        <div class="eds__section-label">Подписанты · ${signers.length}</div>
+        <div class="eds__signers">${signersHtml}</div>
+
+        ${signers.length > 0 ? `
+          <div class="eds__note">Все подписи действительны и соответствуют требованиям</div>
+        ` : ''}
+      </div>`;
 
     this._dialogService.showConfirmDialog(
-        '✅ Подтверждение ЭЦП',
+        'Подтверждение ЭЦП',
         messageHtml,
         'Проверка электронной цифровой подписи прошла успешно',
-        '🆗 Закрыть',
+        'Закрыть',
         ''
     );
   }
 
-  private showNoSignatureDialog(res: any): void {
+  private showNoSignatureDialog(res: VerifiedDocumentDto): void {
     const messageHtml = `
-        <div style="font-size: 1rem; line-height: 1.6;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding: 12px; background: #f8d7da; border-radius: 8px; border: 1px solid #f5c6cb;">
-                <span style="font-size: 2rem;">⚠️</span>
-                <div>
-                    <strong style="color: #721c24; font-size: 1.1rem;">${res.message}</strong>
-                    <div style="color: #721c24; font-size: 0.9rem; margin-top: 4px;">
-                        Документ не подписан электронной цифровой подписью
-                    </div>
-                </div>
-            </div>
-            
-            <div style="padding: 12px; background: #fff3cd; border-radius: 6px; border: 1px solid #ffeeba; color: #856404;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 1.2rem;">💡</span>
-                    <span>Для подписания документа обратитесь к ответственному лицу</span>
-                </div>
-            </div>
+      <div class="eds">
+        <div class="eds__banner eds__banner--error">
+          <span class="eds__icon eds__icon--warn"></span>
+          <div>
+            <div class="eds__banner-title">${this.escapeHtml(res.message)}</div>
+            <div class="eds__banner-subtitle">Документ не подписан электронной цифровой подписью</div>
+          </div>
         </div>
-    `;
+
+        <div class="eds__note">Для подписания документа обратитесь к ответственному лицу</div>
+      </div>`;
 
     this._dialogService.showConfirmDialog(
-        '⚠️ Подтверждение ЭЦП',
+        'Подтверждение ЭЦП',
         messageHtml,
         'Электронная подпись отсутствует',
-        '🆗 Закрыть',
+        'Закрыть',
         ''
     );
   }
 
 
-  editDocument(doc) {
+  editDocument(doc: DocumentDto) {
     this.selectedDocument = doc;
     this.fileEditor()?.show();
   }
@@ -203,23 +184,18 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   downloadDocument(doc: DocumentDto) {
-    this.subscriptions.push(
-      this._documentService.downloadDocument(doc, this.url()).subscribe()
-    );
+    this._documentService.downloadDocument(doc, this.url())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 
-  deleteDocument(doc) {
+  deleteDocument(doc: DocumentDto) {
     this.onDelete.emit(doc);
   }
 
   downloadDocxDocument(doc: DocumentDto) {
-    this.subscriptions.push(
-      this._documentService.downloadDocument(doc, this.url() + '/docx').subscribe()
-    );
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-    this.subscriptions = [];
+    this._documentService.downloadDocument(doc, this.url() + '/docx')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 }
