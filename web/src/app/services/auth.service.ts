@@ -145,6 +145,10 @@ export class AuthService implements OnInit {
     return this.http.postBlock<UserCredentials>(`${SERVER_URL}/public/login`, user);
   }
 
+  forgotPassword(login: string): Observable<any> {
+    return this.http.postBlock<any>(`${SERVER_URL}/public/forgot-password`, {login});
+  }
+
   loginWithCredentials(credentials: UserCredentials) {
     let roles = credentials.roles;
     this.updateCredentials(credentials);

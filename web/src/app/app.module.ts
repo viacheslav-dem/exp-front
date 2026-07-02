@@ -7,6 +7,7 @@ import {GlobalToastyService} from "./services/global-toasty.service";
 import {AuthService} from "./services/auth.service";
 import {DefineRole} from "./services/define-role";
 import {LoginComponent} from "./base/login/login.component";
+import {ForgotPasswordComponent} from "./base/forgot-password/forgot-password.component";
 import {StorageService} from "./services/storage.service";
 import {registerLocaleData} from "@angular/common";
 import localeRu from '@angular/common/locales/ru';
@@ -117,6 +118,7 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         AppComponent,
         LoginesifulComponent,
         LoginComponent,
+        ForgotPasswordComponent,
         HelloComponent,
         ErrorPageComponent,
         AuditComponent,

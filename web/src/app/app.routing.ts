@@ -1,5 +1,6 @@
 import {Routes} from "@angular/router";
 import {LoginComponent} from "./base/login/login.component";
+import {ForgotPasswordComponent} from "./base/forgot-password/forgot-password.component";
 import {authGuard} from "./services/auth-guard.service";
 import {loginPageGuard} from "./services/login-page.guard.service";
 import {DefineRole} from "./services/define-role";
@@ -41,6 +42,7 @@ export const appRoutes: Routes = [
   },
   {path: 'signin', redirectTo: 'login'},
   {path: 'login', component: LoginComponent, canActivate: [loginPageGuard]},
+  {path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [loginPageGuard]},
   {path: 'error', component: ErrorPageComponent},
   {path: 'select-role', component: SelectRoleComponent},
   {path: 'info', component: InfoComponent},
