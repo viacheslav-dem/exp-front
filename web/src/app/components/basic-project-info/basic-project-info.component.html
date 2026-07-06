@@ -113,8 +113,20 @@
       </span>
     </div>
   }
+    @if (project.nioktrPeriod) {
+        <div class="text-sm mb-2">
+            <span>Сроки выполнения НИОК(Т)Р: </span>
+            <span class="italic">{{ project.nioktrPeriod }}</span>
+        </div>
+    }
+    @if (project.innovationPeriod) {
+        <div class="text-sm mb-2">
+            <span>Сроки выполнения работ по освоению (внедрению) инноваций: </span>
+            <span class="italic">{{ project.innovationPeriod }}</span>
+        </div>
+    }
 
-  @if (project.financing.length) {
+    @if (project.financing.length) {
     <div class="text-sm mb-2">
       <span>Финансирование: </span>
       <ul class="mb-0 ps-4 mt-1">
