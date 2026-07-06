@@ -1,7 +1,7 @@
 
 @if (expertReview() && project()) {
 <div class="card card-block" style="padding: 0.75rem 1rem 1rem;"
-     [ngClass]="{'alert-danger': expertReview().red,'alert-warning': expertReview().yellow,'alert-primary': expertReview().blue}">
+     [ngClass]="{'alert-danger': expertReview().red,'alert-warning': expertReview().yellow,'alert-primary': expertReview().blue, 'alert-economist': isEconomist()}">
   <div>
     <span (click)="showTransitionHistoryModal()" class="selectable" [ngClass]="['badge', expertReview().badge]">
       {{expertReview().state | reviewState}}

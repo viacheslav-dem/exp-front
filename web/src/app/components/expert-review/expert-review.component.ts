@@ -437,4 +437,10 @@ export class ExpertReviewComponent implements OnInit {
         }
         this.expertReview.set(update({ ...current }));
     }
+
+    isEconomist(): boolean {
+        if (anyMatch(this.role(), Role.BELISA_EDIT, Role.SECTION_CHAIRMAN, Role.BUREAU_CHAIRMAN))
+            return this.project().reviewStats.some(item => item.personId == this.expertReview().expert.id && item.economist);
+        return false;
+    }
 }
