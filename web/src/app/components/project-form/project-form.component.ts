@@ -72,7 +72,9 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     selectedCommercializationMethod: CatalogDto;
 
     allOrgs: SelectItem[] = [];
-    _userSelectedOrg: SelectItem = null;
+
+    allExecutors: string[] = [];
+    selectedExecutor: string;
 
     // Специализация проекта - lazy loading
     specializationItemsMap: Map<number, SpecializationDto[]> = new Map();
@@ -121,7 +123,10 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         if (!project) project = new ProjectDto();
         if (!project.period) project.period = new PeriodDto();
         if (!project.projectSpecialization) project.projectSpecialization = [];
-        if (!project.executor) this._userSelectedOrg = null;
+        if (project.executor) {
+           this.allExecutors = project.executor.split('; ')
+        }
+
 
         // Если специализации пустые, добавляем один пустой элемент по умолчанию
         if (project.projectSpecialization.length === 0) {
@@ -261,6 +266,9 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         this._project.subDirections.push(this.directions[i].subDirectionDtos[j]);
       }
     }
+
+    this._project.executor = this.allExecutors.join('; ')
+
     try {
       this.validate();
       if (!this.canAddSocialEconomicGoals()) {
@@ -943,7 +951,16 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
     }
 
     selectOrg(org: SelectItem) {
-        this._project.executor = org ? org.value.name : null;
+        this.selectedExecutor = org ? org.value.name : null;
+    }
+
+    addExecutor() {
+        if (!this.selectedExecutor) {
+            throw 'Пожалуйста, укажите исполнителей и соисполнителей объекта экспертизы.';
+        }
+        this.allExecutors.push(this.selectedExecutor);
+        this.selectedExecutor = null;
+        this.cdr?.markForCheck?.();
     }
 
 }

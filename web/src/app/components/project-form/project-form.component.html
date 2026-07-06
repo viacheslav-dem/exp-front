@@ -156,31 +156,51 @@
 
     <div class="form-group">
         <label class="form-group-label">Потенциальный(-е) исполнитель(-и) объекта государственной экспертизы</label>
-        <div>
-            <ng-select
-                    [items]="allOrgs"
-                    bindLabel="value.name"
-                    [(ngModel)]="_project.executor"
-                    [searchable]="true"
-                    [clearable]="true"
-                    placeholder="Выберите организацию-исполнитель проекта"
-                    (ngModelChange)="selectOrg($event)">
-                <ng-template ng-label-tmp let-item="item">
-                    <!-- Display the item using multiple fields in the selected area -->
-                    <span style="white-space: normal; word-break: break-word;"> {{ item.value.name }} </span>
-                </ng-template>
+        @if (allExecutors.length != 0) {
+            <div class="form-sub-group italic">
+                <ul>
+                    @for (executor of allExecutors; track $index) {
+                        <li>
+                            <span>{{ executor }}: </span>
+                            <a class="btn btn-icon btn-icon-sm" (click)="allExecutors.splice($index, 1)">
+                                <fa-icon icon="minus"></fa-icon>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
 
-                <ng-template ng-option-tmp let-item="item">
-                    <!-- Display the options in the dropdown list -->
-                    <span style="white-space: normal; word-break: break-word;"> {{ item.value.name }} </span>
-                </ng-template>
-            </ng-select>
-        </div>
-        <div class="hint">
-            <p class="font-italic">
-                <b>Подсказка.</b>
-                Если известен(-ы) (наименование исполнителя(-ей), соисполнителя(-ей).
-            </p>
+        <div class="row">
+            <div class="col-10">
+                <ng-select
+                        [items]="allOrgs"
+                        bindLabel="value.name"
+                        [(ngModel)]="selectedExecutor"
+                        [searchable]="true"
+                        [clearable]="true"
+                        placeholder="Выберите организацию-исполнитель проекта"
+                        (ngModelChange)="selectOrg($event)">
+                    <ng-template ng-label-tmp let-item="item">
+                        <!-- Display the item using multiple fields in the selected area -->
+                        <span style="white-space: normal; word-break: break-word;"> {{ item.value.name }} </span>
+                    </ng-template>
+
+                    <ng-template ng-option-tmp let-item="item">
+                        <!-- Display the options in the dropdown list -->
+                        <span style="white-space: normal; word-break: break-word;"> {{ item.value.name }} </span>
+                    </ng-template>
+                </ng-select>
+            </div>
+            <div class="col-2">
+                <button class="btn btn-primary w-100" (click)="addExecutor()">Добавить</button>
+            </div>
+            <div class="hint">
+                <p class="font-italic">
+                    <b>Подсказка.</b>
+                    Если известен(-ы) (наименование исполнителя(-ей), соисполнителя(-ей).
+                </p>
+            </div>
         </div>
     </div>
     @if (!_project.code?.code.startsWith('8.10')) {
