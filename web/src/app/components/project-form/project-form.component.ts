@@ -958,7 +958,11 @@ export class ProjectFormComponent implements OnInit, OnDestroy {
         if (!this.selectedExecutor) {
             throw 'Пожалуйста, укажите исполнителей и соисполнителей объекта экспертизы.';
         }
-        this.allExecutors.push(this.selectedExecutor);
+        if (!this.allExecutors.includes(this.selectedExecutor))
+            this.allExecutors.push(this.selectedExecutor);
+        else {
+            throw 'Данная организация уже была выбрана.';
+        }
         this.selectedExecutor = null;
         this.cdr?.markForCheck?.();
     }
