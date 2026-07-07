@@ -28,6 +28,7 @@ import {LifecycleGroupTermsMessages} from "@app/pipes/lifecycle-group-state.pipe
 import {Page} from "@app/components/common-components/page-and-filter/model/Page";
 import {RemarkDto} from "@app/dto/RemarkDto";
 import {ManualSelectionRequestDto} from "@app/dto/ManualSelectionRequestDto";
+import {AutomaticExpertSelectionResultDto} from "@app/dto/AutomaticExpertSelectionResultDto";
 
 @Injectable()
 export class ProjectService extends HasStateService {
@@ -322,7 +323,7 @@ export class ProjectService extends HasStateService {
     );
   }
 
-  automaticExpertSelection(projectId: number): Observable<ExpertReviewDto[]> {
+  automaticExpertSelection(projectId: number): Observable<AutomaticExpertSelectionResultDto> {
     return this._http.post(`${this.url}/automatic-expert-selection`, projectId)
   }
 

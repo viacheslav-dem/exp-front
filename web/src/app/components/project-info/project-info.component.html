@@ -69,6 +69,7 @@
             <app-expert-review-list
               [expertReviews]="project.expertReviews" [project]="project"
               [role]="role" (onChanged)="onExpertReviewsChanged($event)"
+              (onProjectChanged)="onProjectChanged($event)"
               [canChooseExperts]="canChooseExperts()">
             </app-expert-review-list>
           }

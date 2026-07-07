@@ -19,6 +19,7 @@ import {ExpertReviewState} from "@app/pipes/review-state.pipe";
 import {ConfirmDialogField} from "@app/components/dialogs/confirm-dialog/ConfirmDialogField";
 import {DialogResult} from "@app/components/dialogs/dialog-result";
 import {ManualSelectionRequestDto} from "@app/dto/ManualSelectionRequestDto";
+import {AutomaticExpertSelectionResultDto} from "@app/dto/AutomaticExpertSelectionResultDto";
 
 @Component({
     selector: 'app-expert-review-list',
@@ -36,6 +37,9 @@ export class ExpertReviewListComponent {
   readonly role = input<string | undefined>(undefined);
   readonly project = input<ProjectDto | undefined>(undefined);
   readonly onChanged = output<ExpertReviewDto[]>();
+  // Эмитится после автоматического выбора эксперта: несёт свежий ProjectDto с обновлённым reviewStats
+  // (экономист подсвечивается по project().reviewStats, который иначе остаётся устаревшим до перезагрузки страницы)
+  readonly onProjectChanged = output<ProjectDto>();
   readonly canChooseExperts = input<boolean | undefined>(undefined);
 
   public readonly searchExpertComponent = viewChild.required(SearchExpertComponent);
@@ -177,15 +181,18 @@ export class ExpertReviewListComponent {
 
     // Оригинальная логика из коммита 82eafcb от 12.12.2025: просто добавляем результат к списку
     this._projectService.automaticExpertSelection(project.id).pipe(
-      tap((res: ExpertReviewDto[]) => {
+      tap((res: AutomaticExpertSelectionResultDto) => {
         this.isAutomaticSelectionLoading.set(false);
         const currentReviews = this.expertReviews();
-        const updatedReviews = [...currentReviews, ...res];
+        const updatedReviews = [...currentReviews, ...res.expertReviews];
         if (updatedReviews.length < 2) {
           this.isAutomaticSelectionMode.set(false);
           this._toasty.warn("Нет доступных экспертов для автоматического выбора. Пожалуйста, выберите эксперта вручную.")
         }
         this.onChanged.emit(updatedReviews);
+        // reviewStats приходит вместе с ответом — обновляем проект без лишнего запроса,
+        // иначе флаг economist остаётся устаревшим до перезагрузки страницы
+        this.onProjectChanged.emit({...project, expertReviews: updatedReviews, reviewStats: res.reviewStats});
       }),
       catchError((error) => {
         this.isAutomaticSelectionLoading.set(false);
@@ -209,7 +216,7 @@ export class ExpertReviewListComponent {
         }
         this.isAutomaticSelectionMode.set(false);
         this._toasty.error(errorMessage);
-        return of([]);
+        return of(null);
       }),
       takeUntilDestroyed(this._destroyRef)
     ).subscribe();
@@ -232,15 +239,17 @@ export class ExpertReviewListComponent {
       // Небольшая задержка перед автоматическим выбором, чтобы пользователь увидел изменение
       timer(1000).pipe(
         switchMap(() => this._projectService.automaticExpertSelection(project.id).pipe(
-          tap((res: ExpertReviewDto[]) => {
+          tap((res: AutomaticExpertSelectionResultDto) => {
             const currentReviews = this.expertReviews();
-            const updatedReviews = [...currentReviews, ...res];
+            const updatedReviews = [...currentReviews, ...res.expertReviews];
             this.onChanged.emit(updatedReviews);
+            // reviewStats приходит вместе с ответом — обновляем проект без лишнего запроса
+            this.onProjectChanged.emit({...project, expertReviews: updatedReviews, reviewStats: res.reviewStats});
           }),
           catchError((error) => {
             // Логируем ошибку, но не показываем пользователю, так как это автоматический процесс
             console.error("Ошибка при автоматическом выборе нового эксперта:", error);
-            return of([]);
+            return of(null);
           })
         )),
         takeUntilDestroyed(this._destroyRef)
