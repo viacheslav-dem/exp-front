@@ -336,6 +336,11 @@ export class ProjectService extends HasStateService {
     return this._http.post(`${this.url}/send-all/finished`, idList);
   }
 
+  /** Массовый возврат объектов заказчику без экспертизы (проекты с уже подготовленным письмом о возврате). */
+  sendAllReturned(idList: number[]): Observable<any> {
+    return this._http.post(`${this.url}/send-all/returned`, idList);
+  }
+
   getExpertRemarksByProject(projectId: number): Observable<RemarkDto[]> {
     return this._http.getBlock(`${this.url}/${projectId}/expert-remarks`);
   }

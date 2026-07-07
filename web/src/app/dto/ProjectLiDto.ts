@@ -16,4 +16,6 @@ export class ProjectLiDto extends HasState {
   sections: SectionPlainDto[];
   /** Признак наличия замечаний экспертов/бюро/секции по объекту (для выделения в списке у аппарата бюро ГЭС). */
   hasRemarks?: boolean;
+  /** Признак наличия подготовленного письма о возврате заказчику (используется для массовой отправки). */
+  hasDecisionDocument?: boolean;
 }

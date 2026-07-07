@@ -107,14 +107,29 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
     /** Состояние загрузки при отправке (в ГЭС и/или заказчику). */
     readonly sending = signal<boolean>(false);
 
-    /** Выбранные к отправке в ГЭС (ON_SIGNING). */
+    /**
+     * Выбранные к отправке в ГЭС (ON_SIGNING без уже подготовленного письма о возврате заказчику).
+     * Объекты ON_SIGNING с hasDecisionDocument = true уже решено вернуть заказчику без экспертизы
+     * (см. project-info: кнопки "Отправить письмо заказчику" против "Отправить в ГЭС") -
+     * их нельзя отправлять на экспертизу, у них нет активных групп ГЭС.
+     */
     getProjectsListToGes(): ProjectLiDto[] {
-        return this.projectsList.filter(p => p.state === ProjectState.ON_SIGNING);
+        return this.projectsList.filter(p => p.state === ProjectState.ON_SIGNING && !p.hasDecisionDocument);
     }
 
-    /** Выбранные к отправке заказчику (ON_FINAL_SIGNING). */
-    getProjectsListToCustomer(): ProjectLiDto[] {
+    /** ON_SIGNING с уже подготовленным письмом о возврате заказчику без экспертизы. */
+    private getProjectsListToReturn(): ProjectLiDto[] {
+        return this.projectsList.filter(p => p.state === ProjectState.ON_SIGNING && !!p.hasDecisionDocument);
+    }
+
+    /** ON_FINAL_SIGNING — завершение проекта, отправка результатов заказчику. */
+    private getProjectsListToFinish(): ProjectLiDto[] {
         return this.projectsList.filter(p => p.state === ProjectState.ON_FINAL_SIGNING);
+    }
+
+    /** Выбранные к отправке заказчику: завершение (ON_FINAL_SIGNING) или возврат без экспертизы (ON_SIGNING + письмо). */
+    getProjectsListToCustomer(): ProjectLiDto[] {
+        return [...this.getProjectsListToFinish(), ...this.getProjectsListToReturn()];
     }
 
     showModal() {
@@ -122,24 +137,30 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
     }
 
     /**
-     * Отправляет выбранные: в ГЭС (ON_SIGNING) и заказчику (ON_FINAL_SIGNING) массовыми запросами.
+     * Отправляет выбранные объекты массовыми запросами: в ГЭС (ON_SIGNING),
+     * завершённые заказчику (ON_FINAL_SIGNING) и возврат заказчику без экспертизы (ON_SIGNING + письмо).
      */
     sendSelected() {
         const toGes = this.getProjectsListToGes();
-        const toCustomer = this.getProjectsListToCustomer();
-        if (toGes.length === 0 && toCustomer.length === 0) {
+        const toFinish = this.getProjectsListToFinish();
+        const toReturn = this.getProjectsListToReturn();
+        if (toGes.length === 0 && toFinish.length === 0 && toReturn.length === 0) {
             return;
         }
         this.sending.set(true);
         const gesIds = toGes.map(p => p.id);
-        const customerIds = toCustomer.map(p => p.id);
+        const finishIds = toFinish.map(p => p.id);
+        const returnIds = toReturn.map(p => p.id);
         const gesObs = gesIds.length
             ? this._projectService.sendAllOnExpertExamination(gesIds)
             : of(null);
-        const customerObs = customerIds.length
-            ? this._projectService.sendAllFinished(customerIds)
+        const finishObs = finishIds.length
+            ? this._projectService.sendAllFinished(finishIds)
             : of(null);
-        forkJoin([gesObs, customerObs]).subscribe({
+        const returnObs = returnIds.length
+            ? this._projectService.sendAllReturned(returnIds)
+            : of(null);
+        forkJoin([gesObs, finishObs, returnObs]).subscribe({
             next: () => {
                 this.sending.set(false);
                 this.projectsList = [];
@@ -148,7 +169,7 @@ export class ProjectListComponent extends FilterAndPages<ProjectLiDto> {
                 this.loadPage();
                 const parts: string[] = [];
                 if (gesIds.length) parts.push('в ГЭС');
-                if (customerIds.length) parts.push('заказчику');
+                if (finishIds.length || returnIds.length) parts.push('заказчику');
                 this._toasty.success('Объекты отправлены ' + parts.join(' и ') + '.');
                 this.closeModal();
             },
