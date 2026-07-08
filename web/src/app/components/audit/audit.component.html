@@ -53,9 +53,6 @@
                           <span>IP источника</span>
                         </th>
                         <th class="border-0 fw-semibold small text-muted">
-                          <span>IP хоста</span>
-                        </th>
-                        <th class="border-0 fw-semibold small text-muted">
                           <span>Время операции</span>
                         </th>
                         <th class="selectable border-0 fw-semibold small text-muted cursor-pointer"
@@ -89,7 +86,6 @@
                             </td>
                             <td class="text-body-secondary small">{{record.sourceName || '-'}}</td>
                             <td class="text-body-secondary small code-ip">{{record.sourceIp || '-'}}</td>
-                            <td class="text-body-secondary small code-ip">{{record.hostIp || '-'}}</td>
                             <td class="operation-time">
                                 @if (record.operationStartTime && record.operationEndTime) {
                                 <div>{{record.operationStartTime | date:'HH:mm:ss'}} - {{record.operationEndTime | date:'HH:mm:ss'}}</div>

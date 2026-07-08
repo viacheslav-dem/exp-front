@@ -11,7 +11,6 @@ export interface AuditRecordDto {
   // НОВЫЕ ПОЛЯ
   sourceName?: string;
   sourceIp?: string;
-  hostIp?: string;
   operationStartTime?: string;
   operationEndTime?: string;
 }

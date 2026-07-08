@@ -7,6 +7,7 @@ export enum AuditTypes {
     AUTH_ERROR = 'AUTH_ERROR',
     LOGOUT = 'LOGOUT',
     SESSION_EXPIRED = 'SESSION_EXPIRED',
+    TOKEN_REFRESH = 'TOKEN_REFRESH',
     UNKNOWN = 'UNKNOWN',
     UNKNOWN_ERROR = 'UNKNOWN_ERROR',
     TRANSITION = 'TRANSITION',
@@ -68,6 +69,7 @@ export class AuditTypePipe extends AbstractEnumPipe<AuditTypes> {
         this.map[AuditTypes.AUTH_ERROR] = 'Ошибка аутентификации';
         this.map[AuditTypes.LOGOUT] = 'Выход из системы';
         this.map[AuditTypes.SESSION_EXPIRED] = 'Время сессии истекло';
+        this.map[AuditTypes.TOKEN_REFRESH] = 'Обновление токена доступа';
         this.map[AuditTypes.UNKNOWN] = 'Не указан';
         this.map[AuditTypes.UNKNOWN_ERROR] = 'Неизвестная ошибка';
         this.map[AuditTypes.TRANSITION] = 'Изменение состояния объекта экспертизы';

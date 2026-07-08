@@ -51,10 +51,7 @@ export class AuditComponent extends FilterAndPages<AuditRecordDto> {
           .setPlaceholder('Поиск по источнику...'),
       SearchField.startsWith('sourceIp')
           .setTitle('IP источника')
-          .setPlaceholder('Поиск по IP...'),
-      SearchField.startsWith('hostIp')
-          .setTitle('IP хоста')
-          .setPlaceholder('Поиск по IP хоста...')
+          .setPlaceholder('Поиск по IP...')
     ];
     this.enableFilterCache("audit");
     setTimeout(() => {
@@ -130,6 +127,7 @@ export class AuditComponent extends FilterAndPages<AuditRecordDto> {
       'AUTH_ERROR': 'bg-danger',
       'LOGOUT': 'bg-secondary',
       'SESSION_EXPIRED': 'bg-warning',
+      'TOKEN_REFRESH': 'bg-success',
       'TRANSITION': 'bg-info',
       'TRANSITION_ERROR': 'bg-danger',
       'USER': 'bg-primary',
@@ -186,6 +184,7 @@ export class AuditComponent extends FilterAndPages<AuditRecordDto> {
       'AUTH_ERROR': 'fas fa-exclamation-triangle me-1',
       'LOGOUT': 'fas fa-sign-out-alt me-1',
       'SESSION_EXPIRED': 'fas fa-clock me-1',
+      'TOKEN_REFRESH': 'fas fa-sync-alt me-1',
       'SECURITY_ALERT': 'fas fa-shield-alt me-1',
       'SECURITY_ALERT_ERROR': 'fas fa-bug me-1',
       'OPERATION_AUDIT': 'fas fa-clipboard-list me-1',
