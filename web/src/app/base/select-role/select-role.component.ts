@@ -1,4 +1,4 @@
-import {Component, OnInit, viewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, viewChild} from '@angular/core';
 import {AuthService} from "@app/services/auth.service";
 import {StorageService} from "@app/services/storage.service";
 import {RoleInfoDto} from "@app/dto/RoleInfoDto";
@@ -7,6 +7,8 @@ import {ProjectListComponent} from "@app/components/project-list/project-list.co
 import {DataIseful} from "@app/dto/DataIseful";
 import {UserEsiful} from "@app/dto/UserEsiful";
 import {EsifulService} from "@app/services/esiful.service";
+import {Subject} from "rxjs";
+import {takeUntil} from "rxjs/operators";
 
 @Component({
     selector: 'app-select-role',
@@ -14,7 +16,7 @@ import {EsifulService} from "@app/services/esiful.service";
     styleUrls: ['select-role.component.scss'],
     standalone: false
 })
-export class SelectRoleComponent implements OnInit {
+export class SelectRoleComponent implements OnInit, OnDestroy {
 
   roles: string[] = [];
   currRole: string;
@@ -25,6 +27,10 @@ export class SelectRoleComponent implements OnInit {
 
   readonly projectListComponent = viewChild(ProjectListComponent);
 
+  // fix: отписка при уничтожении компонента — без неё поздний ответ dataParams()
+  // переходит обратно на /select-role (relativeTo ссылается на уже неактуальный route),
+  private readonly destroy$ = new Subject<void>();
+
   constructor(private _storageService: StorageService,
               private _authService: AuthService,
               private esifulService: EsifulService,
@@ -33,13 +39,13 @@ export class SelectRoleComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const dataParam = params['data'];
       if (dataParam) {
         const data = new DataIseful();
         data.dataParam = dataParam;
         data.codeVerifier = this._storageService.getCodeVerifier();
-       this.esifulService.dataParams(data).subscribe({
+       this.esifulService.dataParams(data).pipe(takeUntil(this.destroy$)).subscribe({
           next: (response: UserEsiful) => {
               console.log(response);
               // fix: убираем ?data= из URL, чтобы F5 не повторял callback
@@ -56,7 +62,7 @@ export class SelectRoleComponent implements OnInit {
       }
         this.roles = this._storageService.getRoles();
         this.currRole = this._storageService.getCurrRole();
-        this.route.params.subscribe(() => {
+        this.route.params.pipe(takeUntil(this.destroy$)).subscribe(() => {
           this.getRolesInfo();
           const comp = this.projectListComponent();
           if (comp != null) {
@@ -64,6 +70,11 @@ export class SelectRoleComponent implements OnInit {
           }
         });
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   enterHow(currRole: string) {
