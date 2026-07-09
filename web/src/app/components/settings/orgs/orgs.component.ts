@@ -9,7 +9,7 @@ import {environment} from "../../../../environments/environment";
     selector: 'app-orgs',
     templateUrl: './orgs.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.settings) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.settings) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class OrgsComponent extends PropertyComponent<Orgs> implements OnInit {
 

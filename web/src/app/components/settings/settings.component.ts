@@ -20,7 +20,7 @@ import {environment} from "../../../environments/environment";
     templateUrl: './settings.component.html',
     styleUrls: ['./settings.component.scss'],
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.settings) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.settings) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class SettingsComponent extends FilterAndPages<PropertyDto> implements AfterViewInit {
 

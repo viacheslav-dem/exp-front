@@ -168,7 +168,7 @@ export const PASSWORD_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class PasswordInputComponent extends ControlComponent<PasswordDto> {
 

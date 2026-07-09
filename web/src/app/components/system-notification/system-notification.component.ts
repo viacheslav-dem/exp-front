@@ -11,7 +11,7 @@ import {SystemNotificationStore} from "@app/services/system-notification.store";
     selector: 'system-notification',
     templateUrl: './system-notification.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class SystemNotificationComponent {
 

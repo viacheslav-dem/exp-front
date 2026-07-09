@@ -13,7 +13,7 @@ import {SystemNotificationStore} from "@app/services/system-notification.store";
     selector: 'app-root-page',
     templateUrl: 'root-page.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class RootPageComponent implements OnInit {
 

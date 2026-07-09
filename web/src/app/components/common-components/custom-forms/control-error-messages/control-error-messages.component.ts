@@ -21,7 +21,7 @@ import {environment} from "../../../../../environments/environment";
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class ControlErrorMessagesComponent implements OnInit, OnChanges {
 

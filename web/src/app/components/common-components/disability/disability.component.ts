@@ -60,7 +60,7 @@ export const DISABILITY_CONTROL_VALUE_ACCESSOR: any = {
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class DisabilityComponent extends ControlComponent<DisabilityDto> {
 }

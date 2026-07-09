@@ -7,7 +7,7 @@ import {environment} from "../../../environments/environment";
     selector: 'app-same-project-list',
     templateUrl: './same-project-list.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.listsAndInfo) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.listsAndInfo) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 
 export class SameProjectListComponent {

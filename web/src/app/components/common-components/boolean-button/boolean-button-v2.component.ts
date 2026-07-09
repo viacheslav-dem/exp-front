@@ -37,7 +37,7 @@ export const BB_CONTROL_VALUE_ACCESSOR: any = {
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class BooleanButtonV2Component extends ControlComponent<boolean> {
 

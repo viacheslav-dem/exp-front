@@ -19,7 +19,7 @@ import {switchMap, takeUntil} from "rxjs/operators";
   standalone: false,
   changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class LoginesifulComponent implements OnInit, OnDestroy {
   public roles: string[] = [];

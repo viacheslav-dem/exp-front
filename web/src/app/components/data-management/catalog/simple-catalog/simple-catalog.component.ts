@@ -125,7 +125,7 @@ import {environment} from "../../../../../environments/environment";
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class SimpleCatalogComponent<T extends CatalogDto> extends CatalogTemplate<T> {
 

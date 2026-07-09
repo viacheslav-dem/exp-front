@@ -16,7 +16,7 @@ import {environment} from "../../../../../environments/environment";
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class SocialEconomicGoalsComponent {
   Catalog = Catalog;

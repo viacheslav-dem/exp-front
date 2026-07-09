@@ -15,7 +15,7 @@ import {environment} from "../../../../environments/environment";
     templateUrl: './real-time-stats.component.html',
     styleUrls: ['./real-time-stats.component.scss'],
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class RealTimeStatsComponent {
 

@@ -14,7 +14,7 @@ import {SpecializationDto} from "@app/dto/SpecializationDto";
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
         ? ChangeDetectionStrategy.OnPush
-        : ChangeDetectionStrategy.Default
+        : ChangeDetectionStrategy.Eager
 })
 export class SpecializationComponent extends CatalogTemplate<SpecializationDto> {
 

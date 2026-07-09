@@ -17,7 +17,7 @@ import {environment} from "../../../../environments/environment";
     templateUrl: './templates.component.html',
     styleUrls: ['./templates.component.scss'],
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dataManagement) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dataManagement) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class TemplatesComponent extends FilterAndPages<TemplateDocumentDto> implements AfterViewInit {
 

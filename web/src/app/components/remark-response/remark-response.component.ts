@@ -6,7 +6,7 @@ import {environment} from "../../../environments/environment";
     selector: 'app-remark-response',
     templateUrl: './remark-response.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 
 export class RemarkResponseComponent {

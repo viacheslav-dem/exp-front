@@ -33,7 +33,7 @@ import {takeUntil} from "rxjs/operators";
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class LifecycleGroupComponent implements OnInit, OnDestroy {
 

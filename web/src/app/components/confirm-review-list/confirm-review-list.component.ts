@@ -45,7 +45,7 @@ import {environment} from "../../../environments/environment";
     templateUrl: './confirm-review-list.component.html',
     styleUrls: ['confirm-review-list.component.scss'],
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class ConfirmReviewListComponent extends FilterAndPages<ProjectReviewsExpertsDto> implements OnInit, OnDestroy {
 

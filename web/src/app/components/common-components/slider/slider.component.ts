@@ -10,7 +10,7 @@ import {Subject, debounceTime} from 'rxjs';
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class SliderComponent implements OnInit, OnChanges {
 

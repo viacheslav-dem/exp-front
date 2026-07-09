@@ -9,7 +9,7 @@ import {environment} from "../../../../environments/environment";
     templateUrl: './project-transition-history.component.html',
     styleUrls: ['project-transition-history.component.scss'],
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.history) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.history) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class ProjectTransitionHistoryComponent implements OnInit {
 

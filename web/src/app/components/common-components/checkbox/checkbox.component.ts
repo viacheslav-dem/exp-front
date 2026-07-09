@@ -24,7 +24,7 @@ export const CHECKBOX_VALUE_ACCESSOR: any = {
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class CheckboxComponent extends ControlComponent<boolean> {
 

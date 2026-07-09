@@ -19,7 +19,7 @@ import {environment} from "../../../../environments/environment";
     selector: 'project-list-from-stats',
     templateUrl: 'project-list-from-stats.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class ProjectListFromStatsComponent extends FilterAndPages<ProjectDto> {
 

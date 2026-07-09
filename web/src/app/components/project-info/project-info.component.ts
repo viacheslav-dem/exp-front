@@ -45,7 +45,7 @@ import {EsifulService} from "@app/services/esiful.service";
     selector: 'app-project-info',
     templateUrl: 'project-info.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class ProjectInfoComponent implements OnInit {
 

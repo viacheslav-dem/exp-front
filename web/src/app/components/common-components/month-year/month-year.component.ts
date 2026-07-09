@@ -31,7 +31,7 @@ export const MONTH_YEAR_VALUE_ACCESSOR: any = {
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.commonControls)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class MonthYearComponent extends ControlComponent<number> {
 

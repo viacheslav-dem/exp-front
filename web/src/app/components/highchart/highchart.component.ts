@@ -88,7 +88,7 @@ Highcharts.wrap(Highcharts.Chart.prototype, 'getContainer', function (proceed) {
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class HighchartComponent {
 

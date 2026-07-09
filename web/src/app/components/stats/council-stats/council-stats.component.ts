@@ -22,7 +22,7 @@ import {environment} from "../../../../environments/environment";
     selector: 'app-council-stats',
     templateUrl: './council-stats.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 @Injectable({ providedIn: 'root' })
 export class CouncilStatsComponent implements OnInit, AfterViewInit {

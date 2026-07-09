@@ -40,7 +40,7 @@ import {EsifulService} from "@app/services/esiful.service";
     templateUrl: './basic-project-info.component.html',
     styleUrls: ['./basic-project-info.component.scss'],
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectDetail) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class BasicProjectInfoComponent {
 

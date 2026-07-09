@@ -8,7 +8,7 @@ import {environment} from "../../../environments/environment";
     selector: 'app-agenda-chat',
     templateUrl: 'agenda-chat.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.listsAndInfo) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.listsAndInfo) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class AgendaChatComponent implements OnInit {
 

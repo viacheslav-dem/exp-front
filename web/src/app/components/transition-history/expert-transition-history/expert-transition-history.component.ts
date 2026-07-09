@@ -8,7 +8,7 @@ import {environment} from "../../../../environments/environment";
     templateUrl: './expert-transition-history.component.html',
     styleUrls: ['expert-transition-history.component.scss'],
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.history) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.history) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class ExpertTransitionHistoryComponent implements OnInit {
 

@@ -28,7 +28,7 @@ import {environment} from "../../../environments/environment";
     templateUrl: './user-list.component.html',
     styleUrls: ['user-list.component.scss'],
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.coreShell) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class UserListComponent extends FilterAndPages<PersonDto> implements OnDestroy {
 

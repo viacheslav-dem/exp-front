@@ -9,7 +9,7 @@ import {NumberPipe} from "@app/pipes/number.pipe";
     selector: 'app-project-copy',
     templateUrl: 'project-copy.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 
 

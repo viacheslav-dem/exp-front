@@ -18,7 +18,7 @@ import {environment} from "../../../environments/environment";
   templateUrl: './audit.component.html',
   styleUrls: ['./audit.component.scss'],
   standalone: false,
-  changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+  changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.stats) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class AuditComponent extends FilterAndPages<AuditRecordDto> {
 

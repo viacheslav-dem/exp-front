@@ -5,7 +5,7 @@ import {environment} from "../../../environments/environment";
     selector: 'app-comment-list',
     templateUrl: './comment-list.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.listsAndInfo) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.listsAndInfo) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class CommentListComponent implements OnInit {
 

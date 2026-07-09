@@ -9,7 +9,7 @@ import {environment} from "../../../../environments/environment";
     templateUrl: './group-transition-history.component.html',
     styleUrls: ['group-transition-history.component.scss'],
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.history) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.history) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class GroupTransitionHistoryComponent implements OnInit {
 

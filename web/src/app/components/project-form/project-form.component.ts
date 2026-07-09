@@ -28,7 +28,7 @@ import {SelectItem} from "@app/components/common-components/page-and-filter/mode
     templateUrl: 'project-form.component.html',
     styleUrls: ['project-form.component.scss'],
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class ProjectFormComponent implements OnInit, OnDestroy {
 

@@ -41,7 +41,7 @@ import {FormValidationScrollService} from "@app/services/form-validation-scroll.
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.projectFlow)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class CouncilConclusionFormContainerComponent extends DocumentForm<CouncilConclusionFormContent> {
 

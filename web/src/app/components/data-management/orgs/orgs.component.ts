@@ -19,7 +19,7 @@ import {environment} from "../../../../environments/environment";
     templateUrl: './orgs.component.html',
     styleUrls: ['./orgs.component.scss'],
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dataManagement) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dataManagement) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class OrgsComponent extends FilterAndPages<OrgDto> {
 

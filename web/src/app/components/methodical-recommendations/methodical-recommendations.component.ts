@@ -60,7 +60,7 @@ import {PdfViewerModule} from "ng2-pdf-viewer";
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dialogs)
         ? ChangeDetectionStrategy.OnPush
-        : ChangeDetectionStrategy.Default
+        : ChangeDetectionStrategy.Eager
 })
 export class MethodicalRecommendationsComponent implements OnInit, OnDestroy{
 

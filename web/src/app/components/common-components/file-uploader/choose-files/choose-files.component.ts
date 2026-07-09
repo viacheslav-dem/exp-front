@@ -10,7 +10,7 @@ import {GlobalToastyService} from "@app/services/global-toasty.service";
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.fileAndPdf)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class ChooseFilesComponent {
 

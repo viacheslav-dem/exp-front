@@ -11,7 +11,7 @@ import {environment} from "../../../../environments/environment";
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.settings)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class ExaminationPolicyComponent extends PropertyComponent<ExaminationPolicy> {
   constructor(protected _dataService: DataService,

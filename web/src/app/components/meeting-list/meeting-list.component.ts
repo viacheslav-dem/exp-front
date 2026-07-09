@@ -17,7 +17,7 @@ import {environment} from "../../../environments/environment";
     selector: 'app-meeting-list',
     templateUrl: 'meeting-list.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.meetings) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.meetings) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class MeetingListComponent extends FilterAndPages<MeetingDto> {
 

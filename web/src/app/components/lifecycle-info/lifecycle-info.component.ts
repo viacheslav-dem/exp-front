@@ -16,7 +16,7 @@ import {environment} from "../../../environments/environment";
     selector: 'app-lifecycle-info',
     templateUrl: './lifecycle-info.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.listsAndInfo) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.listsAndInfo) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class LifecycleInfoComponent implements OnInit, OnDestroy {
 

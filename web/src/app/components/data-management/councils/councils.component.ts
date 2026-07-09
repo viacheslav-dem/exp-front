@@ -37,7 +37,7 @@ import {PersonFullNamePipe} from "@app/pipes/person-full-name.pipe";
     templateUrl: './councils.component.html',
     styleUrls: ['./councils.component.scss'],
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dataManagement) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.dataManagement) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class CouncilsComponent extends FilterAndPages<CouncilDto> {
   Catalog = Catalog;

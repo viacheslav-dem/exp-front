@@ -12,7 +12,7 @@ import {environment} from "../../../../environments/environment";
     selector: 'app-search-person',
     templateUrl: './search-person.component.html',
     standalone: false,
-    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.search) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Default
+    changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.search) ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager
 })
 export class SearchPersonComponent extends FilterAndPages<PersonPlainDto> {
 

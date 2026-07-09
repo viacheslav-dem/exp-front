@@ -75,7 +75,7 @@ export const VOTE_RESULTS_CONTROL_VALUE_ACCESSOR: any = {
     // Feature flag для безопасного rollout: в prod по умолчанию Default (см. environment.prod.ts)
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.meetings)
       ? ChangeDetectionStrategy.OnPush
-      : ChangeDetectionStrategy.Default
+      : ChangeDetectionStrategy.Eager
 })
 export class VoteResultsComponent extends ControlComponent<VoteResults> {
 

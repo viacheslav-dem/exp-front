@@ -14,7 +14,7 @@ import {RecordKeepingDto} from "@app/dto/RecordKeepingDto";
     standalone: false,
     changeDetection: (environment.features.onPush.enabled && environment.features.onPush.groups.catalogsAdmin)
         ? ChangeDetectionStrategy.OnPush
-        : ChangeDetectionStrategy.Default
+        : ChangeDetectionStrategy.Eager
 })
 export class RecordKeepingComponent extends CatalogTemplate<RecordKeepingDto> {
 

@@ -38,7 +38,12 @@
             "sourceMap": false,
             "optimization": false,
             "namedChunks": true,
-            "browser": "src/main.ts"
+            "browser": "src/main.ts",
+            "stylePreprocessorOptions": {
+              "sass": {
+                "silenceDeprecations": ["import", "global-builtin", "color-functions", "if-function"]
+              }
+            }
           },
           "configurations": {
             "production": {
@@ -88,7 +93,12 @@
             "assets": [
               "src/assets",
               "src/WEB-INF"
-            ]
+            ],
+            "stylePreprocessorOptions": {
+              "sass": {
+                "silenceDeprecations": ["import", "global-builtin", "color-functions", "if-function"]
+              }
+            }
           }
         }
       }
