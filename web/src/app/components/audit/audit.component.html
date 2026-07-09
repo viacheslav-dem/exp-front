@@ -13,89 +13,93 @@
                           <table class="table table-hover mb-0">
                             <thead class="table-light">
                               <tr>
-                                <th class="selectable border-0 fw-semibold small text-muted cursor-pointer"
-                                    (click)="sortBy('date')">
-                                  <span>Дата/время</span>
-                                  @if (sort.property == 'date') {
-                        <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
-                        } @else {
-                        <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
-                        }
-                        </th>
-                        <th class="selectable border-0 fw-semibold small text-muted cursor-pointer"
-                            (click)="sortBy('person')">
-                          <span>Пользователь</span>
-                          @if (sort.property == 'person') {
-                        <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
-                        } @else {
-                        <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
-                        }
-                        </th>
-                        <th class="selectable border-0 fw-semibold small text-muted cursor-pointer"
-                            (click)="sortBy('type')">
-                          <span>Тип</span>
-                          @if (sort.property == 'type') {
-                        <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
-                        } @else {
-                        <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
-                        }
-                        </th>
-                        <th class="border-0 fw-semibold small text-muted">
-                          <span>IP источника</span>
-                        </th>
-                        <th class="border-0 fw-semibold small text-muted">
-                          <span>Время операции</span>
-                        </th>
-                        <th class="selectable border-0 fw-semibold small text-muted cursor-pointer"
-                            (click)="sortBy('message')">
-                          <span>Сообщение</span>
-                          @if (sort.property == 'message') {
-                        <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
-                        } @else {
-                        <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
-                        }
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @for (record of audit; track record) {
-                        <tr class="audit-table-row" (click)="showDetails(record)">
-                            <td class="text-nowrap text-body-secondary small">
-                                {{record.date | date:'dd.MM.yyyy HH:mm:ss'}}
-                            </td>
-                            @if (record.person) {
-                            <td class="fw-medium">{{record.person | fullName}}</td>
-                            }
-                            @if (!record.person) {
-                            <td class="text-body-secondary fst-italic">Неавторизованный</td>
-                            }
-                            <td>
-                                 <span class="badge" [ngClass]="getBadgeClass(record.type)" class="rounded-pill px-2 py-1 small">
-                                     <i [class]="getIconClass(record.type)"></i>
-                                     {{record.type | auditType}}
-                                </span>
-                            </td>
-                            <td class="text-body-secondary small code-ip">{{record.sourceIp || '-'}}</td>
-                            <td class="operation-time">
-                                @if (record.operationStartTime && record.operationEndTime) {
-                                <div>{{record.operationStartTime | date:'HH:mm:ss'}} - {{record.operationEndTime | date:'HH:mm:ss'}}</div>
-                            <div [class.duration-high]="getDuration(record) > 5000">
-                              Длит: {{getDurationFormatted(record)}}
-                                </div>
-                                } @else {
-                                <span class="text-muted">-</span>
+                                <th class="border-0 fw-semibold small text-muted" [attr.aria-sort]="getAriaSort('date')">
+                                  <button type="button" class="th-sort-btn" (click)="sortBy('date')">
+                                    <span>Дата/время</span>
+                                    @if (sort.property == 'date') {
+                                    <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
+                                    } @else {
+                                    <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
+                                    }
+                                  </button>
+                                </th>
+                                <th class="border-0 fw-semibold small text-muted" [attr.aria-sort]="getAriaSort('person')">
+                                  <button type="button" class="th-sort-btn" (click)="sortBy('person')">
+                                    <span>Пользователь</span>
+                                    @if (sort.property == 'person') {
+                                    <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
+                                    } @else {
+                                    <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
+                                    }
+                                  </button>
+                                </th>
+                                <th class="border-0 fw-semibold small text-muted" [attr.aria-sort]="getAriaSort('type')">
+                                  <button type="button" class="th-sort-btn" (click)="sortBy('type')">
+                                    <span>Тип</span>
+                                    @if (sort.property == 'type') {
+                                    <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
+                                    } @else {
+                                    <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
+                                    }
+                                  </button>
+                                </th>
+                                <th class="border-0 fw-semibold small text-muted" [attr.aria-sort]="getAriaSort('message')">
+                                  <button type="button" class="th-sort-btn" (click)="sortBy('message')">
+                                    <span>Сообщение</span>
+                                    @if (sort.property == 'message') {
+                                    <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
+                                    } @else {
+                                    <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
+                                    }
+                                  </button>
+                                </th>
+                                <th class="border-0 fw-semibold small text-muted chevron-col">
+                                  <span class="visually-hidden">Открыть подробности</span>
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              @for (record of audit; track record) {
+                                <tr class="audit-table-row"
+                                    [class.row-severity-high]="isHighSeverity(record.type)"
+                                    tabindex="0"
+                                    [attr.aria-label]="getRowAriaLabel(record)"
+                                    (click)="showDetails(record)"
+                                    (keydown.enter)="showDetails(record)"
+                                    (keydown.space)="showDetails(record); $event.preventDefault()">
+                                    <td class="text-nowrap text-body-secondary small">
+                                        {{record.date | date:'dd.MM.yyyy HH:mm:ss'}}
+                                    </td>
+                                    @if (record.person) {
+                                    <td class="fw-medium">{{record.person | fullName}}</td>
+                                    }
+                                    @if (!record.person && isSystemEvent(record)) {
+                                    <td class="text-body-secondary fst-italic">
+                                      <i class="fas fa-robot me-1" aria-hidden="true"></i>Плановая задача
+                                    </td>
+                                    }
+                                    @if (!record.person && !isSystemEvent(record)) {
+                                    <td class="text-body-secondary fst-italic">Неавторизованный</td>
+                                    }
+                                    <td>
+                                         <span class="badge" [ngClass]="getBadgeClass(record.type)" class="rounded-pill px-2 py-1 small">
+                                             <i [class]="getIconClass(record.type)" aria-hidden="true"></i>
+                                             {{record.type | auditType}}
+                                        </span>
+                                    </td>
+                                    <td class="text-body-secondary small message-cell">{{record.message | short:120}}</td>
+                                    <td class="chevron-cell text-muted" aria-hidden="true">
+                                      <i class="fas fa-chevron-right"></i>
+                                    </td>
+                                </tr>
                                 }
-                            </td>
-                            <td class="text-body-secondary small">{{record.message | short:120}}</td>
-                        </tr>
-                        }
-                        </tbody>
-                      </table>
-                    </div>
+                            </tbody>
+                          </table>
+                        </div>
                         }
                         @if (audit.length == 0) {
                         <div class="alert alert-info fst-italic mb-0 rounded-4 shadow-sm border-0 p-3">
-                          <i class="fas fa-info-circle me-2"></i>Записи отсутствуют
+                          <i class="fas fa-info-circle me-2" aria-hidden="true"></i>Записи отсутствуют
                         </div>
                         }
                         <div class="mt-4">
@@ -118,4 +122,56 @@
             </div>
         </div>
     </div>
+
+    <app-modal #detailModal title="Информация о событии аудита">
+      @if (selectedRecord) {
+      <dl class="detail-list mb-0">
+        <dt>Дата/время</dt>
+        <dd>{{selectedRecord.date | date:'dd.MM.yyyy HH:mm:ss'}}</dd>
+
+        <dt>Пользователь</dt>
+        <dd>
+          @if (selectedRecord.person) {
+            {{selectedRecord.person | fullName}}
+          } @else if (isSystemEvent(selectedRecord)) {
+            <i class="fas fa-robot me-1" aria-hidden="true"></i>Плановая задача (системное событие)
+          } @else {
+            Неавторизованный
+          }
+        </dd>
+
+        <dt>Тип события</dt>
+        <dd>
+          <span class="badge" [ngClass]="getBadgeClass(selectedRecord.type)" class="rounded-pill px-2 py-1 small">
+            <i [class]="getIconClass(selectedRecord.type)" aria-hidden="true"></i>
+            {{selectedRecord.type | auditType}}
+          </span>
+        </dd>
+
+        <dt>IP источника</dt>
+        <dd class="code-ip">
+          @if (isSystemEvent(selectedRecord)) {
+            — <span class="text-muted small">(системная задача, HTTP-запроса не было)</span>
+          } @else {
+            {{selectedRecord.sourceIp || '-'}}
+          }
+        </dd>
+
+        <dt>Время выполнения</dt>
+        <dd>
+          @if (selectedRecord.operationStartTime && selectedRecord.operationEndTime) {
+            {{selectedRecord.operationStartTime | date:'HH:mm:ss'}} - {{selectedRecord.operationEndTime | date:'HH:mm:ss'}}
+            <span [class.duration-high]="getDuration(selectedRecord) > 5000">
+              (длительность: {{getDurationFormatted(selectedRecord)}})
+            </span>
+          } @else {
+            <span class="text-muted">—</span>
+          }
+        </dd>
+
+        <dt>Сообщение</dt>
+        <dd class="detail-message">{{selectedRecord.message || '—'}}</dd>
+      </dl>
+      }
+    </app-modal>
 </div>

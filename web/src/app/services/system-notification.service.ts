@@ -18,6 +18,6 @@ export class SystemNotificationService {
     }
 
     saveNotification(notification: SystemNotificationDto): Observable<SystemNotificationDto> {
-        return this._http.post(`${this.url}/`, notification);
+        return this._http.post(`${this.url}`, notification);
     }
 }

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, viewChild} from "@angular/core";
 import {AuditService} from "@app/services/audit.service";
 import {AuditTypePipe, getAllAuditTypes} from "@app/pipes/audit-type.pipe";
 import {
@@ -11,6 +11,7 @@ import {
 import {FilterAndPages} from "@app/components/common-components/page-and-filter/filter-and-pages";
 import {AuditRecordDto} from "@app/dto/AuditRecordDto";
 import {SearchField} from "@app/components/common-components/page-and-filter/model/SearchField";
+import {ModalComponent} from "@app/components/common-components/modal/modal.component";
 import {environment} from "../../../environments/environment";
 
 @Component({
@@ -26,6 +27,14 @@ export class AuditComponent extends FilterAndPages<AuditRecordDto> {
   audit: AuditRecordDto[] = [];
   sort: SortOrder = new SortOrder('date', Direction.DESC);
   allTypes: string[] = getAllAuditTypes();
+  selectedRecord: AuditRecordDto | null = null;
+
+  readonly detailModal = viewChild<ModalComponent>('detailModal');
+
+  // Типы, требующие визуального акцента в таблице (реальные проблемы, не рутинные события).
+  private readonly highSeverityTypes = new Set([
+    'SESSION_ANOMALY', 'BRUTE_FORCE', 'PRIVILEGE_CHANGE', 'IP_BLOCKED', 'SECURITY_ALERT'
+  ]);
 
   constructor(private _service: AuditService,
               private _auditTypePipe: AuditTypePipe,
@@ -80,6 +89,13 @@ export class AuditComponent extends FilterAndPages<AuditRecordDto> {
     this.update();
   }
 
+  getAriaSort(property: string): 'ascending' | 'descending' | 'none' {
+    if (this.sort.property !== property) {
+      return 'none';
+    }
+    return this.sort.direction === Direction.ASC ? 'ascending' : 'descending';
+  }
+
   getSortOrders() {
     if (this.sort.property == 'person') {
       return sortByName('person.personName.', this.sort.direction);
@@ -111,9 +127,26 @@ export class AuditComponent extends FilterAndPages<AuditRecordDto> {
     return '';
   }
 
+  // IP == 'unknown' бывает только когда HTTP-запроса вообще не было (фоновая scheduled-задача) —
+  // у настоящих неавторизованных/неудачных запросов IP всегда реальный.
+  isSystemEvent(record: AuditRecordDto): boolean {
+    return !record.person && record.sourceIp === 'unknown';
+  }
+
+  isHighSeverity(type: string): boolean {
+    return type?.endsWith('_ERROR') || this.highSeverityTypes.has(type);
+  }
+
   showDetails(record: AuditRecordDto) {
-    // Открыть модальное окно с деталями события
-    console.log('Details:', record);
+    this.selectedRecord = record;
+    this.detailModal()?.show();
+    this.cdr?.markForCheck?.();
+  }
+
+  getRowAriaLabel(record: AuditRecordDto): string {
+    const who = record.person ? '' : (this.isSystemEvent(record) ? 'плановая задача, ' : 'неавторизованный, ');
+    const type = this._auditTypePipe.transform(record.type);
+    return `Событие: ${type}, ${who}открыть подробности`;
   }
 
   getBadgeClass(type: string): string {
