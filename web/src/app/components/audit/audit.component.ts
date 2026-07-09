@@ -45,10 +45,6 @@ export class AuditComponent extends FilterAndPages<AuditRecordDto> {
           .setSelectText('Выбрать тип')
           .setCheckAllEnabled(true)
           .setTitle('Тип записи'),
-      // НОВЫЕ ФИЛЬТРЫ - используем SearchField.startsWith или SearchField.contains
-      SearchField.startsWith('sourceName')
-          .setTitle('Источник события')
-          .setPlaceholder('Поиск по источнику...'),
       SearchField.startsWith('sourceIp')
           .setTitle('IP источника')
           .setPlaceholder('Поиск по IP...')

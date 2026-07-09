@@ -40,15 +40,6 @@
                         <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
                         }
                         </th>
-                        <th class="selectable border-0 fw-semibold small text-muted cursor-pointer"
-                            (click)="sortBy('sourceName')">
-                          <span>Источник</span>
-                          @if (sort.property == 'sourceName') {
-                        <fa-icon class="fa-active ms-1 text-primary" [icon]="SortClass[this.sort.direction]"></fa-icon>
-                        } @else {
-                        <fa-icon icon="sort" class="ms-1 text-muted opacity-50"></fa-icon>
-                        }
-                        </th>
                         <th class="border-0 fw-semibold small text-muted">
                           <span>IP источника</span>
                         </th>
@@ -84,7 +75,6 @@
                                      {{record.type | auditType}}
                                 </span>
                             </td>
-                            <td class="text-body-secondary small">{{record.sourceName || '-'}}</td>
                             <td class="text-body-secondary small code-ip">{{record.sourceIp || '-'}}</td>
                             <td class="operation-time">
                                 @if (record.operationStartTime && record.operationEndTime) {

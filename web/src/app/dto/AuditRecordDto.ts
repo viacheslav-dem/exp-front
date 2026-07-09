@@ -9,7 +9,6 @@ export interface AuditRecordDto {
   message: string;
 
   // НОВЫЕ ПОЛЯ
-  sourceName?: string;
   sourceIp?: string;
   operationStartTime?: string;
   operationEndTime?: string;
