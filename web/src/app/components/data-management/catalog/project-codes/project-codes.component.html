@@ -49,8 +49,8 @@
                   <!-- Дополнительная информация -->
                   <div class="item-details">
                     <div class="detail-item">
-<!--                      <span class="detail-label">Закреплённое подразделение ГКНТ:</span>-->
-                        <span class="detail-label">Закреплённый отдел БелИСА:</span>
+                     <span class="detail-label">Закреплённое подразделение ГКНТ:</span>
+                       <!-- <span class="detail-label">Закреплённый отдел БелИСА:</span> -->
                       <span class="detail-value">{{code.gkntDepartment?.name | orElse: 'не указано'}}</span>
                     </div>
                     <div class="detail-item">
@@ -98,8 +98,8 @@
                 </div>
 
                 <div class="form-group">
-<!--                  <label class="form-label">Закреплённое подразделение ГКНТ</label>-->
-                    <span class="detail-label">Закреплённый отдел БелИСА:</span>
+                  <label class="form-label">Закреплённое подразделение ГКНТ</label>
+                  <!--  <span class="detail-label">Закреплённый отдел БелИСА:</span> -->
                   <app-dropdown
                     [options]="gkntDepartments" 
                     [resetEnabled]="false"

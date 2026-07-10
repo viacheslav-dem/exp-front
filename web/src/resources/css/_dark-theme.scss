@@ -407,25 +407,26 @@
     color: var(--dark-info-text);
   }
 
-  // Notification backgrounds
+  // Notification backgrounds. !important — см. пояснение у одноимённых правил
+  // в _common.scss: та же коллизия специфичности с .alert-light возможна и здесь.
   .card.INFORMATION_BACKGROUND,
   .alert.INFORMATION_BACKGROUND {
-    background-color: var(--dark-info-bg);
+    background-color: var(--dark-info-bg) !important;
   }
 
   .card.EMPTY_BACKGROUND,
   .alert.EMPTY_BACKGROUND {
-    background-color: var(--dark-bg-card);
+    background-color: var(--dark-bg-card) !important;
   }
 
   .card.WARNING_BACKGROUND,
   .alert.WARNING_BACKGROUND {
-    background-color: var(--dark-warning-bg);
+    background-color: var(--dark-warning-bg) !important;
   }
 
   .card.IMPORTANT_BACKGROUND,
   .alert.IMPORTANT_BACKGROUND {
-    background-color: var(--dark-danger-bg);
+    background-color: var(--dark-danger-bg) !important;
   }
 
   // --- Transition history colors (softer in dark mode) ---

@@ -26,6 +26,7 @@ import {RootPageComponent} from "@app/components/root-page/root-page.component";
 import {SubOrgListComponent} from "@app/components/sub-org-list/sub-org-list.component";
 import {NotificationComponent} from "@app/components/notification/notification.component";
 import {SystemNotificationComponent} from "@app/components/system-notification/system-notification.component";
+import {MaintenanceWindowComponent} from "@app/components/maintenance-window/maintenance-window.component";
 import {InfoComponent} from "@app/base/info/info.component";
 import {LogoComponent} from "@app/base/logo/logo.component";
 import {CallbackComponent} from "@app/components/callback/callback.component";
@@ -75,6 +76,7 @@ export const appRoutes: Routes = [
       {path: 'sub-org', component: SubOrgListComponent},
       {path: 'notification', component: NotificationComponent},
       {path: 'system-notification', component: SystemNotificationComponent},
+      {path: 'maintenance-window', component: MaintenanceWindowComponent},
       {path: 'confirm-manual', component: ConfirmManualSelectionComponent},
       {path: 'methodical-recommendations', component: MethodicalRecommendationsComponent},
       DataManagementRoutes,

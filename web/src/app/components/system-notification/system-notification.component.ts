@@ -64,7 +64,11 @@ export class SystemNotificationComponent {
                 this.displayedNotificationStyleClass.set(styleClass);
             },
             error: () => {
-                this.notification.update(n => ({ ...n, message: '' }));
+                // Запись для этого имени ещё не создана в БД — сбрасываем ВСЮ модель
+                // (а не только message), иначе enabled/type/id остаются от предыдущего
+                // выбранного уведомления и сохранение может уйти не туда.
+                this.notification.set({ ...new SystemNotificationDto(), name: nameKey });
+                this.selectedNotificationType.set(SystemNotificationTypes.EMPTY_BACKGROUND);
             },
         });
     }

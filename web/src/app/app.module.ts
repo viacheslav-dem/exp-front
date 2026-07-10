@@ -89,6 +89,8 @@ import {ChartService} from "@app/services/chart.service";
 import { NotificationComponent } from './components/notification/notification.component';
 import {SystemNotificationComponent} from "@app/components/system-notification/system-notification.component";
 import {SystemNotificationService} from "@app/services/system-notification.service";
+import {MaintenanceWindowComponent} from "@app/components/maintenance-window/maintenance-window.component";
+import {MaintenanceWindowService} from "@app/services/maintenance-window.service";
 import {ErrorInterceptor} from "@app/http-interceptors/error-interceptor";
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { defineLocale } from 'ngx-bootstrap/chronos';
@@ -163,6 +165,7 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         RemarkResponseComponent,
         NotificationComponent,
         SystemNotificationComponent,
+        MaintenanceWindowComponent,
         BackToTopComponent
     ],
     bootstrap: [
@@ -214,6 +217,7 @@ registerLocaleData(localeRu, 'ru', localeRuExtra);
         AgendaService,
         ChartService,
         SystemNotificationService,
+        MaintenanceWindowService,
         provideHttpClient(withInterceptorsFromDi())
     ] })
 export class AppModule {

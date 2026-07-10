@@ -11,10 +11,10 @@ export class ProjectStatePipe extends AbstractEnumPipe<ProjectState> {
     this.map[ProjectState.ROUGH] = 'Черновик';
     this.map[ProjectState.FOR_APPROVAL] = 'На утверждении';
     this.map[ProjectState.NEW] = 'Новый';
-    this.map[ProjectState.ON_CHECKING] = 'В отделе БелИса';
-    // this.map[ProjectState.ON_CHECKING] = 'В подразделении ГКНТ';
-    this.map[ProjectState.ON_DEPARTMENT_SIGNING] = 'На подписи в отделе БелИса';
-    // this.map[ProjectState.ON_DEPARTMENT_SIGNING] = 'На подписи в подразделении ГКНТ';
+    //this.map[ProjectState.ON_CHECKING] = 'В отделе БелИса';
+     this.map[ProjectState.ON_CHECKING] = 'В подразделении ГКНТ';
+    //this.map[ProjectState.ON_DEPARTMENT_SIGNING] = 'На подписи в отделе БелИса';
+     this.map[ProjectState.ON_DEPARTMENT_SIGNING] = 'На подписи в подразделении ГКНТ';
     this.map[ProjectState.ON_SIGNING] = 'На визировании';
     this.map[ProjectState.ON_EXPERT_EXAMINATION] = 'На экспертной оценке';
     this.map[ProjectState.ON_EXAMINATION] = 'На экспертизе';

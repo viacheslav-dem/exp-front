@@ -1,0 +1,84 @@
+<div class="card maintenance-window-card mx-3 pb-3 pt-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">
+      <fa-icon icon="exclamation-triangle" class="me-2 maintenance-header-icon"></fa-icon>
+      Технические работы
+    </h5>
+    <span class="badge maintenance-status-badge"
+      [class.maintenance-status-badge--on]="maintenanceWindow().enabled"
+      [class.maintenance-status-badge--off]="!maintenanceWindow().enabled">
+      <fa-icon [icon]="maintenanceWindow().enabled ? 'check' : 'times'" class="me-1"></fa-icon>
+      {{ maintenanceWindow().enabled ? 'Ограничение включено' : 'Ограничение выключено' }}
+    </span>
+  </div>
+
+  <div [loadingData]="isLoading()">
+    <div class="form-sub-group">
+      <label>Ограничение входа на период технических работ: </label>
+      <app-boolean-button
+        [ngModel]="maintenanceWindow().enabled"
+        (ngModelChange)="onEnabledChange($event)"
+        [falseLabel]="'выключено'"
+        [trueLabel]="'включено'"
+        class="space-between-button">
+      </app-boolean-button>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6 form-sub-group">
+        <label><fa-icon icon="calendar" class="me-1 text-muted"></fa-icon> Начало работ</label>
+        <input type="datetime-local"
+          [ngModel]="startAtInput()"
+          (ngModelChange)="onStartAtInputChange($event)"
+          class="form-control">
+      </div>
+
+      <div class="col-md-6 form-sub-group">
+        <label><fa-icon icon="calendar" class="me-1 text-muted"></fa-icon> Окончание работ</label>
+        <input type="datetime-local"
+          [ngModel]="endAtInput()"
+          (ngModelChange)="onEndAtInputChange($event)"
+          class="form-control">
+      </div>
+    </div>
+
+    <div class="form-sub-group">
+      <label>Текст сообщения пользователям:</label>
+      <textarea
+        [ngModel]="maintenanceWindow().message"
+        (ngModelChange)="onMessageChange($event)"
+        rows="3"
+        class="form-control mt-05"
+        placeholder="Введите текст сообщения">
+      </textarea>
+    </div>
+
+    @if (maintenanceWindow().enabled) {
+      <div class="alert IMPORTANT_BACKGROUND maintenance-alert mb-3">
+        <fa-icon icon="exclamation-triangle" class="me-2"></fa-icon>
+        На указанный период вход в систему будет доступен <strong>только пользователям с ролью «Администратор»</strong>.
+        Остальные пользователи при попытке входа увидят текст сообщения, указанный выше.
+      </div>
+    } @else {
+      <div class="text-sm text-muted mb-3">
+        <fa-icon icon="info-circle" class="me-1"></fa-icon>
+        Пока ограничение выключено, вход в систему доступен всем пользователям как обычно.
+      </div>
+    }
+
+    <div class="text-sm text-muted mb-3">
+      <fa-icon icon="info-circle" class="me-1"></fa-icon>
+      Ограничение проверяется при входе и при обновлении токена сессии. Пользователи, уже находящиеся
+      в системе на момент включения, будут отключены не мгновенно, а в течение часа (срок жизни токена сессии).
+    </div>
+
+    <div class="mt-1">
+      <button class="btn btn-primary" [disabled]="isSaving()" (click)="save()">
+        @if (isSaving()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+        }
+        Сохранить
+      </button>
+    </div>
+  </div>
+</div>

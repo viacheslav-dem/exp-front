@@ -47,8 +47,8 @@ export class RootPageComponent implements OnInit {
     let catalogMenu = [
       {link: '/data-management/councils', title: 'ГЭС'},
       {link: '/data-management/orgs', title: 'Организации'},
-      // {link: '/data-management/gknt-department', title: 'Подразделения ГКНТ'},
-      {link: '/data-management/gknt-department', title: 'Отделы БелИСА'},
+      {link: '/data-management/gknt-department', title: 'Подразделения ГКНТ'},
+      //{link: '/data-management/gknt-department', title: 'Отделы БелИСА'},
       {link: '/data-management/project-codes', title: 'Коды объектов экспертизы'},
       {link: '/data-management/industries', title: 'Виды деятельности'},
       {link: '/data-management/areas', title: 'Области компетенции'},
@@ -76,7 +76,8 @@ export class RootPageComponent implements OnInit {
     ];
     let notificationMenu = [
       {link: '/notification', title: 'Уведомление на почту'},
-      {link: '/system-notification', title: 'Системное оповещение'}
+      {link: '/system-notification', title: 'Системное оповещение'},
+      {link: '/maintenance-window', title: 'Технические работы'}
     ];
 
     switch (role) {

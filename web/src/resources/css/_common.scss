@@ -602,22 +602,26 @@ span.badge.bg-primary,
   margin-left: 10px;
 }
 
-// Фон по типу оповещения: специфичность выше .card и .alert, чтобы перекрывать их background
+// Фон по типу оповещения. !important обязателен: на странице логина этот же элемент
+// несёт класс .alert-light, а бутстраповское .alert.alert-light компилируется ПОСЛЕ
+// этих правил с той же специфичностью (0,2,0) и без !important побеждает по порядку
+// в каскаде — фон остаётся светло-серым вместо заданного цвета.
 .card.INFORMATION_BACKGROUND,
 .alert.INFORMATION_BACKGROUND {
-  background-color: #a3d9ff;
+  background-color: #a3d9ff !important;
 }
 .card.EMPTY_BACKGROUND,
 .alert.EMPTY_BACKGROUND {
-  background-color: #fff;
+  background-color: #fff !important;
 }
 .card.WARNING_BACKGROUND,
 .alert.WARNING_BACKGROUND {
-  background-color: #ffef98;
+  background-color: #ffef98 !important;
 }
 .card.IMPORTANT_BACKGROUND,
 .alert.IMPORTANT_BACKGROUND {
-  background-color: #f8d7da;
+  // Насыщеннее прежнего #f8d7da, но контраст с чёрным текстом ~9.3:1 (выше порога AAA 7:1)
+  background-color: #f1948a !important;
 }
 
 .program-version {
